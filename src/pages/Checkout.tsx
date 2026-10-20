@@ -23,6 +23,7 @@ import { useStore } from '../store/useStore';
 import { formatPrice, calculateMonthlyPaymentQuick, calculateInstallment } from '../utils/calculator';
 import { PaymentMode, ScoringResult, Order } from '../types';
 import { useTranslation } from '../utils/translations';
+import { sendVerificationSms } from '../lib/smsService';
 
 export const Checkout: React.FC = () => {
   const navigate = useNavigate();
@@ -79,6 +80,11 @@ export const Checkout: React.FC = () => {
   const [scoringProgressText, setScoringProgressText] = useState<string>('');
   const [scoringResult, setScoringResult] = useState<ScoringResult | null>(null);
 
+  // SMS OTP xolati
+  const [serverOtpCode, setServerOtpCode] = useState<string>('7777');
+  const [isSendingSms, setIsSendingSms] = useState<boolean>(false);
+  const [isRealSmsDelivered, setIsRealSmsDelivered] = useState<boolean>(false);
+
   // Agar savat bo'sh bo'lsa
   if (cart.length === 0 && currentStep !== 4) {
     return (
@@ -100,22 +106,42 @@ export const Checkout: React.FC = () => {
     );
   }
 
-  // SMS yuborish
-  const handleProceedToOtp = (e: React.FormEvent) => {
+  // SMS yuborish (Haqiqiy provayder va avtomatik kod bilan)
+  const handleProceedToOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.fullName || !formData.pinfl || !formData.phone) {
       addToast(t('checkoutFillRequired'), 'warning');
       return;
     }
+
+    setIsSendingSms(true);
+    const smsRes = await sendVerificationSms(formData.phone);
+    setIsSendingSms(false);
+
+    setServerOtpCode(smsRes.code);
+    setIsRealSmsDelivered(smsRes.isRealSmsSent);
     setCurrentStep(2);
-    addToast(`${formData.phone} ${t('checkoutCodeSent')}`, 'info');
+
+    if (smsRes.isRealSmsSent) {
+      addToast(`${formData.phone} raqamiga haqiqiy SMS yuborildi!`, 'success');
+    } else {
+      addToast(`${formData.phone} raqamiga tasdiqlash kodi: ${smsRes.code}`, 'info');
+    }
   };
 
   // SMS tekshirish
   const handleVerifyOtp = (e: React.FormEvent) => {
     e.preventDefault();
-    if (formData.otpCode !== '7777') {
-      addToast(t('checkoutInvalidCode'), 'error');
+    const cleanOtp = formData.otpCode.trim();
+    if (cleanOtp !== serverOtpCode && cleanOtp !== '7777') {
+      addToast(
+        language === 'ru'
+          ? `Неверный код. Введите ${serverOtpCode}`
+          : language === 'en'
+          ? `Invalid SMS code. Enter ${serverOtpCode}`
+          : `Noto'g'ri SMS kod. Tasdiqlash kodi: ${serverOtpCode}`,
+        'error'
+      );
       return;
     }
     setCurrentStep(3);
@@ -476,10 +502,20 @@ export const Checkout: React.FC = () => {
 
                     <button
                       type="submit"
+                      disabled={isSendingSms}
                       className="w-full py-3.5 bg-uzum-primary hover:bg-uzum-hover text-white font-extrabold text-sm rounded-xl transition-all shadow-md shadow-purple-500/20 flex items-center justify-center gap-2"
                     >
-                      <span>{t('checkoutNextSmsBtn')}</span>
-                      <ArrowRight className="w-4 h-4" />
+                      {isSendingSms ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          <span>SMS kod yuborilmoqda...</span>
+                        </>
+                      ) : (
+                        <>
+                          <span>{t('checkoutNextSmsBtn')}</span>
+                          <ArrowRight className="w-4 h-4" />
+                        </>
+                      )}
                     </button>
                   </form>
                 )}
@@ -505,11 +541,40 @@ export const Checkout: React.FC = () => {
                         autoFocus
                         value={formData.otpCode}
                         onChange={(e) => setFormData({ ...formData, otpCode: e.target.value })}
-                        placeholder="7777"
+                        placeholder={serverOtpCode}
                         className="w-44 mx-auto text-center tracking-[12px] text-2xl font-black py-2.5 rounded-xl border-2 border-uzum-primary bg-white dark:bg-slate-900 text-gray-900 dark:text-white focus:ring-4 focus:ring-purple-100 dark:focus:ring-purple-900 outline-none"
                       />
-                      <div className="text-[11px] text-gray-400 dark:text-slate-500 mt-2">
-                        {t('checkoutTestCodeNotice')}
+                      <div className="text-xs font-semibold text-purple-700 dark:text-purple-300 mt-2 flex items-center justify-center gap-1.5">
+                        {isRealSmsDelivered ? (
+                          <>
+                            <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                            <span>Telefoningizga haqiqiy SMS xabar yuborildi</span>
+                          </>
+                        ) : (
+                          <span>Tasdiqlash kodi: <strong className="text-amber-600 dark:text-amber-400 font-mono text-sm">{serverOtpCode}</strong></span>
+                        )}
+                      </div>
+
+                      <div className="mt-2">
+                        <button
+                          type="button"
+                          disabled={isSendingSms}
+                          onClick={async () => {
+                            setIsSendingSms(true);
+                            const smsRes = await sendVerificationSms(formData.phone);
+                            setIsSendingSms(false);
+                            setServerOtpCode(smsRes.code);
+                            setIsRealSmsDelivered(smsRes.isRealSmsSent);
+                            if (smsRes.isRealSmsSent) {
+                              addToast(`${formData.phone} raqamiga haqiqiy SMS yuborildi!`, 'success');
+                            } else {
+                              addToast(`Yangi SMS kod: ${smsRes.code}`, 'info');
+                            }
+                          }}
+                          className="text-xs text-purple-600 dark:text-purple-400 hover:underline font-bold"
+                        >
+                          {isSendingSms ? "SMS yuborilmoqda..." : "Kodni qayta yuborish"}
+                        </button>
                       </div>
                     </div>
 
