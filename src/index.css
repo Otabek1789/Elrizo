@@ -119,3 +119,14 @@ html.dark ::-webkit-scrollbar-thumb:hover {
 .admin-bell-btn:hover .admin-bell-icon {
   animation: bell-ring 0.6s ease-in-out;
 }
+
+/* Chrome, Edge, Safari brauzerlaridagi autofill ko'k fonini global yo'q qilish */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active {
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: inherit !important;
+  transition: background-color 5000000s ease-in-out 0s !important;
+  box-shadow: inset 0 0 20px 20px transparent !important;
+}

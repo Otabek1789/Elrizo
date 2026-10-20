@@ -81,7 +81,8 @@
 }
 
 .auth-103-input-field input {
-    background: none;
+    background: transparent !important;
+    background-color: transparent !important;
     outline: none;
     border: none;
     line-height: 1;
@@ -90,6 +91,31 @@
     color: #1f2937;
     width: 100%;
     margin-left: 0.75rem;
+    border-radius: 54px;
+}
+
+/* Chrome, Edge, Safari brauzerlaridagi autofill ko'k to'rtburchak fonini butunlay yo'q qilish */
+.auth-103-input-field input:-webkit-autofill,
+.auth-103-input-field input:-webkit-autofill:hover,
+.auth-103-input-field input:-webkit-autofill:focus,
+.auth-103-input-field input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 1000px #f3f4f6 inset !important;
+    box-shadow: 0 0 0 1000px #f3f4f6 inset !important;
+    -webkit-text-fill-color: #1f2937 !important;
+    caret-color: #1f2937 !important;
+    transition: background-color 5000000s ease-in-out 0s !important;
+    background-color: transparent !important;
+    border-radius: 54px;
+}
+
+.auth-103-input-field:focus-within input:-webkit-autofill,
+.auth-103-input-field:focus-within input:-webkit-autofill:hover,
+.auth-103-input-field:focus-within input:-webkit-autofill:focus,
+.auth-103-input-field:focus-within input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 1000px #ffffff inset !important;
+    box-shadow: 0 0 0 1000px #ffffff inset !important;
+    -webkit-text-fill-color: #1f2937 !important;
+    caret-color: #1f2937 !important;
 }
 
 .auth-103-input-field input::placeholder {
