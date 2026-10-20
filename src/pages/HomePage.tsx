@@ -11,39 +11,17 @@ import {
   Clock, 
   Percent,
   SlidersHorizontal,
-  ArrowRight,
-  Tag,
-  Copy,
-  Check
+  ArrowRight
 } from 'lucide-react';
 import { BannerSlider } from '../components/BannerSlider';
 import { CategoryList } from '../components/CategoryList';
 import { ProductCard } from '../components/ProductCard';
 import { useStore } from '../store/useStore';
 import { useTranslation } from '../utils/translations';
-import { formatPrice } from '../utils/calculator';
 
 export const HomePage: React.FC = () => {
-  const { products, promoCodes, applyPromoCode, openCart, addToast } = useStore();
+  const { products } = useStore();
   const { t, language } = useTranslation();
-  const [copiedCode, setCopiedCode] = React.useState<string | null>(null);
-
-  const handleCopyCode = (code: string) => {
-    navigator.clipboard?.writeText(code);
-    setCopiedCode(code);
-    addToast(`${code} ${language === 'ru' ? 'промокод скопирован!' : language === 'en' ? 'promo code copied!' : 'promokodi nusxalandi!'}`, 'success');
-    setTimeout(() => setCopiedCode(null), 2500);
-  };
-
-  const handleApplyDirect = (code: string) => {
-    const res = applyPromoCode(code);
-    if (res.success) {
-      addToast(res.message || `${code} promokodi qo'llandi!`, 'success');
-      openCart();
-    } else {
-      addToast(res.message || 'Xatolik', 'error');
-    }
-  };
 
   const weeklyOffers = products.filter((p) => p.isWeeklyOffer);
   const zeroDownProducts = products.filter((p) => p.hasZeroDown);
@@ -119,93 +97,6 @@ export const HomePage: React.FC = () => {
           </motion.div>
         ))}
       </div>
-
-      {/* 3.5. ELRIZO Rasmiy Chegirma Promokodlari Bloki */}
-      <section className="bg-gradient-to-r from-purple-900 via-indigo-900 to-purple-950 text-white rounded-3xl p-5 sm:p-7 shadow-xl relative overflow-hidden">
-        {/* Background ambient lighting */}
-        <div className="absolute -top-12 -right-12 w-48 h-48 bg-purple-500/20 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-12 -left-12 w-48 h-48 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none" />
-
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-          <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <span className="p-1.5 rounded-xl bg-white/10 backdrop-blur-md text-amber-300">
-                <Tag className="w-4 h-4" />
-              </span>
-              <span className="text-[11px] font-black uppercase tracking-widest text-amber-300">
-                {language === 'ru' ? 'Специальные купоны' : language === 'en' ? 'Special Coupons' : 'Maxsus Aksiya Kuponlari'}
-              </span>
-            </div>
-            <h2 className="text-xl sm:text-2xl font-black tracking-tight text-white">
-              {language === 'ru' ? 'Активируйте промокод и экономьте до 20%' : language === 'en' ? 'Apply promo codes and save up to 20%' : "Promokodni faollashtiring va 20% gacha tejang!"}
-            </h2>
-            <p className="text-xs sm:text-sm text-purple-200/90 max-w-xl">
-              {language === 'ru' ? 'Скопируйте нужный промокод в один клик и примените его в корзине или при оформлении заказа.' : language === 'en' ? 'Copy your preferred promo code with one click and apply it in your cart or checkout.' : "Bir marta bosish bilan promokodni nusxalang va savatchada yoki buyurtma berishda darhol chegirmaga ega bo'ling."}
-            </p>
-          </div>
-        </div>
-
-        {/* Promokodlar gridi */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 relative z-10">
-          {promoCodes.filter(p => p.isActive).map((promo) => {
-            const isCopied = copiedCode === promo.code;
-            const discountLabel = promo.discountType === 'percentage' 
-              ? `-${promo.discountValue}%` 
-              : `-${formatPrice(promo.discountValue, false, language)} so'm`;
-
-            return (
-              <motion.div
-                key={promo.id}
-                whileHover={{ y: -4, scale: 1.02 }}
-                transition={{ type: 'spring', stiffness: 350, damping: 22 }}
-                className="bg-white/10 hover:bg-white/15 backdrop-blur-md border border-white/15 rounded-2xl p-4 flex flex-col justify-between space-y-3 transition-all"
-              >
-                <div>
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="text-lg font-black tracking-widest font-mono text-amber-300">
-                      {promo.code}
-                    </span>
-                    <span className="px-2 py-0.5 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-xs font-black">
-                      {discountLabel}
-                    </span>
-                  </div>
-                  <p className="text-xs text-purple-100/80 mt-1.5 leading-relaxed line-clamp-2">
-                    {promo.description}
-                  </p>
-                </div>
-
-                <div className="pt-2 border-t border-white/10 flex items-center gap-2">
-                  <button
-                    onClick={() => handleCopyCode(promo.code)}
-                    className="flex-1 py-1.5 px-2.5 rounded-xl bg-white/15 hover:bg-white/25 text-white text-xs font-bold transition-all flex items-center justify-center gap-1.5 active:scale-95"
-                    title="Nusxa olish"
-                  >
-                    {isCopied ? (
-                      <>
-                        <Check className="w-3.5 h-3.5 text-emerald-400" />
-                        <span className="text-emerald-300 font-black">{language === 'ru' ? 'Скопировано!' : language === 'en' ? 'Copied!' : 'Nusxalandi!'}</span>
-                      </>
-                    ) : (
-                      <>
-                        <Copy className="w-3.5 h-3.5" />
-                        <span>{language === 'ru' ? 'Копировать' : language === 'en' ? 'Copy' : 'Nusxalash'}</span>
-                      </>
-                    )}
-                  </button>
-
-                  <button
-                    onClick={() => handleApplyDirect(promo.code)}
-                    className="py-1.5 px-3 rounded-xl bg-amber-400 hover:bg-amber-300 text-purple-950 text-xs font-black transition-all shadow-md active:scale-95 shrink-0"
-                    title="Savatda qo'llash"
-                  >
-                    {language === 'ru' ? 'В корзину' : language === 'en' ? 'Apply' : "Qo'llash"}
-                  </button>
-                </div>
-              </motion.div>
-            );
-          })}
-        </div>
-      </section>
 
       {/* 4. Hafta Takliflari (Hot Weekly Offers) */}
       {weeklyOffers.length > 0 && (
