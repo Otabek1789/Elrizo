@@ -219,14 +219,7 @@ export const useStore = create<StoreState>()(
       },
 
       // Cart
-      cart: [
-        {
-          product: PRODUCTS[0],
-          quantity: 1,
-          selectedInstallmentMonths: 12,
-          purchaseType: 'installment',
-        },
-      ],
+      cart: [],
       isCartOpen: false,
       openCart: () => set({ isCartOpen: true }),
       closeCart: () => set({ isCartOpen: false }),
@@ -403,7 +396,7 @@ export const useStore = create<StoreState>()(
       },
 
       // Favorites
-      favorites: ['prod-001', 'prod-003'],
+      favorites: [],
       toggleFavorite: (productId) => {
         set((state) => {
           const exists = state.favorites.includes(productId);
@@ -621,7 +614,7 @@ export const useStore = create<StoreState>()(
       t: (key: TranslationKey) => getTranslation(get().language, key),
     }),
     {
-      name: 'elrizo_nasiya_storage', // LocalStorage kaliti
+      name: 'elrizo_store_v2', // LocalStorage kaliti (0 dan bo'sh boshlash uchun)
       storage: createJSONStorage(() => localStorage),
       onRehydrateStorage: () => (state) => {
         if (state && typeof document !== 'undefined') {
