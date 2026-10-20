@@ -7,8 +7,8 @@ export const INITIAL_USER: User = {
   phone: '+998 90 123 45 67',
   passportOrPinfl: '31204956780012',
   isVerified: true,
-  scoringLimit: 18000000, // 18 mln so'm
-  usedLimit: 4500000,
+  scoringLimit: 0,
+  usedLimit: 0,
   avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
   isAdmin: false,
 };

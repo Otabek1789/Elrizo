@@ -50,7 +50,7 @@ export const App: React.FC = () => {
             email: email,
             phone: session.user.phone || meta.phone || '+998 90 123 45 67',
             isVerified: true,
-            scoringLimit: isAdmin ? 50000000 : 15000000,
+            scoringLimit: 0,
             usedLimit: 0,
             isAdmin,
             role: isAdmin ? 'admin' : 'user',

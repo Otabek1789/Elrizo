@@ -506,7 +506,7 @@ export const useStore = create<StoreState>()(
             email: cleanEmail,
             phone: '+998 90 777 00 00',
             isVerified: true,
-            scoringLimit: isAdmin ? 50000000 : 15000000,
+            scoringLimit: 0,
             usedLimit: 0,
             isAdmin,
             role: isAdmin ? 'admin' : 'user',
@@ -621,6 +621,10 @@ export const useStore = create<StoreState>()(
           try {
             localStorage.removeItem('elrizo_nasiya_storage');
           } catch (e) {}
+        }
+        if (state?.user) {
+          state.user.scoringLimit = 0;
+          state.user.usedLimit = 0;
         }
         if (state && typeof document !== 'undefined') {
           if (state.theme === 'dark') {

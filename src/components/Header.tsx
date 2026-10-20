@@ -581,7 +581,7 @@ export const Header: React.FC = () => {
                     <Crown className="w-3 h-3 text-amber-500" />
                     <span>Admin</span>
                   </>
-                ) : (user ? `${t('nasiyaLimit')} ${Math.round((user.scoringLimit - user.usedLimit) / 1000000)} ${t('mln')}` : t('installment'))}
+                ) : (user && user.scoringLimit > 0 ? `${t('nasiyaLimit')} ${Math.round((user.scoringLimit - user.usedLimit) / 1000000)} ${t('mln')}` : t('installment'))}
               </span>
             </div>
           </motion.button>
