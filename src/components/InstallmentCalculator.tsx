@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   Calculator, 
   Calendar, 
@@ -30,7 +31,8 @@ export const InstallmentCalculator: React.FC<InstallmentCalculatorProps> = ({
   onClose,
   onSelectPlan,
 }) => {
-  const { addToCart, setActivePage } = useStore();
+  const navigate = useNavigate();
+  const { addToCart, setActivePage, user, openLoginRequiredModal } = useStore();
   const { t, language } = useTranslation();
 
   const [selectedMonths, setSelectedMonths] = useState<3 | 6 | 12 | 24>(12);
@@ -48,6 +50,13 @@ export const InstallmentCalculator: React.FC<InstallmentCalculatorProps> = ({
   }, [product.price, selectedMonths, downPaymentAmount]);
 
   const handleApplyOrder = () => {
+    if (!user) {
+      if (onClose) {
+        onClose();
+      }
+      openLoginRequiredModal();
+      return;
+    }
     addToCart(product, selectedMonths, 'installment');
     if (onSelectPlan) {
       onSelectPlan(selectedMonths, downPaymentAmount);
@@ -55,7 +64,7 @@ export const InstallmentCalculator: React.FC<InstallmentCalculatorProps> = ({
     if (onClose) {
       onClose();
     }
-    setActivePage('checkout');
+    navigate('/checkout');
   };
 
   const content = (

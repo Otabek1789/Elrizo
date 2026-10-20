@@ -407,6 +407,12 @@ export const TRANSLATIONS = {
     promoMinOrderToast: "Ushbu promokod faqat minimal buyurtma uchun amal qiladi:",
     availablePromosHint: "Mavjud promokodlar:",
     promoAppliedBadge: "chegirma taqdim etildi",
+
+    // Login Required Modal
+    loginRequiredTitle: "Akkauntga kirish talab etiladi",
+    loginRequiredDesc: "Akkauntga kirmasdan tovarlarni sotib olib bo'lmaydi. Savatga yoki sevimlilarga qo'shish hamda buyurtma berish uchun avval profilingizga kiring.",
+    loginBtn: "Kirish",
+    backLinkBtn: "Ortga",
   },
   ru: {
     // Header & Navigation
@@ -810,6 +816,12 @@ export const TRANSLATIONS = {
     promoMinOrderToast: "Этот промокод действует при минимальной сумме заказа:",
     availablePromosHint: "Доступные промокоды:",
     promoAppliedBadge: "скидка предоставлена",
+
+    // Login Required Modal
+    loginRequiredTitle: "Требуется вход в аккаунт",
+    loginRequiredDesc: "Без входа в аккаунт покупка товаров невозможна. Чтобы добавить товар в корзину, избранное или оформить заказ, пожалуйста, войдите в свой профиль.",
+    loginBtn: "Войти",
+    backLinkBtn: "Назад",
   },
   en: {
     // Header & Navigation
@@ -1213,6 +1225,12 @@ export const TRANSLATIONS = {
     promoMinOrderToast: "This promo code requires a minimum order amount of:",
     availablePromosHint: "Available promo codes:",
     promoAppliedBadge: "discount applied",
+
+    // Login Required Modal
+    loginRequiredTitle: "Account Login Required",
+    loginRequiredDesc: "You cannot purchase products without logging in. To add items to your cart, favorites, or place an order, please sign in to your profile.",
+    loginBtn: "Sign In",
+    backLinkBtn: "Back",
   }
 } as const;
 

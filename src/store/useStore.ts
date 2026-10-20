@@ -66,6 +66,9 @@ interface StoreState {
   isAuthOpen: boolean;
   openAuth: () => void;
   closeAuth: () => void;
+  isLoginRequiredModalOpen: boolean;
+  openLoginRequiredModal: () => void;
+  closeLoginRequiredModal: () => void;
   loginWithEmail: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   logoutUser: () => void;
 
@@ -225,6 +228,11 @@ export const useStore = create<StoreState>()(
       closeCart: () => set({ isCartOpen: false }),
 
       addToCart: (product, months = 12, purchaseType = 'installment') => {
+        if (!get().user) {
+          set({ isLoginRequiredModalOpen: true });
+          return;
+        }
+
         set((state) => {
           const existingIndex = state.cart.findIndex((item) => item.product.id === product.id);
           let updatedCart: CartItem[];
@@ -398,6 +406,11 @@ export const useStore = create<StoreState>()(
       // Favorites
       favorites: [],
       toggleFavorite: (productId) => {
+        if (!get().user) {
+          set({ isLoginRequiredModalOpen: true });
+          return;
+        }
+
         set((state) => {
           const exists = state.favorites.includes(productId);
           const updated = exists
@@ -493,6 +506,9 @@ export const useStore = create<StoreState>()(
       isAuthOpen: false,
       openAuth: () => set({ isAuthOpen: true }),
       closeAuth: () => set({ isAuthOpen: false }),
+      isLoginRequiredModalOpen: false,
+      openLoginRequiredModal: () => set({ isLoginRequiredModalOpen: true }),
+      closeLoginRequiredModal: () => set({ isLoginRequiredModalOpen: false }),
 
       loginWithEmail: async (email: string, password: string) => {
         const cleanEmail = email.trim().toLowerCase();

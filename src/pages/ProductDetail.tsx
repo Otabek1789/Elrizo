@@ -34,6 +34,8 @@ export const ProductDetail: React.FC = () => {
     isFavorite,
     addToCart,
     addToast,
+    user,
+    openLoginRequiredModal,
   } = useStore();
   const { t, language } = useTranslation();
 
@@ -51,6 +53,10 @@ export const ProductDetail: React.FC = () => {
     .slice(0, 4);
 
   const handleAddToCart = () => {
+    if (!user) {
+      openLoginRequiredModal();
+      return;
+    }
     for (let i = 0; i < quantity; i++) {
       addToCart(product, 12, 'full');
     }
@@ -245,6 +251,10 @@ export const ProductDetail: React.FC = () => {
               <button
                 id="detail-btn-installment"
                 onClick={() => {
+                  if (!user) {
+                    openLoginRequiredModal();
+                    return;
+                  }
                   addToCart(product, 12, 'installment');
                   navigate('/checkout');
                 }}

@@ -11,6 +11,7 @@ import { AdminPanel } from './pages/AdminPanel';
 import { LoginPage } from './pages/LoginPage';
 import { CartDrawer } from './components/CartDrawer';
 import { AuthModal } from './components/AuthModal';
+import { LoginRequiredModal } from './components/LoginRequiredModal';
 import { InstallmentCalculator } from './components/InstallmentCalculator';
 import { Footer } from './components/Footer';
 import { ScrollProgressBar, ScrollToTopButton } from './components/ScrollFeatures';
@@ -135,6 +136,7 @@ export const App: React.FC = () => {
       {/* 6. Global Modallar & Mini-Drawerlar */}
       <CartDrawer />
       <AuthModal />
+      <LoginRequiredModal />
 
       {/* 7. Global Tezkor Nasiya Kalkulyatori Modali */}
       {isCalculatorOpen && calculatorProduct && (

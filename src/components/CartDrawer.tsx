@@ -22,6 +22,8 @@ export const CartDrawer: React.FC = () => {
     getDiscountAmount,
     getFinalTotal,
     getFinalMonthlyTotal,
+    user,
+    openLoginRequiredModal,
   } = useStore();
   const { t, language } = useTranslation();
 
@@ -42,6 +44,11 @@ export const CartDrawer: React.FC = () => {
   };
 
   const handleCheckout = () => {
+    if (!user) {
+      closeCart();
+      openLoginRequiredModal();
+      return;
+    }
     closeCart();
     navigate('/checkout');
   };

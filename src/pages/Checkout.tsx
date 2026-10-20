@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { 
   CreditCard, 
@@ -42,8 +42,17 @@ export const Checkout: React.FC = () => {
     getDiscountAmount,
     getFinalTotal,
     getFinalMonthlyTotal,
+    openLoginRequiredModal,
   } = useStore();
   const { t, language } = useTranslation();
+
+  // Akkauntga kirmagan bo'lsa, xarid qilishga ruxsat bermaslik
+  useEffect(() => {
+    if (!user) {
+      openLoginRequiredModal();
+      navigate('/');
+    }
+  }, [user, navigate, openLoginRequiredModal]);
 
   const totalAmount = getCartTotal();
   const monthlyTotal = getCartMonthlyTotal();
