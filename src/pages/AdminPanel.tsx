@@ -409,12 +409,12 @@ export const AdminPanel: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-[#F8F9FA] dark:bg-[#0B0F19] text-gray-900 dark:text-gray-100 flex overflow-hidden selection:bg-purple-200 selection:text-purple-900">
+    <div className="h-full w-full bg-[#F8F9FA] dark:bg-[#0B0F19] text-gray-900 dark:text-gray-100 flex overflow-hidden selection:bg-purple-200 selection:text-purple-900">
       {/* 1. PROFESSIONAL ENTERPRISE COLLAPSIBLE SIDEBAR */}
       <motion.aside
         animate={{ width: isSidebarCollapsed ? 80 : 280 }}
         transition={{ type: 'spring', stiffness: 300, damping: 28 }}
-        className="bg-white dark:bg-slate-800 border-r border-gray-200 dark:border-slate-800 flex flex-col h-screen sticky top-0 shrink-0 relative z-30 shadow-sm dark:shadow-2xl transition-colors"
+        className="bg-white dark:bg-slate-800 border-r border-gray-200 dark:border-slate-800 flex flex-col h-full shrink-0 relative z-30 shadow-sm dark:shadow-2xl transition-colors"
       >
         {/* Sidebar Brand Header */}
         {isSidebarCollapsed ? (
@@ -617,7 +617,7 @@ export const AdminPanel: React.FC = () => {
       </motion.aside>
 
       {/* 2. MAIN CONTENT AREA */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-y-auto">
+      <div className="flex-1 flex flex-col min-w-0 h-full overflow-y-auto">
         {/* Top Navbar with Language and Theme Switcher */}
         <header className="bg-white/90 dark:bg-slate-800/80 backdrop-blur-md border-b border-gray-200 dark:border-slate-800 px-6 py-4 flex items-center justify-between sticky top-0 z-20 transition-colors">
           <div className="flex items-center gap-3">

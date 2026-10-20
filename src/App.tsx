@@ -105,15 +105,17 @@ export const App: React.FC = () => {
   const isAuthPage = location.pathname === '/login' || location.pathname === '/auth';
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#F8F9FA] dark:bg-[#0B0F19] text-gray-900 dark:text-gray-100 relative selection:bg-purple-200 selection:text-purple-900">
+    <div className={`flex flex-col bg-[#F8F9FA] dark:bg-[#0B0F19] text-gray-900 dark:text-gray-100 relative selection:bg-purple-200 selection:text-purple-900 ${
+      isAdminPage ? 'h-screen overflow-hidden' : 'min-h-screen'
+    }`}>
       {/* 1. Scroll Progress Bar (Sayt bo'ylab scroll animatsiyasi) */}
-      {!isAuthPage && <ScrollProgressBar />}
+      {!isAuthPage && !isAdminPage && <ScrollProgressBar />}
 
       {/* 2. Global Header (Admin panel yoki Login sahifasida bo'lmaganda) */}
       {!isAdminPage && !isAuthPage && <Header />}
 
       {/* 3. Main Dynamic Routes (Tezkor va qotishlarsiz o'tish) */}
-      <main className="flex-1">
+      <main className={isAdminPage ? "flex-1 h-full overflow-hidden" : "flex-1"}>
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/catalog" element={<CatalogPage />} />
@@ -132,7 +134,7 @@ export const App: React.FC = () => {
       {!isAdminPage && !isAuthPage && <Footer />}
 
       {/* 5. Suzuvchi Tepaga Qaytish Tugmasi (ScrollToTop) */}
-      <ScrollToTopButton />
+      {!isAdminPage && <ScrollToTopButton />}
 
       {/* 6. Global Modallar & Mini-Drawerlar */}
       <CartDrawer />
