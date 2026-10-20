@@ -248,7 +248,7 @@ export const AdminPanel: React.FC = () => {
 
   // Faqat otabek1789@gmail.com uchun xavfsizlik tekshiruvi (oraliq sahifalarsiz darhol yo'naltirish)
   if (!user || user.email?.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/login" replace />;
   }
 
   // Hisob-kitoblar
@@ -604,8 +604,8 @@ export const AdminPanel: React.FC = () => {
             whileHover={{ scale: 1.05, x: isSidebarCollapsed ? 0 : 3 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => {
-              navigate('/', { replace: true });
               logoutUser();
+              navigate('/login', { replace: true });
             }}
             className={`w-full flex items-center ${isSidebarCollapsed ? 'justify-center p-3' : 'gap-3 p-2.5'} text-xs font-bold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-xl transition-colors`}
             title={isSidebarCollapsed ? (language === 'ru' ? 'Выйти' : language === 'en' ? 'Log out' : 'Tizimdan chiqish') : undefined}
