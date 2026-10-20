@@ -20,6 +20,7 @@ import {
   ArrowRight
 } from 'lucide-react';
 import { ProductCard } from '../components/ProductCard';
+import { CustomSelect } from '../components/CustomSelect';
 import { useStore } from '../store/useStore';
 import { CATEGORIES } from '../data/mockData';
 import { formatPrice } from '../utils/calculator';
@@ -274,10 +275,28 @@ export const CatalogPage: React.FC = () => {
       {/* 2. Yuqori Saralash (Sort) va Ko'rinish (View) Paneli */}
       <div className="bg-white dark:bg-slate-800 p-3.5 rounded-2xl border border-gray-200 dark:border-slate-800 shadow-xs flex flex-wrap items-center justify-between gap-3 transition-colors">
         {/* Saralash (Sort) Tanlovi */}
-        <div className="flex items-center gap-2 flex-wrap text-xs">
+        {/* Mobile CustomSelect */}
+        <div className="w-full sm:hidden">
+          <CustomSelect
+            size="sm"
+            value={sortBy}
+            onChange={(val) => setSortBy(val as SortOption)}
+            options={[
+              { value: 'popular', label: t('sortPopular') },
+              { value: 'price_asc', label: t('sortPriceAsc') },
+              { value: 'price_desc', label: t('sortPriceDesc') },
+              { value: 'rating', label: t('sortRating') },
+              { value: 'discount', label: t('sortDiscount') },
+              { value: 'newest', label: t('sortNewest') },
+            ]}
+          />
+        </div>
+
+        {/* Desktop Sorting Pills */}
+        <div className="hidden sm:flex items-center gap-2 flex-wrap text-xs">
           <div className="flex items-center gap-1.5 text-gray-500 dark:text-gray-400 font-bold mr-1">
             <ArrowUpDown className="w-3.5 h-3.5 text-uzum-primary dark:text-purple-400" />
-            <span className="hidden sm:inline">{t('sorting')}</span>
+            <span>{t('sorting')}</span>
           </div>
 
           {[

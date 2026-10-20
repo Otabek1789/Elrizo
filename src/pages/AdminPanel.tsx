@@ -54,6 +54,7 @@ import { formatPrice } from '../utils/calculator';
 import { ADMIN_EMAIL } from '../lib/supabase';
 import { CATEGORIES } from '../data/mockData';
 import { Order, Product, PromoCode } from '../types';
+import { CustomSelect } from '../components/CustomSelect';
 
 interface RegionCoordinate {
   name: string;
@@ -1482,17 +1483,20 @@ export const AdminPanel: React.FC = () => {
                                 {ord.scoringScore || 795} {language === 'ru' ? 'баллов' : language === 'en' ? 'pts' : 'ball'}
                               </span>
                             </td>
-                            <td className="py-3 px-3" onClick={(e) => e.stopPropagation()}>
-                              <select
+                            <td className="py-3 px-3 min-w-[150px]" onClick={(e) => e.stopPropagation()}>
+                              <CustomSelect
+                                size="sm"
                                 value={ord.status}
-                                onChange={(e) => updateOrderStatus(ord.id, e.target.value as Order['status'])}
-                                className="text-[11px] font-bold py-1 px-2 rounded-lg border border-gray-200 dark:border-slate-600 outline-none bg-white dark:bg-slate-900 text-gray-800 dark:text-slate-200"
-                              >
-                                <option value="scoring_approved">{language === 'ru' ? 'Одобрено' : language === 'en' ? 'Approved' : 'Tasdiqlangan'}</option>
-                                <option value="processing">{language === 'ru' ? 'В обработке' : language === 'en' ? 'Processing' : 'Jarayonda'}</option>
-                                <option value="delivered">{language === 'ru' ? 'Доставлено' : language === 'en' ? 'Delivered' : 'Yetkazildi'}</option>
-                                <option value="pending">{language === 'ru' ? 'Ожидание' : language === 'en' ? 'Pending' : 'Kutilmoqda'}</option>
-                              </select>
+                                onChange={(val) => updateOrderStatus(ord.id, val as Order['status'])}
+                                buttonClassName="!py-1 !px-2.5 text-[11px] font-bold rounded-lg border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-xs"
+                                dropdownClassName="w-44 !z-50"
+                                options={[
+                                  { value: 'scoring_approved', label: language === 'ru' ? 'Одобрено' : language === 'en' ? 'Approved' : 'Tasdiqlangan', badge: 'Skoring' },
+                                  { value: 'processing', label: language === 'ru' ? 'В обработке' : language === 'en' ? 'Processing' : 'Jarayonda' },
+                                  { value: 'delivered', label: language === 'ru' ? 'Доставлено' : language === 'en' ? 'Delivered' : 'Yetkazildi' },
+                                  { value: 'pending', label: language === 'ru' ? 'Ожидание' : language === 'en' ? 'Pending' : 'Kutilmoqda' },
+                                ]}
+                              />
                             </td>
                             <td className="py-3 px-3 text-right" onClick={(e) => e.stopPropagation()}>
                               <motion.button
@@ -1585,15 +1589,15 @@ export const AdminPanel: React.FC = () => {
                       <label className="block font-bold text-gray-700 dark:text-slate-300 mb-1">
                         {language === 'ru' ? 'Категория *' : language === 'en' ? 'Category *' : 'Toifasi *'}
                       </label>
-                      <select
+                      <CustomSelect
                         value={newProduct.categoryId}
-                        onChange={(e) => setNewProduct({ ...newProduct, categoryId: e.target.value })}
-                        className="w-full px-3 py-2 rounded-xl bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white outline-none focus:border-purple-500"
-                      >
-                        {CATEGORIES.map((c) => (
-                          <option key={c.id} value={c.id}>{c.name}</option>
-                        ))}
-                      </select>
+                        onChange={(val) => setNewProduct({ ...newProduct, categoryId: val as string })}
+                        buttonClassName="bg-gray-50 dark:bg-slate-900 border-gray-200 dark:border-slate-700"
+                        options={CATEGORIES.map((c) => ({
+                          value: c.id,
+                          label: c.name,
+                        }))}
+                      />
                     </div>
 
                     <div>
@@ -1874,14 +1878,16 @@ export const AdminPanel: React.FC = () => {
                             <label className="block text-xs font-bold text-gray-700 dark:text-slate-300 mb-1">
                               {language === 'ru' ? 'Тип скидки:' : language === 'en' ? 'Discount Type:' : 'Chegirma turi:'}
                             </label>
-                            <select
+                            <CustomSelect
+                              size="sm"
                               value={newPromo.discountType}
-                              onChange={(e) => setNewPromo({ ...newPromo, discountType: e.target.value as any })}
-                              className="w-full px-3.5 py-2 rounded-xl border border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-white text-xs font-bold outline-none focus:border-uzum-primary"
-                            >
-                              <option value="percentage">{language === 'ru' ? 'Процент (%)' : language === 'en' ? 'Percentage (%)' : 'Foiz (%)'}</option>
-                              <option value="fixed">{language === 'ru' ? 'Фиксированная сумма (сум)' : language === 'en' ? 'Fixed sum (UZS)' : 'Aniq summa (so\'m)'}</option>
-                            </select>
+                              onChange={(val) => setNewPromo({ ...newPromo, discountType: val as any })}
+                              buttonClassName="bg-gray-50 dark:bg-slate-900 border-gray-200 dark:border-slate-700"
+                              options={[
+                                { value: 'percentage', label: language === 'ru' ? 'Процент (%)' : language === 'en' ? 'Percentage (%)' : 'Foiz (%)' },
+                                { value: 'fixed', label: language === 'ru' ? 'Фиксированная сумма (сум)' : language === 'en' ? 'Fixed sum (UZS)' : 'Aniq summa (so\'m)' },
+                              ]}
+                            />
                           </div>
 
                           <div>

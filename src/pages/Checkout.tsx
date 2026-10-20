@@ -24,6 +24,8 @@ import { formatPrice, calculateMonthlyPaymentQuick, calculateInstallment } from 
 import { PaymentMode, ScoringResult, Order } from '../types';
 import { useTranslation } from '../utils/translations';
 import { sendVerificationSms } from '../lib/smsService';
+import { CustomSelect } from '../components/CustomSelect';
+import { UZBEKISTAN_REGIONS } from '../data/regions';
 
 export const Checkout: React.FC = () => {
   const navigate = useNavigate();
@@ -479,12 +481,15 @@ export const Checkout: React.FC = () => {
                         <label className="block text-xs font-bold text-gray-700 dark:text-slate-300 mb-1">
                           {t('checkoutCityLabel')}
                         </label>
-                        <input
-                          type="text"
-                          required
+                        <CustomSelect
                           value={formData.city}
-                          onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                          className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-gray-900 dark:text-white text-sm focus:border-uzum-primary focus:ring-2 focus:ring-purple-200 dark:focus:ring-purple-900 outline-none"
+                          onChange={(val) => setFormData({ ...formData, city: val as string })}
+                          buttonClassName="!py-2.5 !px-3.5 rounded-xl border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900"
+                          options={UZBEKISTAN_REGIONS.map((r) => ({
+                            value: r.shortUz,
+                            label: language === 'ru' ? r.nameRu : language === 'en' ? r.nameEn : r.nameUz,
+                            badge: r.popular ? 'Tezkor' : undefined,
+                          }))}
                         />
                       </div>
 
