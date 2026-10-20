@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Header } from './components/Header';
 import { HomePage } from './pages/HomePage';
@@ -21,6 +21,7 @@ import { CheckCircle, Info, AlertTriangle, AlertCircle, X } from 'lucide-react';
 
 export const App: React.FC = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const {
     calculatorProduct,
     isCalculatorOpen,
@@ -72,6 +73,9 @@ export const App: React.FC = () => {
                   : `Xush kelibsiz, ${userObj.fullName}! (Google orqali kirdingiz)`), 
             'success'
           );
+          if (isAdmin && (location.pathname === '/login' || location.pathname === '/auth')) {
+            navigate('/admin', { replace: true });
+          }
         }
       }
     });

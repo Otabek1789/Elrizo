@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Navigate } from 'react-router-dom';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
 import { 
   Crown, 
@@ -246,38 +246,9 @@ export const AdminPanel: React.FC = () => {
     description: '',
   });
 
-  // Faqat otabek1789@gmail.com uchun xavfsizlik tekshiruvi
+  // Faqat otabek1789@gmail.com uchun xavfsizlik tekshiruvi (oraliq sahifalarsiz darhol yo'naltirish)
   if (!user || user.email?.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) {
-    return (
-      <div className="min-h-[75vh] flex items-center justify-center p-4">
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.85, y: 30 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          transition={{ type: 'spring', damping: 20 }}
-          className="max-w-md w-full p-8 bg-white dark:bg-slate-800 rounded-3xl border border-rose-200 dark:border-rose-900/50 text-center space-y-5 shadow-2xl"
-        >
-          <motion.div 
-            animate={{ rotate: [0, -10, 10, -10, 0] }}
-            transition={{ repeat: Infinity, duration: 3, delay: 1 }}
-            className="w-16 h-16 rounded-full bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center mx-auto shadow-inner"
-          >
-            <XCircle className="w-8 h-8" />
-          </motion.div>
-          <h2 className="text-xl font-black text-gray-900 dark:text-white">Ruxsat cheklangan!</h2>
-          <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
-            Ushbu Admin Boshqaruv Paneliga faqat <strong>{ADMIN_EMAIL}</strong> orqali kirish huquqi mavjud.
-          </p>
-          <motion.button
-            whileHover={{ scale: 1.05, y: -2 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => navigate('/')}
-            className="px-6 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-xs font-bold rounded-xl hover:brightness-110 transition-all shadow-lg shadow-purple-600/30"
-          >
-            Bosh sahifaga qaytish
-          </motion.button>
-        </motion.div>
-      </div>
-    );
+    return <Navigate to="/" replace />;
   }
 
   // Hisob-kitoblar
@@ -633,8 +604,8 @@ export const AdminPanel: React.FC = () => {
             whileHover={{ scale: 1.05, x: isSidebarCollapsed ? 0 : 3 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => {
+              navigate('/', { replace: true });
               logoutUser();
-              navigate('/');
             }}
             className={`w-full flex items-center ${isSidebarCollapsed ? 'justify-center p-3' : 'gap-3 p-2.5'} text-xs font-bold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-xl transition-colors`}
             title={isSidebarCollapsed ? (language === 'ru' ? 'Выйти' : language === 'en' ? 'Log out' : 'Tizimdan chiqish') : undefined}

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, Navigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Mail, 
@@ -47,64 +47,9 @@ export const LoginPage: React.FC = () => {
   const [isTelegramModalOpen, setIsTelegramModalOpen] = useState(false);
   const [telegramUsername, setTelegramUsername] = useState('');
 
-  // Agar allaqachon kirgan bo'lsa va profil holatida bo'lsa
+  // Agar allaqachon kirgan bo'lsa darhol tegishli sahifaga yo'naltirish (oraliq sahifa ko'rinmaydi)
   if (user) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="max-w-md w-full bg-white rounded-3xl p-8 border border-gray-100 shadow-xl text-center space-y-6"
-        >
-          <div className="w-20 h-20 rounded-full mx-auto flex items-center justify-center bg-purple-100 text-uzum-primary shadow-inner">
-            {user.isAdmin ? (
-              <Crown className="w-10 h-10 text-amber-500" />
-            ) : (
-              <UserIcon className="w-10 h-10 text-uzum-primary" />
-            )}
-          </div>
-
-          <div>
-            <span className={`text-[11px] font-black uppercase px-2.5 py-1 rounded-full ${
-              user.isAdmin ? 'bg-amber-100 text-amber-800' : 'bg-purple-100 text-uzum-primary'
-            }`}>
-              {user.isAdmin ? t('loginAdminRole') : t('loginUserRole')}
-            </span>
-            <h2 className="text-2xl font-black text-gray-900 mt-2">{user.fullName}</h2>
-            <p className="text-xs text-gray-500 mt-1">{user.email}</p>
-          </div>
-
-          <div className="space-y-3 pt-2">
-            {user.isAdmin && (
-              <button
-                onClick={() => navigate('/admin')}
-                className="w-full py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold text-sm rounded-xl transition-all shadow-md flex items-center justify-center gap-2"
-              >
-                <Crown className="w-4 h-4" />
-                <span>{t('authAdminPanelCardTitle')}</span>
-              </button>
-            )}
-
-            <button
-              onClick={() => navigate('/catalog')}
-              className="w-full py-3 bg-uzum-primary hover:bg-uzum-hover text-white font-bold text-sm rounded-xl transition-all shadow-sm flex items-center justify-center gap-2"
-            >
-              <span>{t('catalog')}</span>
-              <ChevronRight className="w-4 h-4" />
-            </button>
-
-            <button
-              onClick={() => {
-                logoutUser();
-              }}
-              className="w-full py-2.5 border border-rose-200 text-rose-600 hover:bg-rose-50 text-xs font-bold rounded-xl transition-colors"
-            >
-              {t('authLogoutBtn')}
-            </button>
-          </div>
-        </motion.div>
-      </div>
-    );
+    return <Navigate to={user.isAdmin ? '/admin' : '/'} replace />;
   }
 
   // 1. Kirish (Sign in) — OTP shart emas, to'g'ridan-to'g'ri kirish
