@@ -413,6 +413,13 @@ export const TRANSLATIONS = {
     loginRequiredDesc: "Akkauntga kirmasdan tovarlarni sotib olib bo'lmaydi. Savatga yoki sevimlilarga qo'shish hamda buyurtma berish uchun avval profilingizga kiring.",
     loginBtn: "Kirish",
     backLinkBtn: "Ortga",
+
+    // City Selection Modal
+    selectCityTitle: "Yetkazib berish shahri yoki viloyatini tanlang",
+    searchCityPlaceholder: "Shahar yoki viloyat nomini kiriting...",
+    popularCitiesTitle: "Ommabop shaharlar",
+    allRegionsTitle: "Barcha viloyat va shaharlar",
+    cityChangedToast: "Yetkazib berish shahri belgilandi:",
   },
   ru: {
     // Header & Navigation
@@ -822,6 +829,13 @@ export const TRANSLATIONS = {
     loginRequiredDesc: "Без входа в аккаунт покупка товаров невозможна. Чтобы добавить товар в корзину, избранное или оформить заказ, пожалуйста, войдите в свой профиль.",
     loginBtn: "Войти",
     backLinkBtn: "Назад",
+
+    // City Selection Modal
+    selectCityTitle: "Выберите город или область доставки",
+    searchCityPlaceholder: "Введите название города или области...",
+    popularCitiesTitle: "Популярные города",
+    allRegionsTitle: "Все области и города",
+    cityChangedToast: "Город доставки изменен:",
   },
   en: {
     // Header & Navigation
@@ -1231,6 +1245,13 @@ export const TRANSLATIONS = {
     loginRequiredDesc: "You cannot purchase products without logging in. To add items to your cart, favorites, or place an order, please sign in to your profile.",
     loginBtn: "Sign In",
     backLinkBtn: "Back",
+
+    // City Selection Modal
+    selectCityTitle: "Select delivery city or region",
+    searchCityPlaceholder: "Search city or region...",
+    popularCitiesTitle: "Popular cities",
+    allRegionsTitle: "All regions and cities",
+    cityChangedToast: "Delivery city updated:",
   }
 } as const;
 

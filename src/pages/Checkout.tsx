@@ -43,6 +43,7 @@ export const Checkout: React.FC = () => {
     getFinalTotal,
     getFinalMonthlyTotal,
     openLoginRequiredModal,
+    selectedCity,
   } = useStore();
   const { t, language } = useTranslation();
 
@@ -76,7 +77,7 @@ export const Checkout: React.FC = () => {
     pinfl: user?.passportOrPinfl || '31204956780012',
     passportSeries: 'AB 1234567',
     phone: user?.phone || '+998 90 123 45 67',
-    city: 'Toshkent shahri',
+    city: selectedCity ? `${selectedCity}` : 'Toshkent shahri',
     address: 'Chilonzor tumani, 9-mavze, 24-uy',
     deliveryNotes: 'Eshik oldida qoldiring',
     cardNumber: '8600 1425 8890 1234',

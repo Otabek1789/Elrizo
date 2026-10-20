@@ -82,6 +82,13 @@ interface StoreState {
   openCalculator: (product: Product) => void;
   closeCalculator: () => void;
 
+  // Selected City & Region
+  selectedCity: string;
+  setSelectedCity: (city: string) => void;
+  isCityModalOpen: boolean;
+  openCityModal: () => void;
+  closeCityModal: () => void;
+
   // Theme & Language (Light/Dark mode & UZ/RU/EN)
   theme: Theme;
   setTheme: (theme: Theme) => void;
@@ -563,6 +570,13 @@ export const useStore = create<StoreState>()(
       openCalculator: (product) => set({ calculatorProduct: product, isCalculatorOpen: true }),
       closeCalculator: () => set({ calculatorProduct: null, isCalculatorOpen: false }),
 
+      // Selected City
+      selectedCity: 'Toshkent',
+      setSelectedCity: (city: string) => set({ selectedCity: city }),
+      isCityModalOpen: false,
+      openCityModal: () => set({ isCityModalOpen: true }),
+      closeCityModal: () => set({ isCityModalOpen: false }),
+
       // Toasts
       toasts: [],
       addToast: (message, type = 'info') => {
@@ -662,6 +676,7 @@ export const useStore = create<StoreState>()(
         language: state.language,
         promoCodes: state.promoCodes,
         appliedPromoCode: state.appliedPromoCode,
+        selectedCity: state.selectedCity,
       }),
     }
   )

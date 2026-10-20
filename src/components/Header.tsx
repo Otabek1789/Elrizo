@@ -71,6 +71,8 @@ export const Header: React.FC = () => {
     getCartTotal,
     theme,
     toggleTheme,
+    selectedCity,
+    openCityModal,
   } = useStore();
 
   const { t, language, setLanguage } = useTranslation();
@@ -159,10 +161,13 @@ export const Header: React.FC = () => {
           <div className="flex items-center gap-5">
             <motion.div 
               whileHover={{ scale: 1.04 }}
-              className="flex items-center gap-1.5 text-gray-600 dark:text-gray-200 hover:text-uzum-primary dark:hover:text-white cursor-pointer transition-colors"
+              whileTap={{ scale: 0.96 }}
+              onClick={openCityModal}
+              className="flex items-center gap-1.5 text-gray-600 dark:text-gray-200 hover:text-uzum-primary dark:hover:text-purple-300 cursor-pointer transition-colors group py-0.5 px-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800"
+              title="Shaharni o'zgartirish"
             >
-              <MapPin className="w-3.5 h-3.5 text-uzum-primary dark:text-purple-400 animate-bounce" />
-              <span>{t('cityLabel')} <strong className="text-gray-800 dark:text-white">{t('cityTashkent')}</strong></span>
+              <MapPin className="w-3.5 h-3.5 text-uzum-primary dark:text-purple-400 group-hover:scale-110 transition-transform" />
+              <span>{t('cityLabel')} <strong className="text-gray-800 dark:text-white underline decoration-dotted decoration-purple-400 underline-offset-2 font-bold">{selectedCity}</strong></span>
             </motion.div>
             <div className="flex items-center gap-1.5 text-gray-600 dark:text-gray-200 hover:text-uzum-primary dark:hover:text-white cursor-pointer transition-colors">
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400" />
@@ -510,6 +515,18 @@ export const Header: React.FC = () => {
 
         {/* Right Actions (Theme, Language, Profile, Admin Panel, Favorites, Cart) */}
         <div className="flex items-center gap-1.5 sm:gap-2">
+          {/* City Selector Button (Mobile only) */}
+          <motion.button
+            whileHover={{ scale: 1.06 }}
+            whileTap={{ scale: 0.94 }}
+            onClick={openCityModal}
+            className="flex md:hidden items-center gap-1 p-1.5 sm:px-2 rounded-xl text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-800 text-xs font-bold transition-colors border border-gray-200/60 dark:border-slate-700/60"
+            title="Shaharni tanlash"
+          >
+            <MapPin className="w-3.5 h-3.5 text-uzum-primary dark:text-purple-400 shrink-0" />
+            <span className="max-w-[65px] truncate text-[11px] font-bold">{selectedCity}</span>
+          </motion.button>
+
           {/* Theme Switcher Button (Mobile only, on desktop it is in the top bar) */}
           <motion.button
             whileHover={{ scale: 1.08 }}

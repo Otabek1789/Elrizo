@@ -12,6 +12,7 @@ import { LoginPage } from './pages/LoginPage';
 import { CartDrawer } from './components/CartDrawer';
 import { AuthModal } from './components/AuthModal';
 import { LoginRequiredModal } from './components/LoginRequiredModal';
+import { CitySelectModal } from './components/CitySelectModal';
 import { InstallmentCalculator } from './components/InstallmentCalculator';
 import { Footer } from './components/Footer';
 import { ScrollProgressBar, ScrollToTopButton } from './components/ScrollFeatures';
@@ -137,6 +138,7 @@ export const App: React.FC = () => {
       <CartDrawer />
       <AuthModal />
       <LoginRequiredModal />
+      <CitySelectModal />
 
       {/* 7. Global Tezkor Nasiya Kalkulyatori Modali */}
       {isCalculatorOpen && calculatorProduct && (
