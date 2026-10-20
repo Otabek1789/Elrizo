@@ -1,0 +1,650 @@
+import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
+import { ActivePage, CartItem, Order, Product, PromoCode, User } from '../types';
+import { INITIAL_USER, PRODUCTS } from '../data/mockData';
+import { searchProducts } from '../utils/searchHelper';
+import { 
+  saveOrderToSupabase, 
+  checkSupabaseConnection, 
+  authenticateWithSupabase, 
+  signOutFromSupabase, 
+  isAdminUser 
+} from '../lib/supabase';
+import { Language, Theme, TranslationKey, getTranslation } from '../utils/translations';
+
+interface ToastNotification {
+  id: string;
+  message: string;
+  type: 'success' | 'info' | 'warning' | 'error';
+}
+
+interface StoreState {
+  // Navigation & Page State
+  activePage: ActivePage;
+  selectedProductId: string | null;
+  selectedCategorySlug: string | null;
+  setActivePage: (page: ActivePage) => void;
+  navigateToProduct: (productId: string) => void;
+  navigateToCategory: (categorySlug: string | null) => void;
+
+  // Search State
+  searchQuery: string;
+  setSearchQuery: (query: string) => void;
+
+  // Products Data
+  products: Product[];
+  filteredProducts: () => Product[];
+  addProduct: (product: Product) => void;
+  deleteProduct: (productId: string) => void;
+
+  // Cart State (Persisted in localStorage)
+  cart: CartItem[];
+  isCartOpen: boolean;
+  openCart: () => void;
+  closeCart: () => void;
+  addToCart: (product: Product, months?: 3 | 6 | 12 | 24, purchaseType?: 'full' | 'installment') => void;
+  removeFromCart: (productId: string) => void;
+  updateQuantity: (productId: string, quantity: number) => void;
+  clearCart: () => void;
+  getCartTotal: () => number;
+  getCartMonthlyTotal: () => number;
+  getCartItemsCount: () => number;
+
+  // Favorites State (Persisted in localStorage)
+  favorites: string[]; // product IDs
+  toggleFavorite: (productId: string) => void;
+  isFavorite: (productId: string) => boolean;
+
+  // Orders & BNPL Applications (Persisted in localStorage & synced with Supabase)
+  orders: Order[];
+  addOrder: (order: Order) => Promise<void>;
+  updateOrderStatus: (orderId: string, status: Order['status']) => void;
+  deleteOrder: (orderId: string) => void;
+
+  // User & Auth State (Persisted in localStorage)
+  user: User | null;
+  isAuthOpen: boolean;
+  openAuth: () => void;
+  closeAuth: () => void;
+  loginWithEmail: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  logoutUser: () => void;
+
+  // Supabase Status
+  supabaseConnected: boolean;
+  initSupabaseCheck: () => Promise<void>;
+
+  // Global Calculator Modal
+  calculatorProduct: Product | null;
+  isCalculatorOpen: boolean;
+  openCalculator: (product: Product) => void;
+  closeCalculator: () => void;
+
+  // Theme & Language (Light/Dark mode & UZ/RU/EN)
+  theme: Theme;
+  setTheme: (theme: Theme) => void;
+  toggleTheme: () => void;
+  language: Language;
+  setLanguage: (lang: Language) => void;
+  t: (key: TranslationKey) => string;
+
+  // Toast notifications
+  toasts: ToastNotification[];
+  addToast: (message: string, type?: 'success' | 'info' | 'warning' | 'error') => void;
+  removeToast: (id: string) => void;
+
+  // Promo codes (WELCOME10, ELRIZO15, etc.)
+  promoCodes: PromoCode[];
+  appliedPromoCode: PromoCode | null;
+  applyPromoCode: (code: string) => { success: boolean; message?: string };
+  removePromoCode: () => void;
+  addPromoCode: (promo: PromoCode) => void;
+  togglePromoCode: (id: string) => void;
+  deletePromoCode: (id: string) => void;
+  getDiscountAmount: () => number;
+  getFinalTotal: () => number;
+  getFinalMonthlyTotal: () => number;
+}
+
+export const INITIAL_PROMO_CODES: PromoCode[] = [
+  {
+    id: 'promo-welcome10',
+    code: 'WELCOME10',
+    discountType: 'percentage',
+    discountValue: 10,
+    description: "Yangi mijozlar uchun 10% chegirma",
+    isActive: true,
+    usageCount: 142,
+  },
+  {
+    id: 'promo-elrizo15',
+    code: 'ELRIZO15',
+    discountType: 'percentage',
+    discountValue: 15,
+    description: "ELRIZO maxsus aksiyasi — 15% chegirma",
+    isActive: true,
+    usageCount: 89,
+  },
+  {
+    id: 'promo-super500',
+    code: 'SUPER500',
+    discountType: 'fixed',
+    discountValue: 500000,
+    minOrderAmount: 3000000,
+    description: "3 000 000 so'mdan yuqori xaridga 500 000 so'm sovg'a",
+    isActive: true,
+    usageCount: 35,
+  },
+  {
+    id: 'promo-bahor20',
+    code: 'BAHOR20',
+    discountType: 'percentage',
+    discountValue: 20,
+    description: "Bahoriy katta chegirma 20%",
+    isActive: true,
+    usageCount: 64,
+  },
+];
+
+export const useStore = create<StoreState>()(
+  persist(
+    (set, get) => ({
+      // Navigation
+      activePage: 'home',
+      selectedProductId: null,
+      selectedCategorySlug: null,
+
+      setActivePage: (page) => {
+        set({ activePage: page });
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      },
+
+      navigateToProduct: (productId) => {
+        set({ selectedProductId: productId, activePage: 'product-detail' });
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      },
+
+      navigateToCategory: (categorySlug) => {
+        set({ selectedCategorySlug: categorySlug, activePage: 'home' });
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      },
+
+      // Search
+      searchQuery: '',
+      setSearchQuery: (query) => set({ searchQuery: query }),
+
+      // Products
+      products: PRODUCTS,
+      filteredProducts: () => {
+        const { products, searchQuery, selectedCategorySlug } = get();
+        let result = products;
+
+        if (searchQuery.trim()) {
+          result = searchProducts(result, searchQuery);
+          if (selectedCategorySlug) {
+            const inCategory = result.filter(
+              (p) =>
+                p.categoryId.toLowerCase().includes(selectedCategorySlug.toLowerCase()) ||
+                p.categoryName.toLowerCase().includes(selectedCategorySlug.toLowerCase())
+            );
+            if (inCategory.length > 0) {
+              result = inCategory;
+            }
+          }
+          return result;
+        }
+
+        if (selectedCategorySlug) {
+          result = result.filter(
+            (p) =>
+              p.categoryId.toLowerCase().includes(selectedCategorySlug.toLowerCase()) ||
+              p.categoryName.toLowerCase().includes(selectedCategorySlug.toLowerCase())
+          );
+        }
+
+        return result;
+      },
+
+      addProduct: (newProduct) => {
+        set((state) => ({
+          products: [newProduct, ...state.products],
+        }));
+        get().addToast("Yangi mahsulot muvaffaqiyatli qo'shildi", 'success');
+      },
+
+      deleteProduct: (productId) => {
+        set((state) => ({
+          products: state.products.filter((p) => p.id !== productId),
+        }));
+        get().addToast("Mahsulot o'chirildi", 'info');
+      },
+
+      // Cart
+      cart: [
+        {
+          product: PRODUCTS[0],
+          quantity: 1,
+          selectedInstallmentMonths: 12,
+          purchaseType: 'installment',
+        },
+      ],
+      isCartOpen: false,
+      openCart: () => set({ isCartOpen: true }),
+      closeCart: () => set({ isCartOpen: false }),
+
+      addToCart: (product, months = 12, purchaseType = 'installment') => {
+        set((state) => {
+          const existingIndex = state.cart.findIndex((item) => item.product.id === product.id);
+          let updatedCart: CartItem[];
+
+          if (existingIndex > -1) {
+            updatedCart = [...state.cart];
+            updatedCart[existingIndex].quantity += 1;
+            updatedCart[existingIndex].selectedInstallmentMonths = months;
+            updatedCart[existingIndex].purchaseType = purchaseType;
+          } else {
+            updatedCart = [
+              ...state.cart,
+              {
+                product,
+                quantity: 1,
+                selectedInstallmentMonths: months,
+                purchaseType,
+              },
+            ];
+          }
+
+          get().addToast(`"${product.title.slice(0, 30)}..." savatga qo'shildi`, 'success');
+          return { cart: updatedCart, isCartOpen: true };
+        });
+      },
+
+      removeFromCart: (productId) => {
+        set((state) => ({
+          cart: state.cart.filter((item) => item.product.id !== productId),
+        }));
+      },
+
+      updateQuantity: (productId, quantity) => {
+        if (quantity <= 0) {
+          get().removeFromCart(productId);
+          return;
+        }
+        set((state) => ({
+          cart: state.cart.map((item) =>
+            item.product.id === productId ? { ...item, quantity } : item
+          ),
+        }));
+      },
+
+      clearCart: () => set({ cart: [] }),
+
+      getCartTotal: () => {
+        const { cart } = get();
+        return cart.reduce((total, item) => total + item.product.price * item.quantity, 0);
+      },
+
+      getCartMonthlyTotal: () => {
+        const { cart } = get();
+        return cart.reduce((total, item) => {
+          const months = item.selectedInstallmentMonths || 12;
+          const markupPercent = months === 3 ? 0 : months === 6 ? 12 : months === 12 ? 24 : 38;
+          const itemTotal = item.product.price * item.quantity * (1 + markupPercent / 100);
+          return total + Math.round(itemTotal / months);
+        }, 0);
+      },
+
+      getCartItemsCount: () => {
+        const { cart } = get();
+        return cart.reduce((sum, item) => sum + item.quantity, 0);
+      },
+
+      // Promo codes implementation
+      promoCodes: INITIAL_PROMO_CODES,
+      appliedPromoCode: null,
+
+      applyPromoCode: (codeStr: string) => {
+        const cleanCode = codeStr.trim().toUpperCase();
+        if (!cleanCode) {
+          const msg = get().t('promoNotFoundToast');
+          get().addToast(msg, 'error');
+          return { success: false, message: msg };
+        }
+
+        const current = get().appliedPromoCode;
+        if (current && current.code.toUpperCase() === cleanCode) {
+          const msg = get().t('promoAlreadyAppliedToast');
+          get().addToast(msg, 'warning');
+          return { success: false, message: msg };
+        }
+
+        const promo = get().promoCodes.find(
+          (p) => p.code.toUpperCase() === cleanCode && p.isActive
+        );
+
+        if (!promo) {
+          const msg = get().t('promoNotFoundToast');
+          get().addToast(msg, 'error');
+          return { success: false, message: msg };
+        }
+
+        const total = get().getCartTotal();
+        if (promo.minOrderAmount && total < promo.minOrderAmount) {
+          const msg = `${get().t('promoMinOrderToast')} ${promo.minOrderAmount.toLocaleString('uz-UZ')} so'm`;
+          get().addToast(msg, 'warning');
+          return { success: false, message: msg };
+        }
+
+        set({ appliedPromoCode: promo });
+
+        // Increment usage count
+        set((state) => ({
+          promoCodes: state.promoCodes.map((p) =>
+            p.id === promo.id ? { ...p, usageCount: (p.usageCount || 0) + 1 } : p
+          ),
+        }));
+
+        get().addToast(`${get().t('promoAppliedToast')} (${promo.code})`, 'success');
+        return { success: true };
+      },
+
+      removePromoCode: () => {
+        set({ appliedPromoCode: null });
+        get().addToast(get().t('promoRemovedToast'), 'info');
+      },
+
+      addPromoCode: (promo: PromoCode) => {
+        set((state) => ({
+          promoCodes: [promo, ...state.promoCodes],
+        }));
+        get().addToast(`Promokod "${promo.code}" muvaffaqiyatli qo'shildi!`, 'success');
+      },
+
+      togglePromoCode: (id: string) => {
+        set((state) => ({
+          promoCodes: state.promoCodes.map((p) =>
+            p.id === id ? { ...p, isActive: !p.isActive } : p
+          ),
+        }));
+      },
+
+      deletePromoCode: (id: string) => {
+        set((state) => ({
+          promoCodes: state.promoCodes.filter((p) => p.id !== id),
+          appliedPromoCode: state.appliedPromoCode?.id === id ? null : state.appliedPromoCode,
+        }));
+        get().addToast("Promokod o'chirildi", 'info');
+      },
+
+      getDiscountAmount: () => {
+        const { appliedPromoCode } = get();
+        const total = get().getCartTotal();
+        if (!appliedPromoCode || total <= 0) return 0;
+
+        if (appliedPromoCode.discountType === 'percentage') {
+          return Math.round(total * (appliedPromoCode.discountValue / 100));
+        } else {
+          return Math.min(appliedPromoCode.discountValue, total);
+        }
+      },
+
+      getFinalTotal: () => {
+        const total = get().getCartTotal();
+        const discount = get().getDiscountAmount();
+        return Math.max(0, total - discount);
+      },
+
+      getFinalMonthlyTotal: () => {
+        const baseMonthly = get().getCartMonthlyTotal();
+        const baseTotal = get().getCartTotal();
+        if (baseTotal <= 0) return 0;
+        const finalTotal = get().getFinalTotal();
+        const ratio = finalTotal / baseTotal;
+        return Math.round(baseMonthly * ratio);
+      },
+
+      // Favorites
+      favorites: ['prod-001', 'prod-003'],
+      toggleFavorite: (productId) => {
+        set((state) => {
+          const exists = state.favorites.includes(productId);
+          const updated = exists
+            ? state.favorites.filter((id) => id !== productId)
+            : [...state.favorites, productId];
+
+          const product = state.products.find((p) => p.id === productId);
+          if (product) {
+            get().addToast(
+              exists ? "Sevimlilardan o'chirildi" : "Sevimlilarga qo'shildi",
+              'info'
+            );
+          }
+          return { favorites: updated };
+        });
+      },
+
+      isFavorite: (productId) => {
+        return get().favorites.includes(productId);
+      },
+
+      // Orders (Local Storage + Supabase sync)
+      orders: [
+        {
+          id: 'ord-initial-01',
+          contractNumber: 'ELR-849201',
+          customerName: 'Bobur Mirzayev',
+          customerPhone: '+998 90 123 45 67',
+          pinfl: '31204956780012',
+          deliveryAddress: 'Toshkent sh., Chilonzor tumani, 9-mavze, 24-uy',
+          totalPrice: 18450000,
+          monthlyPayment: 1537500,
+          installmentMonths: 12,
+          scoringScore: 795,
+          status: 'scoring_approved',
+          createdAt: new Date(Date.now() - 86400000 * 2).toISOString(),
+          paymentMode: 'installment',
+          items: [
+            {
+              productId: PRODUCTS[0].id,
+              title: PRODUCTS[0].title,
+              price: PRODUCTS[0].price,
+              quantity: 1,
+              monthlyPayment: 1537500,
+            },
+          ],
+        },
+      ],
+      addOrder: async (order: Order) => {
+        set((state) => ({
+          orders: [order, ...state.orders],
+        }));
+
+        try {
+          const res = await saveOrderToSupabase({
+            contractNumber: order.contractNumber,
+            customerName: order.customerName,
+            pinfl: order.pinfl || '',
+            phone: order.customerPhone,
+            city: 'Toshkent',
+            address: order.deliveryAddress,
+            totalPrice: order.totalPrice,
+            monthlyPayment: order.monthlyPayment,
+            paymentMode: order.paymentMode,
+            installmentMonths: order.installmentMonths,
+            items: order.items,
+            scoringScore: order.scoringScore,
+            status: order.status,
+          });
+        } catch (e) {
+          console.error("Supabase order sync error:", e);
+        }
+      },
+
+      updateOrderStatus: (orderId, newStatus) => {
+        set((state) => ({
+          orders: state.orders.map((o) =>
+            o.id === orderId ? { ...o, status: newStatus } : o
+          ),
+        }));
+        get().addToast(`Ariza holati yangilandi: ${newStatus}`, 'info');
+      },
+
+      deleteOrder: (orderId) => {
+        set((state) => ({
+          orders: state.orders.filter((o) => o.id !== orderId),
+        }));
+        get().addToast("Ariza o'chirildi", 'info');
+      },
+
+      // User & Auth (Email & Parol)
+      user: null,
+      isAuthOpen: false,
+      openAuth: () => set({ isAuthOpen: true }),
+      closeAuth: () => set({ isAuthOpen: false }),
+
+      loginWithEmail: async (email: string, password: string) => {
+        const cleanEmail = email.trim().toLowerCase();
+        const res = await authenticateWithSupabase(cleanEmail, password);
+
+        if (res.success) {
+          const isAdmin = res.isAdmin;
+          const userObj: User = {
+            id: res.user?.id || `usr-${Date.now()}`,
+            fullName: isAdmin ? "Otabek Jo'rayev" : cleanEmail.split('@')[0],
+            email: cleanEmail,
+            phone: '+998 90 777 00 00',
+            isVerified: true,
+            scoringLimit: isAdmin ? 50000000 : 15000000,
+            usedLimit: 0,
+            isAdmin,
+            role: isAdmin ? 'admin' : 'user',
+          };
+
+          set({ user: userObj, isAuthOpen: false });
+
+          if (isAdmin) {
+            get().addToast(`Xush kelibsiz Administrator Otabek Jo'rayev! Admin panel ochildi`, 'success');
+            set({ activePage: 'admin' });
+          } else {
+            get().addToast(`Xush kelibsiz, ${userObj.fullName}!`, 'success');
+          }
+
+          return { success: true };
+        } else {
+          get().addToast(res.error || "Email yoki parol xato", 'error');
+          return { success: false, error: res.error };
+        }
+      },
+
+      logoutUser: () => {
+        signOutFromSupabase();
+        set({ user: null, activePage: 'home' });
+        get().addToast('Tizimdan chiqildi', 'info');
+      },
+
+      // Supabase Connection Status
+      supabaseConnected: true,
+      initSupabaseCheck: async () => {
+        const isOk = await checkSupabaseConnection();
+        set({ supabaseConnected: isOk });
+      },
+
+      // Calculator Modal
+      calculatorProduct: null,
+      isCalculatorOpen: false,
+      openCalculator: (product) => set({ calculatorProduct: product, isCalculatorOpen: true }),
+      closeCalculator: () => set({ calculatorProduct: null, isCalculatorOpen: false }),
+
+      // Toasts
+      toasts: [],
+      addToast: (message, type = 'info') => {
+        const id = `${Date.now()}-${Math.random()}`;
+        set((state) => ({ toasts: [...state.toasts, { id, message, type }] }));
+        setTimeout(() => {
+          get().removeToast(id);
+        }, 3500);
+      },
+      removeToast: (id) => {
+        set((state) => ({ toasts: state.toasts.filter((t) => t.id !== id) }));
+      },
+
+      // Theme (Light/Dark mode)
+      theme: 'light' as Theme,
+      setTheme: (theme: Theme) => {
+        if (typeof document !== 'undefined') {
+          // Vaqtinchalik barcha transitionlarni o'chirib, rejimni bir lahzada (bittada) o'tkazish
+          const css = document.createElement('style');
+          css.appendChild(
+            document.createTextNode(
+              `*, *::before, *::after {
+                -webkit-transition: none !important;
+                -moz-transition: none !important;
+                -o-transition: none !important;
+                -ms-transition: none !important;
+                transition: none !important;
+              }`
+            )
+          );
+          document.head.appendChild(css);
+
+          if (theme === 'dark') {
+            document.documentElement.classList.add('dark');
+          } else {
+            document.documentElement.classList.remove('dark');
+          }
+
+          // Force reflow to immediately apply theme styles without delay
+          void window.getComputedStyle(document.body).opacity;
+
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              if (document.head.contains(css)) {
+                document.head.removeChild(css);
+              }
+            });
+          });
+        }
+        set({ theme });
+      },
+      toggleTheme: () => {
+        const next = get().theme === 'dark' ? 'light' : 'dark';
+        get().setTheme(next);
+      },
+
+      // Language (UZ/RU/EN)
+      language: 'uz' as Language,
+      setLanguage: (lang: Language) => {
+        set({ language: lang });
+        if (typeof document !== 'undefined') {
+          document.documentElement.lang = lang;
+        }
+      },
+      t: (key: TranslationKey) => getTranslation(get().language, key),
+    }),
+    {
+      name: 'elrizo_nasiya_storage', // LocalStorage kaliti
+      storage: createJSONStorage(() => localStorage),
+      onRehydrateStorage: () => (state) => {
+        if (state && typeof document !== 'undefined') {
+          if (state.theme === 'dark') {
+            document.documentElement.classList.add('dark');
+          } else {
+            document.documentElement.classList.remove('dark');
+          }
+          if (state.language) {
+            document.documentElement.lang = state.language;
+          }
+        }
+      },
+      partialize: (state) => ({
+        cart: state.cart,
+        favorites: state.favorites,
+        user: state.user,
+        orders: state.orders,
+        theme: state.theme,
+        language: state.language,
+        promoCodes: state.promoCodes,
+        appliedPromoCode: state.appliedPromoCode,
+      }),
+    }
+  )
+);
