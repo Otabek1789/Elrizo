@@ -1183,31 +1183,70 @@ export const AdminPanel: React.FC = () => {
                     </motion.button>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    {orders.slice(0, 3).map((ord, idx) => (
-                      <motion.div
-                        key={ord.id}
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: idx * 0.1 }}
-                        whileHover={{ y: -4, scale: 1.02 }}
-                        onClick={() => setSelectedOrder(ord)}
-                        className="p-4 rounded-2xl bg-gray-50 dark:bg-slate-900/60 border border-gray-200 dark:border-slate-700/60 cursor-pointer space-y-2 hover:border-purple-400 transition-all shadow-xs"
-                      >
-                        <div className="flex justify-between items-center text-xs">
-                          <span className="font-mono text-purple-600 dark:text-purple-400 font-bold">{ord.contractNumber || ord.id}</span>
-                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-bold">
-                            {ord.scoringScore || 795} {language === 'ru' ? 'баллов' : language === 'en' ? 'pts' : 'ball'}
-                          </span>
-                        </div>
-                        <div className="text-xs font-bold text-gray-900 dark:text-white truncate">{ord.customerName}</div>
-                        <div className="flex justify-between text-xs items-baseline pt-1 border-t border-gray-200 dark:border-slate-800">
-                          <span className="text-gray-400 text-[11px]">{ord.installmentMonths || 12} {language === 'ru' ? 'мес' : language === 'en' ? 'mo' : 'oy'}</span>
-                          <span className="text-amber-600 dark:text-amber-400 font-black">{formatPrice(ord.totalPrice, true, language)}</span>
-                        </div>
-                      </motion.div>
-                    ))}
-                  </div>
+                  {orders.length === 0 ? (
+                    <div className="py-8 text-center text-gray-400 dark:text-slate-500 text-xs">
+                      {language === 'ru' ? 'Заявок пока нет' : language === 'en' ? 'No applications yet' : "Hozircha arizalar mavjud emas"}
+                    </div>
+                  ) : (
+                    <div className="overflow-x-auto rounded-2xl border border-gray-100 dark:border-slate-800">
+                      <table className="w-full text-left border-collapse">
+                        <thead>
+                          <tr className="border-b border-gray-100 dark:border-slate-800 bg-gray-50/70 dark:bg-slate-900/40 text-[11px] font-extrabold uppercase text-gray-500 dark:text-slate-400">
+                            <th className="py-3 px-4">{language === 'ru' ? '№ Договора' : language === 'en' ? 'Contract #' : 'Shartnoma #'}</th>
+                            <th className="py-3 px-4">{language === 'ru' ? 'Клиент' : language === 'en' ? 'Customer' : 'Mijoz'}</th>
+                            <th className="py-3 px-4">{language === 'ru' ? 'Срок' : language === 'en' ? 'Term' : 'Muddat'}</th>
+                            <th className="py-3 px-4">{language === 'ru' ? 'Сумма' : language === 'en' ? 'Total' : 'Jami summa'}</th>
+                            <th className="py-3 px-4">{language === 'ru' ? 'В месяц' : language === 'en' ? 'Monthly' : "Oylik to'lov"}</th>
+                            <th className="py-3 px-4">{language === 'ru' ? 'Скоринг' : language === 'en' ? 'Scoring' : 'Skoring'}</th>
+                            <th className="py-3 px-4">{language === 'ru' ? 'Статус' : language === 'en' ? 'Status' : 'Holat'}</th>
+                            <th className="py-3 px-4 text-right">{language === 'ru' ? 'Действие' : language === 'en' ? 'Action' : 'Ko\'rish'}</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-100 dark:divide-slate-800 text-xs">
+                          {orders.slice(0, 5).map((ord) => (
+                            <motion.tr 
+                              key={ord.id} 
+                              whileHover={{ backgroundColor: theme === 'dark' ? '#1e293b50' : '#faf5ff' }}
+                              onClick={() => setSelectedOrder(ord)} 
+                              className="cursor-pointer transition-colors"
+                            >
+                              <td className="py-3.5 px-4 font-mono font-bold text-purple-600 dark:text-purple-400">
+                                {ord.contractNumber || ord.id}
+                              </td>
+                              <td className="py-3.5 px-4 font-bold text-gray-900 dark:text-white">
+                                {ord.customerName}
+                              </td>
+                              <td className="py-3.5 px-4 text-gray-500 dark:text-slate-400 font-medium">
+                                {ord.installmentMonths || 12} {language === 'ru' ? 'мес' : language === 'en' ? 'mo' : 'oy'}
+                              </td>
+                              <td className="py-3.5 px-4 font-black text-amber-600 dark:text-amber-400">
+                                {formatPrice(ord.totalPrice, true, language)}
+                              </td>
+                              <td className="py-3.5 px-4 font-bold text-emerald-600 dark:text-emerald-400">
+                                {formatPrice(ord.monthlyPayment || Math.round(ord.totalPrice / (ord.installmentMonths || 12)), true, language)}
+                              </td>
+                              <td className="py-3.5 px-4">
+                                <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-50 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/30">
+                                  {ord.scoringScore || 795} {language === 'ru' ? 'баллов' : language === 'en' ? 'pts' : 'ball'}
+                                </span>
+                              </td>
+                              <td className="py-3.5 px-4">
+                                <span className="px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800/50">
+                                  {ord.status === 'scoring_approved' ? (language === 'ru' ? 'Одобрено' : language === 'en' ? 'Approved' : 'Tasdiqlangan') : ord.status}
+                                </span>
+                              </td>
+                              <td className="py-3.5 px-4 text-right">
+                                <button className="text-xs font-bold text-purple-600 dark:text-purple-400 hover:text-purple-700 flex items-center gap-1 justify-end ml-auto">
+                                  <span>{language === 'ru' ? 'Детали' : language === 'en' ? 'Details' : 'Batafsil'}</span>
+                                  <ChevronRight className="w-3.5 h-3.5" />
+                                </button>
+                              </td>
+                            </motion.tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
                 </motion.div>
               </motion.div>
             )}
