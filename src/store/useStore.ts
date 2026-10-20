@@ -617,6 +617,11 @@ export const useStore = create<StoreState>()(
       name: 'elrizo_store_v2', // LocalStorage kaliti (0 dan bo'sh boshlash uchun)
       storage: createJSONStorage(() => localStorage),
       onRehydrateStorage: () => (state) => {
+        if (typeof window !== 'undefined') {
+          try {
+            localStorage.removeItem('elrizo_nasiya_storage');
+          } catch (e) {}
+        }
         if (state && typeof document !== 'undefined') {
           if (state.theme === 'dark') {
             document.documentElement.classList.add('dark');
