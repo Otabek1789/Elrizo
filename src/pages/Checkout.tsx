@@ -17,15 +17,20 @@ import {
   Sparkles,
   ShoppingBag,
   Tag,
-  X
+  X,
+  Download,
+  ExternalLink,
+  Truck
 } from 'lucide-react';
 import { useStore } from '../store/useStore';
 import { formatPrice, calculateMonthlyPaymentQuick, calculateInstallment } from '../utils/calculator';
-import { PaymentMode, ScoringResult, Order } from '../types';
+import { PaymentMode, ScoringResult, Order, OrderItem } from '../types';
 import { useTranslation } from '../utils/translations';
 import { sendVerificationSms } from '../lib/smsService';
 import { CustomSelect } from '../components/CustomSelect';
 import { UZBEKISTAN_REGIONS } from '../data/regions';
+import { generateAndPrintContract } from '../lib/pdfContractGenerator';
+import { generatePaymentLink } from '../lib/paymentService';
 
 export const Checkout: React.FC = () => {
   const navigate = useNavigate();
@@ -46,6 +51,7 @@ export const Checkout: React.FC = () => {
     getFinalMonthlyTotal,
     openLoginRequiredModal,
     selectedCity,
+    openOrderTracking,
   } = useStore();
   const { t, language } = useTranslation();
 
@@ -96,6 +102,10 @@ export const Checkout: React.FC = () => {
   const [serverOtpCode, setServerOtpCode] = useState<string>('7777');
   const [isSendingSms, setIsSendingSms] = useState<boolean>(false);
   const [isRealSmsDelivered, setIsRealSmsDelivered] = useState<boolean>(false);
+
+  // Online to'lov tizimi (Click, Payme, Uzum Pay)
+  const [selectedOnlineProvider, setSelectedOnlineProvider] = useState<'click' | 'payme' | 'uzumpay'>('click');
+  const [completedOrder, setCompletedOrder] = useState<Order | null>(null);
 
   // Agar savat bo'sh bo'lsa
   if (cart.length === 0 && currentStep !== 4) {
@@ -212,6 +222,7 @@ export const Checkout: React.FC = () => {
       };
 
       addOrder(newInstallmentOrder);
+      setCompletedOrder(newInstallmentOrder);
 
       setCurrentStep(4);
       clearCart();
@@ -242,10 +253,77 @@ export const Checkout: React.FC = () => {
     };
 
     addOrder(newFullOrder);
+    setCompletedOrder(newFullOrder);
 
     addToast(t('checkoutOrderSuccessToast'), 'success');
     setCurrentStep(4);
     clearCart();
+  };
+
+  // Click, Payme yoki Uzum Pay orqali haqiqiy to'lov
+  const handleOnlinePaymentCheckout = (provider: 'click' | 'payme' | 'uzumpay') => {
+    const contractNumber = `ELR-PAY-${Math.floor(100000 + Math.random() * 900000)}`;
+    const newFullOrder: Order = {
+      id: `ord-${Date.now()}`,
+      contractNumber,
+      customerName: formData.fullName,
+      customerPhone: formData.phone,
+      deliveryAddress: `${formData.city}, ${formData.address}`,
+      totalPrice: finalTotal,
+      paymentMode: 'full',
+      status: 'processing',
+      createdAt: new Date().toISOString(),
+      appliedPromoCode: appliedPromoCode?.code,
+      discountAmount: discountAmount > 0 ? discountAmount : undefined,
+      items: cart.map((c) => ({
+        productId: c.product.id,
+        title: c.product.title,
+        price: c.product.price,
+        quantity: c.quantity,
+      })),
+    };
+
+    addOrder(newFullOrder);
+    setCompletedOrder(newFullOrder);
+
+    const paymentLink = generatePaymentLink(provider, {
+      orderId: newFullOrder.id,
+      contractNumber,
+      amount: finalTotal,
+      customerPhone: formData.phone,
+    });
+
+    window.open(paymentLink.paymentUrl, '_blank', 'noopener,noreferrer');
+    addToast(`${provider.toUpperCase()} rasmiy to'lov sahifasi ochildi!`, 'info');
+
+    setCurrentStep(4);
+    clearCart();
+  };
+
+  // Rasmiy Nasiya Shartnomasi va Grafikini PDF yuklab olish / chop etish
+  const handleDownloadPdfContract = () => {
+    const contractNumber = scoringResult?.contractNumber || completedOrder?.contractNumber || 'ELR-748291';
+    const orderItems: OrderItem[] = (completedOrder?.items && completedOrder.items.length > 0)
+      ? completedOrder.items
+      : [
+          { productId: 'item-0', title: 'Buyurtma tovarlari', price: finalTotal, quantity: 1 }
+        ];
+
+    generateAndPrintContract({
+      id: completedOrder?.id || `ord-${Date.now()}`,
+      contractNumber,
+      createdAt: new Date().toISOString(),
+      customerName: formData.fullName,
+      customerPhone: formData.phone,
+      deliveryAddress: `${formData.city}, ${formData.address}`,
+      pinfl: formData.pinfl,
+      totalPrice: finalTotal,
+      paymentMode: 'installment',
+      installmentMonths: selectedMonths,
+      monthlyPayment: finalMonthlyTotal,
+      status: 'scoring_approved',
+      items: orderItems,
+    });
   };
 
   const handleApplyPromo = (codeToApply?: string) => {
@@ -319,19 +397,28 @@ export const Checkout: React.FC = () => {
             {t('checkoutCourierNotice')}
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
             <button
               onClick={() => navigate('/')}
-              className="py-3 px-6 bg-uzum-primary hover:bg-uzum-hover text-white font-bold text-sm rounded-xl transition-colors shadow-md shadow-purple-500/20"
+              className="w-full sm:w-auto py-3 px-5 border border-gray-200 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-700 text-gray-700 dark:text-slate-200 font-bold text-xs rounded-xl transition-colors"
             >
               {t('checkoutBackToHomeBtn')}
             </button>
+
             <button
-              onClick={() => addToast(t('checkoutContractDownloadedToast'), 'info')}
-              className="py-3 px-6 border border-gray-200 dark:border-slate-800 hover:bg-gray-50 dark:hover:bg-slate-800 text-gray-700 dark:text-slate-300 font-bold text-sm rounded-xl transition-colors flex items-center justify-center gap-2"
+              onClick={handleDownloadPdfContract}
+              className="w-full sm:w-auto py-3 px-5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold text-xs rounded-xl transition-all shadow-md shadow-emerald-600/20 flex items-center justify-center gap-2"
             >
-              <FileText className="w-4 h-4" />
-              <span>{t('checkoutDownloadContractBtn')}</span>
+              <Download className="w-4 h-4" />
+              <span>Nasiya Shartnomasi PDF</span>
+            </button>
+
+            <button
+              onClick={openOrderTracking}
+              className="w-full sm:w-auto py-3 px-5 bg-primary-600 hover:bg-primary-700 text-white font-bold text-xs rounded-xl transition-all shadow-md shadow-primary-500/20 flex items-center justify-center gap-2"
+            >
+              <Truck className="w-4 h-4" />
+              <span>Buyurtmani kuzatish</span>
             </button>
           </div>
         </div>
@@ -686,19 +773,55 @@ export const Checkout: React.FC = () => {
             ) : (
               /* Agar To'liq To'lov tanlangan bo'lsa */
               <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700/60 p-6 space-y-5 shadow-sm">
-                <h3 className="text-base font-bold text-gray-900 dark:text-white">{t('checkoutPaymentMethodTitle')}</h3>
+                <h3 className="text-base font-bold text-gray-900 dark:text-white">To'lov tizimini tanlang (Haqiqiy onlayn to'lov)</h3>
+                
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  <div className="p-4 rounded-xl border-2 border-uzum-primary bg-purple-50/50 dark:bg-purple-950/40 flex flex-col items-center justify-center text-center cursor-pointer">
-                    <span className="font-extrabold text-sm text-uzum-primary dark:text-purple-300">{t('checkoutPayUzum')}</span>
-                    <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-bold mt-1">{t('checkoutCashbackBadge')}</span>
+                  {/* Click */}
+                  <div 
+                    onClick={() => setSelectedOnlineProvider('click')}
+                    className={`p-4 rounded-2xl border-2 cursor-pointer transition-all flex flex-col items-center justify-center text-center ${
+                      selectedOnlineProvider === 'click'
+                        ? 'border-blue-500 bg-blue-50/50 dark:bg-blue-950/40 ring-2 ring-blue-500/20 shadow-sm'
+                        : 'border-gray-200 dark:border-slate-700/60 bg-white dark:bg-slate-900/60 hover:border-gray-300'
+                    }`}
+                  >
+                    <div className="w-9 h-9 rounded-xl bg-blue-600 text-white font-black text-[11px] flex items-center justify-center shadow mb-2">
+                      CLICK
+                    </div>
+                    <span className="font-extrabold text-sm text-gray-900 dark:text-white">Click Up</span>
+                    <span className="text-[11px] text-blue-600 dark:text-blue-400 font-bold mt-0.5">0% komissiya</span>
                   </div>
-                  <div className="p-4 rounded-xl border border-gray-200 dark:border-slate-700/60 bg-white dark:bg-slate-900/60 hover:border-purple-300 dark:hover:border-purple-600/40 flex flex-col items-center justify-center text-center cursor-pointer transition-colors">
-                    <span className="font-extrabold text-sm text-gray-800 dark:text-slate-200">{t('checkoutPayPayme')}</span>
-                    <span className="text-[11px] text-gray-400 dark:text-slate-500 mt-1">{t('checkoutFastPaymentBadge')}</span>
+
+                  {/* Payme */}
+                  <div 
+                    onClick={() => setSelectedOnlineProvider('payme')}
+                    className={`p-4 rounded-2xl border-2 cursor-pointer transition-all flex flex-col items-center justify-center text-center ${
+                      selectedOnlineProvider === 'payme'
+                        ? 'border-teal-500 bg-teal-50/50 dark:bg-teal-950/40 ring-2 ring-teal-500/20 shadow-sm'
+                        : 'border-gray-200 dark:border-slate-700/60 bg-white dark:bg-slate-900/60 hover:border-gray-300'
+                    }`}
+                  >
+                    <div className="w-9 h-9 rounded-xl bg-teal-500 text-white font-black text-[11px] flex items-center justify-center shadow mb-2">
+                      payme
+                    </div>
+                    <span className="font-extrabold text-sm text-gray-900 dark:text-white">Payme</span>
+                    <span className="text-[11px] text-teal-600 dark:text-teal-400 font-bold mt-0.5">Uzcard / Humo</span>
                   </div>
-                  <div className="p-4 rounded-xl border border-gray-200 dark:border-slate-700/60 bg-white dark:bg-slate-900/60 hover:border-purple-300 dark:hover:border-purple-600/40 flex flex-col items-center justify-center text-center cursor-pointer transition-colors">
-                    <span className="font-extrabold text-sm text-gray-800 dark:text-slate-200">{t('checkoutCashOnDelivery')}</span>
-                    <span className="text-[11px] text-gray-400 dark:text-slate-500 mt-1">{t('checkoutUponDeliveryBadge')}</span>
+
+                  {/* Uzum Pay */}
+                  <div 
+                    onClick={() => setSelectedOnlineProvider('uzumpay')}
+                    className={`p-4 rounded-2xl border-2 cursor-pointer transition-all flex flex-col items-center justify-center text-center ${
+                      selectedOnlineProvider === 'uzumpay'
+                        ? 'border-purple-600 bg-purple-50/50 dark:bg-purple-950/40 ring-2 ring-purple-600/20 shadow-sm'
+                        : 'border-gray-200 dark:border-slate-700/60 bg-white dark:bg-slate-900/60 hover:border-gray-300'
+                    }`}
+                  >
+                    <div className="w-9 h-9 rounded-xl bg-purple-600 text-white font-black text-[11px] flex items-center justify-center shadow mb-2">
+                      uzum
+                    </div>
+                    <span className="font-extrabold text-sm text-gray-900 dark:text-white">Uzum Pay</span>
+                    <span className="text-[11px] text-purple-600 dark:text-purple-400 font-bold mt-0.5">Keshbek bilan</span>
                   </div>
                 </div>
 
@@ -732,12 +855,27 @@ export const Checkout: React.FC = () => {
                   </div>
                 </div>
 
+                <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700/60 flex items-center justify-between text-xs">
+                  <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
+                    <ShieldCheck className="w-4 h-4 text-emerald-500" />
+                    <span>Tanlangan to'lov tizimi: <strong className="uppercase font-bold text-slate-900 dark:text-white">{selectedOnlineProvider}</strong></span>
+                  </div>
+                  <span className="text-emerald-600 dark:text-emerald-400 font-bold">Rasmiy Gateway</span>
+                </div>
+
                 <button
                   type="button"
-                  onClick={handleFullPaymentOrder}
-                  className="w-full py-3.5 bg-uzum-primary hover:bg-uzum-hover text-white font-extrabold text-sm rounded-xl transition-all shadow-md shadow-purple-500/20"
+                  onClick={() => handleOnlinePaymentCheckout(selectedOnlineProvider)}
+                  className={`w-full py-4 text-white font-black text-sm rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 transform active:scale-98 ${
+                    selectedOnlineProvider === 'click'
+                      ? 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 shadow-blue-500/25'
+                      : selectedOnlineProvider === 'payme'
+                      ? 'bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-600 shadow-teal-500/25'
+                      : 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 shadow-purple-500/25'
+                  }`}
                 >
-                  {t('checkoutConfirmOrderBtn')} ({formatPrice(finalTotal, true, language)})
+                  <span>{selectedOnlineProvider.toUpperCase()} orqali to'lash ({formatPrice(finalTotal, true, language)})</span>
+                  <ExternalLink className="w-4 h-4" />
                 </button>
               </div>
             )}

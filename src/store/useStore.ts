@@ -1,7 +1,8 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { ActivePage, CartItem, Order, Product, PromoCode, User } from '../types';
+import { ActivePage, CartItem, Order, Product, PromoCode, User, Review } from '../types';
 import { INITIAL_USER, PRODUCTS } from '../data/mockData';
+import { INITIAL_REVIEWS } from '../data/mockReviews';
 import { searchProducts } from '../utils/searchHelper';
 import { 
   saveOrderToSupabase, 
@@ -113,6 +114,24 @@ interface StoreState {
   getDiscountAmount: () => number;
   getFinalTotal: () => number;
   getFinalMonthlyTotal: () => number;
+
+  // Product Comparison (Taqqoslash)
+  comparisonList: string[]; // product IDs
+  addToComparison: (productId: string) => void;
+  removeFromComparison: (productId: string) => void;
+  clearComparison: () => void;
+  isComparisonModalOpen: boolean;
+  openComparisonModal: () => void;
+  closeComparisonModal: () => void;
+
+  // Real Customer Reviews (Sharhlar)
+  reviews: Record<string, Review[]>;
+  addReview: (productId: string, review: { userName: string; rating: number; comment: string }) => void;
+
+  // Order Tracking (Buyurtmani kuzatish)
+  isOrderTrackingOpen: boolean;
+  openOrderTracking: () => void;
+  closeOrderTracking: () => void;
 }
 
 export const INITIAL_PROMO_CODES: PromoCode[] = [
@@ -577,6 +596,62 @@ export const useStore = create<StoreState>()(
       openCityModal: () => set({ isCityModalOpen: true }),
       closeCityModal: () => set({ isCityModalOpen: false }),
 
+      // Product Comparison (Taqqoslash)
+      comparisonList: [],
+      addToComparison: (productId: string) => {
+        const { comparisonList, products } = get();
+        if (comparisonList.includes(productId)) {
+          get().addToast("Ushbu mahsulot allaqachon taqqoslashga qo'shilgan", 'info');
+          return;
+        }
+        if (comparisonList.length >= 4) {
+          get().addToast("Bir vaqtda ko'pi bilan 4 ta mahsulotni taqqoslash mumkin", 'warning');
+          return;
+        }
+        const product = products.find(p => p.id === productId);
+        set({ comparisonList: [...comparisonList, productId] });
+        get().addToast(`"${product?.title.slice(0, 25)}..." taqqoslashga qo'shildi`, 'success');
+      },
+      removeFromComparison: (productId: string) => {
+        set((state) => ({
+          comparisonList: state.comparisonList.filter((id) => id !== productId),
+        }));
+      },
+      clearComparison: () => set({ comparisonList: [] }),
+      isComparisonModalOpen: false,
+      openComparisonModal: () => set({ isComparisonModalOpen: true }),
+      closeComparisonModal: () => set({ isComparisonModalOpen: false }),
+
+      // Real Customer Reviews (Sharhlar)
+      reviews: INITIAL_REVIEWS,
+      addReview: (productId: string, reviewData) => {
+        const newRev: Review = {
+          id: `rev-${Date.now()}`,
+          productId,
+          userName: reviewData.userName || "Hurmatli Mijoz",
+          rating: reviewData.rating,
+          comment: reviewData.comment,
+          createdAt: new Date().toISOString(),
+          verifiedPurchase: true,
+          likesCount: 0,
+        };
+        set((state) => {
+          const currentList = state.reviews[productId] || [];
+          return {
+            reviews: {
+              ...state.reviews,
+              [productId]: [newRev, ...currentList],
+            },
+          };
+        });
+        get().addToast("Sharhingiz qabul qilindi va chop etildi! Rahmat!", 'success');
+      },
+
+      // Order Tracking (Buyurtmani kuzatish)
+      isOrderTrackingOpen: false,
+      openOrderTracking: () => set({ isOrderTrackingOpen: true }),
+      closeOrderTracking: () => set({ isOrderTrackingOpen: false }),
+
       // Toasts
       toasts: [],
       addToast: (message, type = 'info') => {
@@ -677,6 +752,8 @@ export const useStore = create<StoreState>()(
         promoCodes: state.promoCodes,
         appliedPromoCode: state.appliedPromoCode,
         selectedCity: state.selectedCity,
+        comparisonList: state.comparisonList,
+        reviews: state.reviews,
       }),
     }
   )

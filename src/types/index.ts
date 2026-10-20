@@ -21,7 +21,22 @@ export interface Product {
   description: string;
   deliveryDays?: number;
   sku: string;
+  colors?: { name: string; hex: string }[];
+  storageOptions?: { size: string; priceOffset?: number }[];
 }
+
+export interface Review {
+  id: string;
+  productId: string;
+  userName: string;
+  rating: number;
+  comment: string;
+  createdAt: string;
+  verifiedPurchase?: boolean;
+  likesCount?: number;
+}
+
+export type OnlinePaymentProvider = 'click' | 'payme' | 'uzumpay';
 
 export interface SubCategory {
   id: string;

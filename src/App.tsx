@@ -14,6 +14,9 @@ import { AuthModal } from './components/AuthModal';
 import { LoginRequiredModal } from './components/LoginRequiredModal';
 import { CitySelectModal } from './components/CitySelectModal';
 import { InstallmentCalculator } from './components/InstallmentCalculator';
+import { ProductComparisonModal } from './components/ProductComparisonModal';
+import { ComparisonBar } from './components/ComparisonBar';
+import { OrderTrackingModal } from './components/OrderTrackingModal';
 import { Footer } from './components/Footer';
 import { ScrollProgressBar, ScrollToTopButton } from './components/ScrollFeatures';
 import { useStore } from './store/useStore';
@@ -141,6 +144,9 @@ export const App: React.FC = () => {
       <AuthModal />
       <LoginRequiredModal />
       <CitySelectModal />
+      <ProductComparisonModal />
+      <ComparisonBar />
+      <OrderTrackingModal />
 
       {/* 7. Global Tezkor Nasiya Kalkulyatori Modali */}
       {isCalculatorOpen && calculatorProduct && (

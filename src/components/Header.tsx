@@ -25,7 +25,9 @@ import {
   Sun,
   Moon,
   Globe,
-  Zap
+  Zap,
+  Truck,
+  Scale
 } from 'lucide-react';
 import { Logo } from './Logo';
 import { useStore } from '../store/useStore';
@@ -73,6 +75,9 @@ export const Header: React.FC = () => {
     toggleTheme,
     selectedCity,
     openCityModal,
+    openOrderTracking,
+    comparisonList,
+    openComparisonModal,
   } = useStore();
 
   const { t, language, setLanguage } = useTranslation();
@@ -176,6 +181,15 @@ export const Header: React.FC = () => {
             <div className="text-gray-600 dark:text-gray-200 hover:text-uzum-primary dark:hover:text-white cursor-pointer transition-colors">
               {t('freeDelivery')}
             </div>
+            <button
+              type="button"
+              onClick={openOrderTracking}
+              className="flex items-center gap-1.5 text-gray-700 dark:text-gray-200 hover:text-uzum-primary dark:hover:text-purple-300 font-bold cursor-pointer transition-colors bg-purple-50/60 dark:bg-purple-950/40 px-2 py-0.5 rounded-lg border border-purple-200/40 dark:border-purple-900/30"
+              title="Shartnoma yoki buyurtma holatini kuzatish"
+            >
+              <Truck className="w-3.5 h-3.5 text-uzum-primary dark:text-purple-400" />
+              <span>Buyurtmani kuzatish</span>
+            </button>
             <div className="hidden lg:flex items-center gap-1 text-[11px] font-bold text-[#640199] dark:text-purple-300 bg-purple-50/90 dark:bg-purple-950/50 px-2.5 py-0.5 rounded-full border border-purple-200/50 dark:border-purple-900/40">
               <span>«{t('slogan')}»</span>
             </div>
@@ -621,6 +635,28 @@ export const Header: React.FC = () => {
               <span className="hidden sm:inline">{t('adminPanel')}</span>
             </motion.button>
           )}
+
+          {/* Product Comparison (Taqqoslash) */}
+          <motion.button
+            id="comparison-btn"
+            whileHover={{ scale: 1.08 }}
+            whileTap={{ scale: 0.92 }}
+            onClick={openComparisonModal}
+            className="relative p-2.5 rounded-2xl transition-colors flex items-center gap-1 text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-slate-800 hover:text-uzum-primary dark:hover:text-purple-300"
+            title="Tovarlarni taqqoslash"
+          >
+            <Scale className={`w-5 h-5 ${comparisonList.length > 0 ? 'text-primary-600 dark:text-primary-400' : ''}`} />
+            {comparisonList.length > 0 && (
+              <motion.span 
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-primary-600 text-white text-[11px] font-bold rounded-full flex items-center justify-center shadow"
+              >
+                {comparisonList.length}
+              </motion.span>
+            )}
+            <span className="hidden xl:inline text-xs font-bold ml-1 text-gray-700 dark:text-white">Taqqoslash</span>
+          </motion.button>
 
           {/* Favorites */}
           <Link to="/favorites">

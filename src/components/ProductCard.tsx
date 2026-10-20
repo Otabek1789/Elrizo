@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Heart, Star, ShoppingBag, Calculator, Zap } from 'lucide-react';
+import { Heart, Star, ShoppingBag, Calculator, Zap, Scale } from 'lucide-react';
 import { Product } from '../types';
 import { useStore } from '../store/useStore';
 import { calculateMonthlyPaymentQuick, formatPrice } from '../utils/calculator';
@@ -18,11 +18,15 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     isFavorite,
     addToCart,
     openCalculator,
+    comparisonList,
+    addToComparison,
+    removeFromComparison,
   } = useStore();
   const { t, language } = useTranslation();
 
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const favorite = isFavorite(product.id);
+  const isCompared = comparisonList.includes(product.id);
 
   // 12 oylik nasiya to'lovi
   const monthlyPayment = calculateMonthlyPaymentQuick(product.price, 12);
@@ -44,6 +48,15 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const handleToggleFavorite = (e: React.MouseEvent) => {
     e.stopPropagation();
     toggleFavorite(product.id);
+  };
+
+  const handleToggleComparison = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (isCompared) {
+      removeFromComparison(product.id);
+    } else {
+      addToComparison(product.id);
+    }
   };
 
   return (
@@ -74,20 +87,36 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           loading="lazy"
         />
 
-        {/* Favorite Heart Button with motion */}
-        <motion.button
-          whileHover={{ scale: 1.25 }}
-          whileTap={{ scale: 0.85 }}
-          onClick={handleToggleFavorite}
-          className="absolute top-3 right-3 p-2 rounded-full bg-white/85 hover:bg-white dark:bg-slate-800/80 dark:hover:bg-slate-700 backdrop-blur-md text-gray-400 dark:text-gray-300 hover:text-rose-500 transition-colors shadow-sm z-10"
-          title={t('addToFavoritesTitle')}
-        >
-          <Heart
-            className={`w-4 h-4 transition-colors ${
-              favorite ? 'fill-rose-500 text-rose-500 animate-pulse' : ''
+        {/* Action Buttons: Favorite & Compare */}
+        <div className="absolute top-3 right-3 flex flex-col gap-1.5 z-10">
+          <motion.button
+            whileHover={{ scale: 1.2 }}
+            whileTap={{ scale: 0.85 }}
+            onClick={handleToggleFavorite}
+            className="p-2 rounded-full bg-white/85 hover:bg-white dark:bg-slate-800/80 dark:hover:bg-slate-700 backdrop-blur-md text-gray-400 dark:text-gray-300 hover:text-rose-500 transition-colors shadow-sm"
+            title={t('addToFavoritesTitle')}
+          >
+            <Heart
+              className={`w-4 h-4 transition-colors ${
+                favorite ? 'fill-rose-500 text-rose-500 animate-pulse' : ''
+              }`}
+            />
+          </motion.button>
+
+          <motion.button
+            whileHover={{ scale: 1.2 }}
+            whileTap={{ scale: 0.85 }}
+            onClick={handleToggleComparison}
+            className={`p-2 rounded-full backdrop-blur-md transition-colors shadow-sm ${
+              isCompared
+                ? 'bg-primary-600 text-white shadow-md shadow-primary-500/30'
+                : 'bg-white/85 hover:bg-white dark:bg-slate-800/80 dark:hover:bg-slate-700 text-gray-400 dark:text-gray-300 hover:text-primary-600'
             }`}
-          />
-        </motion.button>
+            title={isCompared ? "Taqqoslashdan o'chirish" : "Taqqoslashga qo'shish"}
+          >
+            <Scale className="w-4 h-4" />
+          </motion.button>
+        </div>
 
         {/* Badges */}
         <div className="absolute top-2.5 left-2.5 flex flex-col items-start gap-1 z-10 pointer-events-none">
