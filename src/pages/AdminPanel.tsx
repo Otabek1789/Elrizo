@@ -388,16 +388,54 @@ export const AdminPanel: React.FC = () => {
     setTimeout(() => setCopiedRegion(null), 2000);
   };
 
-  const navItems = [
-    { id: 'dashboard', labelUz: 'Dashboard Overview', labelRu: 'Дашборд', labelEn: 'Dashboard', icon: LayoutDashboard },
-    { id: 'applications', labelUz: 'Nasiya Arizalari', labelRu: 'Заявки', labelEn: 'Applications', icon: FileText, count: orders.length },
-    { id: 'analytics', labelUz: 'Grafikalar & Tahlil', labelRu: 'Аналитика', labelEn: 'Analytics', icon: BarChart3 },
-    { id: 'promos', labelUz: 'Promokodlar', labelRu: 'Промокоды', labelEn: 'Promo Codes', icon: Tag, count: promoCodes.length },
-    { id: 'coordinates', labelUz: 'Viloyatlar & GPS', labelRu: 'Регионы (GPS)', labelEn: 'Regions (GPS)', icon: Compass, iconColor: 'text-emerald-500' },
-    { id: 'products', labelUz: 'Mahsulotlar Bazasi', labelRu: 'Товары', labelEn: 'Products', icon: Package, count: products.length },
-    { id: 'customers', labelUz: 'Mijozlar CRM', labelRu: 'Клиенты CRM', labelEn: 'Customers CRM', icon: Users },
-    { id: 'settings', labelUz: 'Tizim Sozlamalari', labelRu: 'Настройки', labelEn: 'Settings', icon: Settings },
-  ] as const;
+  interface NavItem {
+    id: 'dashboard' | 'applications' | 'analytics' | 'products' | 'promos' | 'coordinates' | 'customers' | 'settings';
+    labelUz: string;
+    labelRu: string;
+    labelEn: string;
+    icon: any;
+    count?: number;
+    iconColor?: string;
+  }
+
+  interface NavSection {
+    titleUz: string;
+    titleRu: string;
+    titleEn: string;
+    items: NavItem[];
+  }
+
+  const navSections: NavSection[] = [
+    {
+      titleUz: 'Boshqaruv',
+      titleRu: 'Управление',
+      titleEn: 'Management',
+      items: [
+        { id: 'dashboard', labelUz: 'Dashboard Overview', labelRu: 'Дашборд', labelEn: 'Dashboard', icon: LayoutDashboard },
+        { id: 'applications', labelUz: 'Nasiya Arizalari', labelRu: 'Заявки', labelEn: 'Applications', icon: FileText, count: orders.length },
+        { id: 'analytics', labelUz: 'Grafikalar & Tahlil', labelRu: 'Аналитика', labelEn: 'Analytics', icon: BarChart3 },
+      ],
+    },
+    {
+      titleUz: 'Katalog & Savdo',
+      titleRu: 'Каталог и продажи',
+      titleEn: 'Catalog & Sales',
+      items: [
+        { id: 'products', labelUz: 'Mahsulotlar Bazasi', labelRu: 'Товары', labelEn: 'Products', icon: Package, count: products.length },
+        { id: 'promos', labelUz: 'Promokodlar', labelRu: 'Промокоды', labelEn: 'Promo Codes', icon: Tag, count: promoCodes.length },
+        { id: 'coordinates', labelUz: 'Viloyatlar & GPS', labelRu: 'Регионы (GPS)', labelEn: 'Regions (GPS)', icon: Compass, iconColor: 'text-emerald-500' },
+      ],
+    },
+    {
+      titleUz: 'Mijozlar & Tizim',
+      titleRu: 'Клиенты и система',
+      titleEn: 'Customers & System',
+      items: [
+        { id: 'customers', labelUz: 'Mijozlar CRM', labelRu: 'Клиенты CRM', labelEn: 'Customers CRM', icon: Users },
+        { id: 'settings', labelUz: 'Tizim Sozlamalari', labelRu: 'Настройки', labelEn: 'Settings', icon: Settings },
+      ],
+    },
+  ];
 
   return (
     <div className="min-h-screen bg-[#F8F9FA] dark:bg-[#0B0F19] text-gray-900 dark:text-gray-100 flex overflow-hidden selection:bg-purple-200 selection:text-purple-900">
@@ -405,128 +443,178 @@ export const AdminPanel: React.FC = () => {
       <motion.aside
         animate={{ width: isSidebarCollapsed ? 80 : 280 }}
         transition={{ type: 'spring', stiffness: 300, damping: 28 }}
-        className="bg-white dark:bg-slate-800 border-r border-gray-200 dark:border-slate-800 flex flex-col justify-between shrink-0 relative z-30 shadow-sm dark:shadow-2xl transition-colors"
+        className="bg-white dark:bg-slate-800 border-r border-gray-200 dark:border-slate-800 flex flex-col h-screen sticky top-0 shrink-0 relative z-30 shadow-sm dark:shadow-2xl transition-colors"
       >
-        <div>
-          {/* Sidebar Brand Header */}
-          {isSidebarCollapsed ? (
-            <div className="p-3.5 flex flex-col items-center justify-center gap-2 border-b border-gray-100 dark:border-slate-800/80">
+        {/* Sidebar Brand Header */}
+        {isSidebarCollapsed ? (
+          <div className="p-3.5 flex flex-col items-center justify-center gap-2 border-b border-gray-100 dark:border-slate-800/80 shrink-0">
+            <motion.div 
+              whileHover={{ scale: 1.15, rotate: [0, -10, 10, 0] }}
+              whileTap={{ scale: 0.92 }}
+              onClick={() => setIsSidebarCollapsed(false)}
+              className="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 to-orange-500 flex items-center justify-center text-slate-900 shadow-md shadow-amber-500/25 shrink-0 cursor-pointer"
+              title="ELRIZO Admin (Kengaytirish)"
+            >
+              <Crown className="w-5 h-5 fill-slate-950 text-slate-950" />
+            </motion.div>
+            <motion.button
+              whileHover={{ scale: 1.25, x: 2 }}
+              whileTap={{ scale: 0.85 }}
+              onClick={() => setIsSidebarCollapsed(false)}
+              className="p-1 rounded-lg text-gray-400 hover:text-gray-900 dark:text-slate-400 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-slate-700/60 transition-colors"
+              title="Kengaytirish"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </motion.button>
+          </div>
+        ) : (
+          <div className="p-4 flex items-center justify-between border-b border-gray-100 dark:border-slate-800/80 shrink-0">
+            <div className="flex items-center gap-3 overflow-hidden">
               <motion.div 
-                whileHover={{ scale: 1.15, rotate: [0, -10, 10, 0] }}
-                whileTap={{ scale: 0.92 }}
-                onClick={() => setIsSidebarCollapsed(false)}
+                whileHover={{ rotate: [0, -12, 12, -6, 6, 0], scale: 1.15 }}
+                animate={{ y: [0, -2, 0] }}
+                transition={{ repeat: Infinity, duration: 4, ease: 'easeInOut' }}
                 className="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 to-orange-500 flex items-center justify-center text-slate-900 shadow-md shadow-amber-500/25 shrink-0 cursor-pointer"
-                title="ELRIZO Admin (Kengaytirish)"
               >
                 <Crown className="w-5 h-5 fill-slate-950 text-slate-950" />
               </motion.div>
-              <motion.button
-                whileHover={{ scale: 1.25, x: 2 }}
-                whileTap={{ scale: 0.85 }}
-                onClick={() => setIsSidebarCollapsed(false)}
-                className="p-1 rounded-lg text-gray-400 hover:text-gray-900 dark:text-slate-400 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-slate-700/60 transition-colors"
-                title="Kengaytirish"
+              <motion.div 
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="flex flex-col truncate"
               >
-                <ChevronRight className="w-4 h-4" />
-              </motion.button>
+                <span className="text-sm font-black text-gray-900 dark:text-white tracking-wide">ELRIZO ADMIN</span>
+                <span className="text-[10px] text-amber-600 dark:text-amber-400 font-extrabold flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  Super Administrator
+                </span>
+              </motion.div>
             </div>
-          ) : (
-            <div className="p-4 flex items-center justify-between border-b border-gray-100 dark:border-slate-800/80">
-              <div className="flex items-center gap-3 overflow-hidden">
-                <motion.div 
-                  whileHover={{ rotate: [0, -12, 12, -6, 6, 0], scale: 1.15 }}
-                  animate={{ y: [0, -2, 0] }}
-                  transition={{ repeat: Infinity, duration: 4, ease: 'easeInOut' }}
-                  className="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 to-orange-500 flex items-center justify-center text-slate-900 shadow-md shadow-amber-500/25 shrink-0 cursor-pointer"
-                >
-                  <Crown className="w-5 h-5 fill-slate-950 text-slate-950" />
-                </motion.div>
-                <motion.div 
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  className="flex flex-col truncate"
-                >
-                  <span className="text-sm font-black text-gray-900 dark:text-white tracking-wide">ELRIZO ADMIN</span>
-                  <span className="text-[10px] text-amber-600 dark:text-amber-400 font-extrabold flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                    Super Administrator
-                  </span>
-                </motion.div>
+
+            <motion.button
+              whileHover={{ scale: 1.2 }}
+              whileTap={{ scale: 0.85 }}
+              onClick={() => setIsSidebarCollapsed(true)}
+              className="p-1.5 rounded-lg text-gray-400 hover:text-gray-900 dark:text-slate-400 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-slate-700/60 transition-colors"
+              title="Kichraytirish"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </motion.button>
+          </div>
+        )}
+
+        {/* Scrollable Navigation & Quick Metrics Snapshot */}
+        <div className="flex-1 overflow-y-auto overflow-x-hidden p-3 space-y-4">
+          {navSections.map((section, sIdx) => {
+            const sectionTitle = language === 'ru' ? section.titleRu : language === 'en' ? section.titleEn : section.titleUz;
+            return (
+              <div key={sIdx} className="space-y-1">
+                {!isSidebarCollapsed && (
+                  <div className="px-3 pt-1 pb-1 text-[10px] font-extrabold uppercase tracking-wider text-gray-400 dark:text-slate-500">
+                    {sectionTitle}
+                  </div>
+                )}
+                {isSidebarCollapsed && sIdx > 0 && (
+                  <div className="my-2 border-t border-gray-100 dark:border-slate-800/80 mx-2" />
+                )}
+                <div className="space-y-1">
+                  {section.items.map((item) => {
+                    const Icon = item.icon;
+                    const isSelected = activeSection === item.id;
+                    const label = language === 'ru' ? item.labelRu : language === 'en' ? item.labelEn : item.labelUz;
+
+                    return (
+                      <motion.button
+                        key={item.id}
+                        whileHover={{ x: isSidebarCollapsed ? 0 : 4, scale: isSidebarCollapsed ? 1.06 : 1.01 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => setActiveSection(item.id)}
+                        title={isSidebarCollapsed ? label : undefined}
+                        className={`relative w-full flex items-center ${isSidebarCollapsed ? 'justify-center p-2.5' : 'justify-between px-3 py-2.5'} rounded-xl transition-all ${
+                          isSelected
+                            ? 'text-white font-black shadow-md'
+                            : 'text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100/80 dark:hover:bg-slate-800'
+                        }`}
+                      >
+                        {/* Active sliding pill */}
+                        {isSelected && (
+                          <motion.div
+                            layoutId="adminSidebarActivePill"
+                            className="absolute inset-0 bg-gradient-to-r from-purple-600 via-purple-700 to-indigo-600 rounded-xl -z-10 shadow-lg shadow-purple-600/30"
+                            transition={{ type: 'spring', stiffness: 350, damping: 28 }}
+                          />
+                        )}
+
+                        <div className={`flex items-center ${isSidebarCollapsed ? 'justify-center' : 'gap-3'} relative z-10`}>
+                          <motion.div
+                            animate={isSelected ? { scale: [1, 1.2, 1] } : {}}
+                            transition={{ duration: 0.3 }}
+                          >
+                            <Icon className={`w-4.5 h-4.5 shrink-0 ${'iconColor' in item && item.iconColor ? item.iconColor : ''}`} />
+                          </motion.div>
+                          {!isSidebarCollapsed && <span className="text-xs font-bold">{label}</span>}
+                        </div>
+
+                        {!isSidebarCollapsed && item.count !== undefined && (
+                          <motion.span 
+                            key={item.count}
+                            initial={{ scale: 0.8 }}
+                            animate={{ scale: 1 }}
+                            className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold relative z-10 transition-colors ${
+                              isSelected
+                                ? 'bg-white/20 text-white'
+                                : 'bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-300'
+                            }`}
+                          >
+                            {item.count}
+                          </motion.span>
+                        )}
+                      </motion.button>
+                    );
+                  })}
+                </div>
               </div>
+            );
+          })}
 
-              <motion.button
-                whileHover={{ scale: 1.2 }}
-                whileTap={{ scale: 0.85 }}
-                onClick={() => setIsSidebarCollapsed(true)}
-                className="p-1.5 rounded-lg text-gray-400 hover:text-gray-900 dark:text-slate-400 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-slate-700/60 transition-colors"
-                title="Kichraytirish"
-              >
-                <ChevronLeft className="w-4 h-4" />
-              </motion.button>
-            </div>
-          )}
+          {/* Quick Metrics Snapshot */}
+          {!isSidebarCollapsed && (
+            <div className="pt-2">
+              <div className="p-3 rounded-2xl bg-gradient-to-br from-purple-500/5 via-indigo-500/5 to-purple-600/10 dark:from-purple-950/20 dark:via-indigo-950/20 dark:to-purple-900/30 border border-purple-200/60 dark:border-purple-800/40 space-y-2.5">
+                <div className="flex items-center justify-between text-[11px] font-black text-gray-700 dark:text-slate-300">
+                  <span className="flex items-center gap-1.5">
+                    <Activity className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
+                    {language === 'ru' ? 'Сводка данных' : language === 'en' ? 'Quick Snapshot' : "Tezkor ko'rsatkichlar"}
+                  </span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                </div>
 
-          {/* Navigation Links with animated sliding pill */}
-          <nav className="p-3 space-y-1.5 text-xs font-bold">
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              const isSelected = activeSection === item.id;
-              const label = language === 'ru' ? item.labelRu : language === 'en' ? item.labelEn : item.labelUz;
-
-              return (
-                <motion.button
-                  key={item.id}
-                  whileHover={{ x: isSidebarCollapsed ? 0 : 5, scale: isSidebarCollapsed ? 1.08 : 1.01 }}
-                  whileTap={{ scale: 0.94 }}
-                  onClick={() => setActiveSection(item.id as any)}
-                  title={isSidebarCollapsed ? label : undefined}
-                  className={`relative w-full flex items-center ${isSidebarCollapsed ? 'justify-center p-3' : 'justify-between p-3'} rounded-xl transition-all ${
-                    isSelected
-                      ? 'text-white font-black shadow-md'
-                      : 'text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100/80 dark:hover:bg-slate-800'
-                  }`}
-                >
-                  {/* Active sliding pill */}
-                  {isSelected && (
-                    <motion.div
-                      layoutId="adminSidebarActivePill"
-                      className="absolute inset-0 bg-gradient-to-r from-purple-600 via-purple-700 to-indigo-600 rounded-xl -z-10 shadow-lg shadow-purple-600/30"
-                      transition={{ type: 'spring', stiffness: 350, damping: 28 }}
-                    />
-                  )}
-
-                  <div className={`flex items-center ${isSidebarCollapsed ? 'justify-center' : 'gap-3'} relative z-10`}>
-                    <motion.div
-                      animate={isSelected ? { scale: [1, 1.2, 1] } : {}}
-                      transition={{ duration: 0.3 }}
-                    >
-                      <Icon className={`w-5 h-5 shrink-0 ${'iconColor' in item ? item.iconColor : ''}`} />
-                    </motion.div>
-                    {!isSidebarCollapsed && <span>{label}</span>}
+                <div className="grid grid-cols-2 gap-2 text-center">
+                  <div className="p-2 rounded-xl bg-white dark:bg-slate-800/80 border border-gray-100 dark:border-slate-700/60 shadow-xs">
+                    <div className="text-[10px] text-gray-500 dark:text-slate-400 font-medium">
+                      {language === 'ru' ? 'Товары' : language === 'en' ? 'Products' : 'Tovarlar'}
+                    </div>
+                    <div className="text-sm font-black text-purple-600 dark:text-purple-400">
+                      {products.length}
+                    </div>
                   </div>
 
-                  {!isSidebarCollapsed && 'count' in item && item.count !== undefined && (
-                    <motion.span 
-                      key={item.count}
-                      initial={{ scale: 0.8 }}
-                      animate={{ scale: 1 }}
-                      className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold relative z-10 transition-colors ${
-                        isSelected
-                          ? 'bg-white/20 text-white'
-                          : 'bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-300'
-                      }`}
-                    >
-                      {item.count}
-                    </motion.span>
-                  )}
-                </motion.button>
-              );
-            })}
-          </nav>
+                  <div className="p-2 rounded-xl bg-white dark:bg-slate-800/80 border border-gray-100 dark:border-slate-700/60 shadow-xs">
+                    <div className="text-[10px] text-gray-500 dark:text-slate-400 font-medium">
+                      {language === 'ru' ? 'Заявки' : language === 'en' ? 'Orders' : 'Arizalar'}
+                    </div>
+                    <div className="text-sm font-black text-amber-600 dark:text-amber-400">
+                      {orders.length}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Sidebar Footer */}
-        <div className="p-3 border-t border-gray-200 dark:border-slate-800/80 space-y-2">
+        <div className="p-3 border-t border-gray-200 dark:border-slate-800/80 space-y-2 shrink-0 bg-white dark:bg-slate-800">
           {!isSidebarCollapsed && (
             <motion.div 
               initial={{ opacity: 0, y: 10 }}
