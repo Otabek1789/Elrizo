@@ -89,6 +89,8 @@ export const LoginPage: React.FC = () => {
         usedLimit: 0,
         isAdmin: true,
         role: 'admin',
+        cashbackBalance: 245000,
+        loyaltyCardNumber: '8600 4910 8274 9912',
       };
 
       useStore.setState({ user: adminUser, isAuthOpen: false });
@@ -115,6 +117,8 @@ export const LoginPage: React.FC = () => {
       usedLimit: 0,
       isAdmin: false,
       role: 'user',
+      cashbackBalance: 245000,
+      loyaltyCardNumber: '8600 4910 8274 9912',
     };
 
     useStore.setState({ user: regularUser, isAuthOpen: false });
@@ -157,6 +161,8 @@ export const LoginPage: React.FC = () => {
         usedLimit: 0,
         isAdmin: true,
         role: 'admin',
+        cashbackBalance: 245000,
+        loyaltyCardNumber: '8600 4910 8274 9912',
       };
 
       useStore.setState({ user: adminUser, isAuthOpen: false });
@@ -182,6 +188,8 @@ export const LoginPage: React.FC = () => {
       usedLimit: 0,
       isAdmin: false,
       role: 'user',
+      cashbackBalance: 245000,
+      loyaltyCardNumber: '8600 4910 8274 9912',
     };
 
     useStore.setState({ user: newUser, isAuthOpen: false });
@@ -250,6 +258,8 @@ export const LoginPage: React.FC = () => {
         usedLimit: 0,
         isAdmin: true,
         role: 'admin',
+        cashbackBalance: 245000,
+        loyaltyCardNumber: '8600 4910 8274 9912',
       };
       useStore.setState({ user: adminUser, isAuthOpen: false });
       addToast(
@@ -275,6 +285,8 @@ export const LoginPage: React.FC = () => {
       usedLimit: 0,
       isAdmin: false,
       role: 'user',
+      cashbackBalance: 245000,
+      loyaltyCardNumber: '8600 4910 8274 9912',
     };
     useStore.setState({ user: tgUser, isAuthOpen: false });
     addToast(

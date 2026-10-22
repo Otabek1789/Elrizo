@@ -48,11 +48,14 @@ export const Checkout: React.FC = () => {
     applyPromoCode,
     removePromoCode,
     getDiscountAmount,
-    getFinalTotal,
-    getFinalMonthlyTotal,
     openLoginRequiredModal,
     selectedCity,
     openOrderTracking,
+    useCashbackInCheckout,
+    toggleUseCashbackInCheckout,
+    addCashback,
+    spendCashback,
+    openCashbackCardModal,
   } = useStore();
   const { t, language } = useTranslation();
 
@@ -67,8 +70,18 @@ export const Checkout: React.FC = () => {
   const totalAmount = getCartTotal();
   const monthlyTotal = getCartMonthlyTotal();
   const discountAmount = getDiscountAmount();
-  const finalTotal = getFinalTotal();
-  const finalMonthlyTotal = getFinalMonthlyTotal();
+  const priceAfterPromo = Math.max(0, totalAmount - discountAmount);
+
+  // Nakapitelniy Karta (Keshbek) hisob-kitoblari
+  const availableCashback = user?.cashbackBalance ?? 0;
+  const cashbackDiscount = useCashbackInCheckout ? Math.min(availableCashback, priceAfterPromo) : 0;
+  const finalTotal = Math.max(0, priceAfterPromo - cashbackDiscount);
+
+  const monthlyRatio = totalAmount > 0 ? finalTotal / totalAmount : 1;
+  const finalMonthlyTotal = Math.round(monthlyTotal * monthlyRatio);
+
+  // 1% Keshbek: har bir xariddan 1% kartaga yig'iladi
+  const earnedCashbackAmount = Math.round(finalTotal * 0.01);
 
   const [promoInput, setPromoInput] = useState('');
   const [promoError, setPromoError] = useState('');
@@ -213,6 +226,8 @@ export const Checkout: React.FC = () => {
         createdAt: new Date().toISOString(),
         appliedPromoCode: appliedPromoCode?.code,
         discountAmount: discountAmount > 0 ? discountAmount : undefined,
+        cashbackEarned: earnedCashbackAmount,
+        cashbackSpent: cashbackDiscount > 0 ? cashbackDiscount : undefined,
         items: cart.map((c) => ({
           productId: c.product.id,
           title: c.product.title,
@@ -224,6 +239,14 @@ export const Checkout: React.FC = () => {
 
       addOrder(newInstallmentOrder);
       setCompletedOrder(newInstallmentOrder);
+
+      // Keshbek hisobi: ishlatilgan bo'lsa yechish, yangi 1% keshbekni esa qo'shish
+      if (cashbackDiscount > 0) {
+        spendCashback(cashbackDiscount, `Shartnoma ${contractNumber} uchun to'lov`, newInstallmentOrder.id);
+      }
+      if (earnedCashbackAmount > 0) {
+        addCashback(earnedCashbackAmount, `Shartnoma ${contractNumber} xarididan 1% keshbek`, newInstallmentOrder.id);
+      }
 
       setCurrentStep(4);
       clearCart();
@@ -245,6 +268,8 @@ export const Checkout: React.FC = () => {
       createdAt: new Date().toISOString(),
       appliedPromoCode: appliedPromoCode?.code,
       discountAmount: discountAmount > 0 ? discountAmount : undefined,
+      cashbackEarned: earnedCashbackAmount,
+      cashbackSpent: cashbackDiscount > 0 ? cashbackDiscount : undefined,
       items: cart.map((c) => ({
         productId: c.product.id,
         title: c.product.title,
@@ -255,6 +280,13 @@ export const Checkout: React.FC = () => {
 
     addOrder(newFullOrder);
     setCompletedOrder(newFullOrder);
+
+    if (cashbackDiscount > 0) {
+      spendCashback(cashbackDiscount, `Buyurtma ${contractNumber} uchun to'lov`, newFullOrder.id);
+    }
+    if (earnedCashbackAmount > 0) {
+      addCashback(earnedCashbackAmount, `Buyurtma ${contractNumber} xarididan 1% keshbek`, newFullOrder.id);
+    }
 
     addToast(t('checkoutOrderSuccessToast'), 'success');
     setCurrentStep(4);
@@ -276,6 +308,8 @@ export const Checkout: React.FC = () => {
       createdAt: new Date().toISOString(),
       appliedPromoCode: appliedPromoCode?.code,
       discountAmount: discountAmount > 0 ? discountAmount : undefined,
+      cashbackEarned: earnedCashbackAmount,
+      cashbackSpent: cashbackDiscount > 0 ? cashbackDiscount : undefined,
       items: cart.map((c) => ({
         productId: c.product.id,
         title: c.product.title,
@@ -286,6 +320,13 @@ export const Checkout: React.FC = () => {
 
     addOrder(newFullOrder);
     setCompletedOrder(newFullOrder);
+
+    if (cashbackDiscount > 0) {
+      spendCashback(cashbackDiscount, `Online to'lov ${contractNumber} uchun keshbek`, newFullOrder.id);
+    }
+    if (earnedCashbackAmount > 0) {
+      addCashback(earnedCashbackAmount, `Buyurtma ${contractNumber} xarididan 1% keshbek`, newFullOrder.id);
+    }
 
     const paymentLink = generatePaymentLink(provider, {
       orderId: newFullOrder.id,
@@ -396,6 +437,37 @@ export const Checkout: React.FC = () => {
 
           <div className="p-4 bg-gray-50 dark:bg-slate-900/60 rounded-2xl text-xs text-gray-500 dark:text-slate-400 border border-gray-200 dark:border-slate-800">
             {t('checkoutCourierNotice')}
+          </div>
+
+          {/* Nakapitelniy Karta Keshbek Natijasi */}
+          <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-50 to-yellow-50 dark:from-amber-950/40 dark:to-yellow-950/40 border border-amber-200 dark:border-amber-800/60 text-left space-y-2.5 text-xs shadow-xs">
+            <div className="flex items-center justify-between">
+              <span className="font-extrabold text-amber-950 dark:text-amber-200 flex items-center gap-1.5">
+                <CreditCard className="w-4 h-4 text-amber-600" />
+                <span>ELRIZO Club Nakapitelniy Karta</span>
+              </span>
+              <button
+                type="button"
+                onClick={openCashbackCardModal}
+                className="text-[11px] font-bold text-amber-700 dark:text-amber-300 underline hover:text-amber-900 cursor-pointer"
+              >
+                Kartani ko'rish
+              </button>
+            </div>
+            {completedOrder?.cashbackSpent && (
+              <div className="flex justify-between text-gray-700 dark:text-slate-300">
+                <span>Keshbek hisobidan to'landi:</span>
+                <strong className="text-rose-600 dark:text-rose-400 font-bold">-{formatPrice(completedOrder.cashbackSpent, true, language)}</strong>
+              </div>
+            )}
+            <div className="flex justify-between text-gray-700 dark:text-slate-300">
+              <span>Kartangizga tushgan 1% keshbek:</span>
+              <strong className="text-emerald-600 dark:text-emerald-400 font-black">+{formatPrice(completedOrder?.cashbackEarned || earnedCashbackAmount, true, language)} 🎁</strong>
+            </div>
+            <div className="flex justify-between text-gray-700 dark:text-slate-300 pt-1.5 border-t border-amber-200/60 dark:border-amber-800/40 font-medium">
+              <span>Kartangizdagi yangi balans:</span>
+              <strong className="text-amber-900 dark:text-amber-200 font-black">{formatPrice(user?.cashbackBalance ?? 0, true, language)}</strong>
+            </div>
           </div>
 
           <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
@@ -1039,6 +1111,73 @@ export const Checkout: React.FC = () => {
               )}
             </div>
 
+            {/* Nakapitelniy Karta (Keshbek) Bo'limi */}
+            <div className="border-t border-gray-100 dark:border-slate-700/60 pt-3">
+              <div className="flex items-center justify-between mb-2">
+                <label className="text-xs font-bold text-gray-700 dark:text-slate-300 flex items-center gap-1.5">
+                  <CreditCard className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+                  <span>Nakapitelniy Karta (1% Keshbek)</span>
+                </label>
+                <button
+                  type="button"
+                  onClick={openCashbackCardModal}
+                  className="text-[11px] font-bold text-amber-600 dark:text-amber-400 hover:underline cursor-pointer"
+                >
+                  Kartani ochish
+                </button>
+              </div>
+
+              <div className="p-3 rounded-2xl bg-gradient-to-r from-amber-500/10 via-yellow-500/10 to-amber-500/15 dark:from-amber-500/20 dark:to-yellow-500/20 border border-amber-300/60 dark:border-amber-700/50 space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="w-7 h-7 rounded-lg bg-amber-500 text-white flex items-center justify-center font-black text-xs shadow-xs">
+                      1%
+                    </div>
+                    <div>
+                      <div className="text-[11px] font-bold text-amber-950 dark:text-amber-200">
+                        {user?.loyaltyCardNumber || '8600 •••• 9912'}
+                      </div>
+                      <div className="text-[10px] text-amber-700 dark:text-amber-400">
+                        Mavjud balans: <strong className="font-black text-amber-900 dark:text-amber-200">{formatPrice(availableCashback, true, language)}</strong>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Checkbox / Toggle to spend or save cashback */}
+                {availableCashback > 0 ? (
+                  <label className="flex items-center justify-between p-2 rounded-xl bg-white/80 dark:bg-slate-900/80 border border-amber-200/80 dark:border-amber-800/60 cursor-pointer select-none">
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={useCashbackInCheckout}
+                        onChange={toggleUseCashbackInCheckout}
+                        className="w-4 h-4 rounded text-amber-600 focus:ring-amber-500 border-gray-300"
+                      />
+                      <span className="text-xs font-bold text-gray-800 dark:text-slate-200">
+                        Keshbek hisobidan to'lash
+                      </span>
+                    </div>
+                    {useCashbackInCheckout && (
+                      <span className="text-xs font-black text-emerald-600 dark:text-emerald-400">
+                        -{formatPrice(cashbackDiscount, true, language)}
+                      </span>
+                    )}
+                  </label>
+                ) : (
+                  <div className="text-[11px] text-amber-800 dark:text-amber-400 italic">
+                    Ushbu xarid orqali kartangizga ilk 1% keshbek yig'iladi!
+                  </div>
+                )}
+
+                {/* 1% accumulation guarantee badge */}
+                <div className="flex items-center gap-1.5 text-[10px] text-amber-800 dark:text-amber-300 font-bold bg-amber-200/50 dark:bg-amber-900/40 px-2 py-1 rounded-lg">
+                  <Sparkles className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                  <span>Xariddan kartangizga +{formatPrice(earnedCashbackAmount, true, language)} (+1%) tushadi</span>
+                </div>
+              </div>
+            </div>
+
             {/* Hisob-kitob qatori */}
             <div className="border-t border-gray-100 dark:border-slate-700/60 pt-3 space-y-2 text-xs text-gray-600 dark:text-slate-300">
               <div className="flex justify-between">
@@ -1049,6 +1188,12 @@ export const Checkout: React.FC = () => {
                 <div className="flex justify-between text-emerald-600 dark:text-emerald-400 font-bold">
                   <span>{t('promoDiscount')} ({appliedPromoCode?.code})</span>
                   <span>-{formatPrice(discountAmount, true, language)}</span>
+                </div>
+              )}
+              {cashbackDiscount > 0 && (
+                <div className="flex justify-between text-amber-600 dark:text-amber-400 font-bold">
+                  <span>Nakapitelniy karta (Keshbek)</span>
+                  <span>-{formatPrice(cashbackDiscount, true, language)}</span>
                 </div>
               )}
               <div className="flex justify-between">

@@ -17,6 +17,7 @@ import { InstallmentCalculator } from './components/InstallmentCalculator';
 import { ProductComparisonModal } from './components/ProductComparisonModal';
 import { ComparisonBar } from './components/ComparisonBar';
 import { OrderTrackingModal } from './components/OrderTrackingModal';
+import { NakapitelniyCardModal } from './components/NakapitelniyCardModal';
 import { Footer } from './components/Footer';
 import { ScrollProgressBar, ScrollToTopButton } from './components/ScrollFeatures';
 import { useStore } from './store/useStore';
@@ -60,6 +61,8 @@ export const App: React.FC = () => {
             usedLimit: 0,
             isAdmin,
             role: isAdmin ? 'admin' : 'user',
+            cashbackBalance: currentUser?.cashbackBalance ?? 150000,
+            loyaltyCardNumber: currentUser?.loyaltyCardNumber ?? '8600 7712 3340 9182',
           };
 
           useStore.setState({ user: userObj });
@@ -147,6 +150,7 @@ export const App: React.FC = () => {
       <ProductComparisonModal />
       <ComparisonBar />
       <OrderTrackingModal />
+      <NakapitelniyCardModal />
 
       {/* 7. Global Tezkor Nasiya Kalkulyatori Modali */}
       {isCalculatorOpen && calculatorProduct && (

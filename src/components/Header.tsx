@@ -27,7 +27,9 @@ import {
   Globe,
   Zap,
   Truck,
-  Scale
+  Scale,
+  CreditCard,
+  Gift
 } from 'lucide-react';
 import { Logo } from './Logo';
 import { useStore } from '../store/useStore';
@@ -78,6 +80,7 @@ export const Header: React.FC = () => {
     openOrderTracking,
     comparisonList,
     openComparisonModal,
+    openCashbackCardModal,
   } = useStore();
 
   const { t, language, setLanguage } = useTranslation();
@@ -189,6 +192,18 @@ export const Header: React.FC = () => {
             >
               <Truck className="w-3.5 h-3.5 text-uzum-primary dark:text-purple-400" />
               <span>Buyurtmani kuzatish</span>
+            </button>
+            <button
+              type="button"
+              onClick={openCashbackCardModal}
+              className="hidden sm:flex items-center gap-1.5 text-amber-800 dark:text-amber-300 hover:text-amber-950 dark:hover:text-amber-100 font-extrabold cursor-pointer transition-colors bg-gradient-to-r from-amber-50 to-yellow-50 dark:from-amber-950/50 dark:to-yellow-950/50 px-2.5 py-0.5 rounded-lg border border-amber-300/60 dark:border-amber-700/50 shadow-xs"
+              title="1% Keshbek Nakapitelniy Karta"
+            >
+              <CreditCard className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+              <span>1% Keshbek Karta</span>
+              <span className="bg-amber-500 text-white text-[10px] px-1.5 py-0.2 rounded-full font-black">
+                {formatPrice(user?.cashbackBalance ?? 245000, false, language)}
+              </span>
             </button>
             <div className="hidden lg:flex items-center gap-1 text-[11px] font-bold text-[#640199] dark:text-purple-300 bg-purple-50/90 dark:bg-purple-950/50 px-2.5 py-0.5 rounded-full border border-purple-200/50 dark:border-purple-900/40">
               <span>«{t('slogan')}»</span>
@@ -635,6 +650,29 @@ export const Header: React.FC = () => {
               <span className="hidden sm:inline">{t('adminPanel')}</span>
             </motion.button>
           )}
+
+          {/* Nakapitelniy Karta (Keshbek) Button */}
+          <motion.button
+            id="nakapitelniy-card-header-btn"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={openCashbackCardModal}
+            className="relative flex items-center gap-2 p-2 sm:px-3 sm:py-2 rounded-2xl bg-gradient-to-r from-amber-500/10 via-yellow-500/10 to-amber-500/15 dark:from-amber-500/20 dark:to-yellow-500/20 text-amber-900 dark:text-amber-200 hover:bg-amber-100/80 dark:hover:bg-amber-900/40 border border-amber-300/60 dark:border-amber-600/40 transition-all shadow-xs"
+            title="1% Nakapitelniy Keshbek Karta"
+          >
+            <div className="relative">
+              <CreditCard className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+              <span className="absolute -top-1 -right-1 text-[8px] font-black bg-amber-500 text-white px-1 rounded-full shadow-xs">
+                1%
+              </span>
+            </div>
+            <div className="hidden xl:flex flex-col text-left">
+              <span className="text-[11px] font-bold leading-none text-amber-950 dark:text-amber-200">Keshbek Karta</span>
+              <span className="text-[11px] font-black text-amber-600 dark:text-amber-400 mt-0.5">
+                {formatPrice(user?.cashbackBalance ?? 245000, true, language)}
+              </span>
+            </div>
+          </motion.button>
 
           {/* Product Comparison (Taqqoslash) */}
           <motion.button

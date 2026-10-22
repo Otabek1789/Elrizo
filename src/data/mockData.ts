@@ -11,6 +11,8 @@ export const INITIAL_USER: User = {
   usedLimit: 0,
   avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
   isAdmin: false,
+  cashbackBalance: 245000, // 245,000 so'm boshlang'ich keshbek
+  loyaltyCardNumber: '8600 4910 8274 9912',
 };
 
 export const CATEGORIES: Category[] = [

@@ -88,6 +88,15 @@ export interface CartItem {
   purchaseType: 'full' | 'installment';
 }
 
+export interface CashbackTransaction {
+  id: string;
+  orderId?: string;
+  type: 'earned' | 'spent';
+  amount: number; // in so'm
+  date: string;
+  description: string;
+}
+
 export interface User {
   id: string;
   fullName: string;
@@ -100,6 +109,8 @@ export interface User {
   avatarUrl?: string;
   role?: 'admin' | 'user';
   isAdmin?: boolean;
+  cashbackBalance?: number; // Nakapitelniy karta balansi (so'm)
+  loyaltyCardNumber?: string; // 8600 4521 8812 9014
 }
 
 export type PaymentMode = 'full' | 'installment';
@@ -147,6 +158,8 @@ export interface Order {
   status: 'pending' | 'scoring_approved' | 'processing' | 'delivered';
   appliedPromoCode?: string;
   discountAmount?: number;
+  cashbackEarned?: number; // Xariddan yig'ilgan 1% keshbek
+  cashbackSpent?: number; // Xaridda ishlatilgan keshbek
 }
 
 export interface PromoCode {

@@ -200,6 +200,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             <div className="text-sm sm:text-base font-black text-gray-900 dark:text-white leading-tight">
               {formatPrice(product.price, true, language)}
             </div>
+            {/* 1% Nakapitelniy Keshbek Yorlig'i */}
+            <div className="mt-1 flex items-center gap-1 text-[10px] font-bold text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 px-2 py-0.5 rounded-md border border-amber-200/50 dark:border-amber-800/40 w-fit">
+              <span>🎁 +1% keshbek ({formatPrice(Math.round(product.price * 0.01), false, language)})</span>
+            </div>
           </div>
         </div>
 

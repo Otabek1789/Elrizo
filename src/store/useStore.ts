@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { ActivePage, CartItem, Order, Product, PromoCode, User, Review } from '../types';
+import { ActivePage, CartItem, Order, Product, PromoCode, User, Review, CashbackTransaction } from '../types';
 import { INITIAL_USER, PRODUCTS } from '../data/mockData';
 import { INITIAL_REVIEWS } from '../data/mockReviews';
 import { searchProducts } from '../utils/searchHelper';
@@ -132,6 +132,18 @@ interface StoreState {
   isOrderTrackingOpen: boolean;
   openOrderTracking: () => void;
   closeOrderTracking: () => void;
+
+  // Nakapitelniy Karta (Cashback Loyalty Program)
+  cashbackTransactions: CashbackTransaction[];
+  addCashback: (amount: number, description: string, orderId?: string) => void;
+  spendCashback: (amount: number, description: string, orderId?: string) => boolean;
+  useCashbackInCheckout: boolean;
+  setUseCashbackInCheckout: (val: boolean) => void;
+  toggleUseCashbackInCheckout: () => void;
+  getCashbackDiscount: () => number;
+  isCashbackCardModalOpen: boolean;
+  openCashbackCardModal: () => void;
+  closeCashbackCardModal: () => void;
 }
 
 export const INITIAL_PROMO_CODES: PromoCode[] = [
@@ -552,6 +564,8 @@ export const useStore = create<StoreState>()(
             usedLimit: 0,
             isAdmin,
             role: isAdmin ? 'admin' : 'user',
+            cashbackBalance: 245000,
+            loyaltyCardNumber: '8600 4910 8274 9912',
           };
 
           set({ user: userObj, isAuthOpen: false });
@@ -652,6 +666,82 @@ export const useStore = create<StoreState>()(
       openOrderTracking: () => set({ isOrderTrackingOpen: true }),
       closeOrderTracking: () => set({ isOrderTrackingOpen: false }),
 
+      // Nakapitelniy Karta (Cashback Loyalty Program)
+      cashbackTransactions: [
+        {
+          id: 'cb-init-1',
+          type: 'earned',
+          amount: 145000,
+          date: '18-Oktabr',
+          description: "iPhone 15 Pro Max xarididan 1% keshbek",
+        },
+        {
+          id: 'cb-init-2',
+          type: 'earned',
+          amount: 100000,
+          date: '12-Oktabr',
+          description: "Samsung Smart TV xarididan 1% keshbek",
+        },
+      ],
+      useCashbackInCheckout: false,
+      setUseCashbackInCheckout: (val: boolean) => set({ useCashbackInCheckout: val }),
+      toggleUseCashbackInCheckout: () => set((state) => ({ useCashbackInCheckout: !state.useCashbackInCheckout })),
+      
+      getCashbackDiscount: () => {
+        const { useCashbackInCheckout, user, getFinalTotal } = get();
+        if (!useCashbackInCheckout || !user || !user.cashbackBalance) return 0;
+        const total = getFinalTotal();
+        return Math.min(user.cashbackBalance, total);
+      },
+
+      addCashback: (amount: number, description: string, orderId?: string) => {
+        const currentUser = get().user;
+        if (!currentUser || amount <= 0) return;
+        const newTx: CashbackTransaction = {
+          id: `cb-${Date.now()}`,
+          orderId,
+          type: 'earned',
+          amount,
+          date: new Date().toLocaleDateString('uz-UZ', { day: 'numeric', month: 'short' }),
+          description,
+        };
+        const updatedUser = {
+          ...currentUser,
+          cashbackBalance: (currentUser.cashbackBalance || 0) + amount,
+        };
+        set((state) => ({
+          user: updatedUser,
+          cashbackTransactions: [newTx, ...state.cashbackTransactions],
+        }));
+        get().addToast(`Nakapitelniy kartangizga +${amount.toLocaleString()} so'm keshbek qo'shildi! 🎁`, 'success');
+      },
+
+      spendCashback: (amount: number, description: string, orderId?: string) => {
+        const currentUser = get().user;
+        if (!currentUser || (currentUser.cashbackBalance || 0) < amount || amount <= 0) return false;
+        const newTx: CashbackTransaction = {
+          id: `cb-${Date.now()}`,
+          orderId,
+          type: 'spent',
+          amount,
+          date: new Date().toLocaleDateString('uz-UZ', { day: 'numeric', month: 'short' }),
+          description,
+        };
+        const updatedUser = {
+          ...currentUser,
+          cashbackBalance: Math.max(0, (currentUser.cashbackBalance || 0) - amount),
+        };
+        set((state) => ({
+          user: updatedUser,
+          cashbackTransactions: [newTx, ...state.cashbackTransactions],
+        }));
+        return true;
+      },
+
+      isCashbackCardModalOpen: false,
+      openCashbackCardModal: () => set({ isCashbackCardModalOpen: true }),
+      closeCashbackCardModal: () => set({ isCashbackCardModalOpen: false }),
+
       // Toasts
       toasts: [],
       addToast: (message, type = 'info') => {
@@ -730,6 +820,12 @@ export const useStore = create<StoreState>()(
         if (state?.user) {
           state.user.scoringLimit = 0;
           state.user.usedLimit = 0;
+          if (state.user.cashbackBalance === undefined) {
+            state.user.cashbackBalance = 245000;
+          }
+          if (!state.user.loyaltyCardNumber) {
+            state.user.loyaltyCardNumber = '8600 4910 8274 9912';
+          }
         }
         if (state && typeof document !== 'undefined') {
           if (state.theme === 'dark') {
@@ -754,6 +850,7 @@ export const useStore = create<StoreState>()(
         selectedCity: state.selectedCity,
         comparisonList: state.comparisonList,
         reviews: state.reviews,
+        cashbackTransactions: state.cashbackTransactions,
       }),
     }
   )

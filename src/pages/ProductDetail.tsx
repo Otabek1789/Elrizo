@@ -417,6 +417,26 @@ export const ProductDetail: React.FC = () => {
               </div>
             </div>
 
+            {/* 1% Nakapitelniy Keshbek Card Promo */}
+            <div className="flex items-center justify-between p-3 rounded-xl bg-gradient-to-r from-amber-50 to-yellow-50 dark:from-amber-950/40 dark:to-yellow-950/40 border border-amber-200/80 dark:border-amber-800/60 text-xs shadow-xs">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-amber-500 to-yellow-400 text-white flex items-center justify-center font-black text-xs shadow-xs">
+                  1%
+                </div>
+                <div>
+                  <div className="font-bold text-amber-950 dark:text-amber-200">
+                    1% Nakapitelniy Keshbek Karta
+                  </div>
+                  <div className="text-[11px] text-amber-700 dark:text-amber-400">
+                    Xariddan so'ng kartangizga <strong className="font-black text-amber-900 dark:text-amber-200">+{formatPrice(Math.round(effectivePrice * quantity * 0.01), false, language)}</strong> tushadi
+                  </div>
+                </div>
+              </div>
+              <span className="text-[10px] font-extrabold text-amber-800 dark:text-amber-300 bg-amber-200/60 dark:bg-amber-900/60 px-2 py-1 rounded-md">
+                Yig'ish / Ishlatish
+              </span>
+            </div>
+
             {/* CTAs: Savatga qo'shish & Nasiyaga olish */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
               <button
