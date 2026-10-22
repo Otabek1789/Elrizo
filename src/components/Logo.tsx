@@ -63,7 +63,7 @@ export const Logo: React.FC<LogoProps> = ({
       <div className="flex flex-col justify-center leading-none">
         <div className="flex items-center gap-2">
           <span 
-            className={`font-black tracking-wider uppercase ${titleSize} text-[#640199] dark:text-[#c084fc] transition-colors`}
+            className={`font-black tracking-wider uppercase ${titleSize} text-uzum-primary dark:text-uzum-primary transition-colors`}
           >
             ELRIZO
           </span>

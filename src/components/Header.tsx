@@ -262,19 +262,19 @@ export const Header: React.FC = () => {
             whileHover={{ scale: 1.04 }}
             whileTap={{ scale: 0.96 }}
             onClick={() => setIsCatalogOpen(!isCatalogOpen)}
-            className={`flex items-center gap-1.5 sm:gap-2.5 px-2.5 sm:px-4 py-2 sm:py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all shadow-sm ${
+            className={`flex items-center gap-1.5 sm:gap-2.5 px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all shadow-sm ${
               isCatalogOpen
-                ? 'bg-purple-100 dark:bg-purple-950/70 text-uzum-primary dark:text-purple-300 ring-2 ring-purple-400 dark:ring-purple-600 border border-purple-300 dark:border-purple-700 shadow-md'
-                : 'bg-purple-50 dark:bg-slate-800 text-uzum-primary dark:text-purple-300 hover:bg-purple-100 dark:hover:bg-slate-700 border border-purple-200/80 dark:border-slate-700'
+                ? 'bg-uzum-hover text-white ring-2 ring-purple-300 dark:ring-purple-400 shadow-md'
+                : 'bg-uzum-primary hover:bg-uzum-hover text-white shadow-sm'
             }`}
           >
             <motion.div
               animate={{ rotate: isCatalogOpen ? 90 : 0 }}
               transition={{ duration: 0.2 }}
             >
-              {isCatalogOpen ? <X className="w-4 h-4 sm:w-5 sm:h-5" /> : <Menu className="w-4 h-4 sm:w-5 sm:h-5" />}
+              {isCatalogOpen ? <X className="w-4 h-4 sm:w-5 sm:h-5 text-white" /> : <Menu className="w-4 h-4 sm:w-5 sm:h-5 text-white" />}
             </motion.div>
-            <span className="hidden sm:inline">{t('catalog')}</span>
+            <span className="hidden sm:inline text-white">{t('catalog')}</span>
           </motion.button>
 
           {/* Mega Menu Dropdown with Framer Motion AnimatePresence */}
