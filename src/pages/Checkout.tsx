@@ -20,7 +20,8 @@ import {
   X,
   Download,
   ExternalLink,
-  Truck
+  Truck,
+  Banknote
 } from 'lucide-react';
 import { useStore } from '../store/useStore';
 import { formatPrice, calculateMonthlyPaymentQuick, calculateInstallment } from '../utils/calculator';
@@ -103,8 +104,8 @@ export const Checkout: React.FC = () => {
   const [isSendingSms, setIsSendingSms] = useState<boolean>(false);
   const [isRealSmsDelivered, setIsRealSmsDelivered] = useState<boolean>(false);
 
-  // Online to'lov tizimi (Click, Payme, Uzum Pay)
-  const [selectedOnlineProvider, setSelectedOnlineProvider] = useState<'click' | 'payme' | 'uzumpay'>('click');
+  // Online to'lov tizimi (Uzum Pay, Payme, Click, Naqd)
+  const [selectedOnlineProvider, setSelectedOnlineProvider] = useState<'uzumpay' | 'payme' | 'click' | 'cash'>('uzumpay');
   const [completedOrder, setCompletedOrder] = useState<Order | null>(null);
 
   // Agar savat bo'sh bo'lsa
@@ -773,56 +774,96 @@ export const Checkout: React.FC = () => {
             ) : (
               /* Agar To'liq To'lov tanlangan bo'lsa */
               <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700/60 p-6 space-y-5 shadow-sm">
-                <h3 className="text-base font-bold text-gray-900 dark:text-white">To'lov tizimini tanlang (Haqiqiy onlayn to'lov)</h3>
+                <h3 className="text-base font-bold text-gray-900 dark:text-white">To'lov usulini tanlang:</h3>
                 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  {/* Click */}
-                  <div 
-                    onClick={() => setSelectedOnlineProvider('click')}
-                    className={`p-4 rounded-2xl border-2 cursor-pointer transition-all flex flex-col items-center justify-center text-center ${
-                      selectedOnlineProvider === 'click'
-                        ? 'border-blue-500 bg-blue-50/50 dark:bg-blue-950/40 ring-2 ring-blue-500/20 shadow-sm'
-                        : 'border-gray-200 dark:border-slate-700/60 bg-white dark:bg-slate-900/60 hover:border-gray-300'
-                    }`}
-                  >
-                    <div className="w-9 h-9 rounded-xl bg-blue-600 text-white font-black text-[11px] flex items-center justify-center shadow mb-2">
-                      CLICK
-                    </div>
-                    <span className="font-extrabold text-sm text-gray-900 dark:text-white">Click Up</span>
-                    <span className="text-[11px] text-blue-600 dark:text-blue-400 font-bold mt-0.5">0% komissiya</span>
-                  </div>
-
-                  {/* Payme */}
-                  <div 
-                    onClick={() => setSelectedOnlineProvider('payme')}
-                    className={`p-4 rounded-2xl border-2 cursor-pointer transition-all flex flex-col items-center justify-center text-center ${
-                      selectedOnlineProvider === 'payme'
-                        ? 'border-teal-500 bg-teal-50/50 dark:bg-teal-950/40 ring-2 ring-teal-500/20 shadow-sm'
-                        : 'border-gray-200 dark:border-slate-700/60 bg-white dark:bg-slate-900/60 hover:border-gray-300'
-                    }`}
-                  >
-                    <div className="w-9 h-9 rounded-xl bg-teal-500 text-white font-black text-[11px] flex items-center justify-center shadow mb-2">
-                      payme
-                    </div>
-                    <span className="font-extrabold text-sm text-gray-900 dark:text-white">Payme</span>
-                    <span className="text-[11px] text-teal-600 dark:text-teal-400 font-bold mt-0.5">Uzcard / Humo</span>
-                  </div>
-
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   {/* Uzum Pay */}
-                  <div 
+                  <button
+                    type="button"
                     onClick={() => setSelectedOnlineProvider('uzumpay')}
-                    className={`p-4 rounded-2xl border-2 cursor-pointer transition-all flex flex-col items-center justify-center text-center ${
+                    className={`p-3.5 rounded-2xl border-2 transition-all flex flex-col items-center justify-between text-center relative cursor-pointer ${
                       selectedOnlineProvider === 'uzumpay'
-                        ? 'border-purple-600 bg-purple-50/50 dark:bg-purple-950/40 ring-2 ring-purple-600/20 shadow-sm'
-                        : 'border-gray-200 dark:border-slate-700/60 bg-white dark:bg-slate-900/60 hover:border-gray-300'
+                        ? 'border-purple-600 bg-purple-50/70 dark:bg-purple-950/50 ring-2 ring-purple-600/30 shadow-md'
+                        : 'border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900/60 hover:border-gray-300 dark:hover:border-slate-600'
                     }`}
                   >
-                    <div className="w-9 h-9 rounded-xl bg-purple-600 text-white font-black text-[11px] flex items-center justify-center shadow mb-2">
+                    <div className="w-9 h-9 rounded-xl bg-purple-600 text-white font-black text-[11px] flex items-center justify-center shadow mb-1.5">
                       uzum
                     </div>
-                    <span className="font-extrabold text-sm text-gray-900 dark:text-white">Uzum Pay</span>
-                    <span className="text-[11px] text-purple-600 dark:text-purple-400 font-bold mt-0.5">Keshbek bilan</span>
-                  </div>
+                    <span className="font-extrabold text-xs sm:text-sm text-gray-900 dark:text-white">Uzum Pay</span>
+                    <span className="text-[10px] text-purple-600 dark:text-purple-400 font-bold mt-0.5">1% Keshbek</span>
+                    {selectedOnlineProvider === 'uzumpay' && (
+                      <span className="absolute top-2 right-2 w-4 h-4 rounded-full bg-purple-600 text-white flex items-center justify-center text-[10px] font-bold">
+                        ✓
+                      </span>
+                    )}
+                  </button>
+
+                  {/* Payme */}
+                  <button
+                    type="button"
+                    onClick={() => setSelectedOnlineProvider('payme')}
+                    className={`p-3.5 rounded-2xl border-2 transition-all flex flex-col items-center justify-between text-center relative cursor-pointer ${
+                      selectedOnlineProvider === 'payme'
+                        ? 'border-teal-500 bg-teal-50/70 dark:bg-teal-950/50 ring-2 ring-teal-500/30 shadow-md'
+                        : 'border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900/60 hover:border-gray-300 dark:hover:border-slate-600'
+                    }`}
+                  >
+                    <div className="w-9 h-9 rounded-xl bg-teal-500 text-white font-black text-[11px] flex items-center justify-center shadow mb-1.5">
+                      payme
+                    </div>
+                    <span className="font-extrabold text-xs sm:text-sm text-gray-900 dark:text-white">Payme</span>
+                    <span className="text-[10px] text-teal-600 dark:text-teal-400 font-bold mt-0.5">Uzcard / Humo</span>
+                    {selectedOnlineProvider === 'payme' && (
+                      <span className="absolute top-2 right-2 w-4 h-4 rounded-full bg-teal-500 text-white flex items-center justify-center text-[10px] font-bold">
+                        ✓
+                      </span>
+                    )}
+                  </button>
+
+                  {/* Click */}
+                  <button
+                    type="button"
+                    onClick={() => setSelectedOnlineProvider('click')}
+                    className={`p-3.5 rounded-2xl border-2 transition-all flex flex-col items-center justify-between text-center relative cursor-pointer ${
+                      selectedOnlineProvider === 'click'
+                        ? 'border-blue-500 bg-blue-50/70 dark:bg-blue-950/50 ring-2 ring-blue-500/30 shadow-md'
+                        : 'border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900/60 hover:border-gray-300 dark:hover:border-slate-600'
+                    }`}
+                  >
+                    <div className="w-9 h-9 rounded-xl bg-blue-600 text-white font-black text-[11px] flex items-center justify-center shadow mb-1.5">
+                      CLICK
+                    </div>
+                    <span className="font-extrabold text-xs sm:text-sm text-gray-900 dark:text-white">Click Up</span>
+                    <span className="text-[10px] text-blue-600 dark:text-blue-400 font-bold mt-0.5">Tezkor to'lov</span>
+                    {selectedOnlineProvider === 'click' && (
+                      <span className="absolute top-2 right-2 w-4 h-4 rounded-full bg-blue-600 text-white flex items-center justify-center text-[10px] font-bold">
+                        ✓
+                      </span>
+                    )}
+                  </button>
+
+                  {/* Qabul qilganda naqd */}
+                  <button
+                    type="button"
+                    onClick={() => setSelectedOnlineProvider('cash')}
+                    className={`p-3.5 rounded-2xl border-2 transition-all flex flex-col items-center justify-between text-center relative cursor-pointer ${
+                      selectedOnlineProvider === 'cash'
+                        ? 'border-emerald-600 bg-emerald-50/70 dark:bg-emerald-950/50 ring-2 ring-emerald-600/30 shadow-md'
+                        : 'border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900/60 hover:border-gray-300 dark:hover:border-slate-600'
+                    }`}
+                  >
+                    <div className="w-9 h-9 rounded-xl bg-emerald-600 text-white font-black text-[11px] flex items-center justify-center shadow mb-1.5">
+                      <Banknote className="w-5 h-5 text-white" />
+                    </div>
+                    <span className="font-extrabold text-xs sm:text-sm text-gray-900 dark:text-white">Naqd pul</span>
+                    <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold mt-0.5">Yetkazilganda</span>
+                    {selectedOnlineProvider === 'cash' && (
+                      <span className="absolute top-2 right-2 w-4 h-4 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[10px] font-bold">
+                        ✓
+                      </span>
+                    )}
+                  </button>
                 </div>
 
                 <div className="space-y-4 pt-2">
@@ -858,25 +899,38 @@ export const Checkout: React.FC = () => {
                 <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700/60 flex items-center justify-between text-xs">
                   <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
                     <ShieldCheck className="w-4 h-4 text-emerald-500" />
-                    <span>Tanlangan to'lov tizimi: <strong className="uppercase font-bold text-slate-900 dark:text-white">{selectedOnlineProvider}</strong></span>
+                    <span>Tanlangan to'lov usuli: <strong className="uppercase font-bold text-slate-900 dark:text-white">{selectedOnlineProvider === 'cash' ? 'Qabul qilganda naqd' : selectedOnlineProvider}</strong></span>
                   </div>
-                  <span className="text-emerald-600 dark:text-emerald-400 font-bold">Rasmiy Gateway</span>
+                  <span className="text-emerald-600 dark:text-emerald-400 font-bold">
+                    {selectedOnlineProvider === 'cash' ? 'Kuryer orqali' : 'Rasmiy Gateway'}
+                  </span>
                 </div>
 
-                <button
-                  type="button"
-                  onClick={() => handleOnlinePaymentCheckout(selectedOnlineProvider)}
-                  className={`w-full py-4 text-white font-black text-sm rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 transform active:scale-98 ${
-                    selectedOnlineProvider === 'click'
-                      ? 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 shadow-blue-500/25'
-                      : selectedOnlineProvider === 'payme'
-                      ? 'bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-600 shadow-teal-500/25'
-                      : 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 shadow-purple-500/25'
-                  }`}
-                >
-                  <span>{selectedOnlineProvider.toUpperCase()} orqali to'lash ({formatPrice(finalTotal, true, language)})</span>
-                  <ExternalLink className="w-4 h-4" />
-                </button>
+                {selectedOnlineProvider === 'cash' ? (
+                  <button
+                    type="button"
+                    onClick={handleFullPaymentOrder}
+                    className="w-full py-4 text-white font-black text-sm rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 shadow-emerald-600/25 transform active:scale-98"
+                  >
+                    <CheckCircle2 className="w-4 h-4" />
+                    <span>Buyurtmani tasdiqlash ({formatPrice(finalTotal, true, language)})</span>
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => handleOnlinePaymentCheckout(selectedOnlineProvider)}
+                    className={`w-full py-4 text-white font-black text-sm rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 transform active:scale-98 ${
+                      selectedOnlineProvider === 'click'
+                        ? 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 shadow-blue-500/25'
+                        : selectedOnlineProvider === 'payme'
+                        ? 'bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-600 shadow-teal-500/25'
+                        : 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 shadow-purple-500/25'
+                    }`}
+                  >
+                    <span>{selectedOnlineProvider.toUpperCase()} orqali to'lovga o'tish ({formatPrice(finalTotal, true, language)})</span>
+                    <ExternalLink className="w-4 h-4" />
+                  </button>
+                )}
               </div>
             )}
           </div>
