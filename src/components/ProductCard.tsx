@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Heart, Star, ShoppingBag, Calculator, Zap, Scale } from 'lucide-react';
+import { Heart, Star, ShoppingBag, Calculator, Zap, Scale, Send } from 'lucide-react';
 import { Product } from '../types';
 import { useStore } from '../store/useStore';
 import { calculateMonthlyPaymentQuick, formatPrice } from '../utils/calculator';
 import { useTranslation } from '../utils/translations';
+import { sendProductToTelegram } from '../utils/telegramBot';
 
 interface ProductCardProps {
   product: Product;
@@ -21,6 +22,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     comparisonList,
     addToComparison,
     removeFromComparison,
+    user,
+    addToast,
   } = useStore();
   const { t, language } = useTranslation();
 
@@ -43,6 +46,20 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const handleBuyOnInstallment = (e: React.MouseEvent) => {
     e.stopPropagation();
     openCalculator(product);
+  };
+
+  const [isSendingTg, setIsSendingTg] = useState(false);
+
+  const handleSendProductToTelegram = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsSendingTg(true);
+    const res = await sendProductToTelegram(product, { user });
+    setIsSendingTg(false);
+    if (res.success) {
+      addToast(`«${product.title}» Telegram botga muvaffaqiyatli yuborildi! @elrizo_bot ni tekshiring`, 'success');
+    } else {
+      addToast(res.message, 'error');
+    }
   };
 
   const handleToggleFavorite = (e: React.MouseEvent) => {
@@ -81,7 +98,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           loading="lazy"
         />
 
-        {/* Action Buttons: Favorite & Compare */}
+        {/* Action Buttons: Favorite, Compare & Telegram */}
         <div className="absolute top-3 right-3 flex flex-col gap-1.5 z-10">
           <motion.button
             whileHover={{ scale: 1.2 }}
@@ -109,6 +126,17 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             title={isCompared ? "Taqqoslashdan o'chirish" : "Taqqoslashga qo'shish"}
           >
             <Scale className="w-4 h-4" />
+          </motion.button>
+
+          <motion.button
+            whileHover={{ scale: 1.2 }}
+            whileTap={{ scale: 0.85 }}
+            onClick={handleSendProductToTelegram}
+            disabled={isSendingTg}
+            className="p-2 rounded-full bg-white/85 hover:bg-sky-50 dark:bg-slate-800/80 dark:hover:bg-sky-950/40 backdrop-blur-md text-sky-500 hover:text-sky-600 transition-colors shadow-sm cursor-pointer"
+            title="Tovarni Telegram botga yuborish (@elrizo_bot)"
+          >
+            <Send className={`w-4 h-4 -rotate-12 ${isSendingTg ? 'animate-spin' : ''}`} />
           </motion.button>
         </div>
 

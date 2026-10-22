@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { X, Trash2, ShoppingBag, ArrowRight, CreditCard, Tag, Check, Sparkles } from 'lucide-react';
+import { X, Trash2, ShoppingBag, ArrowRight, CreditCard, Tag, Check, Sparkles, Send, RefreshCw } from 'lucide-react';
 import { useStore } from '../store/useStore';
 import { formatPrice, calculateMonthlyPaymentQuick } from '../utils/calculator';
 import { useTranslation } from '../utils/translations';
+import { sendCartToTelegram } from '../utils/telegramBot';
 
 export const CartDrawer: React.FC = () => {
   const navigate = useNavigate();
@@ -24,8 +25,22 @@ export const CartDrawer: React.FC = () => {
     getFinalMonthlyTotal,
     user,
     openLoginRequiredModal,
+    addToast,
   } = useStore();
   const { t, language } = useTranslation();
+
+  const [isSendingTg, setIsSendingTg] = useState(false);
+
+  const handleSendCartToTelegram = async () => {
+    setIsSendingTg(true);
+    const res = await sendCartToTelegram(cart, finalTotal, user);
+    setIsSendingTg(false);
+    if (res.success) {
+      addToast("Savatdagi barcha tovarlar Telegram botga yuborildi! @elrizo_bot ni tekshiring", 'success');
+    } else {
+      addToast(res.message, 'error');
+    }
+  };
 
   if (!isCartOpen) return null;
 
@@ -269,10 +284,30 @@ export const CartDrawer: React.FC = () => {
               <button
                 id="cart-checkout-btn"
                 onClick={handleCheckout}
-                className="w-full py-3.5 bg-gradient-to-r from-uzum-primary to-purple-700 hover:from-uzum-hover hover:to-purple-800 text-white font-extrabold text-sm rounded-xl transition-all shadow-md shadow-purple-500/25 flex items-center justify-center gap-2 active:scale-95"
+                className="w-full py-3.5 bg-gradient-to-r from-uzum-primary to-purple-700 hover:from-uzum-hover hover:to-purple-800 text-white font-extrabold text-sm rounded-xl transition-all shadow-md shadow-purple-500/25 flex items-center justify-center gap-2 active:scale-95 cursor-pointer"
               >
                 <span>{t('proceedToCheckoutBtn')} ({formatPrice(finalTotal, true, language)})</span>
                 <ArrowRight className="w-4 h-4" />
+              </button>
+
+              <button
+                id="cart-send-telegram-btn"
+                type="button"
+                disabled={isSendingTg}
+                onClick={handleSendCartToTelegram}
+                className="w-full py-2.5 bg-sky-50 hover:bg-sky-100 dark:bg-sky-950/40 dark:hover:bg-sky-900/60 text-sky-700 dark:text-sky-300 font-bold text-xs rounded-xl transition-all border border-sky-200 dark:border-sky-800 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
+              >
+                {isSendingTg ? (
+                  <>
+                    <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                    <span>Telegram botga yuborilmoqda...</span>
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-3.5 h-3.5 -rotate-12" />
+                    <span>Savatdagi tovarlarni Telegram botga yuborish</span>
+                  </>
+                )}
               </button>
             </div>
           )}

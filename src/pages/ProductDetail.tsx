@@ -16,13 +16,15 @@ import {
   Send,
   CheckCircle2,
   HardDrive,
-  Palette
+  Palette,
+  RefreshCw
 } from 'lucide-react';
 import { useStore } from '../store/useStore';
 import { formatPrice, calculateMonthlyPaymentQuick } from '../utils/calculator';
 import { InstallmentCalculator } from '../components/InstallmentCalculator';
 import { ProductCard } from '../components/ProductCard';
 import { useTranslation, getCategoryTitle } from '../utils/translations';
+import { sendProductToTelegram } from '../utils/telegramBot';
 import { DEFAULT_PRODUCT_COLORS, DEFAULT_STORAGE_OPTIONS } from '../data/mockReviews';
 
 export const ProductDetail: React.FC = () => {
@@ -124,6 +126,33 @@ export const ProductDetail: React.FC = () => {
   const handleShare = () => {
     navigator.clipboard?.writeText(window.location.href);
     addToast(t('linkCopied'), 'info');
+  };
+
+  const [isSendingToTelegram, setIsSendingToTelegram] = useState(false);
+
+  const handleSendToTelegram = async () => {
+    setIsSendingToTelegram(true);
+    const configuredProduct = {
+      ...product,
+      price: effectivePrice,
+      originalPrice: effectiveOriginalPrice,
+      title: `${product.title} (${selectedStorage.size}, ${selectedColor.name})`,
+    };
+    const res = await sendProductToTelegram(configuredProduct, {
+      color: selectedColor.name,
+      storage: selectedStorage.size,
+      price: effectivePrice,
+      monthlyPayment: monthlyPayment,
+      user: user,
+      quantity: quantity,
+    });
+    setIsSendingToTelegram(false);
+
+    if (res.success) {
+      addToast(`«${product.title}» Telegram botga muvaffaqiyatli yuborildi! @elrizo_bot ni tekshiring`, 'success');
+    } else {
+      addToast(res.message, 'error');
+    }
   };
 
   const handleSubmitReview = (e: React.FormEvent) => {
@@ -442,7 +471,7 @@ export const ProductDetail: React.FC = () => {
               <button
                 id="detail-btn-cart"
                 onClick={handleAddToCart}
-                className="py-3.5 px-4 rounded-xl border-2 border-uzum-primary text-uzum-primary hover:bg-purple-50 dark:hover:bg-purple-950/30 font-bold text-sm transition-all flex items-center justify-center gap-2"
+                className="py-3.5 px-4 rounded-xl border-2 border-uzum-primary text-uzum-primary hover:bg-purple-50 dark:hover:bg-purple-950/30 font-bold text-sm transition-all flex items-center justify-center gap-2 cursor-pointer"
               >
                 <ShoppingBag className="w-4 h-4" />
                 <span>{t('addToCartFull')}</span>
@@ -451,12 +480,33 @@ export const ProductDetail: React.FC = () => {
               <button
                 id="detail-btn-installment"
                 onClick={handleBuyInstallment}
-                className="py-3.5 px-4 rounded-xl bg-uzum-primary hover:bg-uzum-hover text-white font-extrabold text-sm shadow-md shadow-purple-500/25 transition-all flex items-center justify-center gap-2"
+                className="py-3.5 px-4 rounded-xl bg-uzum-primary hover:bg-uzum-hover text-white font-extrabold text-sm shadow-md shadow-purple-500/25 transition-all flex items-center justify-center gap-2 cursor-pointer"
               >
                 <CreditCard className="w-4 h-4 text-amber-300" />
                 <span>{t('buyOnInstallmentFull')}</span>
               </button>
             </div>
+
+            {/* Telegram Botga Yuborish Tugmasi (1-klikda) */}
+            <button
+              id="detail-btn-telegram"
+              type="button"
+              disabled={isSendingToTelegram}
+              onClick={handleSendToTelegram}
+              className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-[#229ED9] via-[#2AABEE] to-[#38b6f5] hover:from-[#1b8bc2] hover:to-[#229ED9] text-white font-black text-sm shadow-md shadow-sky-500/25 transition-all flex items-center justify-center gap-2.5 cursor-pointer disabled:opacity-60"
+            >
+              {isSendingToTelegram ? (
+                <>
+                  <RefreshCw className="w-4 h-4 animate-spin" />
+                  <span>Telegram botga yuborilmoqda...</span>
+                </>
+              ) : (
+                <>
+                  <Send className="w-4 h-4 -rotate-12" />
+                  <span>Telegram Botga Yuborish (1-klikda)</span>
+                </>
+              )}
+            </button>
           </div>
 
           {/* Delivery & Assurance Perks */}
