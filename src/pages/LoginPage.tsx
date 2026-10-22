@@ -673,7 +673,7 @@ export const LoginPage: React.FC = () => {
                         type="text"
                         required
                         autoFocus
-                        placeholder="username (masalan: yahyo0526)"
+                        placeholder="username"
                         value={telegramUsername}
                         onChange={(e) => setTelegramUsername(e.target.value)}
                         className="w-full bg-transparent border-none outline-none text-xs font-semibold text-gray-900 dark:text-white placeholder:text-gray-400"
