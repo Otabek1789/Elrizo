@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, Sparkles, ArrowRight } from 'lucide-react';
 import { PROMO_BANNERS } from '../data/mockData';
 import { useStore } from '../store/useStore';
 import { useTranslation, getBannerContent } from '../utils/translations';
 
 export const BannerSlider: React.FC = () => {
+  const navigate = useNavigate();
   const { navigateToCategory } = useStore();
   const { language } = useTranslation();
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -27,11 +29,17 @@ export const BannerSlider: React.FC = () => {
   const banner = PROMO_BANNERS[currentIndex];
   const localizedBanner = getBannerContent(banner.id, language) || banner;
 
+  const handleBannerAction = (targetCat?: string) => {
+    const slug = (targetCat || 'smartphones').replace('cat-', '');
+    navigateToCategory(slug);
+    navigate(`/catalog?category=${slug}`);
+  };
+
   return (
     <div className="relative w-full rounded-2xl md:rounded-3xl overflow-hidden shadow-card group">
       {/* Banner Card Container */}
       <div 
-        onClick={() => navigateToCategory(banner.targetCategory)}
+        onClick={() => handleBannerAction(banner.targetCategory)}
         className={`w-full min-h-[220px] sm:min-h-[300px] md:min-h-[360px] bg-gradient-to-r ${banner.gradient} text-white p-6 sm:p-10 md:p-14 flex items-center justify-between cursor-pointer relative overflow-hidden transition-all duration-700`}
       >
         {/* Ambient Glow */}
@@ -52,7 +60,14 @@ export const BannerSlider: React.FC = () => {
             {localizedBanner.subtitle}
           </p>
 
-          <button className="mt-2 px-5 py-2.5 sm:px-6 sm:py-3 rounded-xl bg-white text-gray-900 font-extrabold text-xs sm:text-sm hover:bg-yellow-300 hover:text-gray-900 transition-all shadow-lg active:scale-95 flex items-center gap-1.5 w-fit">
+          <button 
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleBannerAction(banner.targetCategory);
+            }}
+            className="mt-2 px-5 py-2.5 sm:px-6 sm:py-3 rounded-xl bg-white text-gray-900 font-extrabold text-xs sm:text-sm hover:bg-yellow-300 hover:text-gray-900 transition-all shadow-lg active:scale-95 flex items-center gap-1.5 w-fit cursor-pointer"
+          >
             <span>{localizedBanner.ctaText}</span>
             <ArrowRight className="w-4 h-4" />
           </button>

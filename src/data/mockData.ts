@@ -1016,7 +1016,7 @@ export const PROMO_BANNERS = [
     badge: 'SIZ ROZI — BIZ ROZI!',
     gradient: 'from-[#640199] via-[#8B5CF6] to-[#EC4899]',
     ctaText: 'Xarid qilish',
-    targetCategory: 'cat-smartphones',
+    targetCategory: 'smartphones',
     image: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=600&auto=format&fit=crop&q=80',
   },
   {
@@ -1026,7 +1026,7 @@ export const PROMO_BANNERS = [
     badge: 'KATTA CHEGIRMA',
     gradient: 'from-[#1E1B4B] via-[#312E81] to-[#7000FF]',
     ctaText: 'Katalogga o\'tish',
-    targetCategory: 'cat-appliances',
+    targetCategory: 'appliances',
     image: 'https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?w=600&auto=format&fit=crop&q=80',
   },
   {
@@ -1036,7 +1036,7 @@ export const PROMO_BANNERS = [
     badge: 'SUPER NARX',
     gradient: 'from-[#0F172A] via-[#1E293B] to-[#6366F1]',
     ctaText: 'Tanlash',
-    targetCategory: 'cat-computers',
+    targetCategory: 'computers',
     image: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=600&auto=format&fit=crop&q=80',
   },
 ];
