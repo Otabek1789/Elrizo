@@ -129,9 +129,7 @@ export const NakapitelniyCardModal: React.FC = () => {
                     Faol status
                   </span>
                 ) : (
-                  <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center gap-1">
-                    <Info className="w-3 h-3 text-amber-400" />
-                    Biriktirilmagan
+                  <span >                   
                   </span>
                 )}
               </div>
@@ -174,7 +172,7 @@ export const NakapitelniyCardModal: React.FC = () => {
               <div>
                 <span className="text-[10px] text-purple-300/80 block uppercase">Karta Egasi</span>
                 <span className="text-xs sm:text-sm tracking-wide text-slate-100 font-bold block">
-                  {user ? user.fullName.toUpperCase() : "BIRIKTIRILMAGAN (MEHMON)"}
+                  {user ? user.fullName.toUpperCase() : <></>}
                 </span>
               </div>
               <div className="text-right">

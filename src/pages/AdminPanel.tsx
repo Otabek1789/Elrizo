@@ -51,7 +51,7 @@ import {
 } from 'lucide-react';
 import { useStore } from '../store/useStore';
 import { formatPrice } from '../utils/calculator';
-import { ADMIN_EMAIL } from '../lib/supabase';
+import { ADMIN_EMAIL, fetchOrdersFromSupabase } from '../lib/supabase';
 import { CATEGORIES } from '../data/mockData';
 import { Order, Product, PromoCode } from '../types';
 import { CustomSelect } from '../components/CustomSelect';
@@ -345,12 +345,17 @@ export const AdminPanel: React.FC = () => {
     });
   };
 
-  const handleRefreshCache = () => {
+  const handleRefreshCache = async () => {
     setIsRefreshingCache(true);
-    setTimeout(() => {
-      setIsRefreshingCache(false);
+    try {
+      const remoteOrders = await fetchOrdersFromSupabase();
+      useStore.setState({ orders: remoteOrders || [] });
       addToast("Kesh va Supabase sinxronizatsiyasi yangilandi!", 'success');
-    }, 700);
+    } catch {
+      addToast("Sinxronizatsiyada xatolik", 'error');
+    } finally {
+      setIsRefreshingCache(false);
+    }
   };
 
   const handleCreatePromo = (e: React.FormEvent) => {

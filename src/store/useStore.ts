@@ -573,9 +573,7 @@ export const useStore = create<StoreState>()(
         if (isOk) {
           try {
             const remoteOrders = await fetchOrdersFromSupabase();
-            if (remoteOrders && remoteOrders.length > 0) {
-              set({ orders: remoteOrders });
-            }
+            set({ orders: remoteOrders || [] });
           } catch (e) {
             console.warn("Orders fetch from Supabase:", e);
           }
@@ -779,28 +777,25 @@ export const useStore = create<StoreState>()(
       t: (key: TranslationKey) => getTranslation(get().language, key),
     }),
     {
-      name: 'elrizo_store_v2', // LocalStorage kaliti (0 dan bo'sh boshlash uchun)
+      name: 'elrizo_store_v3', // Yangi toza kalit (0 dan boshlash uchun)
       storage: createJSONStorage(() => localStorage),
       onRehydrateStorage: () => (state) => {
         if (typeof window !== 'undefined') {
           try {
             localStorage.removeItem('elrizo_nasiya_storage');
+            localStorage.removeItem('elrizo_store_v2');
           } catch (e) {}
         }
         if (state) {
-          // Saytdan hali hech kim sotib olmagan bo'lishi kerak: eski mock tranzaksiya va buyurtmalarni tozalaymiz
-          if (state.cashbackTransactions) {
-            state.cashbackTransactions = state.cashbackTransactions.filter(
-              (t: any) => t.id !== 'cb-init-1' && t.id !== 'cb-init-2' && !t.description?.includes('iPhone 15') && !t.description?.includes('Samsung Smart TV')
-            );
+          // Saytdan hali hech kim sotib olmagan: buyurtmalarni tozalaymiz
+          if (state.orders && state.orders.some((o: any) => o.contractNumber === 'ELR-592970' || o.contractNumber === 'ELR-PAY-345805' || o.id === 'ord-initial-01')) {
+            state.orders = [];
           }
-          if (!state.user) {
+          if (state.cashbackTransactions) {
             state.cashbackTransactions = [];
           }
-          if (state.orders) {
-            state.orders = state.orders.filter(
-              (o: any) => o.id !== 'ord-initial-01' && o.contractNumber !== 'ELR-849201'
-            );
+          if (state.promoCodes) {
+            state.promoCodes = state.promoCodes.map((p: any) => ({ ...p, usageCount: 0 }));
           }
         }
         if (state?.user) {
