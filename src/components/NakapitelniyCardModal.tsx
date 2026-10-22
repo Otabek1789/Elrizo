@@ -264,7 +264,7 @@ export const NakapitelniyCardModal: React.FC = () => {
                 closeCashbackCardModal();
                 navigate('/catalog');
               }}
-              className="px-5 py-2 text-xs font-bold bg-primary-600 hover:bg-primary-700 text-white rounded-xl shadow-md shadow-primary-500/25 transition-all hover:scale-[1.02]"
+              className="px-5 py-2.5 text-xs font-bold bg-uzum-primary hover:bg-uzum-hover text-white rounded-xl shadow-md shadow-purple-500/25 transition-all hover:scale-[1.02] cursor-pointer"
             >
               Xarid qilish va yig'ish
             </button>
