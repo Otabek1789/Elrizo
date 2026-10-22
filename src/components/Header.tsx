@@ -264,8 +264,8 @@ export const Header: React.FC = () => {
             onClick={() => setIsCatalogOpen(!isCatalogOpen)}
             className={`flex items-center gap-1.5 sm:gap-2.5 px-2.5 sm:px-4 py-2 sm:py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all shadow-sm ${
               isCatalogOpen
-                ? 'bg-white dark:bg-white text-uzum-primary dark:text-uzum-primary ring-2 ring-purple-400 border border-purple-200 shadow-md'
-                : 'bg-white dark:bg-white text-uzum-primary dark:text-uzum-primary hover:bg-gray-50 dark:hover:bg-gray-100 border border-gray-200/90 dark:border-gray-200'
+                ? 'bg-purple-100 dark:bg-purple-950/70 text-uzum-primary dark:text-purple-300 ring-2 ring-purple-400 dark:ring-purple-600 border border-purple-300 dark:border-purple-700 shadow-md'
+                : 'bg-purple-50 dark:bg-slate-800 text-uzum-primary dark:text-purple-300 hover:bg-purple-100 dark:hover:bg-slate-700 border border-purple-200/80 dark:border-slate-700'
             }`}
           >
             <motion.div
