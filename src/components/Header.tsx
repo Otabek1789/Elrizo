@@ -193,19 +193,7 @@ export const Header: React.FC = () => {
               <Truck className="w-3.5 h-3.5 text-uzum-primary dark:text-purple-400" />
               <span>Buyurtmani kuzatish</span>
             </button>
-            <button
-              type="button"
-              onClick={openCashbackCardModal}
-              className="hidden sm:flex items-center gap-1.5 text-amber-800 dark:text-amber-300 hover:text-amber-950 dark:hover:text-amber-100 font-extrabold cursor-pointer transition-colors bg-gradient-to-r from-amber-50 to-yellow-50 dark:from-amber-950/50 dark:to-yellow-950/50 px-2.5 py-0.5 rounded-lg border border-amber-300/60 dark:border-amber-700/50 shadow-xs"
-              title="1% Jamg'arma Keshbek Kartasi"
-            >
-              <CreditCard className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
-              <span>1% Jamg'arma Karta</span>
-              <span className="bg-amber-500 text-white text-[10px] px-1.5 py-0.2 rounded-full font-black">
-                {formatPrice(user?.cashbackBalance ?? 0, false, language)}
-              </span>
-            </button>
-            <div className="hidden lg:flex items-center gap-1 text-[11px] font-bold text-[#640199] dark:text-purple-300 bg-purple-50/90 dark:bg-purple-950/50 px-2.5 py-0.5 rounded-full border border-purple-200/50 dark:border-purple-900/40">
+            <div className="hidden lg:flex items-center gap-1 text-[11px] font-bold text-uzum-primary dark:text-purple-300 bg-purple-50/90 dark:bg-purple-950/50 px-2.5 py-0.5 rounded-full border border-purple-200/50 dark:border-purple-900/40">
               <span>«{t('slogan')}»</span>
             </div>
           </div>
