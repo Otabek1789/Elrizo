@@ -148,25 +148,31 @@ ${itemsList || "  <i>(Tovarlar ro'yxati biriktirilmagan)</i>"}
   return res.success;
 }
 
+export interface SendProductToTelegramOptions {
+  color?: string;
+  storage?: string;
+  price?: number;
+  monthlyPayment?: number;
+  user?: User | null;
+  quantity?: number;
+  chatId?: string;
+  customNote?: string;
+  isMarketingPost?: boolean;
+}
+
 /**
- * Saytdagi tovar kartasidan tovarni to'g'ridan-to'g'ri Telegram botga yuborish
+ * Saytdagi tovar kartasidan yoki Admin paneldan tovarni to'g'ridan-to'g'ri Telegram bot / kanalga yuborish
  */
 export async function sendProductToTelegram(
   product: Product,
-  options?: {
-    color?: string;
-    storage?: string;
-    price?: number;
-    monthlyPayment?: number;
-    user?: User | null;
-    quantity?: number;
-  }
+  options?: SendProductToTelegramOptions
 ): Promise<{ success: boolean; message: string }> {
   const price = options?.price || product.price;
   const qty = options?.quantity || 1;
   const totalPrice = price * qty;
   const monthly = options?.monthlyPayment || Math.round((totalPrice * 1.24) / 12);
   const photo = product.images?.[0] || 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=800';
+  const targetChat = options?.chatId || TELEGRAM_ADMIN_CHAT_ID;
 
   const now = new Date().toLocaleString('uz-UZ', {
     year: 'numeric',
@@ -176,25 +182,41 @@ export async function sendProductToTelegram(
     minute: '2-digit',
   });
 
-  const caption = `🛍️ <b>ELRIZO — MAHSULOT SO'ROVI</b>
+  let caption = '';
+
+  if (options?.isMarketingPost) {
+    caption = `🔥 <b>ELRIZO ONLINE MARKET — MAXSUS TAKLIF</b>
+━━━━━━━━━━━━━━━━━━━━
+📱 <b>${escapeHtml(product.title)}</b>
+
+💰 <b>Narxi:</b> <b>${totalPrice.toLocaleString('uz-UZ')} so'm</b>
+⚡ <b>Muddatli to'lov:</b> <code>${monthly.toLocaleString('uz-UZ')} so'm / oy</code> (12 oy)
+${product.hasZeroDown ? '✅ <b>Aksiya: 0-0-12 Boshlang\'ich to\'lovsiz Nasiya!</b>\n' : ''}${options?.color ? `🎨 <b>Rangi:</b> ${escapeHtml(options.color)}\n` : ''}${options?.storage ? `💾 <b>Xotirasi:</b> ${escapeHtml(options.storage)}\n` : ''}${options?.customNote ? `\n📝 <i>${escapeHtml(options.customNote)}</i>\n` : ''}━━━━━━━━━━━━━━━━━━━━
+🚚 <b>Yetkazib berish:</b> Butun O'zbekiston bo'ylab 1 kunda!
+🛡️ <b>Kafolat:</b> 1 yil rasmiy kafolat
+🌐 <b>Saytda xarid qilish:</b> https://elrizo.uz/product/${product.id}
+⏰ <b>Vaqt:</b> ${now}`;
+  } else {
+    caption = `🛍️ <b>ELRIZO — MAHSULOT SO'ROVI</b>
 ━━━━━━━━━━━━━━━━━━━━
 📦 <b>Mahsulot:</b> <b>${escapeHtml(product.title)}</b>
 💰 <b>Narxi:</b> <b>${totalPrice.toLocaleString('uz-UZ')} so'm</b> ${qty > 1 ? `(${qty} dona)` : ''}
 📅 <b>Nasiyaga (12 oy):</b> <code>${monthly.toLocaleString('uz-UZ')} so'm/oy</code>
 ${options?.color ? `🎨 <b>Rangi:</b> ${escapeHtml(options.color)}\n` : ''}${options?.storage ? `💾 <b>Xotirasi:</b> ${escapeHtml(options.storage)}\n` : ''}${product.hasZeroDown ? '⚡ <b>Aksiya: 0-0-12 Boshlang\'ich to\'lovsiz</b>\n' : ''}━━━━━━━━━━━━━━━━━━━━
-${options?.user ? `👤 <b>Mijoz:</b> <b>${escapeHtml(options.user.fullName)}</b>\n📞 <b>Telefon:</b> <code>${escapeHtml(options.user.phone || 'Kiritilmagan')}</code>\n` : '👤 <b>Mijoz:</b> Sayt mehmoni (Telegram orqali)\n'}⏰ <b>Vaqt:</b> ${now}
+${options?.user ? `👤 <b>Mijoz:</b> <b>${escapeHtml(options.user.fullName)}</b>\n📞 <b>Telefon:</b> <code>${escapeHtml(options.user.phone || 'Kiritilmagan')}</code>\n` : '👤 <b>Mijoz:</b> Sayt foydalanuvchisi\n'}⏰ <b>Vaqt:</b> ${now}
 🌐 <b>Sayt havolasi:</b> https://elrizo.uz/product/${product.id}`;
+  }
 
-  const res = await sendTelegramPhoto(photo, caption);
+  const res = await sendTelegramPhoto(photo, caption, targetChat);
   if (res.success) {
     return {
       success: true,
-      message: `«${product.title}» Telegram botga muvaffaqiyatli yuborildi!`,
+      message: `«${product.title}» Telegramga muvaffaqiyatli tashlandi!`,
     };
   } else {
     return {
       success: false,
-      message: res.error || "Telegram botga yuborishda xatolik yuz berdi",
+      message: res.error || "Telegramga yuborishda xatolik yuz berdi",
     };
   }
 }

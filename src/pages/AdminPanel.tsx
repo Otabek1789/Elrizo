@@ -57,7 +57,7 @@ import { ADMIN_EMAIL, fetchOrdersFromSupabase } from '../lib/supabase';
 import { CATEGORIES } from '../data/mockData';
 import { Order, Product, PromoCode } from '../types';
 import { CustomSelect } from '../components/CustomSelect';
-import { testTelegramBotConnection, TELEGRAM_BOT_USERNAME, TELEGRAM_ADMIN_CHAT_ID } from '../utils/telegramBot';
+import { testTelegramBotConnection, sendProductToTelegram, TELEGRAM_BOT_USERNAME, TELEGRAM_ADMIN_CHAT_ID } from '../utils/telegramBot';
 
 interface RegionCoordinate {
   name: string;
@@ -191,7 +191,7 @@ export const AdminPanel: React.FC = () => {
     deletePromoCode
   } = useStore();
 
-  const [activeSection, setActiveSection] = useState<'dashboard' | 'applications' | 'analytics' | 'products' | 'promos' | 'coordinates' | 'customers' | 'settings'>('dashboard');
+  const [activeSection, setActiveSection] = useState<'dashboard' | 'applications' | 'analytics' | 'products' | 'telegram' | 'promos' | 'coordinates' | 'customers' | 'settings'>('dashboard');
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [searchFilter, setSearchFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'scoring_approved' | 'processing' | 'delivered'>('all');
@@ -201,9 +201,21 @@ export const AdminPanel: React.FC = () => {
   const [activeChartPoint, setActiveChartPoint] = useState<ChartPoint | null>(null);
   const [chartTimeframe, setChartTimeframe] = useState<'1m' | '6m' | '1y'>('1y');
 
-  // Telegram Bot test holati
+  // Telegram Bot test va tovar post qilish holatlari
   const [isTestingTelegram, setIsTestingTelegram] = useState(false);
   const [telegramTestResult, setTelegramTestResult] = useState<{ success: boolean; message: string } | null>(null);
+
+  // Telegram Post Workspace holatlari
+  const [selectedTelegramProductId, setSelectedTelegramProductId] = useState<string>('');
+  const [telegramCustomTitle, setTelegramCustomTitle] = useState('iPhone 16 Pro Max 256GB');
+  const [telegramCustomPrice, setTelegramCustomPrice] = useState('16500000');
+  const [telegramCustomImage, setTelegramCustomImage] = useState('https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=800');
+  const [telegramCustomNote, setTelegramCustomNote] = useState("0-0-12 Boshlang'ich to'lovsiz Nasiya! 1 yil rasmiy kafolat.");
+  const [telegramTargetChat, setTelegramTargetChat] = useState(TELEGRAM_ADMIN_CHAT_ID);
+  const [telegramSearchQuery, setTelegramSearchQuery] = useState('');
+  const [isPostingTelegram, setIsPostingTelegram] = useState(false);
+  const [sendingProductId, setSendingProductId] = useState<string | null>(null);
+  const [newProductPostToTelegram, setNewProductPostToTelegram] = useState(false);
 
   const handleTestTelegram = async () => {
     setIsTestingTelegram(true);
@@ -213,6 +225,82 @@ export const AdminPanel: React.FC = () => {
     setTelegramTestResult(res);
     if (res.success) {
       addToast(res.message, 'success');
+    } else {
+      addToast(res.message, 'error');
+    }
+  };
+
+  const handleSelectProductForTelegram = (p: Product) => {
+    setSelectedTelegramProductId(p.id);
+    setTelegramCustomTitle(p.title);
+    setTelegramCustomPrice(p.price.toString());
+    setTelegramCustomImage(p.images[0] || '');
+    setTelegramCustomNote(p.hasZeroDown ? "0-0-12 Boshlang'ich to'lovsiz Nasiya! Rasmiy kafolat bilan." : "");
+    addToast(`«${p.title}» tanlandi! Ko'rinishini tekshirib Telegramga tashlashingiz mumkin.`, 'info');
+  };
+
+  const handleQuickSendToTelegram = async (p: Product) => {
+    setSendingProductId(p.id);
+    const res = await sendProductToTelegram(p, {
+      isMarketingPost: true,
+      chatId: telegramTargetChat || TELEGRAM_ADMIN_CHAT_ID,
+    });
+    setSendingProductId(null);
+    if (res.success) {
+      addToast(res.message, 'success');
+    } else {
+      addToast(res.message, 'error');
+    }
+  };
+
+  const handlePublishToTelegram = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!telegramCustomTitle.trim()) {
+      addToast("Mahsulot nomini kiriting!", 'warning');
+      return;
+    }
+    const priceNum = Number(telegramCustomPrice.replace(/\D/g, '')) || 0;
+    if (priceNum <= 0) {
+      addToast("Mahsulot narxini to'g'ri kiriting!", 'warning');
+      return;
+    }
+
+    setIsPostingTelegram(true);
+    const existing = products.find(p => p.id === selectedTelegramProductId);
+    const prod: Product = existing ? {
+      ...existing,
+      title: telegramCustomTitle,
+      price: priceNum,
+      images: telegramCustomImage ? [telegramCustomImage, ...existing.images.slice(1)] : existing.images,
+    } : {
+      id: `prod-${Date.now()}`,
+      title: telegramCustomTitle,
+      slug: telegramCustomTitle.toLowerCase().replace(/\s+/g, '-'),
+      price: priceNum,
+      rating: 5.0,
+      reviewsCount: 1,
+      images: [telegramCustomImage || 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=800'],
+      categoryId: CATEGORIES[0].id,
+      categoryName: CATEGORIES[0].name,
+      inStock: true,
+      stockCount: 10,
+      hasZeroDown: true,
+      maxMonths: 24,
+      specs: {},
+      description: telegramCustomNote || '',
+      sku: `ELR-${Date.now().toString().slice(-4)}`
+    };
+
+    const res = await sendProductToTelegram(prod, {
+      isMarketingPost: true,
+      price: priceNum,
+      chatId: telegramTargetChat.trim() || TELEGRAM_ADMIN_CHAT_ID,
+      customNote: telegramCustomNote.trim() || undefined,
+    });
+
+    setIsPostingTelegram(false);
+    if (res.success) {
+      addToast(`«${telegramCustomTitle}» Telegramga muvaffaqiyatli joylandi!`, 'success');
     } else {
       addToast(res.message, 'error');
     }
@@ -353,6 +441,14 @@ export const AdminPanel: React.FC = () => {
 
     addProduct(productObj);
     addToast(`${newProduct.title} mahsuloti muvaffaqiyatli qo'shildi!`, 'success');
+
+    if (newProductPostToTelegram) {
+      sendProductToTelegram(productObj, {
+        isMarketingPost: true,
+        chatId: telegramTargetChat || TELEGRAM_ADMIN_CHAT_ID,
+      });
+    }
+
     setNewProduct({
       title: '',
       price: '',
@@ -416,7 +512,7 @@ export const AdminPanel: React.FC = () => {
   };
 
   interface NavItem {
-    id: 'dashboard' | 'applications' | 'analytics' | 'products' | 'promos' | 'coordinates' | 'customers' | 'settings';
+    id: 'dashboard' | 'applications' | 'analytics' | 'products' | 'telegram' | 'promos' | 'coordinates' | 'customers' | 'settings';
     labelUz: string;
     labelRu: string;
     labelEn: string;
@@ -449,6 +545,7 @@ export const AdminPanel: React.FC = () => {
       titleEn: 'Catalog & Sales',
       items: [
         { id: 'products', labelUz: 'Mahsulotlar Bazasi', labelRu: 'Товары', labelEn: 'Products', icon: Package, count: products.length },
+        { id: 'telegram', labelUz: 'Telegram Post', labelRu: 'Пост в Телеграм', labelEn: 'Telegram Post', icon: Send, iconColor: 'text-sky-500' },
         { id: 'promos', labelUz: 'Promokodlar', labelRu: 'Промокоды', labelEn: 'Promo Codes', icon: Tag, count: promoCodes.length },
         { id: 'coordinates', labelUz: 'Viloyatlar & GPS', labelRu: 'Регионы (GPS)', labelEn: 'Regions (GPS)', icon: Compass, iconColor: 'text-emerald-500' },
       ],
@@ -704,6 +801,7 @@ export const AdminPanel: React.FC = () => {
                 {activeSection === 'promos' && (language === 'ru' ? 'Управление промокодами' : language === 'en' ? 'Promo Codes Management' : 'Promokodlar va Chegirmalar Boshqaruvi')}
                 {activeSection === 'coordinates' && (language === 'ru' ? 'Регионы и GPS координаты' : language === 'en' ? 'Regions & GPS Coordinates' : 'Viloyatlar Geografiyasi va GPS Koordinatalari')}
                 {activeSection === 'products' && (language === 'ru' ? 'Каталог товаров' : language === 'en' ? 'Products & Inventory' : "Mahsulotlar Katalogi va Yangi Tovar Qo'shish")}
+                {activeSection === 'telegram' && (language === 'ru' ? 'Публикация товаров в Telegram' : language === 'en' ? 'Telegram Product Publisher' : "Tovarlarni Telegramga Tashlash & Marketing")}
                 {activeSection === 'customers' && (language === 'ru' ? 'База клиентов (CRM)' : language === 'en' ? 'Customer CRM' : 'Mijozlar Portfeli va Skoring Tahlili')}
                 {activeSection === 'settings' && (language === 'ru' ? 'Настройки системы' : language === 'en' ? 'System Settings' : 'Platforma va Supabase Sozlamalari')}
               </motion.h2>
@@ -1703,6 +1801,20 @@ export const AdminPanel: React.FC = () => {
                       </label>
                     </div>
 
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        id="postToTelegramCheckAdmin"
+                        checked={newProductPostToTelegram}
+                        onChange={(e) => setNewProductPostToTelegram(e.target.checked)}
+                        className="w-4 h-4 text-sky-600 rounded cursor-pointer"
+                      />
+                      <label htmlFor="postToTelegramCheckAdmin" className="font-bold text-gray-700 dark:text-slate-300 cursor-pointer flex items-center gap-1.5 text-xs">
+                        <Send className="w-3.5 h-3.5 text-sky-500" />
+                        <span>Qo'shilishi bilan Telegram botga ham post qilish</span>
+                      </label>
+                    </div>
+
                     <motion.button
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
@@ -1745,18 +1857,349 @@ export const AdminPanel: React.FC = () => {
                             </div>
                           </div>
 
-                          <motion.button
-                            whileHover={{ scale: 1.25, rotate: 10 }}
-                            whileTap={{ scale: 0.9 }}
-                            onClick={() => deleteProduct(p.id)}
-                            className="p-2 text-gray-400 hover:text-rose-600 dark:text-slate-400 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-lg transition-colors shrink-0"
-                            title={language === 'ru' ? 'Удалить' : language === 'en' ? 'Delete' : "O'chirish"}
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </motion.button>
+                          <div className="flex items-center gap-1.5 shrink-0">
+                            <motion.button
+                              whileHover={{ scale: 1.05 }}
+                              whileTap={{ scale: 0.95 }}
+                              onClick={() => handleQuickSendToTelegram(p)}
+                              disabled={sendingProductId === p.id}
+                              className="px-2.5 py-1.5 text-sky-600 hover:text-white hover:bg-sky-500 bg-sky-50 dark:bg-sky-950/50 dark:text-sky-400 dark:hover:text-white rounded-xl transition-all flex items-center gap-1.5 font-bold text-xs shrink-0 cursor-pointer disabled:opacity-50"
+                              title="Ushbu tovarni Telegram botga tashlash"
+                            >
+                              {sendingProductId === p.id ? (
+                                <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                              ) : (
+                                <Send className="w-3.5 h-3.5 -rotate-12" />
+                              )}
+                              <span className="hidden sm:inline">Telegramga</span>
+                            </motion.button>
+
+                            <motion.button
+                              whileHover={{ scale: 1.25, rotate: 10 }}
+                              whileTap={{ scale: 0.9 }}
+                              onClick={() => deleteProduct(p.id)}
+                              className="p-2 text-gray-400 hover:text-rose-600 dark:text-slate-400 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-lg transition-colors shrink-0"
+                              title={language === 'ru' ? 'Удалить' : language === 'en' ? 'Delete' : "O'chirish"}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </motion.button>
+                          </div>
                         </motion.div>
                       ))}
                     </AnimatePresence>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
+            {/* SECTION: TELEGRAM PRODUCT PUBLISHER */}
+            {activeSection === 'telegram' && (
+              <motion.div 
+                key="telegram"
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -15 }}
+                transition={{ duration: 0.25 }}
+                className="space-y-6"
+              >
+                {/* Top Header Card */}
+                <div className="bg-gradient-to-r from-sky-600 via-sky-500 to-indigo-600 rounded-3xl p-6 text-white shadow-xl shadow-sky-500/20 relative overflow-hidden flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                  <div className="relative z-10 space-y-1">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-xs font-bold uppercase tracking-wider text-sky-100">
+                      <Send className="w-3.5 h-3.5" />
+                      <span>Telegram Marketing & Mahsulotlar Markazi</span>
+                    </div>
+                    <h2 className="text-xl sm:text-2xl font-black">
+                      O'zingiz xohlagan tovarni Telegramga tashlang
+                    </h2>
+                    <p className="text-xs sm:text-sm text-sky-100 max-w-2xl">
+                      Katalogdagi istalgan tovarni tanlang yoki yangi ma'lumotlarni kiriting. Tovar fotosurati, rasmiy narxi, 0-0-12 nasiya to'lovi va to'g'ridan-to'g'ri xarid havolasi bilan Telegram bot yoki kanalingizga bir zumda post bo'lib tushadi.
+                    </p>
+                  </div>
+
+                  <div className="relative z-10 flex flex-wrap items-center gap-2 shrink-0">
+                    <div className="bg-white/15 backdrop-blur-md rounded-2xl px-4 py-2.5 border border-white/20 text-xs">
+                      <div className="text-sky-200 text-[10px] font-bold uppercase">Uланган Bot</div>
+                      <div className="font-extrabold text-white flex items-center gap-1.5 mt-0.5">
+                        <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                        @{TELEGRAM_BOT_USERNAME}
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={handleTestTelegram}
+                      disabled={isTestingTelegram}
+                      className="px-4 py-2.5 rounded-2xl bg-white text-sky-700 hover:bg-sky-50 font-black text-xs shadow-md transition-all flex items-center gap-2 cursor-pointer disabled:opacity-70"
+                    >
+                      {isTestingTelegram ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Zap className="w-3.5 h-3.5 text-amber-500" />}
+                      <span>Ulanishni tekshirish</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Main Workspace: 2-Columns */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                  {/* Left Column: Product Selector & Custom Form */}
+                  <div className="lg:col-span-7 space-y-6">
+                    {/* 1. Quick Catalog Picker */}
+                    <div className="bg-white dark:bg-slate-800/90 p-5 rounded-3xl border border-gray-200 dark:border-slate-700 shadow-sm dark:shadow-xl space-y-3">
+                      <div className="flex items-center justify-between gap-2 border-b border-gray-100 dark:border-slate-700 pb-3">
+                        <div className="flex items-center gap-2">
+                          <Package className="w-5 h-5 text-sky-500" />
+                          <h3 className="text-sm font-extrabold text-gray-900 dark:text-white">
+                            1. Katalogdan tovarni tanlash ({products.length} ta mavjud)
+                          </h3>
+                        </div>
+                        <span className="text-[11px] text-gray-500 dark:text-slate-400">
+                          Bosganda forma avtomatik to'ladi
+                        </span>
+                      </div>
+
+                      {/* Search bar inside picker */}
+                      <div className="relative">
+                        <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                        <input
+                          type="text"
+                          value={telegramSearchQuery}
+                          onChange={(e) => setTelegramSearchQuery(e.target.value)}
+                          placeholder="Qidirish (masalan: iPhone, Samsung, MacBook)..."
+                          className="w-full pl-9 pr-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white outline-none focus:border-sky-500"
+                        />
+                      </div>
+
+                      {/* Mini Cards Grid */}
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 max-h-[220px] overflow-y-auto pr-1">
+                        {products
+                          .filter(p => !telegramSearchQuery || p.title.toLowerCase().includes(telegramSearchQuery.toLowerCase()))
+                          .map(p => {
+                            const isSelected = selectedTelegramProductId === p.id;
+                            return (
+                              <div
+                                key={p.id}
+                                onClick={() => handleSelectProductForTelegram(p)}
+                                className={`p-2.5 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between gap-1.5 ${
+                                  isSelected
+                                    ? 'border-sky-500 bg-sky-50/80 dark:bg-sky-950/40 shadow-sm ring-2 ring-sky-400/30'
+                                    : 'border-gray-200 dark:border-slate-700 hover:border-sky-300 bg-gray-50/50 dark:bg-slate-900/50'
+                                }`}
+                              >
+                                <div className="flex items-center gap-2">
+                                  <img
+                                    src={p.images[0]}
+                                    alt={p.title}
+                                    className="w-10 h-10 object-contain rounded-lg bg-white dark:bg-slate-800 p-0.5 border border-gray-100 dark:border-slate-700"
+                                  />
+                                  <div className="min-w-0">
+                                    <p className="text-[11px] font-bold text-gray-900 dark:text-white truncate">
+                                      {p.title}
+                                    </p>
+                                    <p className="text-[10px] text-amber-600 dark:text-amber-400 font-extrabold">
+                                      {formatPrice(p.price, true, language)}
+                                    </p>
+                                  </div>
+                                </div>
+                                {isSelected && (
+                                  <span className="text-[9px] font-black text-sky-600 dark:text-sky-400 self-end flex items-center gap-1">
+                                    <Check className="w-3 h-3" /> Tanlangan
+                                  </span>
+                                )}
+                              </div>
+                            );
+                          })}
+                      </div>
+                    </div>
+
+                    {/* 2. Custom Post Details Form */}
+                    <form onSubmit={handlePublishToTelegram} className="bg-white dark:bg-slate-800/90 p-5 rounded-3xl border border-gray-200 dark:border-slate-700 shadow-sm dark:shadow-xl space-y-4">
+                      <div className="flex items-center gap-2 border-b border-gray-100 dark:border-slate-700 pb-3">
+                        <Sparkles className="w-5 h-5 text-amber-500" />
+                        <h3 className="text-sm font-extrabold text-gray-900 dark:text-white">
+                          2. Post ma'lumotlarini sozlash
+                        </h3>
+                      </div>
+
+                      <div className="space-y-3 text-xs">
+                        <div>
+                          <label className="block font-bold text-gray-700 dark:text-slate-300 mb-1">
+                            Mahsulot nomi *
+                          </label>
+                          <input
+                            type="text"
+                            required
+                            value={telegramCustomTitle}
+                            onChange={(e) => setTelegramCustomTitle(e.target.value)}
+                            placeholder="iPhone 16 Pro Max 256GB"
+                            className="w-full px-3 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-200 dark:focus:ring-sky-900"
+                          />
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          <div>
+                            <label className="block font-bold text-gray-700 dark:text-slate-300 mb-1">
+                              Narxi (so'mda) *
+                            </label>
+                            <input
+                              type="text"
+                              required
+                              value={telegramCustomPrice}
+                              onChange={(e) => setTelegramCustomPrice(e.target.value)}
+                              placeholder="16500000"
+                              className="w-full px-3 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white outline-none focus:border-sky-500"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block font-bold text-gray-700 dark:text-slate-300 mb-1">
+                              Yuborish manzili (Chat ID yoki Kanal)
+                            </label>
+                            <input
+                              type="text"
+                              value={telegramTargetChat}
+                              onChange={(e) => setTelegramTargetChat(e.target.value)}
+                              placeholder={TELEGRAM_ADMIN_CHAT_ID}
+                              className="w-full px-3 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white outline-none focus:border-sky-500"
+                            />
+                            <span className="text-[10px] text-gray-400 mt-0.5 block">
+                              Sukut bo'yicha: <code>{TELEGRAM_ADMIN_CHAT_ID}</code> (Sizning Telegramingiz)
+                            </span>
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="block font-bold text-gray-700 dark:text-slate-300 mb-1">
+                            Rasm havolasi (URL) *
+                          </label>
+                          <input
+                            type="url"
+                            required
+                            value={telegramCustomImage}
+                            onChange={(e) => setTelegramCustomImage(e.target.value)}
+                            placeholder="https://images.unsplash.com/..."
+                            className="w-full px-3 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white outline-none focus:border-sky-500"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block font-bold text-gray-700 dark:text-slate-300 mb-1">
+                            Maxsus aksiya yoki izoh matni
+                          </label>
+                          <textarea
+                            rows={2}
+                            value={telegramCustomNote}
+                            onChange={(e) => setTelegramCustomNote(e.target.value)}
+                            placeholder="0-0-12 Boshlang'ich to'lovsiz Nasiya! 1 yil rasmiy kafolat."
+                            className="w-full px-3 py-2 rounded-xl bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white outline-none focus:border-sky-500 resize-none"
+                          />
+                        </div>
+                      </div>
+
+                      <button
+                        type="submit"
+                        disabled={isPostingTelegram}
+                        className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-sky-500 via-sky-600 to-indigo-600 hover:from-sky-600 hover:to-indigo-700 text-white font-black text-sm shadow-lg shadow-sky-500/25 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
+                      >
+                        {isPostingTelegram ? (
+                          <>
+                            <RefreshCw className="w-4 h-4 animate-spin" />
+                            <span>Telegramga yuborilmoqda...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Send className="w-4 h-4 -rotate-12" />
+                            <span>Ushbu Tovarni Telegramga Tashlash</span>
+                          </>
+                        )}
+                      </button>
+                    </form>
+                  </div>
+
+                  {/* Right Column: Live Telegram Post Preview */}
+                  <div className="lg:col-span-5 space-y-4 sticky top-6">
+                    <div className="flex items-center justify-between border-b border-gray-200 dark:border-slate-700 pb-2">
+                      <div className="flex items-center gap-2">
+                        <Eye className="w-4 h-4 text-sky-500" />
+                        <h3 className="text-sm font-bold text-gray-900 dark:text-white">
+                          Telegramda qanday ko'rinadi (Jonli Preview)
+                        </h3>
+                      </div>
+                      <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-sky-100 dark:bg-sky-950 text-sky-600 dark:text-sky-400 font-bold">
+                        Live Preview
+                      </span>
+                    </div>
+
+                    {/* Telegram Chat Bubble Simulation */}
+                    <div className="bg-[#54759e]/15 dark:bg-[#0e1621] p-4 rounded-3xl border border-sky-500/20 shadow-xl">
+                      <div className="bg-white dark:bg-[#182533] rounded-2xl overflow-hidden shadow-md max-w-sm mx-auto border border-gray-200/60 dark:border-[#243447]">
+                        {/* Post Photo */}
+                        <div className="w-full h-56 bg-gray-100 dark:bg-[#202f42] flex items-center justify-center overflow-hidden relative">
+                          <img
+                            src={telegramCustomImage || 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=800'}
+                            alt=""
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              (e.target as any).src = 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=800';
+                            }}
+                          />
+                          <div className="absolute top-2 left-2 bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-lg text-[10px] font-black text-white flex items-center gap-1">
+                            <Crown className="w-3 h-3 text-amber-400 fill-amber-400" />
+                            <span>ELRIZO</span>
+                          </div>
+                        </div>
+
+                        {/* Post Caption */}
+                        <div className="p-4 space-y-2.5 text-xs text-gray-800 dark:text-gray-100">
+                          <div className="font-bold text-[13px] text-sky-600 dark:text-sky-400">
+                            🔥 ELRIZO ONLINE MARKET — MAXSUS TAKLIF
+                          </div>
+
+                          <div className="font-extrabold text-sm text-gray-900 dark:text-white">
+                            📱 {telegramCustomTitle || 'Mahsulot nomi'}
+                          </div>
+
+                          <div className="space-y-1 py-1 border-y border-gray-100 dark:border-slate-700/60 font-mono text-[11px]">
+                            <div>
+                              💰 <b>Narxi:</b> <span className="font-extrabold text-amber-600 dark:text-amber-400">{(Number(telegramCustomPrice.replace(/\D/g, '')) || 0).toLocaleString('uz-UZ')} so'm</span>
+                            </div>
+                            <div>
+                              ⚡ <b>Muddatli to'lov:</b> <code>{Math.round(((Number(telegramCustomPrice.replace(/\D/g, '')) || 0) * 1.24) / 12).toLocaleString('uz-UZ')} so'm / oy</code> (12 oy)
+                            </div>
+                            <div className="text-emerald-600 dark:text-emerald-400 font-bold font-sans">
+                              ✅ 0-0-12 Boshlang'ich to'lovsiz Nasiya!
+                            </div>
+                          </div>
+
+                          {telegramCustomNote && (
+                            <div className="text-[11px] italic text-gray-600 dark:text-slate-300 bg-gray-50 dark:bg-slate-900/60 p-2 rounded-xl">
+                              📝 {telegramCustomNote}
+                            </div>
+                          )}
+
+                          <div className="text-[10px] text-gray-500 dark:text-slate-400 space-y-0.5">
+                            <div>🚚 Yetkazib berish: Butun O'zbekiston bo'ylab 1 kunda!</div>
+                            <div>🛡️ Kafolat: 1 yil rasmiy kafolat</div>
+                            <div className="text-sky-600 dark:text-sky-400 font-bold truncate">
+                              🌐 Saytda: https://elrizo.uz/product/{selectedTelegramProductId || 'new'}
+                            </div>
+                          </div>
+
+                          <div className="text-[10px] text-gray-400 dark:text-gray-500 flex items-center justify-between pt-1">
+                            <span>{currentTime}</span>
+                            <span className="text-sky-500 flex items-center gap-0.5">
+                              <Check className="w-3 h-3" />
+                              <Check className="w-3 h-3 -ml-1.5" />
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Simulated Inline Button */}
+                        <div className="p-2 bg-gray-50 dark:bg-[#1f2d3d] border-t border-gray-100 dark:border-slate-800">
+                          <div className="w-full py-2 bg-sky-500/15 dark:bg-sky-500/20 text-sky-600 dark:text-sky-300 rounded-xl text-center font-bold text-xs">
+                            🛍️ Saytda Buyurtma Berish
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </motion.div>
