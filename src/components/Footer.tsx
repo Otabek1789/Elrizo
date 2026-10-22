@@ -43,15 +43,23 @@ export const Footer: React.FC = () => {
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+          <a 
+            href="https://t.me/elrizo_bot" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="flex items-center gap-3 group hover:opacity-90 transition-opacity cursor-pointer"
+          >
+            <div className="w-10 h-10 rounded-xl bg-sky-100 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
               <Headphones className="w-5 h-5" />
             </div>
             <div>
-              <div className="font-bold text-gray-900 dark:text-white">{t('trust4Footer')}</div>
+              <div className="font-bold text-gray-900 dark:text-white flex items-center gap-1.5">
+                <span>{t('trust4Footer')}</span>
+                <span className="text-[10px] text-sky-600 dark:text-sky-400 font-mono font-bold">@elrizo_bot</span>
+              </div>
               <div className="text-[11px] text-gray-500 dark:text-gray-400">{t('trust4FooterDesc')}</div>
             </div>
-          </div>
+          </a>
         </div>
       </div>
 

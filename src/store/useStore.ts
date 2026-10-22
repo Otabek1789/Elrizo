@@ -12,6 +12,7 @@ import {
   isAdminUser,
   fetchOrdersFromSupabase
 } from '../lib/supabase';
+import { sendOrderNotificationToTelegram } from '../utils/telegramBot';
 import { Language, Theme, TranslationKey, getTranslation } from '../utils/translations';
 
 interface ToastNotification {
@@ -478,6 +479,15 @@ export const useStore = create<StoreState>()(
         set((state) => ({
           orders: [order, ...state.orders],
         }));
+
+        // Telegram Bot orqali administratorga tezkor va to'liq hisobot yuborish
+        try {
+          sendOrderNotificationToTelegram(order).catch((err) => {
+            console.warn("Telegram bot send order notification warning:", err);
+          });
+        } catch (tgErr) {
+          console.warn("Telegram bot trigger error:", tgErr);
+        }
 
         try {
           const res = await saveOrderToSupabase({

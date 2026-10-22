@@ -22,6 +22,7 @@ import { NakapitelniyCardModal } from './components/NakapitelniyCardModal';
 import { MobileBottomNav } from './components/MobileBottomNav';
 import { Footer } from './components/Footer';
 import { ScrollProgressBar, ScrollToTopButton } from './components/ScrollFeatures';
+import { TelegramFloatingButton } from './components/TelegramFloatingButton';
 import { useStore } from './store/useStore';
 import { supabase, isAdminUser, ADMIN_EMAIL } from './lib/supabase';
 import { User } from './types';
@@ -141,7 +142,8 @@ export const App: React.FC = () => {
       {/* 4. Global Footer (Admin panel va Login sahifasida ko'rinmaydi) */}
       {!isAdminPage && !isAuthPage && <Footer />}
 
-      {/* 5. Suzuvchi Tepaga Qaytish Tugmasi (ScrollToTop) */}
+      {/* 5. Suzuvchi Telegram Bot Tugmasi (@elrizo_bot) & Tepaga Qaytish */}
+      {!isAdminPage && <TelegramFloatingButton />}
       {!isAdminPage && <ScrollToTopButton />}
 
       {/* 5.1. Mobil Pastki Navigatsiya (Faqat telefonlarda ko'rinadi) */}

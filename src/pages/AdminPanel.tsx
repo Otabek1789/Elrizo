@@ -31,6 +31,7 @@ import {
   Globe,
   Compass,
   AlertTriangle,
+  AlertCircle,
   Menu,
   ChevronLeft,
   Sun,
@@ -47,7 +48,8 @@ import {
   Award,
   Tag,
   Mail,
-  CheckCircle2
+  CheckCircle2,
+  Send
 } from 'lucide-react';
 import { useStore } from '../store/useStore';
 import { formatPrice } from '../utils/calculator';
@@ -55,6 +57,7 @@ import { ADMIN_EMAIL, fetchOrdersFromSupabase } from '../lib/supabase';
 import { CATEGORIES } from '../data/mockData';
 import { Order, Product, PromoCode } from '../types';
 import { CustomSelect } from '../components/CustomSelect';
+import { testTelegramBotConnection, TELEGRAM_BOT_USERNAME, TELEGRAM_ADMIN_CHAT_ID } from '../utils/telegramBot';
 
 interface RegionCoordinate {
   name: string;
@@ -197,6 +200,23 @@ export const AdminPanel: React.FC = () => {
   const [copiedRegion, setCopiedRegion] = useState<string | null>(null);
   const [activeChartPoint, setActiveChartPoint] = useState<ChartPoint | null>(null);
   const [chartTimeframe, setChartTimeframe] = useState<'1m' | '6m' | '1y'>('1y');
+
+  // Telegram Bot test holati
+  const [isTestingTelegram, setIsTestingTelegram] = useState(false);
+  const [telegramTestResult, setTelegramTestResult] = useState<{ success: boolean; message: string } | null>(null);
+
+  const handleTestTelegram = async () => {
+    setIsTestingTelegram(true);
+    setTelegramTestResult(null);
+    const res = await testTelegramBotConnection();
+    setIsTestingTelegram(false);
+    setTelegramTestResult(res);
+    if (res.success) {
+      addToast(res.message, 'success');
+    } else {
+      addToast(res.message, 'error');
+    }
+  };
 
   // Promokod qo'shish formasi
   const [newPromo, setNewPromo] = useState({
@@ -2194,6 +2214,108 @@ export const AdminPanel: React.FC = () => {
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
                       <span>{language === 'ru' ? 'Подключено' : language === 'en' ? 'Connected' : 'Ulangan'}</span>
                     </span>
+                  </motion.div>
+
+                  {/* Telegram Bot Integratsiyasi */}
+                  <motion.div 
+                    whileHover={{ scale: 1.005 }}
+                    className="p-5 bg-gradient-to-br from-sky-50/70 via-blue-50/50 to-indigo-50/40 dark:from-slate-900 dark:via-sky-950/20 dark:to-slate-800/80 rounded-2xl border border-sky-200 dark:border-sky-800/50 space-y-3.5 shadow-xs"
+                  >
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#229ED9] to-[#2AABEE] text-white flex items-center justify-center font-bold text-xs shadow-md shadow-sky-500/25">
+                          <Send className="w-4 h-4 -rotate-12" />
+                        </div>
+                        <div>
+                          <div className="font-extrabold text-gray-900 dark:text-white text-sm flex items-center gap-2">
+                            <span>Telegram Bot Integratsiyasi</span>
+                            <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-sky-100 dark:bg-sky-900/60 text-sky-700 dark:text-sky-300 font-bold">
+                              @{TELEGRAM_BOT_USERNAME}
+                            </span>
+                          </div>
+                          <div className="text-gray-500 dark:text-slate-400 text-[11px]">
+                            Yangi buyurtmalar va arizalar admin chatiga real-vaqtda yuboriladi
+                          </div>
+                        </div>
+                      </div>
+
+                      <span className="text-xs px-2.5 py-1 rounded-xl font-bold bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-500/20 flex items-center gap-1.5 w-fit shadow-xs">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
+                        <span>Faol ulandi</span>
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1 text-xs">
+                      <div className="p-3 bg-white/90 dark:bg-slate-800/90 rounded-xl border border-sky-100 dark:border-slate-700/80 space-y-1">
+                        <div className="text-gray-400 dark:text-slate-400 text-[10px] font-bold uppercase tracking-wider">
+                          Admin Chat ID
+                        </div>
+                        <div className="font-mono font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                          <span>{TELEGRAM_ADMIN_CHAT_ID}</span>
+                          <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-sans font-bold">✓ Biriktirilgan</span>
+                        </div>
+                      </div>
+
+                      <div className="p-3 bg-white/90 dark:bg-slate-800/90 rounded-xl border border-sky-100 dark:border-slate-700/80 space-y-1">
+                        <div className="text-gray-400 dark:text-slate-400 text-[10px] font-bold uppercase tracking-wider">
+                          Bot Foydalanuvchi nomi
+                        </div>
+                        <div className="font-mono font-bold text-sky-600 dark:text-sky-400 flex items-center gap-1">
+                          <a 
+                            href={`https://t.me/${TELEGRAM_BOT_USERNAME}`} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="hover:underline flex items-center gap-1"
+                          >
+                            <span>@{TELEGRAM_BOT_USERNAME}</span>
+                            <ExternalLink className="w-3 h-3" />
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Test Button & Guide */}
+                    <div className="pt-2 border-t border-sky-100 dark:border-slate-700/60 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
+                      <div className="text-[11px] text-gray-500 dark:text-slate-400 leading-snug">
+                        💡 <b>Muhim eslatma:</b> Xabarlar kelishi uchun Telegram'da <a href={`https://t.me/${TELEGRAM_BOT_USERNAME}`} target="_blank" rel="noopener noreferrer" className="text-sky-600 dark:text-sky-400 font-bold hover:underline">@{TELEGRAM_BOT_USERNAME}</a> ga kirib <b>«Start»</b> tugmasini bosgan bo'lishingiz kerak.
+                      </div>
+
+                      <motion.button
+                        whileHover={{ scale: 1.03 }}
+                        whileTap={{ scale: 0.97 }}
+                        type="button"
+                        disabled={isTestingTelegram}
+                        onClick={handleTestTelegram}
+                        className="px-4 py-2 rounded-xl bg-gradient-to-r from-[#229ED9] to-[#2AABEE] hover:from-[#1b8bc2] hover:to-[#229ED9] text-white font-bold text-xs flex items-center gap-1.5 shadow-md shadow-sky-500/25 transition-all shrink-0 cursor-pointer disabled:opacity-60"
+                      >
+                        {isTestingTelegram ? (
+                          <>
+                            <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                            <span>Yuborilmoqda...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Send className="w-3.5 h-3.5 -rotate-12" />
+                            <span>Test xabar yuborish</span>
+                          </>
+                        )}
+                      </motion.button>
+                    </div>
+
+                    {telegramTestResult && (
+                      <div className={`p-2.5 rounded-xl text-xs font-medium flex items-center gap-2 ${
+                        telegramTestResult.success 
+                          ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800' 
+                          : 'bg-rose-50 dark:bg-rose-950/40 text-rose-800 dark:text-rose-300 border border-rose-200 dark:border-rose-800'
+                      }`}>
+                        {telegramTestResult.success ? (
+                          <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0" />
+                        ) : (
+                          <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+                        )}
+                        <span>{telegramTestResult.message}</span>
+                      </div>
+                    )}
                   </motion.div>
 
                   {/* Email Jo'natuvchi & SMTP Sozlamalari (Elrizo / me) */}
