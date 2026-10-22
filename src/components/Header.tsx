@@ -599,7 +599,130 @@ export const Header: React.FC = () => {
             ))}
           </div>
 
-          {/* User / Profile Dropdown Wrapper */}
+          {/* Nakapitelniy Karta (Keshbek) Button */}
+          <motion.button
+            id="nakapitelniy-card-header-btn"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={openCashbackCardModal}
+            className="hidden md:flex relative items-center gap-2 p-2 sm:px-3 sm:py-2 rounded-2xl bg-gradient-to-r from-amber-500/10 via-yellow-500/10 to-amber-500/15 dark:from-amber-500/20 dark:to-yellow-500/20 text-amber-900 dark:text-amber-200 hover:bg-amber-100/80 dark:hover:bg-amber-900/40 border border-amber-300/60 dark:border-amber-600/40 transition-all shadow-xs"
+            title="1% Jamg'arma Keshbek Kartasi"
+          >
+            <div className="relative">
+              <CreditCard className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+              <span className="absolute -top-1 -right-1 text-[8px] font-black bg-amber-500 text-white px-1 rounded-full shadow-xs">
+                1%
+              </span>
+            </div>
+            <div className="hidden xl:flex flex-col text-left">
+              <span className="text-[11px] font-bold leading-none text-amber-950 dark:text-amber-200">Jamg'arma</span>
+              <span className="text-[11px] font-black text-amber-600 dark:text-amber-400 mt-0.5">
+                {formatPrice(user?.cashbackBalance ?? 0, true, language)}
+              </span>
+            </div>
+          </motion.button>
+
+          {/* Product Comparison (Taqqoslash) */}
+          <motion.button
+            id="comparison-btn"
+            whileHover={{ scale: 1.08 }}
+            whileTap={{ scale: 0.92 }}
+            onClick={openComparisonModal}
+            className="hidden md:flex relative p-2.5 rounded-2xl transition-colors items-center gap-1 text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-slate-800 hover:text-uzum-primary dark:hover:text-purple-300"
+            title="Tovarlarni taqqoslash"
+          >
+            <Scale className={`w-5 h-5 ${comparisonList.length > 0 ? 'text-primary-600 dark:text-primary-400' : ''}`} />
+            {comparisonList.length > 0 && (
+              <motion.span 
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-primary-600 text-white text-[11px] font-bold rounded-full flex items-center justify-center shadow"
+              >
+                {comparisonList.length}
+              </motion.span>
+            )}
+            <span className="hidden xl:inline text-xs font-bold ml-1 text-gray-700 dark:text-white">Taqqoslash</span>
+          </motion.button>
+
+          {/* Favorites */}
+          <Link to="/favorites" className="hidden md:block">
+            <motion.button
+              id="favorites-btn"
+              whileHover={{ scale: 1.08 }}
+              whileTap={{ scale: 0.92 }}
+              className={`relative p-2.5 rounded-2xl transition-colors flex items-center gap-1 ${
+                location.pathname === '/favorites'
+                  ? 'bg-purple-100 dark:bg-purple-950/60 text-uzum-primary dark:text-purple-300'
+                  : 'text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-slate-800 hover:text-uzum-primary dark:hover:text-purple-300'
+              }`}
+              title={t('favorites')}
+            >
+              <Heart className={`w-5 h-5 ${favorites.length > 0 ? 'fill-rose-500 text-rose-500 animate-pulse' : ''}`} />
+              {favorites.length > 0 && (
+                <motion.span 
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-uzum-accent text-white text-[11px] font-bold rounded-full flex items-center justify-center shadow"
+                >
+                  {favorites.length}
+                </motion.span>
+              )}
+              <span className="hidden xl:inline text-xs font-bold ml-1 text-gray-700 dark:text-white">{t('favorites')}</span>
+            </motion.button>
+          </Link>
+
+          {/* Cart Drawer Trigger */}
+          <motion.button
+            id="cart-drawer-btn"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={openCart}
+            className="hidden md:flex relative items-center gap-2 p-2 sm:px-3 sm:py-2 rounded-2xl bg-purple-50 dark:bg-purple-950/40 text-uzum-primary dark:text-white hover:bg-purple-100 dark:hover:bg-purple-900/60 transition-colors font-bold text-sm shadow-sm"
+            title={t('cart')}
+          >
+            <div className="relative">
+              <ShoppingCart className="w-5 h-5 text-uzum-primary dark:text-purple-300" />
+              {cartItemsCount > 0 && (
+                <motion.span 
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: 'spring', stiffness: 500 }}
+                  className="absolute -top-2 -right-2 min-w-[18px] h-[18px] px-1 bg-uzum-primary text-white text-[10px] font-black rounded-full flex items-center justify-center shadow-md"
+                >
+                  {cartItemsCount}
+                </motion.span>
+              )}
+            </div>
+            <div className="hidden md:flex flex-col text-left">
+              <span className="text-xs font-bold leading-none text-uzum-primary dark:text-white">{t('cart')}</span>
+              {cartTotal > 0 && (
+                <span className="text-[10px] font-extrabold text-gray-900 dark:text-white mt-0.5">
+                  {formatPrice(cartTotal, true, language)}
+                </span>
+              )}
+            </div>
+          </motion.button>
+
+          {/* Admin Panel Button (Faqat otabek1789@gmail.com uchun - Akkauntdan oldin) */}
+          {user?.isAdmin && (
+            <motion.button
+              id="admin-panel-btn"
+              whileHover={{ scale: 1.08 }}
+              whileTap={{ scale: 0.92 }}
+              onClick={() => navigate('/admin')}
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-2xl text-xs font-black transition-all shadow-md ${
+                location.pathname.startsWith('/admin')
+                  ? 'bg-amber-500 text-white ring-2 ring-amber-300'
+                  : 'bg-gradient-to-r from-amber-400 via-orange-400 to-amber-500 text-gray-950 hover:shadow-amber-400/50'
+              }`}
+              title={t('adminPanel')}
+            >
+              <Crown className="w-4 h-4 text-amber-950 animate-bounce" />
+              <span className="hidden sm:inline">{t('adminPanel')}</span>
+            </motion.button>
+          )}
+
+          {/* User / Profile Dropdown Wrapper (Navbarni eng chetida) */}
           <div className="relative" ref={userMenuRef}>
             <motion.button
               id="user-profile-btn"
@@ -764,129 +887,6 @@ export const Header: React.FC = () => {
               )}
             </AnimatePresence>
           </div>
-
-          {/* Admin Panel Button (Faqat otabek1789@gmail.com uchun) */}
-          {user?.isAdmin && (
-            <motion.button
-              id="admin-panel-btn"
-              whileHover={{ scale: 1.08 }}
-              whileTap={{ scale: 0.92 }}
-              onClick={() => navigate('/admin')}
-              className={`flex items-center gap-1.5 px-3 py-2 rounded-2xl text-xs font-black transition-all shadow-md ${
-                location.pathname.startsWith('/admin')
-                  ? 'bg-amber-500 text-white ring-2 ring-amber-300'
-                  : 'bg-gradient-to-r from-amber-400 via-orange-400 to-amber-500 text-gray-950 hover:shadow-amber-400/50'
-              }`}
-              title={t('adminPanel')}
-            >
-              <Crown className="w-4 h-4 text-amber-950 animate-bounce" />
-              <span className="hidden sm:inline">{t('adminPanel')}</span>
-            </motion.button>
-          )}
-
-          {/* Nakapitelniy Karta (Keshbek) Button */}
-          <motion.button
-            id="nakapitelniy-card-header-btn"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={openCashbackCardModal}
-            className="hidden md:flex relative items-center gap-2 p-2 sm:px-3 sm:py-2 rounded-2xl bg-gradient-to-r from-amber-500/10 via-yellow-500/10 to-amber-500/15 dark:from-amber-500/20 dark:to-yellow-500/20 text-amber-900 dark:text-amber-200 hover:bg-amber-100/80 dark:hover:bg-amber-900/40 border border-amber-300/60 dark:border-amber-600/40 transition-all shadow-xs"
-            title="1% Jamg'arma Keshbek Kartasi"
-          >
-            <div className="relative">
-              <CreditCard className="w-5 h-5 text-amber-600 dark:text-amber-400" />
-              <span className="absolute -top-1 -right-1 text-[8px] font-black bg-amber-500 text-white px-1 rounded-full shadow-xs">
-                1%
-              </span>
-            </div>
-            <div className="hidden xl:flex flex-col text-left">
-              <span className="text-[11px] font-bold leading-none text-amber-950 dark:text-amber-200">Jamg'arma</span>
-              <span className="text-[11px] font-black text-amber-600 dark:text-amber-400 mt-0.5">
-                {formatPrice(user?.cashbackBalance ?? 0, true, language)}
-              </span>
-            </div>
-          </motion.button>
-
-          {/* Product Comparison (Taqqoslash) */}
-          <motion.button
-            id="comparison-btn"
-            whileHover={{ scale: 1.08 }}
-            whileTap={{ scale: 0.92 }}
-            onClick={openComparisonModal}
-            className="hidden md:flex relative p-2.5 rounded-2xl transition-colors items-center gap-1 text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-slate-800 hover:text-uzum-primary dark:hover:text-purple-300"
-            title="Tovarlarni taqqoslash"
-          >
-            <Scale className={`w-5 h-5 ${comparisonList.length > 0 ? 'text-primary-600 dark:text-primary-400' : ''}`} />
-            {comparisonList.length > 0 && (
-              <motion.span 
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-primary-600 text-white text-[11px] font-bold rounded-full flex items-center justify-center shadow"
-              >
-                {comparisonList.length}
-              </motion.span>
-            )}
-            <span className="hidden xl:inline text-xs font-bold ml-1 text-gray-700 dark:text-white">Taqqoslash</span>
-          </motion.button>
-
-          {/* Favorites */}
-          <Link to="/favorites" className="hidden md:block">
-            <motion.button
-              id="favorites-btn"
-              whileHover={{ scale: 1.08 }}
-              whileTap={{ scale: 0.92 }}
-              className={`relative p-2.5 rounded-2xl transition-colors flex items-center gap-1 ${
-                location.pathname === '/favorites'
-                  ? 'bg-purple-100 dark:bg-purple-950/60 text-uzum-primary dark:text-purple-300'
-                  : 'text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-slate-800 hover:text-uzum-primary dark:hover:text-purple-300'
-              }`}
-              title={t('favorites')}
-            >
-              <Heart className={`w-5 h-5 ${favorites.length > 0 ? 'fill-rose-500 text-rose-500 animate-pulse' : ''}`} />
-              {favorites.length > 0 && (
-                <motion.span 
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-uzum-accent text-white text-[11px] font-bold rounded-full flex items-center justify-center shadow"
-                >
-                  {favorites.length}
-                </motion.span>
-              )}
-              <span className="hidden xl:inline text-xs font-bold ml-1 text-gray-700 dark:text-white">{t('favorites')}</span>
-            </motion.button>
-          </Link>
-
-          {/* Cart Drawer Trigger */}
-          <motion.button
-            id="cart-drawer-btn"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={openCart}
-            className="hidden md:flex relative items-center gap-2 p-2 sm:px-3 sm:py-2 rounded-2xl bg-purple-50 dark:bg-purple-950/40 text-uzum-primary dark:text-white hover:bg-purple-100 dark:hover:bg-purple-900/60 transition-colors font-bold text-sm shadow-sm"
-            title={t('cart')}
-          >
-            <div className="relative">
-              <ShoppingCart className="w-5 h-5 text-uzum-primary dark:text-purple-300" />
-              {cartItemsCount > 0 && (
-                <motion.span 
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ type: 'spring', stiffness: 500 }}
-                  className="absolute -top-2 -right-2 min-w-[18px] h-[18px] px-1 bg-uzum-primary text-white text-[10px] font-black rounded-full flex items-center justify-center shadow-md"
-                >
-                  {cartItemsCount}
-                </motion.span>
-              )}
-            </div>
-            <div className="hidden md:flex flex-col text-left">
-              <span className="text-xs font-bold leading-none text-uzum-primary dark:text-white">{t('cart')}</span>
-              {cartTotal > 0 && (
-                <span className="text-[10px] font-extrabold text-gray-900 dark:text-white mt-0.5">
-                  {formatPrice(cartTotal, true, language)}
-                </span>
-              )}
-            </div>
-          </motion.button>
         </div>
       </div>
 
