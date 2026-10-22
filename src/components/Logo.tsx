@@ -12,24 +12,14 @@ interface LogoProps {
 export const LogoIcon: React.FC<{ className?: string; size?: number }> = ({ className = '', size = 44 }) => (
   <div 
     style={{ width: size, height: size }} 
-    className={`shrink-0 select-none flex items-center justify-center relative ${className}`}
+    className={`shrink-0 select-none flex items-center justify-center ${className}`}
   >
-    {/* Light Mode Emblem */}
     <img 
       src="/elrizo-icon.png" 
       alt="ELRIZO emblem" 
       width={size} 
       height={size}
-      className="w-full h-full object-contain filter drop-shadow-xs dark:hidden"
-      loading="eager"
-    />
-    {/* Dark Mode Emblem: Brightened purple & crisp white figure for perfect contrast */}
-    <img 
-      src="/elrizo-icon-dark.png" 
-      alt="ELRIZO emblem" 
-      width={size} 
-      height={size}
-      className="w-full h-full object-contain filter drop-shadow-xs hidden dark:block"
+      className="w-full h-full object-contain filter drop-shadow-xs"
       loading="eager"
     />
   </div>
@@ -63,7 +53,7 @@ export const Logo: React.FC<LogoProps> = ({
       <div className="flex flex-col justify-center leading-none">
         <div className="flex items-center gap-2">
           <span 
-            className={`font-black tracking-wider uppercase ${titleSize} text-uzum-primary dark:text-uzum-primary transition-colors`}
+            className={`font-black tracking-wider uppercase ${titleSize} text-[#640199]`}
           >
             ELRIZO
           </span>
