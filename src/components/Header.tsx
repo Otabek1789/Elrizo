@@ -29,7 +29,10 @@ import {
   Truck,
   Scale,
   CreditCard,
-  Gift
+  Gift,
+  ChevronDown,
+  LogOut,
+  Package
 } from 'lucide-react';
 import { Logo } from './Logo';
 import { useStore } from '../store/useStore';
@@ -81,6 +84,7 @@ export const Header: React.FC = () => {
     comparisonList,
     openComparisonModal,
     openCashbackCardModal,
+    logoutUser,
   } = useStore();
 
   const { t, language, setLanguage } = useTranslation();
@@ -89,8 +93,26 @@ export const Header: React.FC = () => {
   const [activeCategoryId, setActiveCategoryId] = useState(CATEGORIES[0].id);
   const [localSearch, setLocalSearch] = useState(searchQuery);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const catalogRef = useRef<HTMLDivElement>(null);
   const searchContainerRef = useRef<HTMLDivElement>(null);
+  const userMenuRef = useRef<HTMLDivElement>(null);
+
+  // Click outside to close user dropdown
+  useEffect(() => {
+    const handleUserMenuClickOutside = (e: MouseEvent) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
+        setIsUserMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleUserMenuClickOutside);
+    return () => document.removeEventListener('mousedown', handleUserMenuClickOutside);
+  }, []);
+
+  // Close user dropdown on navigation
+  useEffect(() => {
+    setIsUserMenuOpen(false);
+  }, [location.pathname]);
 
   // Tashqi qidiruv so'zi o'zgarganda inputni sinxronlash
   useEffect(() => {
@@ -577,53 +599,171 @@ export const Header: React.FC = () => {
             ))}
           </div>
 
-          {/* User / Profile */}
-          <motion.button
-            id="user-profile-btn"
-            whileHover={{ scale: 1.04 }}
-            whileTap={{ scale: 0.96 }}
-            onClick={() => {
-              if (!user) {
-                navigate('/login');
-              } else {
-                openAuth();
-              }
-            }}
-            className="flex items-center gap-2 p-2 sm:px-3 sm:py-2 rounded-2xl text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors text-sm font-medium"
-          >
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs overflow-hidden shadow-sm ${
-              user?.isAdmin ? 'bg-amber-100 text-amber-800 border border-amber-300 dark:border-amber-500/50' : 'bg-purple-100 dark:bg-purple-950/60 text-uzum-primary dark:text-purple-300'
-            }`}>
-              {user ? (
-                user.isAdmin ? (
-                  <Crown className="w-4 h-4 text-amber-600" />
-                ) : user.avatarUrl ? (
-                  <img src={user.avatarUrl} alt={user.fullName} className="w-full h-full object-cover" />
-                ) : (
-                  user.fullName.charAt(0)
-                )
-              ) : (
-                <UserIcon className="w-4 h-4 text-uzum-primary" />
-              )}
-            </div>
-            <div className="hidden lg:flex flex-col text-left justify-center">
-              <span className="text-xs font-bold text-gray-900 dark:text-white line-clamp-1">
-                {user ? user.fullName.split(' ')[0] : t('enter')}
-              </span>
-              {user && (user.isAdmin || user.scoringLimit > 0) && (
-                <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1">
-                  {user.isAdmin ? (
-                    <>
-                      <Crown className="w-3 h-3 text-amber-500" />
-                      <span>Admin</span>
-                    </>
+          {/* User / Profile Dropdown Wrapper */}
+          <div className="relative" ref={userMenuRef}>
+            <motion.button
+              id="user-profile-btn"
+              whileHover={{ scale: 1.04 }}
+              whileTap={{ scale: 0.96 }}
+              onClick={() => {
+                if (!user) {
+                  navigate('/login');
+                } else {
+                  setIsUserMenuOpen(!isUserMenuOpen);
+                }
+              }}
+              className="flex items-center gap-2 p-2 sm:px-3 sm:py-2 rounded-2xl text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors text-sm font-medium cursor-pointer"
+            >
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs overflow-hidden shadow-sm ${
+                user?.isAdmin ? 'bg-amber-100 text-amber-800 border border-amber-300 dark:border-amber-500/50' : 'bg-purple-100 dark:bg-purple-950/60 text-uzum-primary dark:text-purple-300'
+              }`}>
+                {user ? (
+                  user.isAdmin ? (
+                    <Crown className="w-4 h-4 text-amber-600" />
+                  ) : user.avatarUrl ? (
+                    <img src={user.avatarUrl} alt={user.fullName} className="w-full h-full object-cover" />
                   ) : (
-                    `${t('nasiyaLimit')} ${Math.round((user.scoringLimit - user.usedLimit) / 1000000)} ${t('mln')}`
+                    user.fullName.charAt(0)
+                  )
+                ) : (
+                  <UserIcon className="w-4 h-4 text-uzum-primary" />
+                )}
+              </div>
+              <div className="hidden lg:flex flex-col text-left justify-center">
+                <span className="text-xs font-bold text-gray-900 dark:text-white line-clamp-1 flex items-center gap-1">
+                  {user ? user.fullName.split(' ')[0] : t('enter')}
+                  {user && (
+                    <ChevronDown className={`w-3 h-3 text-gray-400 transition-transform ${isUserMenuOpen ? 'rotate-180' : ''}`} />
                   )}
                 </span>
+                {user && (user.isAdmin || user.scoringLimit > 0) && (
+                  <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1">
+                    {user.isAdmin ? (
+                      <>
+                        <Crown className="w-3 h-3 text-amber-500" />
+                        <span>Admin</span>
+                      </>
+                    ) : (
+                      `${t('nasiyaLimit')} ${Math.round((user.scoringLimit - user.usedLimit) / 1000000)} ${t('mln')}`
+                    )}
+                  </span>
+                )}
+              </div>
+            </motion.button>
+
+            {/* Dropdown Menu when user is logged in */}
+            <AnimatePresence>
+              {isUserMenuOpen && user && (
+                <motion.div
+                  initial={{ opacity: 0, y: 8, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 8, scale: 0.95 }}
+                  transition={{ duration: 0.15 }}
+                  className="absolute right-0 top-full mt-2 w-64 rounded-3xl bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 shadow-2xl p-2 z-50 text-xs space-y-1 backdrop-blur-xl"
+                >
+                  {/* User Header Preview */}
+                  <div className="p-3 bg-purple-50/70 dark:bg-purple-950/40 rounded-2xl flex items-center gap-3 border border-purple-100 dark:border-purple-900/30">
+                    <div className="w-10 h-10 rounded-2xl overflow-hidden bg-gradient-to-tr from-purple-600 to-indigo-600 text-white font-black flex items-center justify-center shrink-0 text-sm shadow-sm">
+                      {user.avatarUrl ? (
+                        <img src={user.avatarUrl} alt={user.fullName} className="w-full h-full object-cover" />
+                      ) : (
+                        user.fullName.charAt(0).toUpperCase()
+                      )}
+                    </div>
+                    <div className="overflow-hidden">
+                      <div className="font-extrabold text-gray-900 dark:text-white truncate">
+                        {user.fullName}
+                      </div>
+                      <div className="text-[11px] text-gray-500 dark:text-slate-400 truncate font-mono">
+                        {user.email}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="pt-1 space-y-0.5">
+                    {/* Profil tugmasi */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsUserMenuOpen(false);
+                        navigate('/profile');
+                      }}
+                      className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-purple-50 dark:hover:bg-purple-950/50 text-gray-700 dark:text-slate-200 font-bold transition-colors cursor-pointer group"
+                    >
+                      <UserIcon className="w-4 h-4 text-purple-600 dark:text-purple-400 group-hover:scale-110 transition-transform" />
+                      <div className="text-left flex-1">
+                        <div className="font-extrabold text-gray-900 dark:text-white">Profil</div>
+                        <div className="text-[10px] text-gray-400 font-normal">Ism, rasm va ma'lumotlarni tahrirlash</div>
+                      </div>
+                      <ChevronRight className="w-3.5 h-3.5 text-gray-400 group-hover:translate-x-0.5 transition-transform" />
+                    </button>
+
+                    {/* Buyurtmalarim */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsUserMenuOpen(false);
+                        navigate('/profile');
+                      }}
+                      className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-slate-700/60 text-gray-700 dark:text-slate-200 font-bold transition-colors cursor-pointer group"
+                    >
+                      <Package className="w-4 h-4 text-indigo-500 group-hover:scale-110 transition-transform" />
+                      <span>Buyurtmalarim tarixi</span>
+                    </button>
+
+                    {/* Jamg'arma karta */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsUserMenuOpen(false);
+                        openCashbackCardModal();
+                      }}
+                      className="w-full flex items-center justify-between px-3 py-2 rounded-xl hover:bg-amber-50 dark:hover:bg-amber-950/40 text-gray-700 dark:text-slate-200 font-bold transition-colors cursor-pointer group"
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <CreditCard className="w-4 h-4 text-amber-500 group-hover:scale-110 transition-transform" />
+                        <span>Jamg'arma karta</span>
+                      </div>
+                      <span className="text-[10px] font-black text-amber-600 dark:text-amber-400 bg-amber-100 dark:bg-amber-900/50 px-2 py-0.5 rounded-full">
+                        {formatPrice(user.cashbackBalance ?? 0, true, language)}
+                      </span>
+                    </button>
+
+                    {/* Admin panel (faqat admin uchun) */}
+                    {user.isAdmin && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsUserMenuOpen(false);
+                          navigate('/admin');
+                        }}
+                        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl bg-amber-50 dark:bg-amber-950/40 text-amber-900 dark:text-amber-200 font-black transition-colors cursor-pointer group"
+                      >
+                        <Crown className="w-4 h-4 text-amber-600 group-hover:rotate-12 transition-transform" />
+                        <span>Admin Panel</span>
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Chiqish */}
+                  <div className="pt-1 border-t border-gray-100 dark:border-slate-700/60">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsUserMenuOpen(false);
+                        logoutUser();
+                        navigate('/');
+                      }}
+                      className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-rose-50 dark:hover:bg-rose-950/40 text-rose-600 dark:text-rose-400 font-bold transition-colors cursor-pointer"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      <span>Tizimdan chiqish</span>
+                    </button>
+                  </div>
+                </motion.div>
               )}
-            </div>
-          </motion.button>
+            </AnimatePresence>
+          </div>
 
           {/* Admin Panel Button (Faqat otabek1789@gmail.com uchun) */}
           {user?.isAdmin && (

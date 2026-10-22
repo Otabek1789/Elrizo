@@ -111,6 +111,8 @@ export interface User {
   isAdmin?: boolean;
   cashbackBalance?: number; // Jamg'arma karta keshbek balansi (so'm)
   loyaltyCardNumber?: string;
+  address?: string;
+  city?: string;
 }
 
 export type PaymentMode = 'full' | 'installment';

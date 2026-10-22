@@ -9,6 +9,7 @@ import { Checkout } from './pages/Checkout';
 import { FavoritesPage } from './pages/FavoritesPage';
 import { AdminPanel } from './pages/AdminPanel';
 import { LoginPage } from './pages/LoginPage';
+import { ProfilePage } from './pages/ProfilePage';
 import { CartDrawer } from './components/CartDrawer';
 import { AuthModal } from './components/AuthModal';
 import { LoginRequiredModal } from './components/LoginRequiredModal';
@@ -131,6 +132,7 @@ export const App: React.FC = () => {
           <Route path="/favorites" element={<FavoritesPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/auth" element={<LoginPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
           <Route path="/admin/*" element={<AdminPanel />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

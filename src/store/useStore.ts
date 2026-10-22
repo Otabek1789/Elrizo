@@ -73,6 +73,7 @@ interface StoreState {
   closeLoginRequiredModal: () => void;
   loginWithEmail: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   logoutUser: () => void;
+  updateUserProfile: (updates: Partial<User>) => void;
 
   // Supabase Status
   supabaseConnected: boolean;
@@ -563,6 +564,14 @@ export const useStore = create<StoreState>()(
         signOutFromSupabase();
         set({ user: null, activePage: 'home' });
         get().addToast('Tizimdan chiqildi', 'info');
+      },
+
+      updateUserProfile: (updates: Partial<User>) => {
+        const currentUser = get().user;
+        if (!currentUser) return;
+        const updatedUser = { ...currentUser, ...updates };
+        set({ user: updatedUser });
+        get().addToast("Profil ma'lumotlari muvaffaqiyatli saqlandi!", 'success');
       },
 
       // Supabase Connection Status & Real-time Orders Sync
