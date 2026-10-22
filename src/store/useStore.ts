@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { ActivePage, CartItem, Order, Product, PromoCode, User, Review, CashbackTransaction } from '../types';
-import { INITIAL_USER, PRODUCTS } from '../data/mockData';
+import { PRODUCTS } from '../data/mockData';
 import { INITIAL_REVIEWS } from '../data/mockReviews';
 import { searchProducts } from '../utils/searchHelper';
 import { 
@@ -471,32 +471,7 @@ export const useStore = create<StoreState>()(
       },
 
       // Orders (Local Storage + Supabase sync)
-      orders: [
-        {
-          id: 'ord-initial-01',
-          contractNumber: 'ELR-849201',
-          customerName: 'Bobur Mirzayev',
-          customerPhone: '+998 90 123 45 67',
-          pinfl: '31204956780012',
-          deliveryAddress: 'Toshkent sh., Chilonzor tumani, 9-mavze, 24-uy',
-          totalPrice: 18450000,
-          monthlyPayment: 1537500,
-          installmentMonths: 12,
-          scoringScore: 795,
-          status: 'scoring_approved',
-          createdAt: new Date(Date.now() - 86400000 * 2).toISOString(),
-          paymentMode: 'installment',
-          items: [
-            {
-              productId: PRODUCTS[0].id,
-              title: PRODUCTS[0].title,
-              price: PRODUCTS[0].price,
-              quantity: 1,
-              monthlyPayment: 1537500,
-            },
-          ],
-        },
-      ],
+      orders: [],
       addOrder: async (order: Order) => {
         set((state) => ({
           orders: [order, ...state.orders],
@@ -801,6 +776,22 @@ export const useStore = create<StoreState>()(
             localStorage.removeItem('elrizo_nasiya_storage');
           } catch (e) {}
         }
+        if (state) {
+          // Saytdan hali hech kim sotib olmagan bo'lishi kerak: eski mock tranzaksiya va buyurtmalarni tozalaymiz
+          if (state.cashbackTransactions) {
+            state.cashbackTransactions = state.cashbackTransactions.filter(
+              (t: any) => t.id !== 'cb-init-1' && t.id !== 'cb-init-2' && !t.description?.includes('iPhone 15') && !t.description?.includes('Samsung Smart TV')
+            );
+          }
+          if (!state.user) {
+            state.cashbackTransactions = [];
+          }
+          if (state.orders) {
+            state.orders = state.orders.filter(
+              (o: any) => o.id !== 'ord-initial-01' && o.contractNumber !== 'ELR-849201'
+            );
+          }
+        }
         if (state?.user) {
           state.user.scoringLimit = 0;
           state.user.usedLimit = 0;
@@ -809,9 +800,6 @@ export const useStore = create<StoreState>()(
           }
           if (state.user.loyaltyCardNumber) {
             delete state.user.loyaltyCardNumber;
-          }
-          if (state.cashbackTransactions?.some((t: any) => t.id === 'cb-init-1' || t.id === 'cb-init-2')) {
-            state.cashbackTransactions = [];
           }
         }
         if (state && typeof document !== 'undefined') {

@@ -185,10 +185,10 @@ export const generateAndPrintContract = (order: Order) => {
             </td>
             <td style="width: 50%; vertical-align: top;">
               <strong>XARIDOR:</strong><br>
-              F.I.Sh: <b>${order.customerName || 'Bobur Mirzayev'}</b><br>
-              JShShIR (PINFL): <b>${order.pinfl || '31204956780012'}</b><br>
-              Telefon: <b>${order.customerPhone || '+998 90 123 45 67'}</b><br>
-              Manzil: <b>${order.deliveryAddress || 'Toshkent shahri'}</b>
+              F.I.Sh: <b>${order.customerName || 'Mijoz'}</b><br>
+              JShShIR (PINFL): <b>${order.pinfl || '-'}</b><br>
+              Telefon: <b>${order.customerPhone || '-'}</b><br>
+              Manzil: <b>${order.deliveryAddress || 'O\'zbekiston'}</b>
             </td>
           </tr>
         </table>
@@ -252,7 +252,7 @@ export const generateAndPrintContract = (order: Order) => {
 
         <div>
           <p><strong>Xaridor:</strong></p>
-          <p style="margin-top: 30px;">Imzo: ________________ / ${order.customerName || 'Bobur Mirzayev'} /</p>
+          <p style="margin-top: 30px;">Imzo: ________________ / ${order.customerName || 'Mijoz'} /</p>
         </div>
       </div>
 

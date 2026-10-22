@@ -113,8 +113,8 @@ const DEMO_ORDERS: Record<string, MockOrderTrackingData> = {
 
 export const OrderTrackingModal: React.FC = () => {
   const { isOrderTrackingOpen, closeOrderTracking, orders } = useStore();
-  const [searchInput, setSearchInput] = useState('ELR-849201');
-  const [activeOrder, setActiveOrder] = useState<MockOrderTrackingData | null>(DEMO_ORDERS['ELR-849201']);
+  const [searchInput, setSearchInput] = useState('');
+  const [activeOrder, setActiveOrder] = useState<MockOrderTrackingData | null>(null);
   const [notFound, setNotFound] = useState(false);
 
   if (!isOrderTrackingOpen) return null;
@@ -441,7 +441,19 @@ export const OrderTrackingModal: React.FC = () => {
                 </div>
               </div>
             </>
-          ) : null}
+          ) : (
+            <div className="text-center py-12 sm:py-16">
+              <div className="w-16 h-16 rounded-2xl bg-purple-50 dark:bg-slate-800 text-uzum-primary dark:text-purple-300 mx-auto flex items-center justify-center mb-4 shadow-inner">
+                <Package className="w-8 h-8" />
+              </div>
+              <h4 className="font-bold text-slate-900 dark:text-white text-base mb-1">
+                Shartnoma yoki buyurtma raqamini kiriting
+              </h4>
+              <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
+                Xaridingiz holatini real vaqtda kuzatish uchun yuqoridagi maydonga shartnoma raqamingizni kiriting va "Kuzatish" tugmasini bosing.
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Footer */}

@@ -23,12 +23,17 @@ export const NakapitelniyCardModal: React.FC = () => {
     user, 
     isCashbackCardModalOpen, 
     closeCashbackCardModal, 
-    cashbackTransactions 
+    cashbackTransactions,
+    openAuth
   } = useStore();
 
   if (!isCashbackCardModalOpen) return null;
 
   const currentBalance = user?.cashbackBalance ?? 0;
+  // Faqat tizimga kirgan foydalanuvchining real xaridlari (fake/namunaviy tranzaksiyalarsiz)
+  const validTransactions = user ? (cashbackTransactions || []).filter(
+    (tx) => tx.id !== 'cb-init-1' && tx.id !== 'cb-init-2' && !tx.description?.includes('iPhone 15') && !tx.description?.includes('Samsung Smart TV')
+  ) : [];
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-slate-950/75 backdrop-blur-md animate-in fade-in duration-200">
@@ -66,6 +71,35 @@ export const NakapitelniyCardModal: React.FC = () => {
 
         {/* Scrollable Content */}
         <div className="flex-1 overflow-y-auto p-3.5 sm:p-6 space-y-4 sm:space-y-6">
+          {/* Akkauntga kirmagan bo'lsa ogohlantirish */}
+          {!user && (
+            <div className="p-3.5 sm:p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-amber-100 dark:bg-amber-900/50 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+                  <Info className="w-4 h-4" />
+                </div>
+                <div>
+                  <p className="text-xs font-bold text-amber-950 dark:text-amber-200">
+                    Akkauntga kirmagansiz
+                  </p>
+                  <p className="text-[11px] text-amber-800 dark:text-amber-300">
+                    Keshbek yig'ish va xaridlarda sarflash uchun hisobingizga kiring.
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  closeCashbackCardModal();
+                  openAuth();
+                }}
+                className="px-3.5 py-1.5 text-xs font-bold bg-amber-500 hover:bg-amber-600 text-slate-950 rounded-xl shrink-0 transition cursor-pointer shadow-xs active:scale-95"
+              >
+                Kirish
+              </button>
+            </div>
+          )}
+
           {/* Virtual VIP Card Display */}
           <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-tr from-slate-950 via-purple-950 to-indigo-900 text-white p-4 sm:p-6 shadow-2xl border border-purple-500/30">
             {/* Holographic / Light Flare Overlay */}
@@ -89,10 +123,17 @@ export const NakapitelniyCardModal: React.FC = () => {
               </div>
 
               <div className="flex items-center gap-2">
-                <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
-                  <Sparkles className="w-3 h-3 text-emerald-400" />
-                  Faol status
-                </span>
+                {user ? (
+                  <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
+                    <Sparkles className="w-3 h-3 text-emerald-400" />
+                    Faol status
+                  </span>
+                ) : (
+                  <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center gap-1">
+                    <Info className="w-3 h-3 text-amber-400" />
+                    Biriktirilmagan
+                  </span>
+                )}
               </div>
             </div>
 
@@ -133,7 +174,7 @@ export const NakapitelniyCardModal: React.FC = () => {
               <div>
                 <span className="text-[10px] text-purple-300/80 block uppercase">Karta Egasi</span>
                 <span className="text-xs sm:text-sm tracking-wide text-slate-100 font-bold block">
-                  {(user?.fullName || 'Bobur Mirzayev').toUpperCase()}
+                  {user ? user.fullName.toUpperCase() : "BIRIKTIRILMAGAN (MEHMON)"}
                 </span>
               </div>
               <div className="text-right">
@@ -189,25 +230,25 @@ export const NakapitelniyCardModal: React.FC = () => {
             <h4 className="font-bold text-sm text-slate-900 dark:text-white flex items-center justify-between">
               <span>Keshbek hisob-kitob tarixi</span>
               <span className="text-xs text-slate-400 font-normal">
-                {cashbackTransactions.length} ta operatsiya
+                {validTransactions.length} ta operatsiya
               </span>
             </h4>
 
-            {cashbackTransactions.length === 0 ? (
+            {validTransactions.length === 0 ? (
               <div className="p-6 sm:p-8 text-center rounded-2xl border border-dashed border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-800/30">
                 <div className="w-10 h-10 mx-auto mb-2 rounded-xl bg-purple-100 dark:bg-purple-950/60 text-uzum-primary dark:text-purple-300 flex items-center justify-center">
                   <Gift className="w-5 h-5" />
                 </div>
                 <p className="text-xs font-bold text-slate-800 dark:text-slate-200">
-                  Hozircha keshbek jamg'arilmagan (0 so'm)
+                  Hozircha keshbek operatsiyalari mavjud emas (0 so'm)
                 </p>
                 <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 max-w-xs mx-auto">
-                  Birinchi xaridingizdan boshlab umumiy to'lovning 1% i ushbu kartangizga avtomatik jamg'ariladi.
+                  Saytdan xarid amalga oshirilganda, umumiy to'lovning 1% miqdori ushbu kartangizga keshbek sifatida avtomatik jamg'ariladi.
                 </p>
               </div>
             ) : (
               <div className="divide-y divide-slate-100 dark:divide-slate-800 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden bg-white dark:bg-slate-800/50">
-                {cashbackTransactions.map((tx) => (
+                {validTransactions.map((tx) => (
                   <div key={tx.id} className="p-3.5 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800/80 transition">
                     <div className="flex items-center gap-3">
                       <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${

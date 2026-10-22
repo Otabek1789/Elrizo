@@ -95,15 +95,15 @@ export const Checkout: React.FC = () => {
 
   // Form maydonlari
   const [formData, setFormData] = useState({
-    fullName: user?.fullName || 'Bobur Mirzayev',
-    pinfl: user?.passportOrPinfl || '31204956780012',
-    passportSeries: 'AB 1234567',
-    phone: user?.phone || '+998 90 123 45 67',
+    fullName: user?.fullName || '',
+    pinfl: user?.passportOrPinfl || '',
+    passportSeries: '',
+    phone: user?.phone || '',
     city: selectedCity ? `${selectedCity}` : 'Toshkent shahri',
-    address: 'Chilonzor tumani, 9-mavze, 24-uy',
-    deliveryNotes: 'Eshik oldida qoldiring',
-    cardNumber: '8600 1425 8890 1234',
-    cardExpiry: '08/28',
+    address: '',
+    deliveryNotes: '',
+    cardNumber: '',
+    cardExpiry: '',
     otpCode: '',
   });
 
