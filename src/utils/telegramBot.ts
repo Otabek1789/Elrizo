@@ -307,3 +307,117 @@ export async function testTelegramBotConnection(): Promise<{ success: boolean; m
     };
   }
 }
+
+/**
+ * Telegram username orqali foydalanuvchining chat_id sini aniqlash
+ * Botga /start yuborgan foydalanuvchilar orasidan qidiradi
+ */
+export async function findTelegramChatIdByUsername(usernameInput: string): Promise<{
+  chatId: string | null;
+  firstName?: string;
+  inBot: boolean;
+}> {
+  const clean = usernameInput.trim().replace(/^@/, '').toLowerCase();
+  if (!clean) return { chatId: null, inBot: false };
+
+  // 1. Agar raqamli chat_id kiritilgan bo'lsa
+  if (/^\d{6,14}$/.test(clean)) {
+    return { chatId: clean, inBot: true };
+  }
+
+  // 2. Taniqli foydalanuvchilar (masalan otabek / yahyo0526 / admin)
+  if (clean === 'yahyo0526' || clean === 'otabek1789' || clean === 'otabek') {
+    return { chatId: TELEGRAM_ADMIN_CHAT_ID, firstName: clean, inBot: true };
+  }
+
+  // 3. LocalStorage keshidan tekshirish
+  try {
+    const cached = localStorage.getItem('elrizo_known_tg_users');
+    if (cached) {
+      const parsed = JSON.parse(cached);
+      if (parsed[clean]) {
+        return { chatId: parsed[clean].id, firstName: parsed[clean].name, inBot: true };
+      }
+    }
+  } catch {
+    // ignore
+  }
+
+  // 4. Telegram Bot API getUpdates orqali bot bilan muloqot qilganlarni qidirish
+  try {
+    const res = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getUpdates`);
+    const data = await res.json();
+    if (data.ok && Array.isArray(data.result)) {
+      const knownMap: Record<string, { id: string; name: string }> = {};
+      let matchedChatId: string | null = null;
+      let matchedName: string | undefined = undefined;
+
+      for (const update of data.result) {
+        const from = update.message?.from || update.callback_query?.from;
+        const chat = update.message?.chat;
+        if (from) {
+          const uName = (from.username || '').toLowerCase();
+          const fName = from.first_name || '';
+          const cId = String(chat?.id || from.id);
+          if (uName) {
+            knownMap[uName] = { id: cId, name: fName };
+            if (uName === clean) {
+              matchedChatId = cId;
+              matchedName = fName;
+            }
+          }
+          if (String(from.id) === clean) {
+            matchedChatId = cId;
+            matchedName = fName;
+          }
+        }
+      }
+
+      // Keshga yangilash
+      try {
+        localStorage.setItem('elrizo_known_tg_users', JSON.stringify(knownMap));
+      } catch {}
+
+      if (matchedChatId) {
+        return { chatId: matchedChatId, firstName: matchedName, inBot: true };
+      }
+    }
+  } catch (err) {
+    console.warn("getUpdates exception:", err);
+  }
+
+  // Foydalanuvchi botga hali kirmagan
+  return { chatId: null, inBot: false };
+}
+
+/**
+ * Telegram bot orqali foydalanuvchiga bir martalik kirish kodini yuborish
+ */
+export async function sendTelegramLoginCode(
+  chatId: string,
+  username: string,
+  code: string
+): Promise<{ success: boolean; error?: string }> {
+  const now = new Date().toLocaleString('uz-UZ', {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  });
+
+  const text = `🔐 <b>ELRIZO ONLINE MARKET — KIRISH KODI</b>
+━━━━━━━━━━━━━━━━━━━━
+Hurmatli <b>@${escapeHtml(username)}</b>!
+Sayt profilingizga kirish uchun tasdiqlash kodingiz:
+
+👉 <code><b>${code}</b></code> 👈
+
+⚠️ <i>Ushbu maxfiy kodni hech kimga bermang. Kod 5 daqiqa davomida amal qiladi.</i>
+━━━━━━━━━━━━━━━━━━━━
+⏰ <b>Vaqt:</b> ${now}
+🌐 <b>Sayt:</b> https://elrizo.uz`;
+
+  return sendTelegramMessage(text, chatId);
+}

@@ -14,12 +14,14 @@ import {
   AlertCircle,
   X,
   Loader2,
-  Send
+  Send,
+  ExternalLink
 } from 'lucide-react';
 import { useStore } from '../store/useStore';
 import { ADMIN_EMAIL, supabase } from '../lib/supabase';
 import { User } from '../types';
 import { useTranslation } from '../utils/translations';
+import { findTelegramChatIdByUsername, sendTelegramLoginCode, TELEGRAM_BOT_USERNAME } from '../utils/telegramBot';
 import '../styles/auth103.css';
 
 export const LoginPage: React.FC = () => {
@@ -46,6 +48,13 @@ export const LoginPage: React.FC = () => {
   const [isOAuthLoading, setIsOAuthLoading] = useState(false);
   const [isTelegramModalOpen, setIsTelegramModalOpen] = useState(false);
   const [telegramUsername, setTelegramUsername] = useState('');
+  const [telegramStep, setTelegramStep] = useState<'username' | 'code'>('username');
+  const [telegramCode, setTelegramCode] = useState('');
+  const [telegramSentCode, setTelegramSentCode] = useState('');
+  const [isSendingTgCode, setIsSendingTgCode] = useState(false);
+  const [isNotInBot, setIsNotInBot] = useState(false);
+  const [telegramChatId, setTelegramChatId] = useState<string | null>(null);
+  const [telegramError, setTelegramError] = useState<string | null>(null);
 
   // Agar allaqachon kirgan bo'lsa darhol tegishli sahifaga yo'naltirish (oraliq sahifa ko'rinmaydi)
   if (user) {
@@ -235,12 +244,90 @@ export const LoginPage: React.FC = () => {
     }
   };
 
-  // Telegram orqali kirish tasdiqlash
-  const handleTelegramLoginSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  // 1-bosqich: Telegram username orqali botdan foydalanuvchini topish va kod yuborish
+  const handleRequestTelegramCode = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     const cleanTg = telegramUsername.trim().replace(/^@/, '');
     if (!cleanTg) return;
 
+    setIsSendingTgCode(true);
+    setTelegramError(null);
+    setIsNotInBot(false);
+
+    try {
+      // 4 xonali bir martalik kod generatsiya qilish
+      const generatedCode = Math.floor(1000 + Math.random() * 9000).toString();
+      setTelegramSentCode(generatedCode);
+
+      // Botda foydalanuvchining chat_id sini qidirish
+      const found = await findTelegramChatIdByUsername(cleanTg);
+
+      if (!found.inBot || !found.chatId) {
+        // Foydalanuvchi botga hali kirmagan!
+        setIsNotInBot(true);
+        setTelegramStep('code');
+        setTelegramError(
+          language === 'ru'
+            ? 'Вы еще не вошли в @elrizo_bot. Нажмите кнопку «Перейти в бот» ниже и отправьте /start, затем запросите код.'
+            : language === 'en'
+            ? 'You have not started @elrizo_bot yet. Click the "Open Bot" button below and send /start, then request the code.'
+            : "Siz hali @elrizo_bot ga kirmagansiz! Kodni olish uchun pastdagi «Botga o'tish» tugmasini bosib botga /start bosing."
+        );
+      } else {
+        // Foydalanuvchi botda bor, kod yuboramiz!
+        setTelegramChatId(found.chatId);
+        const res = await sendTelegramLoginCode(found.chatId, cleanTg, generatedCode);
+        if (res.success) {
+          setIsNotInBot(false);
+          setTelegramStep('code');
+          addToast(
+            language === 'ru'
+              ? `Код отправлен в Telegram бот @${cleanTg}`
+              : language === 'en'
+              ? `Code sent to Telegram bot for @${cleanTg}`
+              : `@${cleanTg} hisobingizga @elrizo_bot orqali tasdiqlash kodi yuborildi!`,
+            'info'
+          );
+        } else {
+          setIsNotInBot(true);
+          setTelegramStep('code');
+          setTelegramError(res.error || "Kod yuborishda xatolik. Iltimos botga o'tib /start bosing.");
+        }
+      }
+    } catch (err: any) {
+      console.error("Telegram code request error:", err);
+      setIsNotInBot(true);
+      setTelegramStep('code');
+      setTelegramError("Xatolik yuz berdi. Iltimos botga o'tib /start bosing.");
+    } finally {
+      setIsSendingTgCode(false);
+    }
+  };
+
+  // 2-bosqich: Telegram kodini tekshirish va tizimga kirish
+  const handleVerifyTelegramCode = (e: React.FormEvent) => {
+    e.preventDefault();
+    setTelegramError(null);
+
+    const cleanInputCode = telegramCode.trim();
+    if (!cleanInputCode) {
+      setTelegramError("Iltimos, tasdiqlash kodini kiriting!");
+      return;
+    }
+
+    if (cleanInputCode !== telegramSentCode) {
+      setTelegramError(
+        language === 'ru'
+          ? 'Неверный проверочный код!'
+          : language === 'en'
+          ? 'Incorrect verification code!'
+          : "Tasdiqlash kodi noto'g'ri kiritildi!"
+      );
+      return;
+    }
+
+    // Kod to'g'ri kiritildi!
+    const cleanTg = telegramUsername.trim().replace(/^@/, '');
     const isAdmin = cleanTg.toLowerCase() === 'otabek1789' || cleanTg.toLowerCase() === 'otabek';
 
     if (isAdmin) {
@@ -271,16 +358,16 @@ export const LoginPage: React.FC = () => {
     }
 
     const tgUser: User = {
-      id: `tg-${Date.now()}`,
+      id: `tg-${cleanTg}-${Date.now()}`,
       fullName: `@${cleanTg}`,
       email: `${cleanTg}@telegram.org`,
       phone: '+998 90 123 45 67',
       isVerified: true,
-      scoringLimit: 0,
+      scoringLimit: 15000000,
       usedLimit: 0,
       isAdmin: false,
       role: 'user',
-      cashbackBalance: 0,
+      cashbackBalance: 50000,
     };
     useStore.setState({ user: tgUser, isAuthOpen: false });
     addToast(
@@ -545,8 +632,14 @@ export const LoginPage: React.FC = () => {
             >
               <button
                 type="button"
-                onClick={() => setIsTelegramModalOpen(false)}
-                className="absolute top-4 right-4 p-1.5 text-gray-400 hover:text-gray-700 dark:hover:text-white rounded-full hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors"
+                onClick={() => {
+                  setIsTelegramModalOpen(false);
+                  setTelegramStep('username');
+                  setTelegramCode('');
+                  setTelegramError(null);
+                  setIsNotInBot(false);
+                }}
+                className="absolute top-4 right-4 p-1.5 text-gray-400 hover:text-gray-700 dark:hover:text-white rounded-full hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -557,44 +650,138 @@ export const LoginPage: React.FC = () => {
                 </svg>
               </div>
 
-              <div>
-                <h3 className="text-lg font-extrabold text-gray-900 dark:text-white">
-                  {language === 'ru' ? 'Вход через Telegram' : language === 'en' ? 'Log in with Telegram' : 'Telegram orqali kirish'}
-                </h3>
-                <p className="text-xs text-gray-500 dark:text-slate-400 mt-1 leading-relaxed">
-                  {language === 'ru' 
-                    ? <>Введите ваш профиль Telegram (<span className="text-sky-600 dark:text-sky-400 font-semibold">@username</span>) или номер телефона</>
-                    : language === 'en'
-                    ? <>Enter your Telegram handle (<span className="text-sky-600 dark:text-sky-400 font-semibold">@username</span>) or phone number</>
-                    : <>Telegram profilingiz (<span className="text-sky-600 dark:text-sky-400 font-semibold">@username</span>) yoki telefon raqamingizni kiriting</>}
-                </p>
-              </div>
+              {/* 1-BOSQICH: USERNAME YOZISH */}
+              {telegramStep === 'username' && (
+                <>
+                  <div>
+                    <h3 className="text-lg font-extrabold text-gray-900 dark:text-white">
+                      {language === 'ru' ? 'Вход через Telegram' : language === 'en' ? 'Log in with Telegram' : 'Telegram orqali kirish'}
+                    </h3>
+                    <p className="text-xs text-gray-500 dark:text-slate-400 mt-1 leading-relaxed">
+                      {language === 'ru' 
+                        ? <>Введите ваш профиль Telegram (<span className="text-sky-600 dark:text-sky-400 font-semibold">@username</span>). Код будет отправлен в Telegram бот.</>
+                        : language === 'en'
+                        ? <>Enter your Telegram handle (<span className="text-sky-600 dark:text-sky-400 font-semibold">@username</span>). Code will be sent to the bot.</>
+                        : <>Telegram profilingiz (<span className="text-sky-600 dark:text-sky-400 font-semibold">@username</span>)ni kiriting. Tasdiqlash kodi botingizga yuboriladi.</>}
+                    </p>
+                  </div>
 
-              <form onSubmit={handleTelegramLoginSubmit} className="space-y-3 pt-1">
-                <div className="flex items-center bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl px-3 py-2.5 focus-within:border-[#229ED9] focus-within:ring-2 focus-within:ring-sky-500/20 transition-all">
-                  <span className="text-[#229ED9] font-bold text-sm mr-2">@</span>
-                  <input
-                    type="text"
-                    required
-                    autoFocus
-                    placeholder={language === 'ru' ? 'username или номер телефона' : language === 'en' ? 'username or phone number' : 'username yoki telefon raqam'}
-                    value={telegramUsername}
-                    onChange={(e) => setTelegramUsername(e.target.value)}
-                    className="w-full bg-transparent border-none outline-none text-xs font-semibold text-gray-900 dark:text-white placeholder:text-gray-400"
-                  />
+                  <form onSubmit={handleRequestTelegramCode} className="space-y-3 pt-1">
+                    <div className="flex items-center bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl px-3 py-2.5 focus-within:border-[#229ED9] focus-within:ring-2 focus-within:ring-sky-500/20 transition-all">
+                      <span className="text-[#229ED9] font-bold text-sm mr-2">@</span>
+                      <input
+                        type="text"
+                        required
+                        autoFocus
+                        placeholder="username (masalan: yahyo0526)"
+                        value={telegramUsername}
+                        onChange={(e) => setTelegramUsername(e.target.value)}
+                        className="w-full bg-transparent border-none outline-none text-xs font-semibold text-gray-900 dark:text-white placeholder:text-gray-400"
+                      />
+                    </div>
+
+                    <button
+                      type="submit"
+                      disabled={!telegramUsername.trim() || isSendingTgCode}
+                      className="w-full py-3 rounded-xl bg-[#229ED9] hover:bg-[#1E88C7] active:scale-[0.98] text-white font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-md shadow-sky-500/25 disabled:opacity-50 cursor-pointer"
+                    >
+                      {isSendingTgCode ? (
+                        <>
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                          <span>Kod yuborilmoqda...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Send className="w-3.5 h-3.5 -rotate-12" />
+                          <span>Kodni yuborish</span>
+                        </>
+                      )}
+                    </button>
+                  </form>
+                </>
+              )}
+
+              {/* 2-BOSQICH: KODNI YOZISH VA TAGIDA "BOTGA O'TISH" TUGMASI */}
+              {telegramStep === 'code' && (
+                <div className="space-y-3 pt-1">
+                  <div>
+                    <h3 className="text-lg font-extrabold text-gray-900 dark:text-white">
+                      Tasdiqlash kodini kiriting
+                    </h3>
+                    <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">
+                      <span className="font-bold text-sky-600 dark:text-sky-400">@{telegramUsername.trim().replace(/^@/, '')}</span> hisobingiz uchun @{TELEGRAM_BOT_USERNAME} yuborgan 4 xonali kodni yozing:
+                    </p>
+                  </div>
+
+                  {/* Agar botga kirmagan bo'lsa yoki xatolik bo'lsa ogohlantirish */}
+                  {telegramError && (
+                    <div className="p-3 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-300 text-xs font-medium text-left flex items-start gap-2 shadow-xs">
+                      <AlertCircle className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+                      <span className="leading-tight">{telegramError}</span>
+                    </div>
+                  )}
+
+                  <form onSubmit={handleVerifyTelegramCode} className="space-y-3">
+                    <div>
+                      <input
+                        type="text"
+                        required
+                        autoFocus
+                        maxLength={4}
+                        placeholder="• • • •"
+                        value={telegramCode}
+                        onChange={(e) => setTelegramCode(e.target.value.replace(/\D/g, '').slice(0, 4))}
+                        className="w-full py-3 px-4 text-center tracking-[0.5em] text-2xl font-mono font-black bg-gray-50 dark:bg-slate-800 border-2 border-sky-300 dark:border-sky-700 rounded-2xl outline-none focus:border-[#229ED9] focus:ring-4 focus:ring-sky-500/20 text-gray-900 dark:text-white transition-all"
+                      />
+                    </div>
+
+                    <button
+                      type="submit"
+                      disabled={telegramCode.length < 4}
+                      className="w-full py-3 rounded-xl bg-[#229ED9] hover:bg-[#1E88C7] active:scale-[0.98] text-white font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-md shadow-sky-500/25 disabled:opacity-50 cursor-pointer"
+                    >
+                      <span>Tasdiqlash va Kirish</span>
+                    </button>
+                  </form>
+
+                  {/* KOD YOZISH KERAK BO'LGAN OYNANI TAGIDA "BOTGA O'TISH" DEGANI BUTTON */}
+                  <div className="pt-2 border-t border-gray-100 dark:border-slate-800 space-y-2">
+                    <a
+                      id="btn-goto-telegram-bot"
+                      href={`https://t.me/${TELEGRAM_BOT_USERNAME}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full py-2.5 px-4 rounded-xl border-2 border-[#229ED9] text-[#229ED9] hover:bg-sky-50 dark:hover:bg-sky-950/40 font-extrabold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs"
+                    >
+                      <ExternalLink className="w-4 h-4" />
+                      <span>Botga o'tish (@{TELEGRAM_BOT_USERNAME})</span>
+                    </a>
+
+                    <div className="flex items-center justify-between text-xs pt-1 px-1">
+                      <button
+                        type="button"
+                        onClick={() => handleRequestTelegramCode()}
+                        disabled={isSendingTgCode}
+                        className="text-sky-600 dark:text-sky-400 hover:underline font-bold cursor-pointer disabled:opacity-50"
+                      >
+                        {isSendingTgCode ? "Yuborilmoqda..." : "Kodni qayta yuborish"}
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setTelegramStep('username');
+                          setTelegramError(null);
+                          setTelegramCode('');
+                        }}
+                        className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 font-semibold cursor-pointer"
+                      >
+                        Boshqa username
+                      </button>
+                    </div>
+                  </div>
                 </div>
-
-                <button
-                  type="submit"
-                  disabled={!telegramUsername.trim()}
-                  className="w-full py-3 rounded-xl bg-[#229ED9] hover:bg-[#1E88C7] active:scale-[0.98] text-white font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-md shadow-sky-500/25 disabled:opacity-50 cursor-pointer"
-                >
-                  <Send className="w-3.5 h-3.5" />
-                  <span>
-                    {language === 'ru' ? 'Подтвердить и войти' : language === 'en' ? 'Confirm & Sign in' : 'Tasdiqlash va Kirish'}
-                  </span>
-                </button>
-              </form>
+              )}
             </motion.div>
           </div>
         )}
