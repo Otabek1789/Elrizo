@@ -737,19 +737,26 @@ export const Header: React.FC = () => {
               }}
               className="flex items-center gap-2 p-2 sm:px-3 sm:py-2 rounded-2xl text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors text-sm font-medium cursor-pointer"
             >
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs overflow-hidden shadow-sm ${
-                user?.isAdmin ? 'bg-amber-100 text-amber-800 border border-amber-300 dark:border-amber-500/50' : 'bg-purple-100 dark:bg-purple-950/60 text-uzum-primary dark:text-purple-300'
-              }`}>
-                {user ? (
-                  user.isAdmin ? (
-                    <Crown className="w-4 h-4 text-amber-600" />
-                  ) : user.avatarUrl ? (
-                    <img src={user.avatarUrl} alt={user.fullName} className="w-full h-full object-cover" />
+              <div className="relative">
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs overflow-hidden shadow-sm ${
+                  user?.isAdmin ? 'bg-amber-100 text-amber-800 border border-amber-300 dark:border-amber-500/50' : 'bg-purple-100 dark:bg-purple-950/60 text-uzum-primary dark:text-purple-300'
+                }`}>
+                  {user ? (
+                    user.avatarUrl ? (
+                      <img src={user.avatarUrl} alt={user.fullName} className="w-full h-full object-cover" />
+                    ) : user.isAdmin ? (
+                      <Crown className="w-4 h-4 text-amber-600" />
+                    ) : (
+                      user.fullName.charAt(0)
+                    )
                   ) : (
-                    user.fullName.charAt(0)
-                  )
-                ) : (
-                  <UserIcon className="w-4 h-4 text-uzum-primary" />
+                    <UserIcon className="w-4 h-4 text-uzum-primary" />
+                  )}
+                </div>
+                {user?.isAdmin && user?.avatarUrl && (
+                  <span className="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-amber-400 text-amber-950 rounded-full flex items-center justify-center p-0.5 shadow-sm border border-white dark:border-slate-800">
+                    <Crown className="w-2.5 h-2.5" />
+                  </span>
                 )}
               </div>
               <div className="hidden lg:flex flex-col text-left justify-center">

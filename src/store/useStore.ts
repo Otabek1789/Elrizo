@@ -531,11 +531,23 @@ export const useStore = create<StoreState>()(
 
         if (res.success) {
           const isAdmin = res.isAdmin;
+
+          // Foydalanuvchining avval saqlangan profil ma'lumotlarini yuklash
+          let savedProfile: Partial<User> | null = null;
+          try {
+            const raw = localStorage.getItem(`elrizo_user_profile_${cleanEmail}`);
+            if (raw) savedProfile = JSON.parse(raw);
+          } catch (e) {}
+
           const userObj: User = {
             id: res.user?.id || `usr-${Date.now()}`,
-            fullName: isAdmin ? "Otabek Jo'rayev" : cleanEmail.split('@')[0],
+            fullName: savedProfile?.fullName || (isAdmin ? "Otabek Jo'rayev" : cleanEmail.split('@')[0]),
             email: cleanEmail,
-            phone: '+998 90 777 00 00',
+            phone: savedProfile?.phone || '+998 90 777 00 00',
+            address: savedProfile?.address || '',
+            city: savedProfile?.city || 'Toshkent',
+            passportOrPinfl: savedProfile?.passportOrPinfl || '',
+            avatarUrl: savedProfile?.avatarUrl || '',
             isVerified: true,
             scoringLimit: 0,
             usedLimit: 0,
@@ -571,6 +583,19 @@ export const useStore = create<StoreState>()(
         if (!currentUser) return;
         const updatedUser = { ...currentUser, ...updates };
         set({ user: updatedUser });
+
+        // Alohida lokal zaxiraga ham ishonchli saqlash
+        try {
+          if (updatedUser.email) {
+            localStorage.setItem(
+              `elrizo_user_profile_${updatedUser.email.toLowerCase().trim()}`,
+              JSON.stringify(updatedUser)
+            );
+          }
+        } catch (e) {
+          console.error("Local storage error:", e);
+        }
+
         get().addToast("Profil ma'lumotlari muvaffaqiyatli saqlandi!", 'success');
       },
 
@@ -815,6 +840,21 @@ export const useStore = create<StoreState>()(
           }
           if (state.user.loyaltyCardNumber) {
             delete state.user.loyaltyCardNumber;
+          }
+          // Saqlangan profil ma'lumotlarini tiklash
+          if (state.user.email) {
+            try {
+              const raw = localStorage.getItem(`elrizo_user_profile_${state.user.email.toLowerCase().trim()}`);
+              if (raw) {
+                const saved = JSON.parse(raw);
+                if (saved.fullName) state.user.fullName = saved.fullName;
+                if (saved.avatarUrl) state.user.avatarUrl = saved.avatarUrl;
+                if (saved.phone) state.user.phone = saved.phone;
+                if (saved.address) state.user.address = saved.address;
+                if (saved.city) state.user.city = saved.city;
+                if (saved.passportOrPinfl) state.user.passportOrPinfl = saved.passportOrPinfl;
+              }
+            } catch (e) {}
           }
         }
         if (state && typeof document !== 'undefined') {

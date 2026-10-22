@@ -53,6 +53,46 @@ const CITIES = [
   'Guliston'
 ];
 
+// Qurilmadan yuklangan rasmni 256x256 hajmda sifatli siqish (localStorage xotirasini tejash uchun)
+const compressImage = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      const img = new Image();
+      img.src = event.target?.result as string;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const maxSize = 256;
+        let width = img.width;
+        let height = img.height;
+        if (width > height) {
+          if (width > maxSize) {
+            height = Math.round((height * maxSize) / width);
+            width = maxSize;
+          }
+        } else {
+          if (height > maxSize) {
+            width = Math.round((width * maxSize) / height);
+            height = maxSize;
+          }
+        }
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, width, height);
+          resolve(canvas.toDataURL('image/jpeg', 0.85));
+        } else {
+          resolve(event.target?.result as string);
+        }
+      };
+      img.onerror = (err) => reject(err);
+    };
+    reader.onerror = (err) => reject(err);
+  });
+};
+
 export const ProfilePage: React.FC = () => {
   const navigate = useNavigate();
   const { user, updateUserProfile, logoutUser, orders, favorites, language, openCashbackCardModal } = useStore();
@@ -69,6 +109,7 @@ export const ProfilePage: React.FC = () => {
   const [customAvatarInput, setCustomAvatarInput] = useState('');
   const [showAvatarModal, setShowAvatarModal] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -108,35 +149,51 @@ export const ProfilePage: React.FC = () => {
     );
   }
 
-  const handleSaveProfile = (e: React.FormEvent) => {
-    e.preventDefault();
+  // O'zgarishlar bor-yo'qligini aniqlash
+  const hasUnsavedChanges = 
+    fullName.trim() !== (user.fullName || '').trim() ||
+    phone.trim() !== (user.phone || '').trim() ||
+    address.trim() !== (user.address || '').trim() ||
+    city !== (user.city || 'Toshkent') ||
+    passportOrPinfl.trim() !== (user.passportOrPinfl || '').trim() ||
+    avatarUrl.trim() !== (user.avatarUrl || '').trim();
+
+  const handleSaveProfile = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     if (!fullName.trim()) return;
 
     setIsSaving(true);
+    updateUserProfile({
+      fullName: fullName.trim(),
+      phone: phone.trim(),
+      address: address.trim(),
+      city,
+      passportOrPinfl: passportOrPinfl.trim(),
+      avatarUrl: avatarUrl.trim(),
+    });
+
+    setSaveSuccess(true);
     setTimeout(() => {
-      updateUserProfile({
-        fullName: fullName.trim(),
-        phone: phone.trim(),
-        address: address.trim(),
-        city,
-        passportOrPinfl: passportOrPinfl.trim(),
-        avatarUrl: avatarUrl.trim(),
-      });
       setIsSaving(false);
-    }, 400);
+    }, 300);
+    setTimeout(() => {
+      setSaveSuccess(false);
+    }, 3000);
   };
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        if (typeof reader.result === 'string') {
-          setAvatarUrl(reader.result);
-          setShowAvatarModal(false);
-        }
-      };
-      reader.readAsDataURL(file);
+      try {
+        const compressedBase64 = await compressImage(file);
+        setAvatarUrl(compressedBase64);
+        updateUserProfile({ avatarUrl: compressedBase64 });
+        setShowAvatarModal(false);
+        setSaveSuccess(true);
+        setTimeout(() => setSaveSuccess(false), 3000);
+      } catch (err) {
+        console.error("Image upload compression error:", err);
+      }
     }
   };
 
@@ -173,6 +230,11 @@ export const ProfilePage: React.FC = () => {
                   fullName.charAt(0).toUpperCase() || 'E'
                 )}
               </div>
+              {user.isAdmin && (
+                <div className="absolute -top-2 -left-2 bg-gradient-to-r from-amber-400 to-amber-500 text-amber-950 p-1.5 rounded-xl shadow-md border-2 border-white dark:border-slate-800" title="Bosh Administrator">
+                  <Crown className="w-4 h-4" />
+                </div>
+              )}
               <button
                 type="button"
                 onClick={() => setShowAvatarModal(true)}
@@ -221,8 +283,23 @@ export const ProfilePage: React.FC = () => {
               </div>
             </div>
 
-            {/* Tezkor keshbek va chiqish tugmalari */}
+            {/* Tezkor keshbek, saqlash va chiqish tugmalari */}
             <div className="flex sm:flex-col items-center gap-2.5 w-full sm:w-auto">
+              {hasUnsavedChanges && (
+                <motion.button
+                  initial={{ scale: 0.9, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  type="button"
+                  onClick={() => handleSaveProfile()}
+                  className="w-full px-4 py-2.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-black text-xs flex items-center justify-center gap-1.5 shadow-lg shadow-emerald-500/25 transition-all cursor-pointer ring-2 ring-emerald-300"
+                >
+                  <Save className="w-3.5 h-3.5" />
+                  <span>Saqlash</span>
+                </motion.button>
+              )}
+
               <button
                 type="button"
                 onClick={openCashbackCardModal}
@@ -443,14 +520,51 @@ export const ProfilePage: React.FC = () => {
               </div>
 
               {/* Saqlash tugmasi */}
-              <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-100 dark:border-slate-700/60">
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-gray-100 dark:border-slate-700/60">
+                <div className="text-xs text-gray-500 dark:text-slate-400">
+                  {hasUnsavedChanges ? (
+                    <span className="text-amber-600 dark:text-amber-400 font-bold flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-amber-500 animate-ping" />
+                      <span>{language === 'ru' ? 'Есть несохраненные изменения' : language === 'en' ? 'Unsaved changes pending' : 'Saqlanmagan o\'zgarishlar mavjud'}</span>
+                    </span>
+                  ) : (
+                    <span className="text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1.5">
+                      <Check className="w-3.5 h-3.5" />
+                      <span>{language === 'ru' ? 'Все данные сохранены' : language === 'en' ? 'All data saved' : 'Barcha ma\'lumotlar saqlangan'}</span>
+                    </span>
+                  )}
+                </div>
+
                 <button
+                  id="save-profile-btn"
                   type="submit"
                   disabled={isSaving}
-                  className="px-6 py-3 rounded-2xl bg-uzum-primary hover:bg-[#520080] text-white font-black text-xs shadow-lg shadow-purple-500/20 transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                  className={`w-full sm:w-auto px-8 py-3.5 rounded-2xl font-black text-xs shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 ${
+                    saveSuccess 
+                      ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-500/25 ring-2 ring-emerald-300' 
+                      : 'bg-uzum-primary hover:bg-[#520080] text-white shadow-purple-500/25 hover:shadow-purple-500/40'
+                  }`}
                 >
-                  <Save className="w-4 h-4" />
-                  <span>{isSaving ? 'Saqlanmoqda...' : (language === 'ru' ? 'Сохранить изменения' : language === 'en' ? 'Save Changes' : 'O\'zgarishlarni saqlash')}</span>
+                  {saveSuccess ? (
+                    <>
+                      <Check className="w-4 h-4 text-white" />
+                      <span>{language === 'ru' ? 'Успешно сохранено!' : language === 'en' ? 'Successfully saved!' : 'Muvaffaqiyatli saqlandi!'}</span>
+                    </>
+                  ) : isSaving ? (
+                    <>
+                      <motion.div
+                        animate={{ rotate: 360 }}
+                        transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}
+                        className="w-4 h-4 border-2 border-white border-t-transparent rounded-full"
+                      />
+                      <span>{language === 'ru' ? 'Сохранение...' : language === 'en' ? 'Saving...' : 'Saqlanmoqda...'}</span>
+                    </>
+                  ) : (
+                    <>
+                      <Save className="w-4 h-4" />
+                      <span>{language === 'ru' ? 'Сохранить изменения' : language === 'en' ? 'Save Changes' : 'O\'zgarishlarni saqlash'}</span>
+                    </>
+                  )}
                 </button>
               </div>
             </motion.form>
@@ -568,7 +682,10 @@ export const ProfilePage: React.FC = () => {
                       type="button"
                       onClick={() => {
                         setAvatarUrl(url);
+                        updateUserProfile({ avatarUrl: url });
                         setShowAvatarModal(false);
+                        setSaveSuccess(true);
+                        setTimeout(() => setSaveSuccess(false), 3000);
                       }}
                       className={`relative aspect-square rounded-2xl overflow-hidden border-2 transition-transform hover:scale-105 cursor-pointer ${
                         avatarUrl === url ? 'border-uzum-primary ring-2 ring-purple-300' : 'border-gray-200 dark:border-slate-700'
@@ -605,12 +722,16 @@ export const ProfilePage: React.FC = () => {
                     type="button"
                     onClick={() => {
                       if (customAvatarInput.trim()) {
-                        setAvatarUrl(customAvatarInput.trim());
+                        const trimmed = customAvatarInput.trim();
+                        setAvatarUrl(trimmed);
+                        updateUserProfile({ avatarUrl: trimmed });
                         setCustomAvatarInput('');
                         setShowAvatarModal(false);
+                        setSaveSuccess(true);
+                        setTimeout(() => setSaveSuccess(false), 3000);
                       }
                     }}
-                    className="px-4 py-2 rounded-xl bg-uzum-primary text-white font-bold text-xs"
+                    className="px-4 py-2 rounded-xl bg-uzum-primary text-white font-bold text-xs cursor-pointer"
                   >
                     OK
                   </button>
