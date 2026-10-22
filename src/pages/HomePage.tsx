@@ -28,7 +28,7 @@ export const HomePage: React.FC = () => {
   const bestSellers = products.filter((p) => p.isBestSeller);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-4 sm:py-6 space-y-10 animate-in fade-in duration-300">
+    <div className="max-w-7xl mx-auto px-4 py-4 sm:py-6 space-y-10">
       {/* 1. Asosiy Promo Bannerlar Slayderi */}
       <BannerSlider />
 
@@ -77,11 +77,9 @@ export const HomePage: React.FC = () => {
             bg: "bg-amber-50/80 dark:bg-slate-800/80 text-amber-800 dark:text-amber-300 border-amber-200/50 dark:border-slate-800",
           },
         ].map((item, idx) => (
-          <motion.div
+          <div
             key={idx}
-            whileHover={{ y: -3, scale: 1.02 }}
-            transition={{ type: 'spring', stiffness: 350, damping: 20 }}
-            className={`p-4 rounded-2xl border ${item.bg} flex items-start gap-3 shadow-xs`}
+            className={`p-4 rounded-2xl border ${item.bg} flex items-start gap-3 shadow-xs hover:-translate-y-0.5 transition-transform duration-150`}
           >
             <div className="p-2.5 rounded-xl bg-white/80 dark:bg-slate-700/80 shadow-xs shrink-0">
               <item.icon className="w-5 h-5" />
@@ -94,7 +92,7 @@ export const HomePage: React.FC = () => {
                 {item.desc}
               </div>
             </div>
-          </motion.div>
+          </div>
         ))}
       </div>
 

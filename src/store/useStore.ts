@@ -196,17 +196,17 @@ export const useStore = create<StoreState>()(
 
       setActivePage: (page) => {
         set({ activePage: page });
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        window.scrollTo(0, 0);
       },
 
       navigateToProduct: (productId) => {
         set({ selectedProductId: productId, activePage: 'product-detail' });
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        window.scrollTo(0, 0);
       },
 
       navigateToCategory: (categorySlug) => {
         set({ selectedCategorySlug: categorySlug, activePage: 'home' });
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        window.scrollTo(0, 0);
       },
 
       // Search

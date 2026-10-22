@@ -60,15 +60,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-40px' }}
-      whileHover={{ y: -6, scale: 1.015 }}
-      whileTap={{ scale: 0.985 }}
-      transition={{ duration: 0.25, ease: 'easeOut' }}
+    <div
       onClick={handleCardClick}
-      className="group bg-white dark:bg-slate-800 rounded-2xl sm:rounded-3xl border border-gray-200/70 dark:border-slate-800/80 hover:border-purple-300 dark:hover:border-purple-500/40 shadow-sm hover:shadow-card-hover transition-all duration-300 flex flex-col justify-between overflow-hidden cursor-pointer relative"
+      className="group bg-white dark:bg-slate-800 rounded-2xl sm:rounded-3xl border border-gray-200/70 dark:border-slate-800/80 hover:border-purple-300 dark:hover:border-purple-500/40 shadow-sm hover:shadow-card-hover hover:-translate-y-1 transition-all duration-150 flex flex-col justify-between overflow-hidden cursor-pointer relative"
     >
       {/* Top Image Section */}
       <div 
@@ -233,6 +227,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           </motion.button>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 };

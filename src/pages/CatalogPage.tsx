@@ -230,7 +230,7 @@ export const CatalogPage: React.FC = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-4 sm:py-6 space-y-6 animate-in fade-in duration-300">
+    <div className="max-w-7xl mx-auto px-4 py-4 sm:py-6 space-y-6">
       {/* 1. Breadcrumb va Sarlavha */}
       <div className="space-y-2">
         <nav className="flex items-center gap-1.5 text-xs text-gray-400">
