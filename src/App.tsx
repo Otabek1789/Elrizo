@@ -62,8 +62,7 @@ export const App: React.FC = () => {
             usedLimit: 0,
             isAdmin,
             role: isAdmin ? 'admin' : 'user',
-            cashbackBalance: currentUser?.cashbackBalance ?? 150000,
-            loyaltyCardNumber: currentUser?.loyaltyCardNumber ?? '8600 7712 3340 9182',
+            cashbackBalance: currentUser?.cashbackBalance ?? 0,
           };
 
           useStore.setState({ user: userObj });

@@ -28,8 +28,7 @@ export const NakapitelniyCardModal: React.FC = () => {
 
   if (!isCashbackCardModalOpen) return null;
 
-  const currentBalance = user?.cashbackBalance ?? 245000;
-  const cardNumber = user?.loyaltyCardNumber || '8600 4910 8274 9912';
+  const currentBalance = user?.cashbackBalance ?? 0;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-slate-950/75 backdrop-blur-md animate-in fade-in duration-200">
@@ -45,7 +44,7 @@ export const NakapitelniyCardModal: React.FC = () => {
             </div>
             <div>
               <h3 className="font-black text-sm sm:text-lg text-slate-900 dark:text-white flex items-center gap-1.5 sm:gap-2">
-                <span>ELRIZO Nakapitelniy Karta</span>
+                <span>ELRIZO Jamg'arma Kartasi</span>
                 <span className="text-[9px] sm:text-[10px] font-black uppercase px-1.5 sm:px-2 py-0.5 rounded-full bg-amber-400 text-purple-950">
                   1% Keshbek
                 </span>
@@ -84,7 +83,7 @@ export const NakapitelniyCardModal: React.FC = () => {
                     ELRIZO CLUB
                   </span>
                   <span className="text-[10px] text-purple-300 font-mono tracking-wider">
-                    NAKAPITELNAYA KARTA
+                    JAMG'ARMA KARTASI
                   </span>
                 </div>
               </div>
@@ -129,18 +128,18 @@ export const NakapitelniyCardModal: React.FC = () => {
               </div>
             </div>
 
-            {/* Card Bottom: Number & Name */}
+            {/* Card Bottom: Member Name & Card Type (Karta raqami olib tashlangan) */}
             <div className="mt-4 sm:mt-5 pt-3 border-t border-white/10 flex items-center justify-between text-xs font-mono relative z-10">
               <div>
-                <span className="text-[10px] text-purple-300/80 block uppercase">Karta raqami</span>
-                <span className="text-xs sm:text-sm tracking-wider sm:tracking-widest text-slate-100 font-bold">
-                  {cardNumber}
+                <span className="text-[10px] text-purple-300/80 block uppercase">Karta Egasi</span>
+                <span className="text-xs sm:text-sm tracking-wide text-slate-100 font-bold block">
+                  {(user?.fullName || 'Bobur Mirzayev').toUpperCase()}
                 </span>
               </div>
               <div className="text-right">
-                <span className="text-[10px] text-purple-300/80 block uppercase">Egasi</span>
-                <span className="text-[11px] sm:text-xs font-bold text-slate-100 truncate max-w-[110px] sm:max-w-[140px] block">
-                  {(user?.fullName || 'Bobur Mirzayev').toUpperCase()}
+                <span className="text-[10px] text-purple-300/80 block uppercase">Keshbek Tizimi</span>
+                <span className="text-[11px] sm:text-xs font-bold text-amber-300 truncate max-w-[130px] sm:max-w-[170px] block">
+                  1% Jamg'arma
                 </span>
               </div>
             </div>
@@ -194,39 +193,53 @@ export const NakapitelniyCardModal: React.FC = () => {
               </span>
             </h4>
 
-            <div className="divide-y divide-slate-100 dark:divide-slate-800 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden bg-white dark:bg-slate-800/50">
-              {cashbackTransactions.map((tx) => (
-                <div key={tx.id} className="p-3.5 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800/80 transition">
-                  <div className="flex items-center gap-3">
-                    <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${
-                      tx.type === 'earned' 
-                        ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400' 
-                        : 'bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400'
-                    }`}>
-                      {tx.type === 'earned' ? (
-                        <ArrowDownLeft className="w-4 h-4" />
-                      ) : (
-                        <ArrowUpRight className="w-4 h-4" />
-                      )}
-                    </div>
-                    <div>
-                      <p className="text-xs font-semibold text-slate-800 dark:text-slate-200 line-clamp-1">
-                        {tx.description}
-                      </p>
-                      <span className="text-[11px] text-slate-400 font-mono">
-                        {tx.date}
-                      </span>
-                    </div>
-                  </div>
-
-                  <span className={`text-sm font-black font-mono shrink-0 ${
-                    tx.type === 'earned' ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'
-                  }`}>
-                    {tx.type === 'earned' ? '+' : '-'}{tx.amount.toLocaleString()} so'm
-                  </span>
+            {cashbackTransactions.length === 0 ? (
+              <div className="p-6 sm:p-8 text-center rounded-2xl border border-dashed border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-800/30">
+                <div className="w-10 h-10 mx-auto mb-2 rounded-xl bg-purple-100 dark:bg-purple-950/60 text-uzum-primary dark:text-purple-300 flex items-center justify-center">
+                  <Gift className="w-5 h-5" />
                 </div>
-              ))}
-            </div>
+                <p className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                  Hozircha keshbek jamg'arilmagan (0 so'm)
+                </p>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 max-w-xs mx-auto">
+                  Birinchi xaridingizdan boshlab umumiy to'lovning 1% i ushbu kartangizga avtomatik jamg'ariladi.
+                </p>
+              </div>
+            ) : (
+              <div className="divide-y divide-slate-100 dark:divide-slate-800 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden bg-white dark:bg-slate-800/50">
+                {cashbackTransactions.map((tx) => (
+                  <div key={tx.id} className="p-3.5 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800/80 transition">
+                    <div className="flex items-center gap-3">
+                      <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${
+                        tx.type === 'earned' 
+                          ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400' 
+                          : 'bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400'
+                      }`}>
+                        {tx.type === 'earned' ? (
+                          <ArrowDownLeft className="w-4 h-4" />
+                        ) : (
+                          <ArrowUpRight className="w-4 h-4" />
+                        )}
+                      </div>
+                      <div>
+                        <p className="text-xs font-semibold text-slate-800 dark:text-slate-200 line-clamp-1">
+                          {tx.description}
+                        </p>
+                        <span className="text-[11px] text-slate-400 font-mono">
+                          {tx.date}
+                        </span>
+                      </div>
+                    </div>
+
+                    <span className={`text-sm font-black font-mono shrink-0 ${
+                      tx.type === 'earned' ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'
+                    }`}>
+                      {tx.type === 'earned' ? '+' : '-'}{tx.amount.toLocaleString()} so'm
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 

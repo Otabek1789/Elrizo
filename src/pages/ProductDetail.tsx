@@ -425,7 +425,7 @@ export const ProductDetail: React.FC = () => {
                 </div>
                 <div>
                   <div className="font-bold text-amber-950 dark:text-amber-200">
-                    1% Nakapitelniy Keshbek Karta
+                    1% Jamg'arma Keshbek Karta
                   </div>
                   <div className="text-[11px] text-amber-700 dark:text-amber-400">
                     Xariddan so'ng kartangizga <strong className="font-black text-amber-900 dark:text-amber-200">+{formatPrice(Math.round(effectivePrice * quantity * 0.01), false, language)}</strong> tushadi

@@ -30,7 +30,7 @@ export const MobileBottomNav: React.FC = () => {
   const cartCount = getCartItemsCount();
   const cartTotal = getCartTotal();
   const favoritesCount = favorites.length;
-  const cashbackBalance = user?.cashbackBalance ?? 245000;
+  const cashbackBalance = user?.cashbackBalance ?? 0;
 
   const currentPath = location.pathname;
 
@@ -87,12 +87,12 @@ export const MobileBottomNav: React.FC = () => {
           </span>
         </Link>
 
-        {/* 3. Nakapitelniy Karta (1% Keshbek) */}
+        {/* 3. Jamg'arma Karta (1% Keshbek) */}
         <button
           type="button"
           onClick={openCashbackCardModal}
           className="flex flex-col items-center justify-center py-1 px-1 rounded-xl text-amber-600 dark:text-amber-400 font-bold transition-all group"
-          title="1% Nakapitelniy Karta"
+          title="1% Jamg'arma Karta"
         >
           <div className="relative">
             <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-amber-500 to-yellow-400 text-white flex items-center justify-center shadow-md shadow-amber-500/25 group-active:scale-95 transition-transform">
@@ -103,7 +103,7 @@ export const MobileBottomNav: React.FC = () => {
             </span>
           </div>
           <span className="text-[9px] mt-0.5 font-black text-amber-700 dark:text-amber-300 truncate">
-            Keshbek
+            Jamg'arma
           </span>
         </button>
 

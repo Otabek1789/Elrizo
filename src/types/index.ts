@@ -109,8 +109,8 @@ export interface User {
   avatarUrl?: string;
   role?: 'admin' | 'user';
   isAdmin?: boolean;
-  cashbackBalance?: number; // Nakapitelniy karta balansi (so'm)
-  loyaltyCardNumber?: string; // 8600 4521 8812 9014
+  cashbackBalance?: number; // Jamg'arma karta keshbek balansi (so'm)
+  loyaltyCardNumber?: string;
 }
 
 export type PaymentMode = 'full' | 'installment';

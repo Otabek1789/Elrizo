@@ -564,8 +564,7 @@ export const useStore = create<StoreState>()(
             usedLimit: 0,
             isAdmin,
             role: isAdmin ? 'admin' : 'user',
-            cashbackBalance: 245000,
-            loyaltyCardNumber: '8600 4910 8274 9912',
+            cashbackBalance: 0,
           };
 
           set({ user: userObj, isAuthOpen: false });
@@ -666,23 +665,8 @@ export const useStore = create<StoreState>()(
       openOrderTracking: () => set({ isOrderTrackingOpen: true }),
       closeOrderTracking: () => set({ isOrderTrackingOpen: false }),
 
-      // Nakapitelniy Karta (Cashback Loyalty Program)
-      cashbackTransactions: [
-        {
-          id: 'cb-init-1',
-          type: 'earned',
-          amount: 145000,
-          date: '18-Oktabr',
-          description: "iPhone 15 Pro Max xarididan 1% keshbek",
-        },
-        {
-          id: 'cb-init-2',
-          type: 'earned',
-          amount: 100000,
-          date: '12-Oktabr',
-          description: "Samsung Smart TV xarididan 1% keshbek",
-        },
-      ],
+      // Jamg'arma Karta (Cashback Loyalty Program)
+      cashbackTransactions: [],
       useCashbackInCheckout: false,
       setUseCashbackInCheckout: (val: boolean) => set({ useCashbackInCheckout: val }),
       toggleUseCashbackInCheckout: () => set((state) => ({ useCashbackInCheckout: !state.useCashbackInCheckout })),
@@ -713,7 +697,7 @@ export const useStore = create<StoreState>()(
           user: updatedUser,
           cashbackTransactions: [newTx, ...state.cashbackTransactions],
         }));
-        get().addToast(`Nakapitelniy kartangizga +${amount.toLocaleString()} so'm keshbek qo'shildi! 🎁`, 'success');
+        get().addToast(`Jamg'arma kartangizga +${amount.toLocaleString()} so'm keshbek qo'shildi! 🎁`, 'success');
       },
 
       spendCashback: (amount: number, description: string, orderId?: string) => {
@@ -820,11 +804,14 @@ export const useStore = create<StoreState>()(
         if (state?.user) {
           state.user.scoringLimit = 0;
           state.user.usedLimit = 0;
-          if (state.user.cashbackBalance === undefined) {
-            state.user.cashbackBalance = 245000;
+          if (state.user.cashbackBalance === undefined || state.user.cashbackBalance === 245000) {
+            state.user.cashbackBalance = 0;
           }
-          if (!state.user.loyaltyCardNumber) {
-            state.user.loyaltyCardNumber = '8600 4910 8274 9912';
+          if (state.user.loyaltyCardNumber) {
+            delete state.user.loyaltyCardNumber;
+          }
+          if (state.cashbackTransactions?.some((t: any) => t.id === 'cb-init-1' || t.id === 'cb-init-2')) {
+            state.cashbackTransactions = [];
           }
         }
         if (state && typeof document !== 'undefined') {

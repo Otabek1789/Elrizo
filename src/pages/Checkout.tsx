@@ -444,7 +444,7 @@ export const Checkout: React.FC = () => {
             <div className="flex items-center justify-between">
               <span className="font-extrabold text-amber-950 dark:text-amber-200 flex items-center gap-1.5">
                 <CreditCard className="w-4 h-4 text-amber-600" />
-                <span>ELRIZO Club Nakapitelniy Karta</span>
+                <span>ELRIZO Jamg'arma Kartasi</span>
               </span>
               <button
                 type="button"
@@ -1116,7 +1116,7 @@ export const Checkout: React.FC = () => {
               <div className="flex items-center justify-between mb-2">
                 <label className="text-xs font-bold text-gray-700 dark:text-slate-300 flex items-center gap-1.5">
                   <CreditCard className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
-                  <span>Nakapitelniy Karta (1% Keshbek)</span>
+                  <span>Jamg'arma Karta (1% Keshbek)</span>
                 </label>
                 <button
                   type="button"
@@ -1135,7 +1135,7 @@ export const Checkout: React.FC = () => {
                     </div>
                     <div>
                       <div className="text-[11px] font-bold text-amber-950 dark:text-amber-200">
-                        {user?.loyaltyCardNumber || '8600 •••• 9912'}
+                        Jamg'arma hisobingiz
                       </div>
                       <div className="text-[10px] text-amber-700 dark:text-amber-400">
                         Mavjud balans: <strong className="font-black text-amber-900 dark:text-amber-200">{formatPrice(availableCashback, true, language)}</strong>
@@ -1192,7 +1192,7 @@ export const Checkout: React.FC = () => {
               )}
               {cashbackDiscount > 0 && (
                 <div className="flex justify-between text-amber-600 dark:text-amber-400 font-bold">
-                  <span>Nakapitelniy karta (Keshbek)</span>
+                  <span>Jamg'arma karta (Keshbek)</span>
                   <span>-{formatPrice(cashbackDiscount, true, language)}</span>
                 </div>
               )}
