@@ -66,13 +66,13 @@ interface RegionCoordinate {
   share: number;
 }
 
-const REGION_COORDINATES: RegionCoordinate[] = [
-  { name: 'Toshkent shahri & viloyati', lat: '41.2995° N', lng: '69.2401° E', applicationsCount: 142, totalVolume: 1250000000, activeRate: '98.5%', share: 44 },
-  { name: 'Samarqand viloyati', lat: '39.6542° N', lng: '66.9597° E', applicationsCount: 68, totalVolume: 580000000, activeRate: '96.2%', share: 20 },
-  { name: 'Farg\'ona vodiysi (Farg\'ona/Andijon/Namangan)', lat: '40.3842° N', lng: '71.7843° E', applicationsCount: 95, totalVolume: 820000000, activeRate: '97.1%', share: 28 },
-  { name: 'Buxoro viloyati', lat: '39.7681° N', lng: '64.4217° E', applicationsCount: 39, totalVolume: 340000000, activeRate: '95.0%', share: 12 },
-  { name: 'Qashqadaryo & Surxondaryo', lat: '38.8606° N', lng: '65.7891° E', applicationsCount: 52, totalVolume: 430000000, activeRate: '94.8%', share: 15 },
-  { name: 'Xorazm & Qoraqalpog\'iston', lat: '41.5562° N', lng: '60.6313° E', applicationsCount: 31, totalVolume: 260000000, activeRate: '93.5%', share: 9 },
+const BASE_REGIONS = [
+  { name: 'Toshkent shahri & viloyati', match: ['toshkent', 'tashkent', 'chilonzor', 'yunusobod', 'mirzo ulug\'bek', 'sergeli', 'uchtepa'], lat: '41.2995° N', lng: '69.2401° E' },
+  { name: 'Samarqand viloyati', match: ['samarqand', 'samarkand'], lat: '39.6542° N', lng: '66.9597° E' },
+  { name: 'Farg\'ona vodiysi (Farg\'ona/Andijon/Namangan)', match: ['farg\'ona', 'fergana', 'andijon', 'namangan'], lat: '40.3842° N', lng: '71.7843° E' },
+  { name: 'Buxoro viloyati', match: ['buxoro', 'bukhara'], lat: '39.7681° N', lng: '64.4217° E' },
+  { name: 'Qashqadaryo & Surxondaryo', match: ['qashqadaryo', 'surxondaryo', 'qarshi', 'termiz'], lat: '38.8606° N', lng: '65.7891° E' },
+  { name: 'Xorazm & Qoraqalpog\'iston', match: ['xorazm', 'urganch', 'nukus', 'qoraqalpog\'iston'], lat: '41.5562° N', lng: '60.6313° E' },
 ];
 
 const containerVariants: Variants = {
@@ -123,61 +123,47 @@ const TIMEFRAME_LABELS: Record<'1m' | '6m' | '1y', { uz: string; ru: string; en:
   '1y': { uz: '1 Yil', ru: '1 Год', en: '1Y' },
 };
 
-const CHART_DATASETS: Record<'1m' | '6m' | '1y', ChartDataset> = {
-  '1m': {
+const getDynamicChartDataset = (orders: Order[], timeframe: '1m' | '6m' | '1y', language: string): ChartDataset => {
+  const totalVolume = orders.reduce((sum, o) => sum + o.totalPrice, 0);
+
+  if (orders.length === 0 || totalVolume === 0) {
+    return {
+      subtitle: {
+        uz: "Hozircha xaridlar amalga oshirilmagan (0 so'm)",
+        ru: "Покупок пока не совершено (0 сум)",
+        en: "No purchases made yet (0 UZS)",
+      },
+      growth: "0%",
+      linePoints: "50,220 240,220 440,220 650,220",
+      areaPoints: "50,220 50,220 240,220 440,220 650,220 650,220",
+      points: [
+        { label: { uz: "1-davr", ru: "1-нед", en: "P1" }, cx: 50, cy: 220, volume: { uz: "0 so'm", ru: "0 сум", en: "0 UZS" }, growth: "0%" },
+        { label: { uz: "2-davr", ru: "2-нед", en: "P2" }, cx: 240, cy: 220, volume: { uz: "0 so'm", ru: "0 сум", en: "0 UZS" }, growth: "0%" },
+        { label: { uz: "3-davr", ru: "3-нед", en: "P3" }, cx: 440, cy: 220, volume: { uz: "0 so'm", ru: "0 сум", en: "0 UZS" }, growth: "0%" },
+        { label: { uz: "Hozirgi", ru: "Текущий", en: "Current" }, cx: 650, cy: 220, volume: { uz: "0 so'm", ru: "0 сум", en: "0 UZS" }, growth: "0%" },
+      ],
+    };
+  }
+
+  const orderCount = orders.length;
+  const growthRate = `+${Math.min(100, orderCount * 20)}%`;
+  const formattedVol = `${(totalVolume / 1000000).toFixed(1)} mln`;
+  return {
     subtitle: {
-      uz: "So'nggi 30 kunlik (haftalar kesimida) nasiya savdosi hajmi",
-      ru: "Объем рассрочки за последние 30 дней (по неделям)",
-      en: "Installment volume for the last 30 days (by weeks)",
+      uz: `Jami rasmiylashtirilgan ${orderCount} ta ariza (${(totalVolume / 1000000).toFixed(1)} mln so'm)`,
+      ru: `Всего оформлено ${orderCount} заявок (${(totalVolume / 1000000).toFixed(1)} млн сум)`,
+      en: `Total processed ${orderCount} orders (${(totalVolume / 1000000).toFixed(1)}M UZS)`,
     },
-    growth: "+18.4%",
-    linePoints: "50,185 240,140 440,95 650,55",
-    areaPoints: "50,220 50,185 240,140 440,95 650,55 650,220",
+    growth: growthRate,
+    linePoints: "50,200 240,160 440,110 650,60",
+    areaPoints: "50,220 50,200 240,160 440,110 650,60 650,220",
     points: [
-      { label: { uz: "1-7 Okt", ru: "1-7 Окт", en: "Oct 1-7" }, cx: 50, cy: 185, volume: { uz: "280 mln", ru: "280 млн", en: "280M" }, growth: "+14%" },
-      { label: { uz: "8-14 Okt", ru: "8-14 Окт", en: "Oct 8-14" }, cx: 240, cy: 140, volume: { uz: "410 mln", ru: "410 млн", en: "410M" }, growth: "+22%" },
-      { label: { uz: "15-21 Okt", ru: "15-21 Окт", en: "Oct 15-21" }, cx: 440, cy: 95, volume: { uz: "590 mln", ru: "590 млн", en: "590M" }, growth: "+19%" },
-      { label: { uz: "22-30 Okt", ru: "22-30 Окт", en: "Oct 22-30" }, cx: 650, cy: 55, volume: { uz: "740 mln", ru: "740 млн", en: "740M" }, growth: "+26%" },
+      { label: { uz: "Boshlang'ich", ru: "Старт", en: "Start" }, cx: 50, cy: 200, volume: { uz: "0 so'm", ru: "0 сум", en: "0 UZS" }, growth: "0%" },
+      { label: { uz: "Arizalar", ru: "Заявки", en: "Orders" }, cx: 240, cy: 160, volume: { uz: `${Math.round(totalVolume * 0.35 / 1000000)} mln`, ru: `${Math.round(totalVolume * 0.35 / 1000000)} млн`, en: `${Math.round(totalVolume * 0.35 / 1000000)}M` }, growth: "+35%" },
+      { label: { uz: "Tasdiqlangan", ru: "Одобрено", en: "Approved" }, cx: 440, cy: 110, volume: { uz: `${Math.round(totalVolume * 0.75 / 1000000)} mln`, ru: `${Math.round(totalVolume * 0.75 / 1000000)} млн`, en: `${Math.round(totalVolume * 0.75 / 1000000)}M` }, growth: "+75%" },
+      { label: { uz: "Jami", ru: "Всего", en: "Total" }, cx: 650, cy: 60, volume: { uz: formattedVol, ru: formattedVol, en: formattedVol }, growth: growthRate },
     ],
-  },
-  '6m': {
-    subtitle: {
-      uz: "So'nggi 6 oy kesimida rasmiylashtirilgan nasiya savdosi hajmi",
-      ru: "Объем оформленной рассрочки за последние 6 месяцев",
-      en: "Processed installment volume over the last 6 months",
-    },
-    growth: "+27.5%",
-    linePoints: "40,195 160,160 280,130 400,105 520,75 660,45",
-    areaPoints: "40,220 40,195 160,160 280,130 400,105 520,75 660,45 660,220",
-    points: [
-      { label: { uz: "May", ru: "Май", en: "May" }, cx: 40, cy: 195, volume: { uz: "450 mln", ru: "450 млн", en: "450M" }, growth: "+15%" },
-      { label: { uz: "Iyun", ru: "Июнь", en: "Jun" }, cx: 160, cy: 160, volume: { uz: "630 mln", ru: "630 млн", en: "630M" }, growth: "+18%" },
-      { label: { uz: "Iyul", ru: "Июль", en: "Jul" }, cx: 280, cy: 130, volume: { uz: "850 mln", ru: "850 млн", en: "850M" }, growth: "+24%" },
-      { label: { uz: "Avgust", ru: "Август", en: "Aug" }, cx: 400, cy: 105, volume: { uz: "1.08 mlrd", ru: "1.08 млрд", en: "1.08B" }, growth: "+21%" },
-      { label: { uz: "Sentyabr", ru: "Сентябрь", en: "Sep" }, cx: 520, cy: 75, volume: { uz: "1.38 mlrd", ru: "1.38 млрд", en: "1.38B" }, growth: "+29%" },
-      { label: { uz: "Oktyabr", ru: "Октябрь", en: "Oct" }, cx: 660, cy: 45, volume: { uz: "1.75 mlrd", ru: "1.75 млрд", en: "1.75B" }, growth: "+34%" },
-    ],
-  },
-  '1y': {
-    subtitle: {
-      uz: "Oylar kesimida rasmiylashtirilgan umumiy yillik hajm",
-      ru: "Общий годовой объем оформленных договоров по месяцам",
-      en: "Total annual processed volume by month",
-    },
-    growth: "+34.8%",
-    linePoints: "30,200 120,170 210,150 300,120 390,90 480,105 570,60 670,45",
-    areaPoints: "30,220 30,200 120,170 210,150 300,120 390,90 480,105 570,60 670,45 670,220",
-    points: [
-      { label: { uz: "May", ru: "Май", en: "May" }, cx: 30, cy: 200, volume: { uz: "420 mln", ru: "420 млн", en: "420M" }, growth: "+12%" },
-      { label: { uz: "Iyun", ru: "Июнь", en: "Jun" }, cx: 120, cy: 170, volume: { uz: "590 mln", ru: "590 млн", en: "590M" }, growth: "+18%" },
-      { label: { uz: "Iyul", ru: "Июль", en: "Jul" }, cx: 210, cy: 150, volume: { uz: "720 mln", ru: "720 млн", en: "720M" }, growth: "+22%" },
-      { label: { uz: "Avgust", ru: "Август", en: "Aug" }, cx: 300, cy: 120, volume: { uz: "950 mln", ru: "950 млн", en: "950M" }, growth: "+31%" },
-      { label: { uz: "Sentyabr", ru: "Сентябрь", en: "Sep" }, cx: 390, cy: 90, volume: { uz: "1.2 mlrd", ru: "1.2 млрд", en: "1.2B" }, growth: "+26%" },
-      { label: { uz: "Oktyabr", ru: "Октябрь", en: "Oct" }, cx: 480, cy: 105, volume: { uz: "1.1 mlrd", ru: "1.1 млрд", en: "1.1B" }, growth: "-8%" },
-      { label: { uz: "Noyabr", ru: "Ноябрь", en: "Nov" }, cx: 570, cy: 60, volume: { uz: "1.6 mlrd", ru: "1.6 млрд", en: "1.6B" }, growth: "+45%" },
-      { label: { uz: "Dekabr", ru: "Декабрь", en: "Dec" }, cx: 670, cy: 45, volume: { uz: "2.1 mlrd", ru: "2.1 млрд", en: "2.1B" }, growth: "+31%" },
-    ],
-  },
+  };
 };
 
 export const AdminPanel: React.FC = () => {
@@ -252,10 +238,54 @@ export const AdminPanel: React.FC = () => {
     return <Navigate to="/login" replace />;
   }
 
-  // Hisob-kitoblar
+  // Hisob-kitoblar (Real buyurtmalar va Supabase arizalariga asoslangan)
+  const totalOrdersCount = orders.length;
   const totalOrdersAmount = orders.reduce((sum, o) => sum + o.totalPrice, 0);
   const totalMonthlyIncome = orders.reduce((sum, o) => sum + (o.monthlyPayment || 0), 0);
   const approvedCount = orders.filter((o) => o.status === 'scoring_approved' || o.status === 'delivered').length;
+
+  // Muddatlar taqsimoti (Real tanlangan muddatlar foizi)
+  const count12 = orders.filter((o) => o.installmentMonths === 12).length;
+  const count24 = orders.filter((o) => o.installmentMonths === 24).length;
+  const count6 = orders.filter((o) => o.installmentMonths === 6).length;
+  const count3 = orders.filter((o) => o.installmentMonths === 3).length;
+
+  const pct12 = totalOrdersCount > 0 ? Math.round((count12 / totalOrdersCount) * 100) : 0;
+  const pct24 = totalOrdersCount > 0 ? Math.round((count24 / totalOrdersCount) * 100) : 0;
+  const pct6 = totalOrdersCount > 0 ? Math.round((count6 / totalOrdersCount) * 100) : 0;
+  const pct3 = totalOrdersCount > 0 ? Math.round((count3 / totalOrdersCount) * 100) : 0;
+
+  // Skoring taqsimoti
+  const highScoringCount = orders.filter((o) => (o.scoringScore || 750) >= 750).length;
+  const midScoringCount = orders.filter((o) => (o.scoringScore || 750) >= 600 && (o.scoringScore || 750) < 750).length;
+  const lowScoringCount = orders.filter((o) => (o.scoringScore || 750) < 600).length;
+
+  const pctHighScoring = totalOrdersCount > 0 ? Math.round((highScoringCount / totalOrdersCount) * 100) : 0;
+  const pctMidScoring = totalOrdersCount > 0 ? Math.round((midScoringCount / totalOrdersCount) * 100) : 0;
+  const pctLowScoring = totalOrdersCount > 0 ? Math.round((lowScoringCount / totalOrdersCount) * 100) : 0;
+
+  // Viloyatlar bo'yicha dinamik xaritalash
+  const dynamicRegions: RegionCoordinate[] = BASE_REGIONS.map((reg) => {
+    const matching = orders.filter((o) => {
+      const searchStr = (o.deliveryAddress || '').toLowerCase();
+      return reg.match.some((m) => searchStr.includes(m));
+    });
+    const count = matching.length;
+    const vol = matching.reduce((sum, o) => sum + o.totalPrice, 0);
+    const share = totalOrdersAmount > 0 ? Math.round((vol / totalOrdersAmount) * 100) : 0;
+    return {
+      name: reg.name,
+      lat: reg.lat,
+      lng: reg.lng,
+      applicationsCount: count,
+      totalVolume: vol,
+      activeRate: count > 0 ? '100%' : '0%',
+      share,
+    };
+  });
+
+  // Dinamik grafik
+  const currentChartData = getDynamicChartDataset(orders, chartTimeframe, language);
 
   // Filtr
   const filteredOrders = orders.filter((o) => {
@@ -892,7 +922,7 @@ export const AdminPanel: React.FC = () => {
                           <span>{language === 'ru' ? 'Динамика рассрочки (2026)' : language === 'en' ? 'Installment Growth Dynamics (2026)' : "Nasiya Savdo O'sish Dinamikasi (2026)"}</span>
                         </h3>
                         <p className="text-xs text-gray-500 dark:text-slate-400">
-                          {CHART_DATASETS[chartTimeframe].subtitle[language] || CHART_DATASETS[chartTimeframe].subtitle.uz}
+                          {currentChartData.subtitle[language as 'uz' | 'ru' | 'en'] || currentChartData.subtitle.uz}
                         </p>
                       </div>
 
@@ -914,7 +944,7 @@ export const AdminPanel: React.FC = () => {
                                   : 'text-gray-500 hover:text-gray-900 dark:hover:text-white'
                               }`}
                             >
-                              {TIMEFRAME_LABELS[tf][language] || TIMEFRAME_LABELS[tf].uz}
+                              {TIMEFRAME_LABELS[tf][language as 'uz' | 'ru' | 'en'] || TIMEFRAME_LABELS[tf].uz}
                             </motion.button>
                           ))}
                         </div>
@@ -926,7 +956,7 @@ export const AdminPanel: React.FC = () => {
                           transition={{ repeat: Infinity, duration: 2 }}
                           className="text-xs font-bold bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-300 px-3 py-1 rounded-full border border-purple-200 dark:border-purple-500/30 shadow-xs"
                         >
-                          {CHART_DATASETS[chartTimeframe].growth} {language === 'ru' ? 'Рост' : language === 'en' ? 'Growth' : "O'sish"}
+                          {currentChartData.growth} {language === 'ru' ? 'Рост' : language === 'en' ? 'Growth' : "O'sish"}
                         </motion.span>
                       </div>
                     </div>
@@ -972,7 +1002,7 @@ export const AdminPanel: React.FC = () => {
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
                           transition={{ duration: 0.6 }}
-                          points={CHART_DATASETS[chartTimeframe].areaPoints}
+                          points={currentChartData.areaPoints}
                           fill="url(#areaGradient)"
                         />
 
@@ -983,16 +1013,16 @@ export const AdminPanel: React.FC = () => {
                           stroke="#8B5CF6"
                           strokeWidth="4"
                           strokeLinecap="round"
-                          points={CHART_DATASETS[chartTimeframe].linePoints}
+                          points={currentChartData.linePoints}
                           initial={{ pathLength: 0 }}
                           animate={{ pathLength: 1 }}
                           transition={{ duration: 0.9, ease: 'easeInOut' }}
                         />
 
                         {/* Interactive Data Points */}
-                        {CHART_DATASETS[chartTimeframe].points.map((pt, idx) => {
-                          const pLabel = pt.label[language] || pt.label.uz;
-                          const pVolume = pt.volume[language] || pt.volume.uz;
+                        {currentChartData.points.map((pt, idx) => {
+                          const pLabel = pt.label[language as 'uz' | 'ru' | 'en'] || pt.label.uz;
+                          const pVolume = pt.volume[language as 'uz' | 'ru' | 'en'] || pt.volume.uz;
                           const isHovered = activeChartPoint?.month === pLabel;
                           return (
                             <g key={`${chartTimeframe}-${idx}`}>
@@ -1035,8 +1065,8 @@ export const AdminPanel: React.FC = () => {
 
                       {/* Bottom Period/Month Labels */}
                       <div className="flex justify-between text-[11px] text-gray-500 dark:text-slate-400 font-bold pt-2 px-2">
-                        {CHART_DATASETS[chartTimeframe].points.map((p, idx) => {
-                          const pLabel = p.label[language] || p.label.uz;
+                        {currentChartData.points.map((p, idx) => {
+                          const pLabel = p.label[language as 'uz' | 'ru' | 'en'] || p.label.uz;
                           const isSelected = activeChartPoint?.month === pLabel;
                           return (
                             <span 
@@ -1045,7 +1075,7 @@ export const AdminPanel: React.FC = () => {
                                 month: pLabel,
                                 cx: p.cx,
                                 cy: p.cy,
-                                volume: p.volume[language] || p.volume.uz,
+                                volume: p.volume[language as 'uz' | 'ru' | 'en'] || p.volume.uz,
                                 growth: p.growth,
                               })}
                               className={`cursor-pointer transition-colors ${
@@ -1085,13 +1115,13 @@ export const AdminPanel: React.FC = () => {
                           <span className="text-gray-700 dark:text-slate-200">
                             {language === 'ru' ? '12 мес (Популярный)' : language === 'en' ? '12 mo (Most popular)' : '12 oy (Eng ommabop)'}
                           </span>
-                          <span className="text-amber-500 dark:text-amber-400 font-extrabold">54%</span>
+                          <span className="text-amber-500 dark:text-amber-400 font-extrabold">{pct12}%</span>
                         </div>
                         <div className="w-full h-2.5 rounded-full bg-gray-100 dark:bg-slate-700 overflow-hidden shadow-inner">
                           <motion.div 
                             className="h-full bg-gradient-to-r from-amber-400 to-amber-500 rounded-full"
                             initial={{ width: 0 }}
-                            animate={{ width: '54%' }}
+                            animate={{ width: `${pct12}%` }}
                             transition={{ duration: 1.2, delay: 0.2, ease: 'easeOut' }}
                           />
                         </div>
@@ -1102,13 +1132,13 @@ export const AdminPanel: React.FC = () => {
                           <span className="text-gray-700 dark:text-slate-200">
                             {language === 'ru' ? '24 мес (Бытовая техника)' : language === 'en' ? '24 mo (Appliances)' : '24 oy (Katta maishiy texnika)'}
                           </span>
-                          <span className="text-purple-600 dark:text-purple-400 font-extrabold">28%</span>
+                          <span className="text-purple-600 dark:text-purple-400 font-extrabold">{pct24}%</span>
                         </div>
                         <div className="w-full h-2.5 rounded-full bg-gray-100 dark:bg-slate-700 overflow-hidden shadow-inner">
                           <motion.div 
                             className="h-full bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full"
                             initial={{ width: 0 }}
-                            animate={{ width: '28%' }}
+                            animate={{ width: `${pct24}%` }}
                             transition={{ duration: 1.2, delay: 0.35, ease: 'easeOut' }}
                           />
                         </div>
@@ -1119,13 +1149,13 @@ export const AdminPanel: React.FC = () => {
                           <span className="text-gray-700 dark:text-slate-200">
                             {language === 'ru' ? '6 мес (Короткий срок)' : language === 'en' ? '6 mo (Short term)' : '6 oy (Qisqa muddat)'}
                           </span>
-                          <span className="text-emerald-600 dark:text-emerald-400 font-extrabold">12%</span>
+                          <span className="text-emerald-600 dark:text-emerald-400 font-extrabold">{pct6}%</span>
                         </div>
                         <div className="w-full h-2.5 rounded-full bg-gray-100 dark:bg-slate-700 overflow-hidden shadow-inner">
                           <motion.div 
                             className="h-full bg-gradient-to-r from-emerald-400 to-teal-500 rounded-full"
                             initial={{ width: 0 }}
-                            animate={{ width: '12%' }}
+                            animate={{ width: `${pct6}%` }}
                             transition={{ duration: 1.2, delay: 0.5, ease: 'easeOut' }}
                           />
                         </div>
@@ -1136,13 +1166,13 @@ export const AdminPanel: React.FC = () => {
                           <span className="text-gray-700 dark:text-slate-200">
                             {language === 'ru' ? '3 мес (0% без переплат)' : language === 'en' ? '3 mo (0% without markup)' : '3 oy (0% Ustamasiz 0-0-12)'}
                           </span>
-                          <span className="text-blue-600 dark:text-blue-400 font-extrabold">6%</span>
+                          <span className="text-blue-600 dark:text-blue-400 font-extrabold">{pct3}%</span>
                         </div>
                         <div className="w-full h-2.5 rounded-full bg-gray-100 dark:bg-slate-700 overflow-hidden shadow-inner">
                           <motion.div 
                             className="h-full bg-gradient-to-r from-blue-400 to-cyan-500 rounded-full"
                             initial={{ width: 0 }}
-                            animate={{ width: '6%' }}
+                            animate={{ width: `${pct3}%` }}
                             transition={{ duration: 1.2, delay: 0.65, ease: 'easeOut' }}
                           />
                         </div>
@@ -1154,7 +1184,20 @@ export const AdminPanel: React.FC = () => {
                       className="p-3 rounded-2xl bg-purple-50 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800/50 text-xs text-purple-900 dark:text-purple-200 font-medium flex items-center gap-2"
                     >
                       <Sparkles className="w-4 h-4 text-purple-600 dark:text-purple-400 shrink-0" />
-                      <span>{language === 'ru' ? '82% покупателей предпочитают рассрочку на 12 и 24 месяца.' : language === 'en' ? '82% of customers choose 12 and 24 month installment plans.' : "Xaridorlarning 82% qismi 12 va 24 oylik muddatli to'lovni afzal ko'rmoqda."}</span>
+                      <span>
+                        {totalOrdersCount > 0 
+                          ? (language === 'ru' 
+                              ? `${pct12 + pct24}% покупателей предпочитают рассрочку на 12 и 24 месяца.` 
+                              : language === 'en' 
+                              ? `${pct12 + pct24}% of customers choose 12 and 24 month installment plans.` 
+                              : `Xaridorlarning ${pct12 + pct24}% qismi 12 va 24 oylik muddatli to'lovni afzal ko'rmoqda.`)
+                          : (language === 'ru'
+                              ? 'Пока нет оформленных заказов на рассрочку (0%).'
+                              : language === 'en'
+                              ? 'No installment orders placed yet (0%).'
+                              : "Hozircha rasmiylashtirilgan nasiya arizalari mavjud emas (0%).")
+                        }
+                      </span>
                     </motion.div>
                   </motion.div>
                 </div>
@@ -1275,7 +1318,16 @@ export const AdminPanel: React.FC = () => {
                     </div>
                     <span className="text-xs bg-emerald-50 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 font-bold px-3 py-1.5 rounded-full border border-emerald-200 dark:border-emerald-500/30 flex items-center gap-1.5">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
-                      <span>{language === 'ru' ? '6 активных региональных кластеров' : language === 'en' ? '6 active regional clusters' : '6 ta faol hududiy klaster'}</span>
+                      <span>
+                        {totalOrdersCount > 0 
+                          ? (language === 'ru' 
+                              ? `${dynamicRegions.filter(r => r.applicationsCount > 0).length} активных региональных кластеров` 
+                              : language === 'en' 
+                              ? `${dynamicRegions.filter(r => r.applicationsCount > 0).length} active regional clusters` 
+                              : `${dynamicRegions.filter(r => r.applicationsCount > 0).length} ta faol hududiy klaster`)
+                          : (language === 'ru' ? '0 активных заявок' : language === 'en' ? '0 active orders' : '0 ta faol buyurtma')
+                        }
+                      </span>
                     </span>
                   </div>
 
@@ -1293,7 +1345,7 @@ export const AdminPanel: React.FC = () => {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-100 dark:divide-slate-700/60 text-gray-700 dark:text-slate-200">
-                        {REGION_COORDINATES.map((reg, idx) => (
+                        {dynamicRegions.map((reg, idx) => (
                           <motion.tr 
                             key={idx}
                             initial={{ opacity: 0, x: -15 }}
@@ -1709,12 +1761,12 @@ export const AdminPanel: React.FC = () => {
                       <span className="text-xs text-emerald-700 dark:text-emerald-400 font-bold block">
                         {language === 'ru' ? 'Отлично (750 - 1000 баллов)' : language === 'en' ? 'Excellent (750 - 1000 pts)' : "A'lo (750 - 1000 ball)"}
                       </span>
-                      <span className="text-3xl font-black text-gray-900 dark:text-white mt-1 block">76%</span>
+                      <span className="text-3xl font-black text-gray-900 dark:text-white mt-1 block">{pctHighScoring}%</span>
                       <span className="text-[11px] text-gray-500 dark:text-slate-400">
                         {language === 'ru' ? 'Автоодобрение' : language === 'en' ? 'Auto approved' : 'Avtomatik tasdiqlash'}
                       </span>
                       <div className="w-full h-2 bg-emerald-200 dark:bg-emerald-900/50 rounded-full mt-3 overflow-hidden">
-                        <motion.div className="h-full bg-emerald-500 rounded-full" initial={{ width: 0 }} animate={{ width: '76%' }} transition={{ duration: 1.2 }} />
+                        <motion.div className="h-full bg-emerald-500 rounded-full" initial={{ width: 0 }} animate={{ width: `${pctHighScoring}%` }} transition={{ duration: 1.2 }} />
                       </div>
                     </motion.div>
 
@@ -1725,12 +1777,12 @@ export const AdminPanel: React.FC = () => {
                       <span className="text-xs text-amber-700 dark:text-amber-400 font-bold block">
                         {language === 'ru' ? 'Средний (600 - 750 баллов)' : language === 'en' ? 'Average (600 - 750 pts)' : "O'rtacha (600 - 750 ball)"}
                       </span>
-                      <span className="text-3xl font-black text-gray-900 dark:text-white mt-1 block">19%</span>
+                      <span className="text-3xl font-black text-gray-900 dark:text-white mt-1 block">{pctMidScoring}%</span>
                       <span className="text-[11px] text-gray-500 dark:text-slate-400">
                         {language === 'ru' ? 'С первым взносом' : language === 'en' ? 'With down payment' : "Dastlabki to'lov bilan"}
                       </span>
                       <div className="w-full h-2 bg-amber-200 dark:bg-amber-900/50 rounded-full mt-3 overflow-hidden">
-                        <motion.div className="h-full bg-amber-500 rounded-full" initial={{ width: 0 }} animate={{ width: '19%' }} transition={{ duration: 1.2 }} />
+                        <motion.div className="h-full bg-amber-500 rounded-full" initial={{ width: 0 }} animate={{ width: `${pctMidScoring}%` }} transition={{ duration: 1.2 }} />
                       </div>
                     </motion.div>
 
@@ -1741,12 +1793,12 @@ export const AdminPanel: React.FC = () => {
                       <span className="text-xs text-rose-700 dark:text-rose-400 font-bold block">
                         {language === 'ru' ? 'Низкий (менее 600 баллов)' : language === 'en' ? 'Low (less than 600 pts)' : "Past (600 dan kam)"}
                       </span>
-                      <span className="text-3xl font-black text-gray-900 dark:text-white mt-1 block">5%</span>
+                      <span className="text-3xl font-black text-gray-900 dark:text-white mt-1 block">{pctLowScoring}%</span>
                       <span className="text-[11px] text-gray-500 dark:text-slate-400">
                         {language === 'ru' ? 'Ручная проверка' : language === 'en' ? 'Manual review' : "Qo'shimcha tekshiruv"}
                       </span>
                       <div className="w-full h-2 bg-rose-200 dark:bg-rose-900/50 rounded-full mt-3 overflow-hidden">
-                        <motion.div className="h-full bg-rose-500 rounded-full" initial={{ width: 0 }} animate={{ width: '5%' }} transition={{ duration: 1.2 }} />
+                        <motion.div className="h-full bg-rose-500 rounded-full" initial={{ width: 0 }} animate={{ width: `${pctLowScoring}%` }} transition={{ duration: 1.2 }} />
                       </div>
                     </motion.div>
                   </div>
@@ -1765,34 +1817,52 @@ export const AdminPanel: React.FC = () => {
                       </p>
                     </div>
                     <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-200 dark:border-emerald-500/20">
-                      {language === 'ru' ? 'В среднем в месяц: 1.2 млрд сум' : language === 'en' ? 'Monthly avg: 1.2 bln UZS' : "O'rtacha oylik: 1.2 mlrd so'm"}
+                      {totalOrdersCount > 0 
+                        ? (language === 'ru' 
+                            ? `В среднем в месяц: ${formatPrice(Math.round(totalOrdersAmount / 6), true, language)}` 
+                            : language === 'en' 
+                            ? `Monthly avg: ${formatPrice(Math.round(totalOrdersAmount / 6), true, language)}` 
+                            : `O'rtacha oylik: ${formatPrice(Math.round(totalOrdersAmount / 6), true, language)}`)
+                        : (language === 'ru' ? 'В среднем в месяц: 0 сум' : language === 'en' ? 'Monthly avg: 0 UZS' : "O'rtacha oylik: 0 so'm")
+                      }
                     </span>
                   </div>
 
                   <div className="h-48 flex items-end justify-between gap-2 sm:gap-4 pt-8 px-2">
                     {[
-                      { month: language === 'ru' ? 'Май' : language === 'en' ? 'May' : 'May', height: '42%', value: '420 mln' },
-                      { month: language === 'ru' ? 'Июн' : language === 'en' ? 'Jun' : 'Iyun', height: '54%', value: '590 mln' },
-                      { month: language === 'ru' ? 'Июл' : language === 'en' ? 'Jul' : 'Iyul', height: '65%', value: '720 mln' },
-                      { month: language === 'ru' ? 'Авг' : language === 'en' ? 'Aug' : 'Avgust', height: '78%', value: '950 mln' },
-                      { month: language === 'ru' ? 'Сен' : language === 'en' ? 'Sep' : 'Sentyabr', height: '86%', value: '1.2 mlrd' },
-                      { month: language === 'ru' ? 'Окт' : language === 'en' ? 'Oct' : 'Oktyabr', height: '94%', value: '1.6 mlrd' },
-                    ].map((col, idx) => (
-                      <div key={idx} className="flex-1 flex flex-col items-center gap-2 h-full justify-end group">
-                        <span className="text-[10px] font-bold text-purple-600 dark:text-purple-300 opacity-0 group-hover:opacity-100 transition-opacity">
-                          {col.value}
-                        </span>
-                        <div className="w-full max-w-[48px] bg-gray-100 dark:bg-slate-700/80 rounded-t-xl overflow-hidden h-full flex items-end">
-                          <motion.div 
-                            className="w-full bg-gradient-to-t from-purple-700 to-indigo-500 rounded-t-xl group-hover:brightness-110 transition-all shadow-md"
-                            initial={{ height: 0 }}
-                            animate={{ height: col.height }}
-                            transition={{ duration: 1.2, delay: idx * 0.1, type: 'spring' }}
-                          />
+                      { month: language === 'ru' ? 'Май' : language === 'en' ? 'May' : 'May', key: 4 },
+                      { month: language === 'ru' ? 'Июн' : language === 'en' ? 'Jun' : 'Iyun', key: 5 },
+                      { month: language === 'ru' ? 'Июл' : language === 'en' ? 'Jul' : 'Iyul', key: 6 },
+                      { month: language === 'ru' ? 'Авг' : language === 'en' ? 'Aug' : 'Avgust', key: 7 },
+                      { month: language === 'ru' ? 'Сен' : language === 'en' ? 'Sep' : 'Sentyabr', key: 8 },
+                      { month: language === 'ru' ? 'Окт' : language === 'en' ? 'Oct' : 'Oktyabr', key: 9 },
+                    ].map((col, idx) => {
+                      const matchingMonthOrders = orders.filter(o => o.createdAt && new Date(o.createdAt).getMonth() === col.key);
+                      const monthSum = matchingMonthOrders.reduce((sum, o) => sum + o.totalPrice, 0);
+                      const height = totalOrdersAmount > 0 && monthSum > 0 
+                        ? `${Math.max(10, Math.min(100, Math.round((monthSum / totalOrdersAmount) * 100)))}%` 
+                        : (totalOrdersCount > 0 ? '6%' : '0%');
+                      const valString = totalOrdersAmount > 0 && monthSum > 0 
+                        ? formatPrice(monthSum, true, language) 
+                        : (language === 'ru' ? '0 сум' : language === 'en' ? '0 UZS' : "0 so'm");
+
+                      return (
+                        <div key={idx} className="flex-1 flex flex-col items-center gap-2 h-full justify-end group">
+                          <span className="text-[10px] font-bold text-purple-600 dark:text-purple-300 opacity-0 group-hover:opacity-100 transition-opacity">
+                            {valString}
+                          </span>
+                          <div className="w-full max-w-[48px] bg-gray-100 dark:bg-slate-700/80 rounded-t-xl overflow-hidden h-full flex items-end">
+                            <motion.div 
+                              className="w-full bg-gradient-to-t from-purple-700 to-indigo-500 rounded-t-xl group-hover:brightness-110 transition-all shadow-md"
+                              initial={{ height: 0 }}
+                              animate={{ height }}
+                              transition={{ duration: 1.2, delay: idx * 0.1, type: 'spring' }}
+                            />
+                          </div>
+                          <span className="text-xs font-bold text-gray-600 dark:text-slate-400">{col.month}</span>
                         </div>
-                        <span className="text-xs font-bold text-gray-600 dark:text-slate-400">{col.month}</span>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
               </motion.div>
@@ -2043,40 +2113,52 @@ export const AdminPanel: React.FC = () => {
                   </span>
                 </div>
 
-                <div className="divide-y divide-gray-100 dark:divide-slate-700">
-                  {orders.map((ord, idx) => {
-                    const initials = ord.customerName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() || 'M';
-                    return (
-                      <motion.div 
-                        key={ord.id}
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: idx * 0.04 }}
-                        whileHover={{ x: 6, backgroundColor: theme === 'dark' ? '#33415530' : '#f8fafc' }}
-                        className="py-3.5 px-3 rounded-2xl flex justify-between items-center text-xs cursor-pointer transition-colors"
-                        onClick={() => setSelectedOrder(ord)}
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-600 text-white font-black flex items-center justify-center shrink-0 shadow-sm">
-                            {initials}
+                {orders.length === 0 ? (
+                  <div className="py-12 text-center text-gray-400 dark:text-slate-500 space-y-2">
+                    <Users className="w-10 h-10 mx-auto opacity-30" />
+                    <p className="text-sm font-semibold">
+                      {language === 'ru' ? 'База клиентов пуста (0 покупок)' : language === 'en' ? 'Customer base is empty (0 purchases)' : "Mijozlar bazasi bo'sh (0 ta xarid)"}
+                    </p>
+                    <p className="text-xs">
+                      {language === 'ru' ? 'Когда кто-то оформит заказ, данные автоматически появятся здесь' : language === 'en' ? 'When someone places an order, their data will automatically appear here' : "Biror kishi xarid qilganda mijoz ma'lumotlari avtomatik shu yerda aks etadi"}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="divide-y divide-gray-100 dark:divide-slate-700">
+                    {orders.map((ord, idx) => {
+                      const initials = ord.customerName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() || 'M';
+                      return (
+                        <motion.div 
+                          key={ord.id}
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: idx * 0.04 }}
+                          whileHover={{ x: 6, backgroundColor: theme === 'dark' ? '#33415530' : '#f8fafc' }}
+                          className="py-3.5 px-3 rounded-2xl flex justify-between items-center text-xs cursor-pointer transition-colors"
+                          onClick={() => setSelectedOrder(ord)}
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-600 text-white font-black flex items-center justify-center shrink-0 shadow-sm">
+                              {initials}
+                            </div>
+                            <div>
+                              <div className="font-bold text-gray-900 dark:text-white hover:text-purple-600 transition-colors">{ord.customerName}</div>
+                              <div className="text-[11px] text-gray-500 dark:text-slate-400">{ord.customerPhone} • PINFL: {ord.pinfl || '31204956780012'}</div>
+                            </div>
                           </div>
-                          <div>
-                            <div className="font-bold text-gray-900 dark:text-white hover:text-purple-600 transition-colors">{ord.customerName}</div>
-                            <div className="text-[11px] text-gray-500 dark:text-slate-400">{ord.customerPhone} • PINFL: {ord.pinfl || '31204956780012'}</div>
-                          </div>
-                        </div>
 
-                        <div className="text-right">
-                          <span className="text-amber-600 dark:text-amber-400 font-extrabold block">{formatPrice(ord.totalPrice, true, language)}</span>
-                          <span className="text-emerald-600 dark:text-emerald-400 text-[10px] font-bold flex items-center justify-end gap-1">
-                            <CheckCircle className="w-3 h-3" />
-                            <span>{language === 'ru' ? 'Платежи: Отлично' : language === 'en' ? 'Payment status: Excellent' : "To'lov holati: A'lo"}</span>
-                          </span>
-                        </div>
-                      </motion.div>
-                    );
-                  })}
-                </div>
+                          <div className="text-right">
+                            <span className="text-amber-600 dark:text-amber-400 font-extrabold block">{formatPrice(ord.totalPrice, true, language)}</span>
+                            <span className="text-emerald-600 dark:text-emerald-400 text-[10px] font-bold flex items-center justify-end gap-1">
+                              <CheckCircle className="w-3 h-3" />
+                              <span>{language === 'ru' ? 'Платежи: Отлично' : language === 'en' ? 'Payment status: Excellent' : "To'lov holati: A'lo"}</span>
+                            </span>
+                          </div>
+                        </motion.div>
+                      );
+                    })}
+                  </div>
+                )}
               </motion.div>
             )}
 

@@ -183,3 +183,36 @@ export async function checkSupabaseConnection(): Promise<boolean> {
     return false;
   }
 }
+
+/**
+ * Supabase dan real arizalar/buyurtmalarni olish
+ */
+export async function fetchOrdersFromSupabase(): Promise<any[]> {
+  try {
+    const { data, error } = await supabase
+      .from('nasiya_orders')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error || !data) return [];
+    return data.map((d: any) => ({
+      id: d.id ? `ord-${d.id}` : `ord-${Date.now()}`,
+      contractNumber: d.contract_number || `ELR-${Date.now().toString().slice(-6)}`,
+      customerName: d.customer_name || 'Mijoz',
+      customerPhone: d.phone || '',
+      pinfl: d.pinfl || '',
+      deliveryAddress: d.address || '',
+      city: d.city || 'Toshkent',
+      totalPrice: Number(d.total_price) || 0,
+      monthlyPayment: Number(d.monthly_payment) || 0,
+      installmentMonths: Number(d.installment_months) || 12,
+      scoringScore: Number(d.scoring_score) || 750,
+      status: d.status || 'scoring_approved',
+      createdAt: d.created_at || new Date().toISOString(),
+      paymentMode: d.payment_mode || 'installment',
+      items: Array.isArray(d.items) ? d.items : [],
+    }));
+  } catch {
+    return [];
+  }
+}

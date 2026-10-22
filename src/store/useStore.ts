@@ -9,7 +9,8 @@ import {
   checkSupabaseConnection, 
   authenticateWithSupabase, 
   signOutFromSupabase, 
-  isAdminUser 
+  isAdminUser,
+  fetchOrdersFromSupabase
 } from '../lib/supabase';
 import { Language, Theme, TranslationKey, getTranslation } from '../utils/translations';
 
@@ -154,7 +155,7 @@ export const INITIAL_PROMO_CODES: PromoCode[] = [
     discountValue: 10,
     description: "Yangi mijozlar uchun 10% chegirma",
     isActive: true,
-    usageCount: 142,
+    usageCount: 0,
   },
   {
     id: 'promo-elrizo15',
@@ -163,7 +164,7 @@ export const INITIAL_PROMO_CODES: PromoCode[] = [
     discountValue: 15,
     description: "ELRIZO maxsus aksiyasi — 15% chegirma",
     isActive: true,
-    usageCount: 89,
+    usageCount: 0,
   },
   {
     id: 'promo-super500',
@@ -173,7 +174,7 @@ export const INITIAL_PROMO_CODES: PromoCode[] = [
     minOrderAmount: 3000000,
     description: "3 000 000 so'mdan yuqori xaridga 500 000 so'm sovg'a",
     isActive: true,
-    usageCount: 35,
+    usageCount: 0,
   },
   {
     id: 'promo-bahor20',
@@ -182,7 +183,7 @@ export const INITIAL_PROMO_CODES: PromoCode[] = [
     discountValue: 20,
     description: "Bahoriy katta chegirma 20%",
     isActive: true,
-    usageCount: 64,
+    usageCount: 0,
   },
 ];
 
@@ -564,11 +565,21 @@ export const useStore = create<StoreState>()(
         get().addToast('Tizimdan chiqildi', 'info');
       },
 
-      // Supabase Connection Status
+      // Supabase Connection Status & Real-time Orders Sync
       supabaseConnected: true,
       initSupabaseCheck: async () => {
         const isOk = await checkSupabaseConnection();
         set({ supabaseConnected: isOk });
+        if (isOk) {
+          try {
+            const remoteOrders = await fetchOrdersFromSupabase();
+            if (remoteOrders && remoteOrders.length > 0) {
+              set({ orders: remoteOrders });
+            }
+          } catch (e) {
+            console.warn("Orders fetch from Supabase:", e);
+          }
+        }
       },
 
       // Calculator Modal
