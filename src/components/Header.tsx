@@ -756,7 +756,7 @@ export const Header: React.FC = () => {
           <div className="flex items-center gap-5 shrink-0">
             <Link
               to="/catalog"
-              className="font-extrabold text-[#640199] dark:text-purple-300 hover:underline flex items-center gap-1.5 bg-purple-50/90 dark:bg-purple-950/50 px-2.5 py-1 rounded-lg border border-purple-200/50 dark:border-purple-900/40"
+              className="font-extrabold text-[#640199] dark:text-purple-300 no-underline hover:no-underline hover:opacity-90 transition-opacity flex items-center gap-1.5 bg-purple-50/90 dark:bg-purple-950/50 px-2.5 py-1 rounded-lg border border-purple-200/50 dark:border-purple-900/40"
             >
               <SlidersHorizontal className="w-3.5 h-3.5 text-[#640199] dark:text-purple-300" />
               <span>{t('catalogAndFilters')}</span>
@@ -764,7 +764,7 @@ export const Header: React.FC = () => {
             <Link
               to="/"
               onClick={() => navigateToCategory(null)}
-              className="font-extrabold text-uzum-primary dark:text-purple-400 hover:underline flex items-center gap-1"
+              className="font-extrabold text-uzum-primary dark:text-purple-400 no-underline hover:no-underline hover:opacity-90 transition-opacity flex items-center gap-1"
             >
               <Sparkles className="w-3.5 h-3.5 text-uzum-primary dark:text-purple-400" />
               {t('allPromotions')}
