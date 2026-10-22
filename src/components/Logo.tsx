@@ -67,7 +67,7 @@ export const Logo: React.FC<LogoProps> = ({
 
         {/* Official Slogan: Siz rozi — biz rozi! */}
         {showSlogan && (
-          <div className="flex items-center gap-1.5 mt-1">
+          <div className="hidden sm:flex items-center gap-1.5 mt-1">
             <span className={`font-semibold tracking-normal ${sloganSize} ${isLight ? 'text-gray-700 dark:text-gray-200' : 'text-gray-200'}`}>
               Siz rozi — biz rozi!
             </span>

@@ -32,26 +32,26 @@ export const NakapitelniyCardModal: React.FC = () => {
   const cardNumber = user?.loyaltyCardNumber || '8600 4910 8274 9912';
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/75 backdrop-blur-md animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-slate-950/75 backdrop-blur-md animate-in fade-in duration-200">
       <div 
         className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 w-full max-w-2xl max-h-[92vh] overflow-hidden flex flex-col animate-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-gradient-to-r from-purple-50 via-white to-amber-50/30 dark:from-slate-900 dark:to-slate-800">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-amber-400 to-purple-600 text-white flex items-center justify-center shadow-md">
-              <Gift className="w-5 h-5" />
+        <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-gradient-to-r from-purple-50 via-white to-amber-50/30 dark:from-slate-900 dark:to-slate-800">
+          <div className="flex items-center gap-2.5 sm:gap-3">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-gradient-to-br from-amber-400 to-purple-600 text-white flex items-center justify-center shadow-md shrink-0">
+              <Gift className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
             <div>
-              <h3 className="font-black text-lg text-slate-900 dark:text-white flex items-center gap-2">
+              <h3 className="font-black text-sm sm:text-lg text-slate-900 dark:text-white flex items-center gap-1.5 sm:gap-2">
                 <span>ELRIZO Nakapitelniy Karta</span>
-                <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-amber-400 text-purple-950">
+                <span className="text-[9px] sm:text-[10px] font-black uppercase px-1.5 sm:px-2 py-0.5 rounded-full bg-amber-400 text-purple-950">
                   1% Keshbek
                 </span>
               </h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                Har bir xariddan 1% yig'iladi, xohlasangiz jamg'arasiz yoki to'lovga ishlatasiz
+              <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 line-clamp-1">
+                Har bir xariddan 1% yig'iladi, jamg'arish yoki to'lovga ishlatish mumkin
               </p>
             </div>
           </div>
@@ -59,16 +59,16 @@ export const NakapitelniyCardModal: React.FC = () => {
           <button
             type="button"
             onClick={closeCashbackCardModal}
-            className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+            className="p-1.5 sm:p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Scrollable Content */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-6">
+        <div className="flex-1 overflow-y-auto p-3.5 sm:p-6 space-y-4 sm:space-y-6">
           {/* Virtual VIP Card Display */}
-          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-tr from-slate-950 via-purple-950 to-indigo-900 text-white p-6 shadow-2xl border border-purple-500/30">
+          <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-tr from-slate-950 via-purple-950 to-indigo-900 text-white p-4 sm:p-6 shadow-2xl border border-purple-500/30">
             {/* Holographic / Light Flare Overlay */}
             <div className="absolute -right-16 -top-16 w-52 h-52 bg-amber-400/20 rounded-full blur-3xl pointer-events-none" />
             <div className="absolute -left-16 -bottom-16 w-52 h-52 bg-purple-500/20 rounded-full blur-3xl pointer-events-none" />
@@ -120,26 +120,26 @@ export const NakapitelniyCardModal: React.FC = () => {
                 Jamg'arilgan Keshbek Balansi:
               </span>
               <div className="flex items-baseline gap-2">
-                <span className="text-3xl sm:text-4xl font-black text-white tracking-tight">
+                <span className="text-2xl sm:text-4xl font-black text-white tracking-tight">
                   {currentBalance.toLocaleString()}
                 </span>
-                <span className="text-base font-bold text-amber-300">
+                <span className="text-sm sm:text-base font-bold text-amber-300">
                   so'm
                 </span>
               </div>
             </div>
 
             {/* Card Bottom: Number & Name */}
-            <div className="mt-5 pt-3 border-t border-white/10 flex items-center justify-between text-xs font-mono relative z-10">
+            <div className="mt-4 sm:mt-5 pt-3 border-t border-white/10 flex items-center justify-between text-xs font-mono relative z-10">
               <div>
                 <span className="text-[10px] text-purple-300/80 block uppercase">Karta raqami</span>
-                <span className="text-sm tracking-widest text-slate-100 font-bold">
+                <span className="text-xs sm:text-sm tracking-wider sm:tracking-widest text-slate-100 font-bold">
                   {cardNumber}
                 </span>
               </div>
               <div className="text-right">
                 <span className="text-[10px] text-purple-300/80 block uppercase">Egasi</span>
-                <span className="text-xs font-bold text-slate-100 truncate max-w-[140px] block">
+                <span className="text-[11px] sm:text-xs font-bold text-slate-100 truncate max-w-[110px] sm:max-w-[140px] block">
                   {(user?.fullName || 'Bobur Mirzayev').toUpperCase()}
                 </span>
               </div>

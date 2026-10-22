@@ -18,6 +18,7 @@ import { ProductComparisonModal } from './components/ProductComparisonModal';
 import { ComparisonBar } from './components/ComparisonBar';
 import { OrderTrackingModal } from './components/OrderTrackingModal';
 import { NakapitelniyCardModal } from './components/NakapitelniyCardModal';
+import { MobileBottomNav } from './components/MobileBottomNav';
 import { Footer } from './components/Footer';
 import { ScrollProgressBar, ScrollToTopButton } from './components/ScrollFeatures';
 import { useStore } from './store/useStore';
@@ -121,7 +122,7 @@ export const App: React.FC = () => {
       {!isAdminPage && !isAuthPage && <Header />}
 
       {/* 3. Main Dynamic Routes (Tezkor va qotishlarsiz o'tish) */}
-      <main className={isAdminPage ? "flex-1 h-full overflow-hidden" : "flex-1"}>
+      <main className={isAdminPage ? "flex-1 h-full overflow-hidden" : "flex-1 pb-20 md:pb-0"}>
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/catalog" element={<CatalogPage />} />
@@ -141,6 +142,9 @@ export const App: React.FC = () => {
 
       {/* 5. Suzuvchi Tepaga Qaytish Tugmasi (ScrollToTop) */}
       {!isAdminPage && <ScrollToTopButton />}
+
+      {/* 5.1. Mobil Pastki Navigatsiya (Faqat telefonlarda ko'rinadi) */}
+      {!isAdminPage && !isAuthPage && <MobileBottomNav />}
 
       {/* 6. Global Modallar & Mini-Drawerlar */}
       <CartDrawer />

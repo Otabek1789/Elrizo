@@ -245,24 +245,24 @@ export const Header: React.FC = () => {
       </div>
 
       {/* Main Header */}
-      <div className="max-w-7xl mx-auto px-4 py-3.5 flex items-center justify-between gap-4">
+      <div className="max-w-7xl mx-auto px-2.5 sm:px-4 py-2 sm:py-3.5 flex items-center justify-between gap-2 sm:gap-4">
         {/* Brand Logo */}
         <Link 
           to="/"
           onClick={() => navigateToCategory(null)}
-          className="group block select-none"
+          className="group block select-none shrink-0"
         >
           <Logo size="md" />
         </Link>
 
         {/* Catalog Button */}
-        <div className="relative" ref={catalogRef}>
+        <div className="relative shrink-0" ref={catalogRef}>
           <motion.button
             id="catalog-toggle-btn"
             whileHover={{ scale: 1.04 }}
             whileTap={{ scale: 0.96 }}
             onClick={() => setIsCatalogOpen(!isCatalogOpen)}
-            className={`flex items-center gap-2.5 px-4 py-2.5 rounded-xl font-bold text-sm transition-all shadow-sm ${
+            className={`flex items-center gap-1.5 sm:gap-2.5 px-2.5 sm:px-4 py-2 sm:py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all shadow-sm ${
               isCatalogOpen
                 ? 'bg-white dark:bg-white text-uzum-primary dark:text-uzum-primary ring-2 ring-purple-400 border border-purple-200 shadow-md'
                 : 'bg-white dark:bg-white text-uzum-primary dark:text-uzum-primary hover:bg-gray-50 dark:hover:bg-gray-100 border border-gray-200/90 dark:border-gray-200'
@@ -272,7 +272,7 @@ export const Header: React.FC = () => {
               animate={{ rotate: isCatalogOpen ? 90 : 0 }}
               transition={{ duration: 0.2 }}
             >
-              {isCatalogOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              {isCatalogOpen ? <X className="w-4 h-4 sm:w-5 sm:h-5" /> : <Menu className="w-4 h-4 sm:w-5 sm:h-5" />}
             </motion.div>
             <span className="hidden sm:inline">{t('catalog')}</span>
           </motion.button>
@@ -285,7 +285,7 @@ export const Header: React.FC = () => {
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 10, scale: 0.98 }}
                 transition={{ duration: 0.2 }}
-                className="absolute top-12 left-0 w-[92vw] sm:w-[680px] md:w-[780px] bg-white dark:bg-slate-800 rounded-3xl shadow-dropdown border border-gray-100 dark:border-slate-800 z-50 overflow-hidden flex flex-col md:flex-row backdrop-blur-xl"
+                className="fixed inset-x-2 top-24 sm:top-28 md:absolute md:top-12 md:left-0 md:inset-x-auto md:w-[780px] bg-white dark:bg-slate-800 rounded-3xl shadow-dropdown border border-gray-100 dark:border-slate-800 z-50 overflow-hidden flex flex-col md:flex-row backdrop-blur-xl max-h-[80vh] md:max-h-none"
               >
                 {/* Left categories list */}
                 <div className="w-full md:w-1/2 bg-gray-50/80 dark:bg-slate-900/80 border-r border-gray-100 dark:border-slate-800 p-3 max-h-[460px] overflow-y-auto">
@@ -392,9 +392,9 @@ export const Header: React.FC = () => {
                 }
               }}
               placeholder={t('searchPlaceholder')}
-              className="w-full pl-11 pr-24 py-2.5 bg-transparent text-sm text-gray-900 dark:text-white rounded-2xl outline-none placeholder:text-gray-400 dark:placeholder:text-gray-400 font-medium"
+              className="w-full pl-8 sm:pl-11 pr-10 sm:pr-24 py-2 sm:py-2.5 bg-transparent text-xs sm:text-sm text-gray-900 dark:text-white rounded-2xl outline-none placeholder:text-gray-400 dark:placeholder:text-gray-400 font-medium"
             />
-            <Search className="w-5 h-5 text-gray-400 absolute left-3.5 pointer-events-none" />
+            <Search className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 absolute left-2.5 sm:left-3.5 pointer-events-none" />
 
             {/* Clear search button */}
             {localSearch && (
@@ -405,10 +405,10 @@ export const Header: React.FC = () => {
                   setLocalSearch('');
                   setSearchQuery('');
                 }}
-                className="absolute right-14 p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 rounded-full hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors"
+                className="absolute right-8 sm:right-14 p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 rounded-full hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors"
                 title={t('clearAll')}
               >
-                <X className="w-4 h-4" />
+                <X className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               </motion.button>
             )}
 
@@ -416,9 +416,10 @@ export const Header: React.FC = () => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => handleExecuteSearch()}
-              className="absolute right-1.5 bg-uzum-primary hover:bg-uzum-hover text-white text-xs font-bold px-3 py-1.5 rounded-xl transition-colors shadow-sm"
+              className="absolute right-1 sm:right-1.5 bg-uzum-primary hover:bg-uzum-hover text-white text-[11px] sm:text-xs font-bold px-2 sm:px-3 py-1 sm:py-1.5 rounded-xl transition-colors shadow-sm flex items-center justify-center"
             >
-              {language === 'ru' ? 'Поиск' : language === 'en' ? 'Search' : 'Qidirish'}
+              <span className="hidden sm:inline">{language === 'ru' ? 'Поиск' : language === 'en' ? 'Search' : 'Qidirish'}</span>
+              <Search className="w-3.5 h-3.5 sm:hidden" />
             </motion.button>
           </motion.div>
 
@@ -657,7 +658,7 @@ export const Header: React.FC = () => {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={openCashbackCardModal}
-            className="relative flex items-center gap-2 p-2 sm:px-3 sm:py-2 rounded-2xl bg-gradient-to-r from-amber-500/10 via-yellow-500/10 to-amber-500/15 dark:from-amber-500/20 dark:to-yellow-500/20 text-amber-900 dark:text-amber-200 hover:bg-amber-100/80 dark:hover:bg-amber-900/40 border border-amber-300/60 dark:border-amber-600/40 transition-all shadow-xs"
+            className="hidden md:flex relative items-center gap-2 p-2 sm:px-3 sm:py-2 rounded-2xl bg-gradient-to-r from-amber-500/10 via-yellow-500/10 to-amber-500/15 dark:from-amber-500/20 dark:to-yellow-500/20 text-amber-900 dark:text-amber-200 hover:bg-amber-100/80 dark:hover:bg-amber-900/40 border border-amber-300/60 dark:border-amber-600/40 transition-all shadow-xs"
             title="1% Nakapitelniy Keshbek Karta"
           >
             <div className="relative">
@@ -680,7 +681,7 @@ export const Header: React.FC = () => {
             whileHover={{ scale: 1.08 }}
             whileTap={{ scale: 0.92 }}
             onClick={openComparisonModal}
-            className="relative p-2.5 rounded-2xl transition-colors flex items-center gap-1 text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-slate-800 hover:text-uzum-primary dark:hover:text-purple-300"
+            className="hidden md:flex relative p-2.5 rounded-2xl transition-colors items-center gap-1 text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-slate-800 hover:text-uzum-primary dark:hover:text-purple-300"
             title="Tovarlarni taqqoslash"
           >
             <Scale className={`w-5 h-5 ${comparisonList.length > 0 ? 'text-primary-600 dark:text-primary-400' : ''}`} />
@@ -697,7 +698,7 @@ export const Header: React.FC = () => {
           </motion.button>
 
           {/* Favorites */}
-          <Link to="/favorites">
+          <Link to="/favorites" className="hidden md:block">
             <motion.button
               id="favorites-btn"
               whileHover={{ scale: 1.08 }}
@@ -729,7 +730,7 @@ export const Header: React.FC = () => {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={openCart}
-            className="relative flex items-center gap-2 p-2 sm:px-3 sm:py-2 rounded-2xl bg-purple-50 dark:bg-purple-950/40 text-uzum-primary dark:text-white hover:bg-purple-100 dark:hover:bg-purple-900/60 transition-colors font-bold text-sm shadow-sm"
+            className="hidden md:flex relative items-center gap-2 p-2 sm:px-3 sm:py-2 rounded-2xl bg-purple-50 dark:bg-purple-950/40 text-uzum-primary dark:text-white hover:bg-purple-100 dark:hover:bg-purple-900/60 transition-colors font-bold text-sm shadow-sm"
             title={t('cart')}
           >
             <div className="relative">

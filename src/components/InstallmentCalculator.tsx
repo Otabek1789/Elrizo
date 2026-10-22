@@ -290,8 +290,8 @@ export const InstallmentCalculator: React.FC<InstallmentCalculatorProps> = ({
 
   if (isModal) {
     return (
-      <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto animate-in fade-in duration-200">
-        <div className="w-full max-w-xl my-8">
+      <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-2.5 sm:p-4 overflow-y-auto animate-in fade-in duration-200">
+        <div className="w-full max-w-xl my-4 sm:my-8">
           {content}
         </div>
       </div>

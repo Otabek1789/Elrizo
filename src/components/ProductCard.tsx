@@ -68,7 +68,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       whileTap={{ scale: 0.985 }}
       transition={{ duration: 0.25, ease: 'easeOut' }}
       onClick={handleCardClick}
-      className="group bg-white dark:bg-slate-800 rounded-3xl border border-gray-200/70 dark:border-slate-800/80 hover:border-purple-300 dark:hover:border-purple-500/40 shadow-sm hover:shadow-card-hover transition-all duration-300 flex flex-col justify-between overflow-hidden cursor-pointer relative"
+      className="group bg-white dark:bg-slate-800 rounded-2xl sm:rounded-3xl border border-gray-200/70 dark:border-slate-800/80 hover:border-purple-300 dark:hover:border-purple-500/40 shadow-sm hover:shadow-card-hover transition-all duration-300 flex flex-col justify-between overflow-hidden cursor-pointer relative"
     >
       {/* Top Image Section */}
       <div 
@@ -157,7 +157,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       </div>
 
       {/* Content Section */}
-      <div className="p-4 flex flex-col flex-1 justify-between gap-3">
+      <div className="p-3 sm:p-4 flex flex-col flex-1 justify-between gap-2.5 sm:gap-3">
         <div>
           {/* Title */}
           <h3 
@@ -182,9 +182,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           {/* Oylik to'lov - Uzum uslubidagi ajralib turuvchi binafsharang fonli yorliq */}
           <motion.div 
             whileHover={{ scale: 1.02 }}
-            className="bg-purple-100/90 dark:bg-purple-950/50 text-uzum-dark dark:text-purple-300 px-2.5 py-1.5 rounded-xl flex items-center justify-between border border-purple-200/60 dark:border-purple-900/40 shadow-xs"
+            className="bg-purple-100/90 dark:bg-purple-950/50 text-uzum-dark dark:text-purple-300 px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-xl flex items-center justify-between border border-purple-200/60 dark:border-purple-900/40 shadow-xs"
           >
-            <span className="text-[11px] font-bold text-purple-700 dark:text-purple-300">{t('monthlyLabel')}</span>
+            <span className="text-[10px] sm:text-[11px] font-bold text-purple-700 dark:text-purple-300">{t('monthlyLabel')}</span>
             <span className="text-xs sm:text-sm font-black text-uzum-primary dark:text-purple-200 tracking-tight">
               {formatPrice(monthlyPayment, true, language)}{t('perMonth')}
             </span>
@@ -193,32 +193,32 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           {/* Original and Current Total Price */}
           <div className="pt-0.5">
             {product.originalPrice && (
-              <span className="text-[11px] text-gray-400 dark:text-gray-500 line-through mr-2 font-medium">
+              <span className="text-[10px] sm:text-[11px] text-gray-400 dark:text-gray-500 line-through mr-1.5 sm:mr-2 font-medium">
                 {formatPrice(product.originalPrice, true, language)}
               </span>
             )}
-            <div className="text-sm sm:text-base font-black text-gray-900 dark:text-white leading-tight">
+            <div className="text-xs sm:text-base font-black text-gray-900 dark:text-white leading-tight">
               {formatPrice(product.price, true, language)}
             </div>
             {/* 1% Nakapitelniy Keshbek Yorlig'i */}
-            <div className="mt-1 flex items-center gap-1 text-[10px] font-bold text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 px-2 py-0.5 rounded-md border border-amber-200/50 dark:border-amber-800/40 w-fit">
-              <span>🎁 +1% keshbek ({formatPrice(Math.round(product.price * 0.01), false, language)})</span>
+            <div className="mt-1 flex items-center gap-1 text-[9px] sm:text-[10px] font-bold text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 px-1.5 sm:px-2 py-0.5 rounded-md border border-amber-200/50 dark:border-amber-800/40 w-fit">
+              <span>🎁 +1% ({formatPrice(Math.round(product.price * 0.01), false, language)})</span>
             </div>
           </div>
         </div>
 
         {/* Action Buttons: Savatga qo'shish & Muddatli to'lovga olish */}
-        <div className="grid grid-cols-2 gap-2 pt-1">
+        <div className="grid grid-cols-2 gap-1.5 sm:gap-2 pt-1">
           <motion.button
             id={`btn-add-cart-${product.id}`}
             whileHover={{ scale: 1.04 }}
             whileTap={{ scale: 0.94 }}
             onClick={handleAddToCart}
-            className="flex items-center justify-center gap-1.5 py-2 px-2 rounded-xl bg-purple-50 dark:bg-slate-800/80 hover:bg-purple-100 dark:hover:bg-slate-700 text-uzum-primary dark:text-purple-300 text-xs font-bold transition-colors border border-purple-200/60 dark:border-slate-800"
+            className="flex items-center justify-center gap-1 py-2 px-1 sm:px-2 rounded-xl bg-purple-50 dark:bg-slate-800/80 hover:bg-purple-100 dark:hover:bg-slate-700 text-uzum-primary dark:text-purple-300 text-[11px] sm:text-xs font-bold transition-colors border border-purple-200/60 dark:border-slate-800"
             title={t('toCartBtn')}
           >
-            <ShoppingBag className="w-3.5 h-3.5" />
-            <span>{t('toCartBtn')}</span>
+            <ShoppingBag className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate">{t('toCartBtn')}</span>
           </motion.button>
 
           <motion.button
@@ -226,10 +226,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             whileHover={{ scale: 1.04 }}
             whileTap={{ scale: 0.94 }}
             onClick={handleBuyOnInstallment}
-            className="flex items-center justify-center py-2 px-2 rounded-xl bg-uzum-primary hover:bg-uzum-hover text-white text-xs font-black transition-colors shadow-sm shadow-purple-500/25"
+            className="flex items-center justify-center py-2 px-1 sm:px-2 rounded-xl bg-uzum-primary hover:bg-uzum-hover text-white text-[11px] sm:text-xs font-black transition-colors shadow-sm shadow-purple-500/25"
             title={t('toInstallmentBtn')}
           >
-            <span>{t('toInstallmentBtn')}</span>
+            <span className="truncate">{t('toInstallmentBtn')}</span>
           </motion.button>
         </div>
       </div>
