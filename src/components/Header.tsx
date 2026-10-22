@@ -618,18 +618,22 @@ export const Header: React.FC = () => {
                 <UserIcon className="w-4 h-4 text-uzum-primary" />
               )}
             </div>
-            <div className="hidden lg:flex flex-col text-left">
+            <div className="hidden lg:flex flex-col text-left justify-center">
               <span className="text-xs font-bold text-gray-900 dark:text-white line-clamp-1">
                 {user ? user.fullName.split(' ')[0] : t('enter')}
               </span>
-              <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1">
-                {user?.isAdmin ? (
-                  <>
-                    <Crown className="w-3 h-3 text-amber-500" />
-                    <span>Admin</span>
-                  </>
-                ) : (user && user.scoringLimit > 0 ? `${t('nasiyaLimit')} ${Math.round((user.scoringLimit - user.usedLimit) / 1000000)} ${t('mln')}` : t('installment'))}
-              </span>
+              {user && (user.isAdmin || user.scoringLimit > 0) && (
+                <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1">
+                  {user.isAdmin ? (
+                    <>
+                      <Crown className="w-3 h-3 text-amber-500" />
+                      <span>Admin</span>
+                    </>
+                  ) : (
+                    `${t('nasiyaLimit')} ${Math.round((user.scoringLimit - user.usedLimit) / 1000000)} ${t('mln')}`
+                  )}
+                </span>
+              )}
             </div>
           </motion.button>
 
