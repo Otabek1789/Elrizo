@@ -233,14 +233,14 @@ export const CatalogPage: React.FC = () => {
     <div className="max-w-7xl mx-auto px-4 py-4 sm:py-6 space-y-6">
       {/* 1. Breadcrumb va Sarlavha */}
       <div className="space-y-2">
-        <nav className="flex items-center gap-1.5 text-xs text-gray-400 dark:text-slate-500">
-          <Link to="/" className="hover:text-uzum-primary dark:hover:text-purple-400 transition-colors">{t('home')}</Link>
-          <ChevronRight className="w-3.5 h-3.5" />
-          <span className="text-gray-700 dark:text-slate-300 font-semibold">{t('catalogAndFilters')}</span>
+        <nav className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-slate-400">
+          <Link to="/" className="text-gray-600 dark:text-slate-300 hover:text-uzum-primary dark:hover:text-purple-400 transition-colors font-medium">{t('home')}</Link>
+          <ChevronRight className="w-3.5 h-3.5 text-gray-400 dark:text-slate-600" />
+          <span className="text-gray-800 dark:text-slate-100 font-semibold">{t('catalogAndFilters')}</span>
           {currentCategory && (
             <>
-              <ChevronRight className="w-3.5 h-3.5" />
-              <span className="text-uzum-primary dark:text-purple-400 font-bold">{getCategoryTitle(currentCategory.slug, language)}</span>
+              <ChevronRight className="w-3.5 h-3.5 text-gray-400 dark:text-slate-600" />
+              <span className="text-uzum-primary dark:text-purple-300 font-bold">{getCategoryTitle(currentCategory.slug, language)}</span>
             </>
           )}
         </nav>
@@ -254,7 +254,7 @@ export const CatalogPage: React.FC = () => {
                 ? getCategoryTitle(currentCategory.slug, language)
                 : t('catalogTitle')}
             </h1>
-            <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 mt-0.5">
+            <p className="text-xs sm:text-sm text-gray-600 dark:text-slate-300 mt-0.5">
               {t('foundLabel')} <strong className="text-uzum-primary dark:text-purple-400 font-bold">{filteredAndSortedProducts.length}</strong> {t('itemsCount')}
             </p>
           </div>
