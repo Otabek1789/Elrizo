@@ -452,7 +452,7 @@ export const LoginPage: React.FC = () => {
           <form onSubmit={handleSignInSubmit} className="auth-103-form sign-in-form">
             <div className="text-center mb-2">
               <h2 className="auth-103-title">{t('loginTitle')}</h2>
-              <p className="text-xs text-gray-500 font-medium">
+              <p className="text-xs text-gray-500 dark:text-slate-400 font-medium">
                 {t('loginSubtitle')}
               </p>
             </div>
@@ -504,7 +504,7 @@ export const LoginPage: React.FC = () => {
           <form onSubmit={handleSignUpSubmit} className="auth-103-form sign-up-form">
             <div className="text-center mb-2">
               <h2 className="auth-103-title">{t('loginSignUpTab')}</h2>
-              <p className="text-xs text-gray-500 font-medium">
+              <p className="text-xs text-gray-500 dark:text-slate-400 font-medium">
                 {t('loginSubtitle')}
               </p>
             </div>

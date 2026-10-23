@@ -233,29 +233,29 @@ export const CatalogPage: React.FC = () => {
     <div className="max-w-7xl mx-auto px-4 py-4 sm:py-6 space-y-6">
       {/* 1. Breadcrumb va Sarlavha */}
       <div className="space-y-2">
-        <nav className="flex items-center gap-1.5 text-xs text-gray-400">
-          <Link to="/" className="hover:text-uzum-primary transition-colors">{t('home')}</Link>
+        <nav className="flex items-center gap-1.5 text-xs text-gray-400 dark:text-slate-500">
+          <Link to="/" className="hover:text-uzum-primary dark:hover:text-purple-400 transition-colors">{t('home')}</Link>
           <ChevronRight className="w-3.5 h-3.5" />
-          <span className="text-gray-700 font-semibold">{t('catalogAndFilters')}</span>
+          <span className="text-gray-700 dark:text-slate-300 font-semibold">{t('catalogAndFilters')}</span>
           {currentCategory && (
             <>
               <ChevronRight className="w-3.5 h-3.5" />
-              <span className="text-uzum-primary font-bold">{getCategoryTitle(currentCategory.slug, language)}</span>
+              <span className="text-uzum-primary dark:text-purple-400 font-bold">{getCategoryTitle(currentCategory.slug, language)}</span>
             </>
           )}
         </nav>
 
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-black text-gray-900 tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white tracking-tight">
               {searchQuery
                 ? `"${searchQuery}" ${t('searchResultsFor')}`
                 : currentCategory
                 ? getCategoryTitle(currentCategory.slug, language)
                 : t('catalogTitle')}
             </h1>
-            <p className="text-xs sm:text-sm text-gray-500 mt-0.5">
-              {t('foundLabel')} <strong className="text-uzum-primary font-bold">{filteredAndSortedProducts.length}</strong> {t('itemsCount')}
+            <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 mt-0.5">
+              {t('foundLabel')} <strong className="text-uzum-primary dark:text-purple-400 font-bold">{filteredAndSortedProducts.length}</strong> {t('itemsCount')}
             </p>
           </div>
 
@@ -362,63 +362,63 @@ export const CatalogPage: React.FC = () => {
           <span className="text-gray-400 font-semibold mr-1">{t('activeFilters')}:</span>
 
           {selectedCategorySlug && (
-            <span className="inline-flex items-center gap-1.5 bg-purple-100 text-uzum-primary font-bold px-2.5 py-1 rounded-lg">
+            <span className="inline-flex items-center gap-1.5 bg-purple-100 dark:bg-purple-950/60 text-uzum-primary dark:text-purple-300 font-bold px-2.5 py-1 rounded-lg">
               {t('categoryLabel')} {currentCategory ? getCategoryTitle(currentCategory.slug, language) : selectedCategorySlug}
-              <button onClick={() => navigateToCategory(null)} className="hover:text-black">
+              <button onClick={() => navigateToCategory(null)} className="hover:text-black dark:hover:text-white">
                 <X className="w-3 h-3" />
               </button>
             </span>
           )}
 
           {onlyZeroDown && (
-            <span className="inline-flex items-center gap-1.5 bg-emerald-100 text-emerald-800 font-bold px-2.5 py-1 rounded-lg">
+            <span className="inline-flex items-center gap-1.5 bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 font-bold px-2.5 py-1 rounded-lg">
               0-0-12 {t('installment')}
-              <button onClick={() => setOnlyZeroDown(false)} className="hover:text-black">
+              <button onClick={() => setOnlyZeroDown(false)} className="hover:text-black dark:hover:text-white">
                 <X className="w-3 h-3" />
               </button>
             </span>
           )}
 
           {selectedMonths && (
-            <span className="inline-flex items-center gap-1.5 bg-indigo-100 text-indigo-800 font-bold px-2.5 py-1 rounded-lg">
+            <span className="inline-flex items-center gap-1.5 bg-indigo-100 dark:bg-indigo-950/60 text-indigo-800 dark:text-indigo-300 font-bold px-2.5 py-1 rounded-lg">
               {selectedMonths} {t('monthsUnit')}
-              <button onClick={() => setSelectedMonths(null)} className="hover:text-black">
+              <button onClick={() => setSelectedMonths(null)} className="hover:text-black dark:hover:text-white">
                 <X className="w-3 h-3" />
               </button>
             </span>
           )}
 
           {(priceRange[0] > 0 || priceRange[1] < 25000000) && (
-            <span className="inline-flex items-center gap-1.5 bg-amber-100 text-amber-900 font-bold px-2.5 py-1 rounded-lg">
+            <span className="inline-flex items-center gap-1.5 bg-amber-100 dark:bg-amber-950/60 text-amber-900 dark:text-amber-300 font-bold px-2.5 py-1 rounded-lg">
               {t('priceBadgeLabel')} {formatPrice(priceRange[0])} — {formatPrice(priceRange[1])}
-              <button onClick={() => setPriceRange([0, 25000000])} className="hover:text-black">
+              <button onClick={() => setPriceRange([0, 25000000])} className="hover:text-black dark:hover:text-white">
                 <X className="w-3 h-3" />
               </button>
             </span>
           )}
 
           {selectedBrands.map((b) => (
-            <span key={b} className="inline-flex items-center gap-1.5 bg-gray-100 text-gray-800 font-bold px-2.5 py-1 rounded-lg">
+            <span key={b} className="inline-flex items-center gap-1.5 bg-gray-100 dark:bg-slate-800 text-gray-800 dark:text-slate-200 font-bold px-2.5 py-1 rounded-lg">
               {t('brandLabel')} {b}
-              <button onClick={() => toggleBrand(b)} className="hover:text-black">
+              <button onClick={() => toggleBrand(b)} className="hover:text-black dark:hover:text-white">
                 <X className="w-3 h-3" />
               </button>
             </span>
           ))}
 
           {minRating && (
-            <span className="inline-flex items-center gap-1.5 bg-yellow-100 text-yellow-900 font-bold px-2.5 py-1 rounded-lg">
+            <span className="inline-flex items-center gap-1.5 bg-yellow-100 dark:bg-yellow-950/60 text-yellow-900 dark:text-yellow-300 font-bold px-2.5 py-1 rounded-lg">
               <span className="flex items-center gap-1">{minRating}+ <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500" /></span>
-              <button onClick={() => setMinRating(null)} className="hover:text-black">
+              <button onClick={() => setMinRating(null)} className="hover:text-black dark:hover:text-white">
                 <X className="w-3 h-3" />
               </button>
             </span>
           )}
 
           {freeDeliveryOnly && (
-            <span className="inline-flex items-center gap-1.5 bg-blue-100 text-blue-900 font-bold px-2.5 py-1 rounded-lg">
+            <span className="inline-flex items-center gap-1.5 bg-blue-100 dark:bg-blue-950/60 text-blue-900 dark:text-blue-300 font-bold px-2.5 py-1 rounded-lg">
               {t('fastDelivery1Day')}
-              <button onClick={() => setFreeDeliveryOnly(false)} className="hover:text-black">
+              <button onClick={() => setFreeDeliveryOnly(false)} className="hover:text-black dark:hover:text-white">
                 <X className="w-3 h-3" />
               </button>
             </span>
@@ -903,7 +903,7 @@ export const CatalogPage: React.FC = () => {
                 {hasActiveFilters && (
                   <button
                     onClick={resetAllFilters}
-                    className="w-full py-2 bg-gray-100 text-gray-700 font-bold rounded-xl text-xs"
+                    className="w-full py-2 bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-200 font-bold rounded-xl text-xs"
                   >
                     {t('clearAll')}
                   </button>
