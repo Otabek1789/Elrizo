@@ -54,7 +54,7 @@ export const ScrollToTopButton: React.FC = () => {
           whileHover={{ scale: 1.15, y: -4 }}
           whileTap={{ scale: 0.9 }}
           transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-          className="fixed bottom-20 md:bottom-6 right-4 sm:right-6 z-40 p-3 sm:p-3.5 rounded-full bg-gradient-to-tr from-uzum-primary to-purple-600 text-white shadow-xl hover:shadow-purple-500/50 flex items-center justify-center border-2 border-white/30 backdrop-blur-sm"
+          className="fixed bottom-36 md:bottom-24 right-4 sm:right-6 z-40 p-3 sm:p-3.5 rounded-full bg-gradient-to-tr from-uzum-primary to-purple-600 text-white shadow-xl hover:shadow-purple-500/50 flex items-center justify-center border-2 border-white/30 backdrop-blur-sm"
           title={language === 'ru' ? 'Наверх' : language === 'en' ? 'Back to top' : 'Tepaga qaytish'}
         >
           <ArrowUp className="w-5 h-5" />

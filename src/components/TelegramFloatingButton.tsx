@@ -8,7 +8,7 @@ export const TelegramFloatingButton: React.FC = () => {
   const language = useStore((s) => s.language);
 
   return (
-    <div className="fixed bottom-4 sm:bottom-6 right-4 sm:right-6 z-40 flex items-center gap-2">
+    <div className="fixed bottom-20 md:bottom-6 right-4 sm:right-6 z-40 flex items-center gap-2">
       {/* Tooltip Popup */}
       <AnimatePresence>
         {showTooltip && (
