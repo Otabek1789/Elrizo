@@ -100,7 +100,82 @@ EXCEPTION
         NULL;
 END $$;
 
--- 5. FOYDALANUVCHILAR EMAILINI AVTOMATIK TASDIQLASH (AUTO-CONFIRM)
+-- 5. MAHSULOTLAR JADVALI (products)
+CREATE TABLE IF NOT EXISTS public.products (
+    id TEXT PRIMARY KEY,
+    title TEXT NOT NULL,
+    slug TEXT NOT NULL,
+    price NUMERIC NOT NULL DEFAULT 0,
+    original_price NUMERIC,
+    discount_percentage INTEGER,
+    rating NUMERIC DEFAULT 5.0,
+    reviews_count INTEGER DEFAULT 0,
+    images JSONB DEFAULT '[]'::jsonb,
+    category_id TEXT NOT NULL,
+    category_name TEXT NOT NULL,
+    in_stock BOOLEAN DEFAULT true,
+    stock_count INTEGER DEFAULT 10,
+    is_best_seller BOOLEAN DEFAULT false,
+    is_weekly_offer BOOLEAN DEFAULT false,
+    has_zero_down BOOLEAN DEFAULT true,
+    max_months INTEGER DEFAULT 24,
+    tags JSONB DEFAULT '[]'::jsonb,
+    specs JSONB DEFAULT '{}'::jsonb,
+    description TEXT DEFAULT '',
+    delivery_days INTEGER DEFAULT 1,
+    sku TEXT,
+    colors JSONB DEFAULT '[]'::jsonb,
+    storage_options JSONB DEFAULT '[]'::jsonb,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Indekslar
+CREATE INDEX IF NOT EXISTS idx_products_category ON public.products (category_id);
+CREATE INDEX IF NOT EXISTS idx_products_price ON public.products (price);
+CREATE INDEX IF NOT EXISTS idx_products_created_at ON public.products (created_at DESC);
+
+-- RLS (Row Level Security)
+ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Mahsulotlarni hamma ko'rishi mumkin" ON public.products;
+DROP POLICY IF EXISTS "Mahsulot qo'shish huquqi" ON public.products;
+DROP POLICY IF EXISTS "Mahsulotni yangilash huquqi" ON public.products;
+DROP POLICY IF EXISTS "Mahsulotni o'chirish huquqi" ON public.products;
+
+CREATE POLICY "Mahsulotlarni hamma ko'rishi mumkin"
+ON public.products FOR SELECT TO anon, authenticated USING (true);
+
+CREATE POLICY "Mahsulot qo'shish huquqi"
+ON public.products FOR INSERT TO anon, authenticated WITH CHECK (true);
+
+CREATE POLICY "Mahsulotni yangilash huquqi"
+ON public.products FOR UPDATE TO anon, authenticated USING (true);
+
+CREATE POLICY "Mahsulotni o'chirish huquqi"
+ON public.products FOR DELETE TO anon, authenticated USING (true);
+
+DROP TRIGGER IF EXISTS set_products_updated_at ON public.products;
+CREATE TRIGGER set_products_updated_at
+BEFORE UPDATE ON public.products
+FOR EACH ROW
+EXECUTE FUNCTION public.handle_updated_at();
+
+-- Realtime publication for products
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_publication_tables 
+        WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'products'
+    ) THEN
+        ALTER PUBLICATION supabase_realtime ADD TABLE public.products;
+    END IF;
+EXCEPTION
+    WHEN OTHERS THEN
+        NULL;
+END $$;
+
+-- 6. FOYDALANUVCHILAR EMAILINI AVTOMATIK TASDIQLASH (AUTO-CONFIRM)
 -- Foydalanuvchi yoki admin email tasdiqlash xatini kutmasdan darhol tizimga kira olishi uchun:
 CREATE OR REPLACE FUNCTION public.auto_confirm_new_users()
 RETURNS TRIGGER AS $$
@@ -116,7 +191,7 @@ BEFORE INSERT ON auth.users
 FOR EACH ROW
 EXECUTE FUNCTION public.auto_confirm_new_users();
 
--- 6. ADMIN FOYDALANUVCHISINI (otabek1789@gmail.com) DARHOL TASDIQLASH
+-- 7. ADMIN FOYDALANUVCHISINI (otabek1789@gmail.com) DARHOL TASDIQLASH
 UPDATE auth.users
 SET email_confirmed_at = NOW()
 WHERE email = 'otabek1789@gmail.com';

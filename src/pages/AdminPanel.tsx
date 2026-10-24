@@ -49,7 +49,9 @@ import {
   Tag,
   Mail,
   CheckCircle2,
-  Send
+  Send,
+  Pencil,
+  Save
 } from 'lucide-react';
 import { useStore } from '../store/useStore';
 import { formatPrice } from '../utils/calculator';
@@ -178,7 +180,9 @@ export const AdminPanel: React.FC = () => {
     deleteOrder, 
     products, 
     addProduct, 
+    updateProduct,
     deleteProduct,
+    fetchProductsFromCloud,
     logoutUser,
     addToast,
     theme,
@@ -200,6 +204,75 @@ export const AdminPanel: React.FC = () => {
   const [copiedRegion, setCopiedRegion] = useState<string | null>(null);
   const [activeChartPoint, setActiveChartPoint] = useState<ChartPoint | null>(null);
   const [chartTimeframe, setChartTimeframe] = useState<'1m' | '6m' | '1y'>('1y');
+
+  // Mahsulotni tahrirlash (Edit Product) holati (Supabase integratsiyasi)
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [editTitle, setEditTitle] = useState('');
+  const [editPrice, setEditPrice] = useState('');
+  const [editOriginalPrice, setEditOriginalPrice] = useState('');
+  const [editCategoryId, setEditCategoryId] = useState('');
+  const [editImage, setEditImage] = useState('');
+  const [editDescription, setEditDescription] = useState('');
+  const [editHasZeroDown, setEditHasZeroDown] = useState(true);
+  const [editInStock, setEditInStock] = useState(true);
+  const [isSavingProduct, setIsSavingProduct] = useState(false);
+  const [isSyncingProducts, setIsSyncingProducts] = useState(false);
+
+  const handleStartEditProduct = (p: Product) => {
+    setEditingProduct(p);
+    setEditTitle(p.title);
+    setEditPrice(p.price.toString());
+    setEditOriginalPrice(p.originalPrice ? p.originalPrice.toString() : '');
+    setEditCategoryId(p.categoryId);
+    setEditImage(p.images[0] || '');
+    setEditDescription(p.description || '');
+    setEditHasZeroDown(p.hasZeroDown !== false);
+    setEditInStock(p.inStock !== false);
+  };
+
+  const handleSaveEditedProduct = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingProduct) return;
+    if (!editTitle.trim()) {
+      addToast("Mahsulot nomini kiriting!", 'warning');
+      return;
+    }
+    const priceNum = Number(editPrice.replace(/\D/g, '')) || 0;
+    if (priceNum <= 0) {
+      addToast("Mahsulot narxini to'g'ri kiriting!", 'warning');
+      return;
+    }
+    const origPriceNum = editOriginalPrice ? Number(editOriginalPrice.replace(/\D/g, '')) : undefined;
+    const cat = CATEGORIES.find(c => c.id === editCategoryId) || CATEGORIES[0];
+
+    setIsSavingProduct(true);
+    await updateProduct(editingProduct.id, {
+      title: editTitle.trim(),
+      price: priceNum,
+      originalPrice: origPriceNum,
+      discountPercentage: origPriceNum && origPriceNum > priceNum ? Math.round(((origPriceNum - priceNum) / origPriceNum) * 100) : undefined,
+      categoryId: cat.id,
+      categoryName: cat.name,
+      images: editImage.trim() ? [editImage.trim(), ...(editingProduct.images.slice(1))] : editingProduct.images,
+      description: editDescription.trim(),
+      hasZeroDown: editHasZeroDown,
+      inStock: editInStock,
+    });
+    setIsSavingProduct(false);
+    setEditingProduct(null);
+  };
+
+  const handleSyncProductsFromCloud = async () => {
+    setIsSyncingProducts(true);
+    try {
+      await fetchProductsFromCloud();
+      addToast("Mahsulotlar Supabase bilan sinxronlashtirildi!", 'success');
+    } catch {
+      addToast("Sinxronizatsiyada xatolik", 'error');
+    } finally {
+      setIsSyncingProducts(false);
+    }
+  };
 
   // Telegram Bot test va tovar post qilish holatlari
   const [isTestingTelegram, setIsTestingTelegram] = useState(false);
@@ -1859,8 +1932,21 @@ export const AdminPanel: React.FC = () => {
                 {/* List */}
                 <div className="lg:col-span-7 bg-white dark:bg-slate-800/90 p-5 rounded-3xl border border-gray-200 dark:border-slate-700 shadow-sm dark:shadow-xl space-y-4 transition-colors">
                   <h3 className="text-base font-bold text-gray-900 dark:text-white border-b border-gray-200 dark:border-slate-700 pb-3 flex items-center justify-between">
-                    <span>{language === 'ru' ? `Товары в магазине (${products.length})` : language === 'en' ? `Store Products (${products.length})` : `Do'kondagi mahsulotlar (${products.length})`}</span>
-                    <span className="text-xs text-purple-600 dark:text-purple-400 font-extrabold">{language === 'ru' ? 'Онлайн витрина' : language === 'en' ? 'Online storefront' : 'Online vitrina'}</span>
+                    <div>
+                      <span>{language === 'ru' ? `Товары в магазине (${products.length})` : language === 'en' ? `Store Products (${products.length})` : `Do'kondagi mahsulotlar (${products.length})`}</span>
+                      <div className="text-[11px] font-normal text-emerald-600 dark:text-emerald-400">● Supabase Cloud bilan ulangan</div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={handleSyncProductsFromCloud}
+                        disabled={isSyncingProducts}
+                        className="px-2.5 py-1 text-xs font-bold bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 hover:bg-purple-100 rounded-lg flex items-center gap-1 transition-colors cursor-pointer"
+                        title="Supabase-dan mahsulotlarni yangilash"
+                      >
+                        <RefreshCw className={`w-3.5 h-3.5 ${isSyncingProducts ? 'animate-spin' : ''}`} />
+                        <span>Sinxronlash</span>
+                      </button>
+                    </div>
                   </h3>
 
                   <div className="space-y-3 max-h-[520px] overflow-y-auto pr-1">
@@ -1906,10 +1992,24 @@ export const AdminPanel: React.FC = () => {
                             </motion.button>
 
                             <motion.button
+                              whileHover={{ scale: 1.15 }}
+                              whileTap={{ scale: 0.9 }}
+                              onClick={() => handleStartEditProduct(p)}
+                              className="p-2 text-gray-500 hover:text-amber-600 dark:text-slate-400 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-500/10 rounded-lg transition-colors shrink-0 cursor-pointer"
+                              title={language === 'ru' ? 'Редактировать' : language === 'en' ? 'Edit' : "Tahrirlash"}
+                            >
+                              <Pencil className="w-4 h-4" />
+                            </motion.button>
+
+                            <motion.button
                               whileHover={{ scale: 1.25, rotate: 10 }}
                               whileTap={{ scale: 0.9 }}
-                              onClick={() => deleteProduct(p.id)}
-                              className="p-2 text-gray-400 hover:text-rose-600 dark:text-slate-400 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-lg transition-colors shrink-0"
+                              onClick={() => {
+                                if (window.confirm(`«${p.title}» mahsulotini o'chirishni tasdiqlaysizmi? (Supabase va do'kondan o'chiriladi)`)) {
+                                  deleteProduct(p.id);
+                                }
+                              }}
+                              className="p-2 text-gray-400 hover:text-rose-600 dark:text-slate-400 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-lg transition-colors shrink-0 cursor-pointer"
                               title={language === 'ru' ? 'Удалить' : language === 'en' ? 'Delete' : "O'chirish"}
                             >
                               <Trash2 className="w-4 h-4" />
@@ -3030,6 +3130,169 @@ export const AdminPanel: React.FC = () => {
                   </motion.button>
                 </div>
               </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* 4. EDIT PRODUCT MODAL (SUPABASE CONNECTED) */}
+      <AnimatePresence>
+        {editingProduct && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 350 }}
+              className="w-full max-w-xl bg-white dark:bg-slate-800 rounded-3xl border border-gray-200 dark:border-slate-700 shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
+            >
+              {/* Header */}
+              <div className="p-5 border-b border-gray-100 dark:border-slate-700 flex items-center justify-between bg-gray-50/60 dark:bg-slate-900/60">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-10 h-10 rounded-xl bg-purple-100 dark:bg-purple-950/60 text-uzum-primary dark:text-purple-300 flex items-center justify-center font-bold">
+                    <Pencil className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-extrabold text-gray-900 dark:text-white">
+                      Mahsulotni tahrirlash
+                    </h3>
+                    <p className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold">
+                      ● Supabase Cloud bazasida darhol yangilanadi
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setEditingProduct(null)}
+                  className="p-2 rounded-xl text-gray-400 hover:text-gray-600 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Form Body */}
+              <form onSubmit={handleSaveEditedProduct} className="p-5 space-y-4 overflow-y-auto">
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 dark:text-slate-300 mb-1">
+                    Mahsulot nomi *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={editTitle}
+                    onChange={(e) => setEditTitle(e.target.value)}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-gray-900 dark:text-white text-xs font-medium focus:ring-2 focus:ring-purple-500 outline-none"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 dark:text-slate-300 mb-1">
+                      Narxi (so'm) *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={editPrice}
+                      onChange={(e) => setEditPrice(e.target.value)}
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-gray-900 dark:text-white text-xs font-medium focus:ring-2 focus:ring-purple-500 outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 dark:text-slate-300 mb-1">
+                      Asl narxi (chegirmasiz)
+                    </label>
+                    <input
+                      type="text"
+                      value={editOriginalPrice}
+                      onChange={(e) => setEditOriginalPrice(e.target.value)}
+                      placeholder="Ixtiyoriy"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-gray-900 dark:text-white text-xs font-medium focus:ring-2 focus:ring-purple-500 outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 dark:text-slate-300 mb-1">
+                    Kategoriya *
+                  </label>
+                  <CustomSelect
+                    value={editCategoryId}
+                    onChange={setEditCategoryId}
+                    options={CATEGORIES.map(c => ({ value: c.id, label: c.name }))}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 dark:text-slate-300 mb-1">
+                    Asosiy rasm havolasi (URL)
+                  </label>
+                  <input
+                    type="url"
+                    value={editImage}
+                    onChange={(e) => setEditImage(e.target.value)}
+                    placeholder="https://..."
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-gray-900 dark:text-white text-xs font-medium focus:ring-2 focus:ring-purple-500 outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 dark:text-slate-300 mb-1">
+                    Tavsif
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={editDescription}
+                    onChange={(e) => setEditDescription(e.target.value)}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-gray-900 dark:text-white text-xs font-medium focus:ring-2 focus:ring-purple-500 outline-none resize-none"
+                  />
+                </div>
+
+                <div className="flex flex-wrap items-center gap-4 pt-1">
+                  <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-gray-700 dark:text-slate-300">
+                    <input
+                      type="checkbox"
+                      checked={editHasZeroDown}
+                      onChange={(e) => setEditHasZeroDown(e.target.checked)}
+                      className="w-4 h-4 text-purple-600 rounded"
+                    />
+                    <span>0-0-12 Boshlang'ich to'lovsiz nasiya</span>
+                  </label>
+
+                  <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-gray-700 dark:text-slate-300">
+                    <input
+                      type="checkbox"
+                      checked={editInStock}
+                      onChange={(e) => setEditInStock(e.target.checked)}
+                      className="w-4 h-4 text-emerald-600 rounded"
+                    />
+                    <span>Omborda mavjud</span>
+                  </label>
+                </div>
+
+                {/* Footer Buttons */}
+                <div className="pt-3 border-t border-gray-100 dark:border-slate-700 flex items-center justify-end gap-2.5">
+                  <button
+                    type="button"
+                    onClick={() => setEditingProduct(null)}
+                    className="px-4 py-2.5 rounded-xl bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-200 font-bold text-xs hover:bg-gray-200 transition-colors cursor-pointer"
+                  >
+                    Bekor qilish
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isSavingProduct}
+                    className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-extrabold text-xs shadow-md shadow-purple-500/25 hover:brightness-110 transition-all flex items-center gap-1.5 disabled:opacity-50 cursor-pointer"
+                  >
+                    {isSavingProduct ? (
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                    ) : (
+                      <Save className="w-3.5 h-3.5" />
+                    )}
+                    <span>Saqlash (Supabase & Kesh)</span>
+                  </button>
+                </div>
+              </form>
             </motion.div>
           </div>
         )}

@@ -38,11 +38,13 @@ export const App: React.FC = () => {
     toasts,
     removeToast,
     initSupabaseCheck,
+    fetchProductsFromCloud,
     theme,
   } = useStore();
 
   useEffect(() => {
     initSupabaseCheck();
+    fetchProductsFromCloud();
 
     // Supabase OAuth (Google) orqali kirganda sessiyani avtomatik qabul qilish
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {

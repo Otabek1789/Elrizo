@@ -10,7 +10,12 @@ import {
   authenticateWithSupabase, 
   signOutFromSupabase, 
   isAdminUser,
-  fetchOrdersFromSupabase
+  fetchOrdersFromSupabase,
+  fetchProductsFromSupabase,
+  saveProductToSupabase,
+  updateProductInSupabase,
+  deleteProductFromSupabase,
+  seedInitialProductsToSupabase
 } from '../lib/supabase';
 import { sendOrderNotificationToTelegram } from '../utils/telegramBot';
 import { Language, Theme, TranslationKey, getTranslation } from '../utils/translations';
@@ -37,8 +42,10 @@ interface StoreState {
   // Products Data
   products: Product[];
   filteredProducts: () => Product[];
-  addProduct: (product: Product) => void;
-  deleteProduct: (productId: string) => void;
+  addProduct: (product: Product) => Promise<void>;
+  updateProduct: (productId: string, updates: Partial<Product>) => Promise<void>;
+  deleteProduct: (productId: string) => Promise<void>;
+  fetchProductsFromCloud: () => Promise<void>;
 
   // Cart State (Persisted in localStorage)
   cart: CartItem[];
@@ -248,18 +255,58 @@ export const useStore = create<StoreState>()(
         return result;
       },
 
-      addProduct: (newProduct) => {
+      addProduct: async (newProduct) => {
         set((state) => ({
           products: [newProduct, ...state.products],
         }));
         get().addToast("Yangi mahsulot muvaffaqiyatli qo'shildi", 'success');
+
+        try {
+          await saveProductToSupabase(newProduct);
+        } catch (e) {
+          console.warn("Supabase addProduct warning:", e);
+        }
       },
 
-      deleteProduct: (productId) => {
+      updateProduct: async (productId, updates) => {
+        set((state) => ({
+          products: state.products.map((p) =>
+            p.id === productId ? { ...p, ...updates } : p
+          ),
+        }));
+        get().addToast("Mahsulot muvaffaqiyatli tahrirlandi", 'success');
+
+        try {
+          await updateProductInSupabase(productId, updates);
+        } catch (e) {
+          console.warn("Supabase updateProduct warning:", e);
+        }
+      },
+
+      deleteProduct: async (productId) => {
         set((state) => ({
           products: state.products.filter((p) => p.id !== productId),
         }));
         get().addToast("Mahsulot o'chirildi", 'info');
+
+        try {
+          await deleteProductFromSupabase(productId);
+        } catch (e) {
+          console.warn("Supabase deleteProduct warning:", e);
+        }
+      },
+
+      fetchProductsFromCloud: async () => {
+        try {
+          const cloudProducts = await fetchProductsFromSupabase();
+          if (cloudProducts && cloudProducts.length > 0) {
+            set({ products: cloudProducts });
+          } else if (cloudProducts && cloudProducts.length === 0) {
+            await seedInitialProductsToSupabase(get().products || PRODUCTS);
+          }
+        } catch (e) {
+          console.warn("fetchProductsFromCloud error:", e);
+        }
       },
 
       // Cart
