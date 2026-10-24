@@ -833,6 +833,21 @@ export const useStore = create<StoreState>()(
         if (state) {
           if (!state.products || state.products.length === 0) {
             state.products = PRODUCTS;
+          } else {
+            state.products = state.products.map((p) => {
+              if (p.images && p.images.length > 0) {
+                p.images = p.images.map((img) => {
+                  if (img.includes('photo-1512290900672-1f41334c26a5')) {
+                    return 'https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?w=800&auto=format&fit=crop&q=80';
+                  }
+                  if (img.includes('photo-1584990347449-3996d92984b9')) {
+                    return 'https://images.unsplash.com/photo-1584269600464-37b1b58a9fe7?w=800&auto=format&fit=crop&q=80';
+                  }
+                  return img;
+                });
+              }
+              return p;
+            });
           }
           // Saytdan hali hech kim sotib olmagan: buyurtmalarni tozalaymiz
           if (state.orders && state.orders.some((o: any) => o.contractNumber === 'ELR-592970' || o.contractNumber === 'ELR-PAY-345805' || o.id === 'ord-initial-01')) {

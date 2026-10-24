@@ -126,8 +126,9 @@ export const CartDrawer: React.FC = () => {
                       className="shrink-0"
                     >
                       <img
-                        src={item.product.images[0]}
+                        src={item.product.images?.[0] || 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=300'}
                         alt={item.product.title}
+                        onError={(e) => { (e.currentTarget as HTMLImageElement).src = 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=300'; }}
                         className="w-16 h-16 object-contain rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-1 hover:scale-105 transition-transform"
                       />
                     </Link>

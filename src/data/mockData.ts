@@ -679,7 +679,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.85,
     reviewsCount: 135,
     images: [
-      'https://images.unsplash.com/photo-1512290900672-1f41334c26a5?w=800&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?w=800&auto=format&fit=crop&q=80',
     ],
     categoryId: 'cat-beauty',
     categoryName: 'Goʻzallik va parvarish',
@@ -987,7 +987,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.9,
     reviewsCount: 140,
     images: [
-      'https://images.unsplash.com/photo-1584990347449-3996d92984b9?w=800&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1584269600464-37b1b58a9fe7?w=800&auto=format&fit=crop&q=80',
     ],
     categoryId: 'cat-home',
     categoryName: 'Uy-roʻzgʻor buyumlari',

@@ -1877,8 +1877,9 @@ export const AdminPanel: React.FC = () => {
                           <div className="flex items-center gap-3 min-w-0">
                             <motion.img 
                               whileHover={{ scale: 1.15 }}
-                              src={p.images[0]} 
+                              src={p.images?.[0] || 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=300'} 
                               alt="" 
+                              onError={(e) => { (e.currentTarget as HTMLImageElement).src = 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=300'; }}
                               className="w-12 h-12 rounded-xl object-contain bg-white dark:bg-slate-800 p-1 shrink-0 border border-gray-200 dark:border-slate-700 cursor-pointer" 
                             />
                             <div className="truncate">

@@ -52,6 +52,8 @@ export const ProductDetail: React.FC = () => {
 
   const product = products.find((p) => p.id === id || p.id === selectedProductId) || products[0];
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [imageError, setImageError] = useState(false);
+  const fallbackDetailImg = 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=800&auto=format&fit=crop&q=80';
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState<'specs' | 'description' | 'reviews'>('specs');
 
@@ -216,7 +218,12 @@ export const ProductDetail: React.FC = () => {
                     : 'border-gray-200 dark:border-slate-800 hover:border-gray-300 opacity-80'
                 }`}
               >
-                <img src={img} alt="" className="w-full h-full object-cover rounded-lg" />
+                <img 
+                  src={img} 
+                  alt="" 
+                  onError={(e) => { (e.currentTarget as HTMLImageElement).src = fallbackDetailImg; }}
+                  className="w-full h-full object-cover rounded-lg" 
+                />
               </button>
             ))}
           </div>
@@ -224,8 +231,9 @@ export const ProductDetail: React.FC = () => {
           {/* Main Big Image */}
           <div className="flex-1 relative aspect-square bg-white dark:bg-slate-800/90 rounded-2xl border border-gray-200 dark:border-slate-800 overflow-hidden flex items-center justify-center shadow-sm">
             <img
-              src={product.images[selectedImageIndex] || product.images[0]}
+              src={!imageError && product.images && product.images.length > 0 ? (product.images[selectedImageIndex] || product.images[0] || fallbackDetailImg) : fallbackDetailImg}
               alt={product.title}
+              onError={() => setImageError(true)}
               className="w-full h-full object-contain p-4 transition-all duration-300"
             />
 

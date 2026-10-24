@@ -76,6 +76,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     }
   };
 
+  const [imageError, setImageError] = useState(false);
+  const fallbackImg = 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=800&auto=format&fit=crop&q=80';
+  const currentImg = !imageError && product.images && product.images.length > 0
+    ? (product.images[activeImageIndex] || product.images[0] || fallbackImg)
+    : fallbackImg;
+
   return (
     <div
       onClick={handleCardClick}
@@ -85,15 +91,16 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       <div 
         className="relative w-full aspect-[4/4.2] overflow-hidden bg-gray-50 dark:bg-slate-900/60 flex items-center justify-center"
         onMouseEnter={() => {
-          if (product.images.length > 1) setActiveImageIndex(1);
+          if (product.images && product.images.length > 1) setActiveImageIndex(1);
         }}
         onMouseLeave={() => {
           setActiveImageIndex(0);
         }}
       >
         <motion.img
-          src={product.images[activeImageIndex] || product.images[0]}
+          src={currentImg}
           alt={product.title}
+          onError={() => setImageError(true)}
           className="w-full h-full object-cover object-center group-hover:scale-108 transition-transform duration-500"
           loading="lazy"
         />
