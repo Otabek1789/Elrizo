@@ -96,6 +96,7 @@ export const Header: React.FC = () => {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const catalogRef = useRef<HTMLDivElement>(null);
   const searchContainerRef = useRef<HTMLDivElement>(null);
+  const mobileSearchContainerRef = useRef<HTMLDivElement>(null);
   const userMenuRef = useRef<HTMLDivElement>(null);
 
   // Click outside to close user dropdown
@@ -130,10 +131,13 @@ export const Header: React.FC = () => {
     }
   }, [localSearch, location.pathname, setSearchQuery]);
 
-  // Click outside to close live search dropdown
+  // Click outside to close live search dropdown (both desktop and mobile)
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (searchContainerRef.current && !searchContainerRef.current.contains(e.target as Node)) {
+      const target = e.target as Node;
+      const clickedDesktop = searchContainerRef.current?.contains(target);
+      const clickedMobile = mobileSearchContainerRef.current?.contains(target);
+      if (!clickedDesktop && !clickedMobile) {
         setIsSearchFocused(false);
       }
     };
@@ -181,6 +185,186 @@ export const Header: React.FC = () => {
     navigateToCategory(categorySlug);
     navigate(`/catalog?category=${encodeURIComponent(categorySlug)}`);
     setIsCatalogOpen(false);
+  };
+
+  const renderSearchBar = (variant: 'desktop' | 'mobile') => {
+    const isMobile = variant === 'mobile';
+    return (
+      <div className="relative w-full">
+        <motion.div 
+          animate={{ scale: isSearchFocused ? 1.005 : 1 }}
+          className={`relative flex items-center rounded-2xl border transition-all ${
+            isSearchFocused
+              ? 'border-uzum-primary ring-4 ring-purple-100 dark:ring-purple-950/60 shadow-md bg-white dark:bg-slate-900'
+              : 'border-gray-200 dark:border-slate-800 bg-gray-50 dark:bg-slate-900/70 hover:bg-gray-100/70 dark:hover:bg-slate-800/80'
+          }`}
+        >
+          <input
+            id={isMobile ? "search-input-mobile" : "search-input"}
+            type="text"
+            value={localSearch}
+            onFocus={() => setIsSearchFocused(true)}
+            onChange={(e) => {
+              setLocalSearch(e.target.value);
+              setIsSearchFocused(true);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                handleExecuteSearch();
+              }
+            }}
+            placeholder={t('searchPlaceholder')}
+            className={`w-full ${isMobile ? 'pl-8 pr-16 py-2 text-xs' : 'pl-11 pr-24 py-2.5 text-sm'} bg-transparent text-gray-900 dark:text-white rounded-2xl outline-none placeholder:text-gray-400 dark:placeholder:text-gray-400 font-medium`}
+          />
+          <Search className={`${isMobile ? 'w-4 h-4 left-2.5' : 'w-5 h-5 left-3.5'} text-gray-400 absolute pointer-events-none`} />
+
+          {/* Clear search button */}
+          {localSearch && (
+            <motion.button
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              onClick={() => {
+                setLocalSearch('');
+                setSearchQuery('');
+              }}
+              className={`absolute ${isMobile ? 'right-10' : 'right-16'} p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 rounded-full hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors`}
+              title={t('clearAll')}
+            >
+              <X className="w-3.5 h-3.5" />
+            </motion.button>
+          )}
+
+          <motion.button
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => handleExecuteSearch()}
+            className={`absolute right-1 sm:right-1.5 bg-uzum-primary hover:bg-uzum-hover text-white ${isMobile ? 'text-[11px] px-2.5 py-1' : 'text-xs px-3 sm:px-3.5 py-1 sm:py-1.5'} font-bold rounded-xl transition-colors shadow-sm flex items-center justify-center gap-1`}
+          >
+            <Search className="w-3.5 h-3.5 sm:hidden" />
+            <span className="hidden sm:inline">{language === 'ru' ? 'Поиск' : language === 'en' ? 'Search' : 'Qidirish'}</span>
+          </motion.button>
+        </motion.div>
+
+        {/* Jonli Qidiruv Natijalari (Live Search Dropdown) */}
+        <AnimatePresence>
+          {isSearchFocused && (
+            <motion.div
+              initial={{ opacity: 0, y: 8, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 8, scale: 0.98 }}
+              transition={{ duration: 0.15 }}
+              className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-slate-800 overflow-hidden z-50 text-left"
+            >
+              {localSearch.trim() ? (
+                <div>
+                  <div className="p-3 bg-gray-50/80 dark:bg-slate-900/80 border-b border-gray-100 dark:border-slate-800 flex items-center justify-between text-xs">
+                    <span className="font-bold text-gray-700 dark:text-gray-300">
+                      {t('searchFoundCount')} ({liveResults.length}):
+                    </span>
+                    {liveResults.length > 0 && (
+                      <button
+                        onMouseDown={() => handleExecuteSearch()}
+                        className="font-bold text-uzum-primary dark:text-purple-400 hover:underline flex items-center gap-1"
+                      >
+                        <span>{t('viewAll')}</span>
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+                  </div>
+
+                  {liveResults.length === 0 ? (
+                    <div className="p-6 text-center text-xs text-gray-500 dark:text-gray-400 space-y-2">
+                      <p className="font-bold text-sm text-gray-800 dark:text-gray-200">"{localSearch}" - {t('searchNotFound')}</p>
+                      <p className="text-[11px] text-gray-400 dark:text-gray-500">{t('noProductsDesc')}</p>
+                      <button
+                        onMouseDown={() => {
+                          setSearchQuery('');
+                          setLocalSearch('');
+                          setIsSearchFocused(false);
+                          navigate('/catalog');
+                        }}
+                        className="mt-2 px-4 py-2 bg-uzum-primary text-white text-xs font-bold rounded-xl shadow-xs"
+                      >
+                        {t('allCategories')}
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="max-h-80 overflow-y-auto divide-y divide-gray-100 dark:divide-slate-800">
+                      {liveResults.slice(0, 5).map((p) => (
+                        <div
+                          key={p.id}
+                          onMouseDown={() => handleSelectProduct(p.id)}
+                          className="p-3 flex items-center gap-3 hover:bg-purple-50/60 dark:hover:bg-slate-800/60 cursor-pointer transition-colors group"
+                        >
+                          <img
+                            src={p.images[0]}
+                            alt={p.title}
+                            className="w-12 h-12 object-contain rounded-xl bg-gray-50 dark:bg-slate-800 shrink-0 border border-gray-100 dark:border-slate-700 p-1"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <span className="text-[9px] font-bold text-gray-400 uppercase tracking-wider block">
+                              {getCategoryTitle(p.categoryId, language)}
+                            </span>
+                            <h4 className="text-xs font-bold text-gray-900 dark:text-white truncate group-hover:text-uzum-primary dark:group-hover:text-purple-300 transition-colors">
+                              {p.title}
+                            </h4>
+                            <div className="flex items-center gap-2 mt-0.5">
+                              <span className="text-xs font-black text-gray-900 dark:text-white">
+                                {formatPrice(p.price, true, language)}
+                              </span>
+                              <span className="text-[10px] font-bold text-uzum-primary dark:text-purple-300 bg-purple-50 dark:bg-purple-950/60 px-1.5 py-0.2 rounded">
+                                {formatPrice(Math.round(p.price / 12), true, language)}{t('perMonth')}
+                              </span>
+                            </div>
+                          </div>
+                          <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-uzum-primary dark:group-hover:text-purple-300 group-hover:translate-x-0.5 transition-all shrink-0" />
+                        </div>
+                      ))}
+
+                      {liveResults.length > 5 && (
+                        <button
+                          onMouseDown={() => handleExecuteSearch()}
+                          className="w-full p-3 bg-gray-50 dark:bg-slate-900 text-center font-bold text-xs text-uzum-primary dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-slate-800 transition-colors flex items-center justify-center gap-1.5"
+                        >
+                          <span>{language === 'ru' ? `Смотреть еще ${liveResults.length - 5} товаров в Каталоге` : language === 'en' ? `View ${liveResults.length - 5} more products in Catalog` : `Yana ${liveResults.length - 5} ta mahsulotni Katalogda ko'rish`}</span>
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="p-4 space-y-3">
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-gray-500 dark:text-gray-400">
+                    <TrendingUp className="w-3.5 h-3.5 text-uzum-primary dark:text-purple-400" />
+                    <span>{language === 'ru' ? 'Популярные поисковые запросы:' : language === 'en' ? 'Popular searches:' : 'Ommabop qidiruvlar:'}</span>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {[
+                      'iPhone 16 Pro Max',
+                      'Samsung Galaxy S24 Ultra',
+                      'Dyson Airwrap',
+                      'MacBook Air M3',
+                      'Artel Smart TV',
+                      `0-0-12 ${t('installment')}`,
+                    ].map((term) => (
+                      <button
+                        key={term}
+                        onMouseDown={() => handleExecuteSearch(term)}
+                        className="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-slate-800 hover:bg-purple-100 dark:hover:bg-purple-900/40 hover:text-uzum-primary dark:hover:text-purple-300 text-gray-700 dark:text-gray-300 text-xs font-semibold transition-colors flex items-center gap-1.5"
+                      >
+                        <Search className="w-3 h-3 text-gray-400" />
+                        <span>{term}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    );
   };
 
   return (
@@ -254,19 +438,23 @@ export const Header: React.FC = () => {
         </div>
       </div>
 
-      {/* Main Header */}
-      <div className="max-w-7xl mx-auto px-2.5 sm:px-4 py-2 sm:py-3.5 flex items-center justify-between gap-2 sm:gap-4">
-        {/* Brand Logo */}
-        <Link 
-          to="/"
-          onClick={() => navigateToCategory(null)}
-          className="group block select-none shrink-0"
-        >
-          <Logo size="md" />
-        </Link>
+      {/* Main Header Container */}
+      <div className="max-w-7xl mx-auto px-2 sm:px-4 py-1.5 sm:py-3">
+        {/* Navigation Row 1: Brand & Actions */}
+        <div className="flex items-center justify-between gap-1 sm:gap-3">
+          {/* Left: Brand Logo & Catalog Button */}
+          <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+            {/* Brand Logo */}
+            <Link 
+              to="/"
+              onClick={() => navigateToCategory(null)}
+              className="group block select-none shrink-0"
+            >
+              <Logo size="md" />
+            </Link>
 
-        {/* Catalog Button */}
-        <div className="relative shrink-0" ref={catalogRef}>
+            {/* Catalog Button */}
+            <div className="relative shrink-0" ref={catalogRef}>
           <motion.button
             id="catalog-toggle-btn"
             whileHover={{ scale: 1.04 }}
@@ -376,219 +564,47 @@ export const Header: React.FC = () => {
             )}
           </AnimatePresence>
         </div>
+      </div>
 
-        {/* Central Search Bar with Live Results Dropdown */}
-        <div ref={searchContainerRef} className="flex-1 max-w-2xl relative">
-          <motion.div 
-            animate={{ scale: isSearchFocused ? 1.01 : 1 }}
-            className={`relative flex items-center rounded-2xl border transition-all ${
-              isSearchFocused
-                ? 'border-uzum-primary ring-4 ring-purple-100 dark:ring-purple-950/60 shadow-md bg-white dark:bg-slate-900'
-                : 'border-gray-200 dark:border-slate-800 bg-gray-50 dark:bg-slate-900/70 hover:bg-gray-100/70 dark:hover:bg-slate-800/80'
-            }`}
-          >
-            <input
-              id="search-input"
-              type="text"
-              value={localSearch}
-              onFocus={() => setIsSearchFocused(true)}
-              onChange={(e) => {
-                setLocalSearch(e.target.value);
-                setIsSearchFocused(true);
-              }}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  handleExecuteSearch();
-                }
-              }}
-              placeholder={t('searchPlaceholder')}
-              className="w-full pl-8 sm:pl-11 pr-10 sm:pr-24 py-2 sm:py-2.5 bg-transparent text-xs sm:text-sm text-gray-900 dark:text-white rounded-2xl outline-none placeholder:text-gray-400 dark:placeholder:text-gray-400 font-medium"
-            />
-            <Search className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 absolute left-2.5 sm:left-3.5 pointer-events-none" />
-
-            {/* Clear search button */}
-            {localSearch && (
-              <motion.button
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                onClick={() => {
-                  setLocalSearch('');
-                  setSearchQuery('');
-                }}
-                className="absolute right-8 sm:right-14 p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 rounded-full hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors"
-                title={t('clearAll')}
-              >
-                <X className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-              </motion.button>
-            )}
-
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => handleExecuteSearch()}
-              className="absolute right-1 sm:right-1.5 bg-uzum-primary hover:bg-uzum-hover text-white text-[11px] sm:text-xs font-bold px-2 sm:px-3 py-1 sm:py-1.5 rounded-xl transition-colors shadow-sm flex items-center justify-center"
-            >
-              <span className="hidden sm:inline">{language === 'ru' ? 'Поиск' : language === 'en' ? 'Search' : 'Qidirish'}</span>
-              <Search className="w-3.5 h-3.5 sm:hidden" />
-            </motion.button>
-          </motion.div>
-
-          {/* Jonli Qidiruv Natijalari (Live Search Dropdown) */}
-          <AnimatePresence>
-            {isSearchFocused && (
-              <motion.div
-                initial={{ opacity: 0, y: 8, scale: 0.98 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: 8, scale: 0.98 }}
-                transition={{ duration: 0.15 }}
-                className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-slate-800 overflow-hidden z-50 text-left"
-              >
-                {localSearch.trim() ? (
-                  <div>
-                    <div className="p-3 bg-gray-50/80 dark:bg-slate-900/80 border-b border-gray-100 dark:border-slate-800 flex items-center justify-between text-xs">
-                      <span className="font-bold text-gray-700 dark:text-gray-300">
-                        {t('searchFoundCount')} ({liveResults.length}):
-                      </span>
-                      {liveResults.length > 0 && (
-                        <button
-                          onMouseDown={() => handleExecuteSearch()}
-                          className="font-bold text-uzum-primary dark:text-purple-400 hover:underline flex items-center gap-1"
-                        >
-                          <span>{t('viewAll')}</span>
-                          <ArrowRight className="w-3.5 h-3.5" />
-                        </button>
-                      )}
-                    </div>
-
-                    {liveResults.length === 0 ? (
-                      <div className="p-6 text-center text-xs text-gray-500 dark:text-gray-400 space-y-2">
-                        <p className="font-bold text-sm text-gray-800 dark:text-gray-200">"{localSearch}" - {t('searchNotFound')}</p>
-                        <p className="text-[11px] text-gray-400 dark:text-gray-500">{t('noProductsDesc')}</p>
-                        <button
-                          onMouseDown={() => {
-                            setSearchQuery('');
-                            setLocalSearch('');
-                            setIsSearchFocused(false);
-                            navigate('/catalog');
-                          }}
-                          className="mt-2 px-4 py-2 bg-uzum-primary text-white text-xs font-bold rounded-xl shadow-xs"
-                        >
-                          {t('allCategories')}
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="max-h-80 overflow-y-auto divide-y divide-gray-100 dark:divide-slate-800">
-                        {liveResults.slice(0, 5).map((p) => (
-                          <div
-                            key={p.id}
-                            onMouseDown={() => handleSelectProduct(p.id)}
-                            className="p-3 flex items-center gap-3 hover:bg-purple-50/60 dark:hover:bg-slate-800/60 cursor-pointer transition-colors group"
-                          >
-                            <img
-                              src={p.images[0]}
-                              alt={p.title}
-                              className="w-12 h-12 object-contain rounded-xl bg-gray-50 dark:bg-slate-800 shrink-0 border border-gray-100 dark:border-slate-700 p-1"
-                            />
-                            <div className="flex-1 min-w-0">
-                              <span className="text-[9px] font-bold text-gray-400 uppercase tracking-wider block">
-                                {getCategoryTitle(p.categoryId, language)}
-                              </span>
-                              <h4 className="text-xs font-bold text-gray-900 dark:text-white truncate group-hover:text-uzum-primary dark:group-hover:text-purple-300 transition-colors">
-                                {p.title}
-                              </h4>
-                              <div className="flex items-center gap-2 mt-0.5">
-                                <span className="text-xs font-black text-gray-900 dark:text-white">
-                                  {formatPrice(p.price, true, language)}
-                                </span>
-                                <span className="text-[10px] font-bold text-uzum-primary dark:text-purple-300 bg-purple-50 dark:bg-purple-950/60 px-1.5 py-0.2 rounded">
-                                  {formatPrice(Math.round(p.price / 12), true, language)}{t('perMonth')}
-                                </span>
-                              </div>
-                            </div>
-                            <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-uzum-primary dark:group-hover:text-purple-300 group-hover:translate-x-0.5 transition-all shrink-0" />
-                          </div>
-                        ))}
-
-                        {liveResults.length > 5 && (
-                          <button
-                            onMouseDown={() => handleExecuteSearch()}
-                            className="w-full p-3 bg-gray-50 dark:bg-slate-900 text-center font-bold text-xs text-uzum-primary dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-slate-800 transition-colors flex items-center justify-center gap-1.5"
-                          >
-                            <span>{language === 'ru' ? `Смотреть еще ${liveResults.length - 5} товаров в Каталоге` : language === 'en' ? `View ${liveResults.length - 5} more products in Catalog` : `Yana ${liveResults.length - 5} ta mahsulotni Katalogda ko'rish`}</span>
-                            <ArrowRight className="w-3.5 h-3.5" />
-                          </button>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <div className="p-4 space-y-3">
-                    <div className="flex items-center gap-1.5 text-xs font-bold text-gray-500 dark:text-gray-400">
-                      <TrendingUp className="w-3.5 h-3.5 text-uzum-primary dark:text-purple-400" />
-                      <span>{language === 'ru' ? 'Популярные поисковые запросы:' : language === 'en' ? 'Popular searches:' : 'Ommabop qidiruvlar:'}</span>
-                    </div>
-                    <div className="flex flex-wrap gap-1.5">
-                      {[
-                        'iPhone 16 Pro Max',
-                        'Samsung Galaxy S24 Ultra',
-                        'Dyson Airwrap',
-                        'MacBook Air M3',
-                        'Artel Smart TV',
-                        `0-0-12 ${t('installment')}`,
-                      ].map((term) => (
-                        <button
-                          key={term}
-                          onMouseDown={() => handleExecuteSearch(term)}
-                          className="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-slate-800 hover:bg-purple-100 dark:hover:bg-purple-900/40 hover:text-uzum-primary dark:hover:text-purple-300 text-gray-700 dark:text-gray-300 text-xs font-semibold transition-colors flex items-center gap-1.5"
-                        >
-                          <Search className="w-3 h-3 text-gray-400" />
-                          <span>{term}</span>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </motion.div>
-            )}
-          </AnimatePresence>
+      {/* Central Search Bar (Desktop only: md:block) */}
+      <div ref={searchContainerRef} className="hidden md:block flex-1 max-w-2xl relative mx-2">
+          {renderSearchBar('desktop')}
         </div>
 
         {/* Right Actions (Theme, Language, Profile, Admin Panel, Favorites, Cart) */}
-        <div className="flex items-center gap-1.5 sm:gap-2">
+        <div className="flex items-center gap-1 sm:gap-2 shrink-0">
           {/* City Selector Button (Mobile only) */}
           <motion.button
-            whileHover={{ scale: 1.06 }}
             whileTap={{ scale: 0.94 }}
             onClick={openCityModal}
-            className="flex md:hidden items-center gap-1 p-1.5 sm:px-2 rounded-xl text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-800 text-xs font-bold transition-colors border border-gray-200/60 dark:border-slate-700/60"
+            className="flex md:hidden items-center gap-1 px-1.5 py-1 rounded-xl text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-800 text-[10px] sm:text-xs font-bold transition-colors border border-gray-200/70 dark:border-slate-700/60 shrink-0"
             title="Shaharni tanlash"
           >
             <MapPin className="w-3.5 h-3.5 text-uzum-primary dark:text-purple-400 shrink-0" />
-            <span className="max-w-[65px] truncate text-[11px] font-bold">{selectedCity}</span>
+            <span className="max-w-[42px] sm:max-w-[65px] truncate text-[10px] sm:text-[11px] font-bold">{selectedCity}</span>
           </motion.button>
 
-          {/* Theme Switcher Button (Mobile only, on desktop it is in the top bar) */}
+          {/* Theme Switcher Button (Mobile only) */}
           <motion.button
-            whileHover={{ scale: 1.08 }}
             whileTap={{ scale: 0.92 }}
             onClick={toggleTheme}
-            className="p-2 sm:p-2.5 rounded-2xl text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors md:hidden"
+            className="p-1 sm:p-1.5 rounded-xl text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors md:hidden shrink-0"
             title={theme === 'dark' ? t('themeLight') : t('themeDark')}
           >
             {theme === 'dark' ? (
-              <Sun className="w-4 h-4 sm:w-5 sm:h-5 text-amber-400" />
+              <Sun className="w-3.5 h-3.5 text-amber-400" />
             ) : (
-              <Moon className="w-4 h-4 sm:w-5 sm:h-5 text-gray-700 dark:text-gray-300" />
+              <Moon className="w-3.5 h-3.5 text-gray-700 dark:text-gray-300" />
             )}
           </motion.button>
 
-          {/* Language Selector in Main Header (Mobile only, on desktop it is in the top bar) */}
-          <div className="flex md:hidden items-center bg-gray-100 dark:bg-slate-800 p-0.5 rounded-xl text-[10px] sm:text-xs font-bold">
+          {/* Language Selector in Main Header (Mobile only) */}
+          <div className="flex md:hidden items-center bg-gray-100 dark:bg-slate-800 p-0.5 rounded-xl text-[9px] font-bold shrink-0">
             {(['uz', 'ru', 'en'] as const).map((l) => (
               <button
                 key={l}
                 onClick={() => setLanguage(l)}
-                className={`px-1.5 py-0.5 rounded-lg uppercase transition-all ${
+                className={`px-1 py-0.5 rounded-md uppercase transition-all ${
                   language === l
                     ? 'bg-white dark:bg-slate-700 text-uzum-primary dark:text-purple-300 shadow-xs font-black'
                     : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white'
@@ -877,6 +893,12 @@ export const Header: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Navigation Row 2: Mobile Search Bar (Mobile only) */}
+      <div ref={mobileSearchContainerRef} className="block md:hidden mt-2 relative w-full">
+        {renderSearchBar('mobile')}
+      </div>
+    </div>
 
       {/* Sub-header navigation (Quick Categories) */}
       <div className="border-t border-gray-100 dark:border-slate-800 px-4 py-2 hidden sm:block bg-white dark:bg-[#0F172A] text-xs transition-colors">

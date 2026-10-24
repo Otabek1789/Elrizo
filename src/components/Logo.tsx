@@ -32,13 +32,13 @@ export const Logo: React.FC<LogoProps> = ({
   variant = 'light',
   className = '' 
 }) => {
-  const iconSize = size === 'sm' ? 32 : size === 'lg' ? 48 : size === 'xl' ? 56 : 42;
-  const titleSize = size === 'sm' ? 'text-lg' : size === 'lg' ? 'text-2xl' : size === 'xl' ? 'text-3xl' : 'text-xl md:text-2xl';
+  const iconSize = size === 'sm' ? 28 : size === 'lg' ? 48 : size === 'xl' ? 56 : 38;
+  const titleSize = size === 'sm' ? 'text-base sm:text-lg' : size === 'lg' ? 'text-2xl' : size === 'xl' ? 'text-3xl' : 'text-lg sm:text-xl md:text-2xl';
   const sloganSize = size === 'sm' ? 'text-[9px]' : size === 'lg' ? 'text-[12px]' : size === 'xl' ? 'text-sm' : 'text-[10px] md:text-[11px]';
   const isLight = variant === 'light';
 
   return (
-    <div className={`flex items-center gap-2.5 select-none ${className}`}>
+    <div className={`flex items-center gap-1.5 sm:gap-2.5 select-none ${className}`}>
       {/* Animated Brand Emblem */}
       <motion.div
         whileHover={{ scale: 1.08, rotate: -2 }}
