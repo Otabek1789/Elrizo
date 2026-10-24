@@ -831,6 +831,9 @@ export const useStore = create<StoreState>()(
           } catch (e) {}
         }
         if (state) {
+          if (!state.products || state.products.length === 0) {
+            state.products = PRODUCTS;
+          }
           // Saytdan hali hech kim sotib olmagan: buyurtmalarni tozalaymiz
           if (state.orders && state.orders.some((o: any) => o.contractNumber === 'ELR-592970' || o.contractNumber === 'ELR-PAY-345805' || o.id === 'ord-initial-01')) {
             state.orders = [];
@@ -879,6 +882,7 @@ export const useStore = create<StoreState>()(
         }
       },
       partialize: (state) => ({
+        products: state.products,
         cart: state.cart,
         favorites: state.favorites,
         user: state.user,

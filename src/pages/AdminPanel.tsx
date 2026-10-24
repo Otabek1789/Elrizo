@@ -461,12 +461,42 @@ export const AdminPanel: React.FC = () => {
     });
   };
 
+  useEffect(() => {
+    let isMounted = true;
+    fetchOrdersFromSupabase().then((remoteOrders) => {
+      if (isMounted && remoteOrders && remoteOrders.length > 0) {
+        const localOrders = useStore.getState().orders;
+        const merged = [...remoteOrders];
+        for (const local of localOrders) {
+          if (!merged.some(m => (m.contractNumber && m.contractNumber === local.contractNumber) || m.id === local.id)) {
+            merged.push(local);
+          }
+        }
+        useStore.setState({ orders: merged });
+      }
+    }).catch(err => {
+      console.warn("Auto-syncing orders from Supabase:", err);
+    });
+    return () => { isMounted = false; };
+  }, []);
+
   const handleRefreshCache = async () => {
     setIsRefreshingCache(true);
     try {
       const remoteOrders = await fetchOrdersFromSupabase();
-      useStore.setState({ orders: remoteOrders || [] });
-      addToast("Kesh va Supabase sinxronizatsiyasi yangilandi!", 'success');
+      const localOrders = useStore.getState().orders;
+      if (remoteOrders && remoteOrders.length > 0) {
+        const merged = [...remoteOrders];
+        for (const local of localOrders) {
+          if (!merged.some(m => (m.contractNumber && m.contractNumber === local.contractNumber) || m.id === local.id)) {
+            merged.push(local);
+          }
+        }
+        useStore.setState({ orders: merged });
+        addToast(`${merged.length} ta ariza (LocalStorage + Cloud) muvaffaqiyatli sinxronlashtirildi!`, 'success');
+      } else {
+        addToast(`LocalStorage dagi ${localOrders.length} ta ariza saqlandi`, 'info');
+      }
     } catch {
       addToast("Sinxronizatsiyada xatolik", 'error');
     } finally {
@@ -2816,20 +2846,25 @@ export const AdminPanel: React.FC = () => {
 
                   <motion.div 
                     whileHover={{ scale: 1.01 }}
-                    className="p-4 bg-gray-50 dark:bg-slate-900 rounded-2xl border border-gray-200 dark:border-slate-700 flex justify-between items-center"
+                    className="p-4 bg-gray-50 dark:bg-slate-900 rounded-2xl border border-gray-200 dark:border-slate-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3"
                   >
                     <div>
-                      <div className="font-bold text-gray-900 dark:text-white">LocalStorage Kesh</div>
-                      <div className="text-gray-500 dark:text-slate-400 text-[11px]">{language === 'ru' ? 'База данных Offline-First' : language === 'en' ? 'Offline-First database cache' : "Offline-First ma'lumotlar bazasi"}</div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-gray-900 dark:text-white">LocalStorage Kesh (elrizo_store_v3)</span>
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300">Faol</span>
+                      </div>
+                      <div className="text-gray-500 dark:text-slate-400 text-xs mt-0.5">
+                        Brauzerda saqlangan: <strong className="text-purple-600 dark:text-purple-400">{products.length}</strong> ta tovar, <strong className="text-purple-600 dark:text-purple-400">{orders.length}</strong> ta ariza, <strong className="text-purple-600 dark:text-purple-400">{promoCodes.length}</strong> ta promokod.
+                      </div>
                     </div>
                     <motion.button
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                       onClick={handleRefreshCache}
-                      className="px-3.5 py-1.5 bg-gray-200 dark:bg-slate-700 hover:bg-gray-300 dark:hover:bg-slate-600 rounded-xl text-gray-800 dark:text-white font-bold transition-colors flex items-center gap-1.5 shadow-xs"
+                      className="px-3.5 py-1.5 bg-uzum-primary hover:bg-[#520080] text-white rounded-xl font-bold transition-all flex items-center gap-1.5 shadow-sm text-xs cursor-pointer"
                     >
                       <RefreshCw className={`w-3.5 h-3.5 ${isRefreshingCache ? 'animate-spin' : ''}`} />
-                      <span>{language === 'ru' ? 'Обновить' : language === 'en' ? 'Refresh' : 'Yangilash'}</span>
+                      <span>{language === 'ru' ? 'Синхронизировать' : language === 'en' ? 'Synchronize' : 'Sinxronlash'}</span>
                     </motion.button>
                   </motion.div>
                 </div>
