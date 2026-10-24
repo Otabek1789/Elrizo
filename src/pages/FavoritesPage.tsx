@@ -38,12 +38,12 @@ export const FavoritesPage: React.FC = () => {
           <p className="text-xs text-gray-500 dark:text-gray-400">
             {t('favoritesEmptyDesc')}
           </p>
-          <button
-            onClick={() => navigate('/')}
-            className="mt-2 px-6 py-2.5 bg-uzum-primary text-white font-bold text-xs rounded-xl hover:bg-uzum-hover transition-colors shadow-sm"
+          <Link
+            to="/"
+            className="mt-2 inline-block px-6 py-2.5 bg-uzum-primary text-white font-bold text-xs rounded-xl hover:bg-uzum-hover transition-colors shadow-sm no-underline"
           >
             {t('exploreProducts')}
-          </button>
+          </Link>
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">

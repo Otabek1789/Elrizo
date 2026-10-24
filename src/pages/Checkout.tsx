@@ -41,7 +41,6 @@ export const Checkout: React.FC = () => {
     getCartTotal,
     getCartMonthlyTotal,
     clearCart,
-    setActivePage,
     addToast,
     addOrder,
     appliedPromoCode,

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Heart, Star, ShoppingBag, Calculator, Zap, Scale, Send } from 'lucide-react';
 import { Product } from '../types';
@@ -182,12 +182,18 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       <div className="p-3 sm:p-4 flex flex-col flex-1 justify-between gap-2.5 sm:gap-3">
         <div>
           {/* Title */}
-          <h3 
-            className="text-xs sm:text-sm font-semibold text-gray-800 dark:text-gray-100 line-clamp-2 leading-snug group-hover:text-uzum-primary dark:group-hover:text-purple-400 transition-colors"
-            title={product.title}
+          <Link
+            to={`/product/${product.id}`}
+            onClick={(e) => e.stopPropagation()}
+            className="block group-hover:text-uzum-primary dark:group-hover:text-purple-400 transition-colors no-underline"
           >
-            {product.title}
-          </h3>
+            <h3 
+              className="text-xs sm:text-sm font-semibold text-gray-800 dark:text-gray-100 line-clamp-2 leading-snug"
+              title={product.title}
+            >
+              {product.title}
+            </h3>
+          </Link>
 
           {/* Rating & Reviews */}
           <div className="flex items-center gap-1.5 mt-1.5">

@@ -189,12 +189,13 @@ export const ProductDetail: React.FC = () => {
           {t('home')}
         </Link>
         <ChevronRight className="w-3.5 h-3.5 shrink-0 text-gray-400 dark:text-slate-600" />
-        <button
+        <Link
+          to={`/catalog?category=${product.categoryId}`}
           onClick={() => navigateToCategory(product.categoryId)}
-          className="hover:text-uzum-primary dark:hover:text-purple-400 transition-colors shrink-0"
+          className="hover:text-uzum-primary dark:hover:text-purple-400 transition-colors shrink-0 no-underline"
         >
           {getCategoryTitle(product.categoryId, language)}
-        </button>
+        </Link>
         <ChevronRight className="w-3.5 h-3.5 shrink-0 text-gray-400 dark:text-slate-600" />
         <span className="text-gray-900 dark:text-white font-medium truncate max-w-xs">{product.title}</span>
       </nav>

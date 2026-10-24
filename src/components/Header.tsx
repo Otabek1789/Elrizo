@@ -152,7 +152,7 @@ export const Header: React.FC = () => {
     setLocalSearch(q);
     setSearchQuery(q);
     setIsSearchFocused(false);
-    navigate('/catalog');
+    navigate(q.trim() ? `/catalog?search=${encodeURIComponent(q.trim())}` : '/catalog');
   };
 
   const handleSelectProduct = (productId: string) => {
@@ -179,7 +179,7 @@ export const Header: React.FC = () => {
 
   const handleCategoryClick = (categorySlug: string) => {
     navigateToCategory(categorySlug);
-    navigate('/catalog');
+    navigate(`/catalog?category=${encodeURIComponent(categorySlug)}`);
     setIsCatalogOpen(false);
   };
 
@@ -916,30 +916,34 @@ export const Header: React.FC = () => {
               <Sparkles className="w-3.5 h-3.5 text-uzum-primary dark:text-purple-400" />
               {t('allPromotions')}
             </Link>
-            <button
+            <Link
+              to="/catalog?category=smartphones"
               onClick={() => handleCategoryClick('smartphones')}
-              className="text-gray-700 dark:text-white hover:text-uzum-primary dark:hover:text-purple-300 font-medium transition-colors"
+              className="text-gray-700 dark:text-white hover:text-uzum-primary dark:hover:text-purple-300 font-medium transition-colors no-underline"
             >
               {t('smartphonesNav')}
-            </button>
-            <button
+            </Link>
+            <Link
+              to="/catalog?category=appliances"
               onClick={() => handleCategoryClick('appliances')}
-              className="text-gray-700 dark:text-white hover:text-uzum-primary dark:hover:text-purple-300 font-medium transition-colors"
+              className="text-gray-700 dark:text-white hover:text-uzum-primary dark:hover:text-purple-300 font-medium transition-colors no-underline"
             >
               {t('appliancesNav')}
-            </button>
-            <button
+            </Link>
+            <Link
+              to="/catalog?category=computers"
               onClick={() => handleCategoryClick('computers')}
-              className="text-gray-700 dark:text-white hover:text-uzum-primary dark:hover:text-purple-300 font-medium transition-colors"
+              className="text-gray-700 dark:text-white hover:text-uzum-primary dark:hover:text-purple-300 font-medium transition-colors no-underline"
             >
               {t('laptopsNav')}
-            </button>
-            <button
+            </Link>
+            <Link
+              to="/catalog?category=beauty"
               onClick={() => handleCategoryClick('beauty')}
-              className="text-gray-700 dark:text-white hover:text-uzum-primary dark:hover:text-purple-300 font-medium transition-colors"
+              className="text-gray-700 dark:text-white hover:text-uzum-primary dark:hover:text-purple-300 font-medium transition-colors no-underline"
             >
               {t('beautyNav')}
-            </button>
+            </Link>
           </div>
 
           <div className="text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/50 px-2.5 py-1 rounded-full font-bold shrink-0 text-[11px] flex items-center gap-1.5 shadow-sm border border-emerald-200/40 dark:border-emerald-900/40">

@@ -139,12 +139,12 @@ export const ProfilePage: React.FC = () => {
             ? 'To view and edit your profile, please log in to your account' 
             : 'Profilingizni ko\'rish va tahrirlash uchun avval shaxsiy kabinetingizga kiring'}
         </p>
-        <button
-          onClick={() => navigate('/login')}
-          className="px-6 py-3 rounded-2xl bg-uzum-primary hover:bg-[#520080] text-white font-extrabold text-sm shadow-lg shadow-purple-500/25 transition-all"
+        <Link
+          to="/login"
+          className="px-6 py-3 rounded-2xl bg-uzum-primary hover:bg-[#520080] text-white font-extrabold text-sm shadow-lg shadow-purple-500/25 transition-all no-underline inline-block"
         >
           {language === 'ru' ? 'Войти в аккаунт' : language === 'en' ? 'Sign In' : 'Tizimga kirish'}
-        </button>
+        </Link>
       </div>
     );
   }

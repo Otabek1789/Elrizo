@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, Sparkles, ArrowRight } from 'lucide-react';
 import { PROMO_BANNERS } from '../data/mockData';
 import { useStore } from '../store/useStore';
@@ -60,17 +60,17 @@ export const BannerSlider: React.FC = () => {
             {localizedBanner.subtitle}
           </p>
 
-          <button 
-            type="button"
+          <Link 
+            to={`/catalog?category=${(banner.targetCategory || 'smartphones').replace('cat-', '')}`}
             onClick={(e) => {
               e.stopPropagation();
               handleBannerAction(banner.targetCategory);
             }}
-            className="mt-2 px-5 py-2.5 sm:px-6 sm:py-3 rounded-xl bg-white text-gray-900 font-extrabold text-xs sm:text-sm hover:bg-yellow-300 hover:text-gray-900 transition-all shadow-lg active:scale-95 flex items-center gap-1.5 w-fit cursor-pointer"
+            className="mt-2 px-5 py-2.5 sm:px-6 sm:py-3 rounded-xl bg-white text-gray-900 font-extrabold text-xs sm:text-sm hover:bg-yellow-300 hover:text-gray-900 transition-all shadow-lg active:scale-95 flex items-center gap-1.5 w-fit cursor-pointer no-underline"
           >
             <span>{localizedBanner.ctaText}</span>
             <ArrowRight className="w-4 h-4" />
-          </button>
+          </Link>
         </div>
 
         {/* Right Image */}

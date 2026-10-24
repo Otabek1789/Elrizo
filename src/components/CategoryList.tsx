@@ -1,18 +1,12 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { CATEGORIES } from '../data/mockData';
 import { useStore } from '../store/useStore';
 import { useTranslation, getCategoryTitle } from '../utils/translations';
 
 export const CategoryList: React.FC = () => {
-  const navigate = useNavigate();
   const { selectedCategorySlug, navigateToCategory } = useStore();
   const { t, language } = useTranslation();
-
-  const handleSelect = (slug: string) => {
-    navigateToCategory(slug);
-    navigate(`/catalog?category=${slug}`);
-  };
 
   return (
     <div className="space-y-3">
@@ -21,10 +15,11 @@ export const CategoryList: React.FC = () => {
           const isSelected = selectedCategorySlug === cat.slug;
           const translatedName = getCategoryTitle(cat.slug, language);
           return (
-            <div
+            <Link
               key={cat.id}
-              onClick={() => handleSelect(cat.slug)}
-              className={`group flex flex-col items-center text-center p-3 sm:p-4 rounded-2xl bg-white dark:bg-slate-800 border cursor-pointer transition-all duration-300 ${
+              to={`/catalog?category=${cat.slug}`}
+              onClick={() => navigateToCategory(cat.slug)}
+              className={`group flex flex-col items-center text-center p-3 sm:p-4 rounded-2xl bg-white dark:bg-slate-800 border cursor-pointer transition-all duration-300 no-underline ${
                 isSelected
                   ? 'border-uzum-primary dark:border-purple-500 bg-purple-50/60 dark:bg-purple-950/40 shadow-md ring-2 ring-purple-200 dark:ring-purple-900'
                   : 'border-gray-200/70 dark:border-slate-800/80 hover:border-purple-300 dark:hover:border-purple-500/40 hover:shadow-card-hover'
@@ -45,7 +40,7 @@ export const CategoryList: React.FC = () => {
               <span className="text-[10px] text-gray-400 dark:text-gray-500 mt-1">
                 {cat.itemCount}+ {t('itemsUnit')}
               </span>
-            </div>
+            </Link>
           );
         })}
       </div>

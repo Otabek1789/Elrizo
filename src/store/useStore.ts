@@ -208,7 +208,7 @@ export const useStore = create<StoreState>()(
       },
 
       navigateToCategory: (categorySlug) => {
-        set({ selectedCategorySlug: categorySlug, activePage: 'home' });
+        set({ selectedCategorySlug: categorySlug });
         window.scrollTo(0, 0);
       },
 

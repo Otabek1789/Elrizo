@@ -67,13 +67,30 @@ export const CatalogPage: React.FC = () => {
   } = useStore();
   const { t, language } = useTranslation();
 
-  // URL query parametrlarini sinxronlash
+  // URL query parametrlarini sinxronlash (React Router bilan)
   useEffect(() => {
     const cat = searchParams.get('category');
-    if (cat !== null && cat !== selectedCategorySlug) {
-      navigateToCategory(cat || null);
+    if (cat !== null) {
+      if (cat !== selectedCategorySlug) {
+        navigateToCategory(cat || null);
+      }
+    }
+    const q = searchParams.get('search') ?? searchParams.get('q');
+    if (q !== null && q !== searchQuery) {
+      setSearchQuery(q);
     }
   }, [searchParams]);
+
+  const handleSelectCategory = (slug: string | null) => {
+    navigateToCategory(slug);
+    const params = new URLSearchParams(searchParams);
+    if (slug) {
+      params.set('category', slug);
+    } else {
+      params.delete('category');
+    }
+    setSearchParams(params);
+  };
 
   // Filtr holatlari
   const [sortBy, setSortBy] = useState<SortOption>('popular');
@@ -364,7 +381,7 @@ export const CatalogPage: React.FC = () => {
           {selectedCategorySlug && (
             <span className="inline-flex items-center gap-1.5 bg-purple-100 dark:bg-purple-950/60 text-uzum-primary dark:text-purple-300 font-bold px-2.5 py-1 rounded-lg">
               {t('categoryLabel')} {currentCategory ? getCategoryTitle(currentCategory.slug, language) : selectedCategorySlug}
-              <button onClick={() => navigateToCategory(null)} className="hover:text-black dark:hover:text-white">
+              <button onClick={() => handleSelectCategory(null)} className="hover:text-black dark:hover:text-white">
                 <X className="w-3 h-3" />
               </button>
             </span>
@@ -472,7 +489,7 @@ export const CatalogPage: React.FC = () => {
             </span>
             <div className="space-y-1 max-h-56 overflow-y-auto pr-1">
               <button
-                onClick={() => navigateToCategory(null)}
+                onClick={() => handleSelectCategory(null)}
                 className={`w-full text-left px-3 py-2 rounded-xl text-xs font-semibold transition-all flex items-center justify-between ${
                   selectedCategorySlug === null
                     ? 'bg-purple-100 dark:bg-purple-900/50 text-uzum-primary dark:text-purple-300 font-bold'
@@ -489,7 +506,7 @@ export const CatalogPage: React.FC = () => {
                 return (
                   <button
                     key={c.id}
-                    onClick={() => navigateToCategory(c.slug)}
+                    onClick={() => handleSelectCategory(c.slug)}
                     className={`w-full text-left px-3 py-2 rounded-xl text-xs font-semibold transition-all flex items-center justify-between ${
                       selectedCategorySlug === c.slug
                         ? 'bg-purple-100 dark:bg-purple-900/50 text-uzum-primary dark:text-purple-300 font-bold'
@@ -842,7 +859,7 @@ export const CatalogPage: React.FC = () => {
                   <span className="text-xs font-bold text-gray-700 dark:text-gray-300">{t('allCategories')}:</span>
                   <div className="space-y-1 max-h-36 overflow-y-auto pr-1">
                     <button
-                      onClick={() => navigateToCategory(null)}
+                      onClick={() => handleSelectCategory(null)}
                       className={`w-full text-left px-3 py-1.5 rounded-lg text-xs font-semibold ${
                         selectedCategorySlug === null
                           ? 'bg-purple-100 dark:bg-purple-900/50 text-uzum-primary dark:text-purple-300 font-bold'
@@ -856,7 +873,7 @@ export const CatalogPage: React.FC = () => {
                       return (
                         <button
                           key={c.id}
-                          onClick={() => navigateToCategory(c.slug)}
+                          onClick={() => handleSelectCategory(c.slug)}
                           className={`w-full text-left px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center justify-between ${
                             selectedCategorySlug === c.slug
                               ? 'bg-purple-100 dark:bg-purple-900/50 text-uzum-primary dark:text-purple-300 font-bold'

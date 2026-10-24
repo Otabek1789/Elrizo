@@ -24,8 +24,7 @@ export const AuthModal: React.FC = () => {
     closeAuth, 
     loginWithEmail, 
     logoutUser, 
-    orders,
-    setActivePage 
+    orders
   } = useStore();
   const { t, language } = useTranslation();
 

@@ -1,11 +1,10 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { ShieldCheck, Truck, Headphones, RotateCcw, CreditCard } from 'lucide-react';
 import { LogoIcon } from './Logo';
-import { useStore } from '../store/useStore';
 import { useTranslation } from '../utils/translations';
 
 export const Footer: React.FC = () => {
-  const { setActivePage, navigateToCategory } = useStore();
   const { t } = useTranslation();
 
   return (
@@ -68,30 +67,30 @@ export const Footer: React.FC = () => {
         <div>
           <h4 className="font-bold text-gray-900 dark:text-white mb-3 text-sm">{t('footerAboutTitle')}</h4>
           <ul className="space-y-2">
-            <li><a href="#" className="hover:text-uzum-primary dark:hover:text-purple-300 transition-colors">{t('footerPickupPoints')}</a></li>
-            <li><a href="#" className="hover:text-uzum-primary dark:hover:text-purple-300 transition-colors">{t('footerVacancies')}</a></li>
-            <li><a href="#" className="hover:text-uzum-primary dark:hover:text-purple-300 transition-colors">{t('footerCompanyDetails')}</a></li>
-            <li><a href="#" className="hover:text-uzum-primary dark:hover:text-purple-300 transition-colors">{t('footerPublicOffer')}</a></li>
+            <li><Link to="/catalog" className="hover:text-uzum-primary dark:hover:text-purple-300 transition-colors no-underline">{t('footerPickupPoints')}</Link></li>
+            <li><Link to="/catalog" className="hover:text-uzum-primary dark:hover:text-purple-300 transition-colors no-underline">{t('footerVacancies')}</Link></li>
+            <li><Link to="/catalog" className="hover:text-uzum-primary dark:hover:text-purple-300 transition-colors no-underline">{t('footerCompanyDetails')}</Link></li>
+            <li><Link to="/catalog" className="hover:text-uzum-primary dark:hover:text-purple-300 transition-colors no-underline">{t('footerPublicOffer')}</Link></li>
           </ul>
         </div>
 
         <div>
           <h4 className="font-bold text-gray-900 dark:text-white mb-3 text-sm">{t('footerForUsers')}</h4>
           <ul className="space-y-2">
-            <li><a href="#" className="hover:text-uzum-primary dark:hover:text-purple-300 transition-colors">{t('footerContactUs')}</a></li>
-            <li><a href="#" className="hover:text-uzum-primary dark:hover:text-purple-300 transition-colors">{t('footerFaq')}</a></li>
-            <li><a href="#" className="hover:text-uzum-primary dark:hover:text-purple-300 transition-colors">{t('footerInstallmentRules')}</a></li>
-            <li><a href="#" className="hover:text-uzum-primary dark:hover:text-purple-300 transition-colors">{t('footerScoringRequirements')}</a></li>
+            <li><a href="https://t.me/elrizo_bot" target="_blank" rel="noopener noreferrer" className="hover:text-uzum-primary dark:hover:text-purple-300 transition-colors">{t('footerContactUs')}</a></li>
+            <li><Link to="/catalog" className="hover:text-uzum-primary dark:hover:text-purple-300 transition-colors no-underline">{t('footerFaq')}</Link></li>
+            <li><Link to="/catalog" className="hover:text-uzum-primary dark:hover:text-purple-300 transition-colors no-underline">{t('footerInstallmentRules')}</Link></li>
+            <li><Link to="/catalog" className="hover:text-uzum-primary dark:hover:text-purple-300 transition-colors no-underline">{t('footerScoringRequirements')}</Link></li>
           </ul>
         </div>
 
         <div>
           <h4 className="font-bold text-gray-900 dark:text-white mb-3 text-sm">{t('footerForBusiness')}</h4>
           <ul className="space-y-2">
-            <li><a href="#" className="hover:text-uzum-primary dark:hover:text-purple-300 transition-colors">{t('footerSellOnElrizo')}</a></li>
-            <li><a href="#" className="hover:text-uzum-primary dark:hover:text-purple-300 transition-colors">{t('footerSellerCabinet')}</a></li>
-            <li><a href="#" className="hover:text-uzum-primary dark:hover:text-purple-300 transition-colors">{t('footerOpenPickup')}</a></li>
-            <li><a href="#" className="hover:text-uzum-primary dark:hover:text-purple-300 transition-colors">{t('footerPartnership')}</a></li>
+            <li><a href="https://t.me/elrizo_bot" target="_blank" rel="noopener noreferrer" className="hover:text-uzum-primary dark:hover:text-purple-300 transition-colors">{t('footerSellOnElrizo')}</a></li>
+            <li><Link to="/login" className="hover:text-uzum-primary dark:hover:text-purple-300 transition-colors no-underline">{t('footerSellerCabinet')}</Link></li>
+            <li><Link to="/catalog" className="hover:text-uzum-primary dark:hover:text-purple-300 transition-colors no-underline">{t('footerOpenPickup')}</Link></li>
+            <li><a href="https://t.me/elrizo_bot" target="_blank" rel="noopener noreferrer" className="hover:text-uzum-primary dark:hover:text-purple-300 transition-colors">{t('footerPartnership')}</a></li>
           </ul>
         </div>
 

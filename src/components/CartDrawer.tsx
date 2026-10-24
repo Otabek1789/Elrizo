@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { X, Trash2, ShoppingBag, ArrowRight, CreditCard, Tag, Check, Sparkles, Send, RefreshCw } from 'lucide-react';
 import { useStore } from '../store/useStore';
 import { formatPrice, calculateMonthlyPaymentQuick } from '../utils/calculator';
@@ -120,17 +120,29 @@ export const CartDrawer: React.FC = () => {
                     key={item.product.id}
                     className="p-3 bg-gray-50/80 dark:bg-slate-900/80 rounded-2xl border border-gray-100 dark:border-slate-800 flex gap-3 relative group"
                   >
-                    <img
-                      src={item.product.images[0]}
-                      alt={item.product.title}
-                      className="w-16 h-16 object-contain rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 shrink-0 p-1"
-                    />
+                    <Link
+                      to={`/product/${item.product.id}`}
+                      onClick={closeCart}
+                      className="shrink-0"
+                    >
+                      <img
+                        src={item.product.images[0]}
+                        alt={item.product.title}
+                        className="w-16 h-16 object-contain rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-1 hover:scale-105 transition-transform"
+                      />
+                    </Link>
 
                     <div className="flex-1 min-w-0 flex flex-col justify-between">
                       <div className="pr-6">
-                        <h4 className="text-xs font-semibold text-gray-900 dark:text-white line-clamp-2 leading-tight">
-                          {item.product.title}
-                        </h4>
+                        <Link
+                          to={`/product/${item.product.id}`}
+                          onClick={closeCart}
+                          className="hover:text-uzum-primary dark:hover:text-purple-400 transition-colors block"
+                        >
+                          <h4 className="text-xs font-semibold text-gray-900 dark:text-white line-clamp-2 leading-tight">
+                            {item.product.title}
+                          </h4>
+                        </Link>
                         <div className="text-xs font-extrabold text-uzum-primary dark:text-purple-400 mt-1">
                           {formatPrice(item.product.price, true, language)}
                         </div>
