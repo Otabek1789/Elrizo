@@ -703,25 +703,6 @@ export const Header: React.FC = () => {
             </div>
           </motion.button>
 
-          {/* Admin Panel Button (Faqat otabek1789@gmail.com uchun - Akkauntdan oldin) */}
-          {user?.isAdmin && (
-            <motion.button
-              id="admin-panel-btn"
-              whileHover={{ scale: 1.08 }}
-              whileTap={{ scale: 0.92 }}
-              onClick={() => navigate('/admin')}
-              className={`flex items-center gap-1.5 px-3 py-2 rounded-2xl text-xs font-black transition-all shadow-md ${
-                location.pathname.startsWith('/admin')
-                  ? 'bg-amber-500 text-white ring-2 ring-amber-300'
-                  : 'bg-gradient-to-r from-amber-400 via-orange-400 to-amber-500 text-gray-950 hover:shadow-amber-400/50'
-              }`}
-              title={t('adminPanel')}
-            >
-              <Crown className="w-4 h-4 text-amber-950 animate-bounce" />
-              <span className="hidden sm:inline">{t('adminPanel')}</span>
-            </motion.button>
-          )}
-
           {/* User / Profile Dropdown Wrapper (Navbarni eng chetida) */}
           <div className="relative" ref={userMenuRef}>
             <motion.button

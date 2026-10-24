@@ -300,6 +300,16 @@ export const ProfilePage: React.FC = () => {
                 </motion.button>
               )}
 
+              {user.isAdmin && (
+                <Link
+                  to="/admin"
+                  className="w-full sm:w-auto px-4 py-2 rounded-2xl bg-gradient-to-r from-amber-400 via-orange-400 to-amber-500 hover:from-amber-500 hover:to-orange-500 text-slate-950 font-black text-xs flex items-center justify-center gap-1.5 shadow-md shadow-amber-500/20 transition-all no-underline"
+                >
+                  <Crown className="w-3.5 h-3.5 text-slate-950" />
+                  <span>Admin Panel</span>
+                </Link>
+              )}
+
               <button
                 type="button"
                 onClick={openCashbackCardModal}
