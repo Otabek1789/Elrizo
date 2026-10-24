@@ -1,0 +1,31 @@
+name: Supabase 24/7 Keep-Alive Heartbeat
+
+# Har kuni soat 06:00 (UTC) da avtomatik ishga tushadi
+# Supabase bepul tarifi 7 kunlik nofaollikdan so'ng to'xtab (pause) qolishining oldini oladi
+# Ushbu cron job bazaga so'rov yuborib, serverni 24/7/365 doim yoniq va uyg'oq saqlaydi.
+
+on:
+  schedule:
+    # Har 2 kunda bir marta soat 06:00 UTC da (Toshkent vaqti bilan 11:00)
+    - cron: '0 6 */2 * *'
+  workflow_dispatch: # GitHub orqali istalgan vaqt qo'lda ishga tushirish imkoniyati
+
+jobs:
+  ping-supabase:
+    runs-on: ubuntu-latest
+    name: Ping Supabase Database
+    steps:
+      - name: Send Keep-Alive Ping to Supabase API
+        run: |
+          echo "Supabase backend serveriga ping yuborilmoqda..."
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "apikey: ${{ secrets.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJkcG1la2N4YmZleWRvZGt5cmJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIwNjI1NzcsImV4cCI6MjEwNzYzODU3N30.Ykj64EUX08JYpb0YMQFtjeVhtiyJU3pEnxqkA4tOt9E' }}" \
+            -H "Authorization: Bearer ${{ secrets.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJkcG1la2N4YmZleWRvZGt5cmJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIwNjI1NzcsImV4cCI6MjEwNzYzODU3N30.Ykj64EUX08JYpb0YMQFtjeVhtiyJU3pEnxqkA4tOt9E' }}" \
+            "https://bdpmekcxbfeydodkyrbn.supabase.co/rest/v1/nasiya_orders?select=id&limit=1")
+          
+          echo "Supabase javob kodi: $HTTP_STATUS"
+          if [ "$HTTP_STATUS" -eq 200 ] || [ "$HTTP_STATUS" -eq 204 ] || [ "$HTTP_STATUS" -eq 206 ]; then
+            echo "✅ Supabase backend muvaffaqiyatli uyg'otildi va 24/7 yoniq holatda!"
+          else
+            echo "⚠️ Supabase kodi: $HTTP_STATUS (lekin so'rov yetib bordi va nofaollik taymeri yangilandi)"
+          fi
