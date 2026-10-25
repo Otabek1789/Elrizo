@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import { Product } from '../types';
+import { Product, User, Review, CashbackTransaction, Order, PromoCode, Category } from '../types';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://bdpmekcxbfeydodkyrbn.supabase.co';
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJkcG1la2N4YmZleWRvZGt5cmJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIwNjI1NzcsImV4cCI6MjEwNzYzODU3N30.Ykj64EUX08JYpb0YMQFtjeVhtiyJU3pEnxqkA4tOt9E';
@@ -67,7 +67,7 @@ export async function authenticateWithSupabase(email: string, password: string):
       }
     }
 
-    // 3. Agar maxsus admin emaili bo'lsa va local rejimda bo'lsa (yoki Supabase Auth cheklovi bo'lsa):
+    // 3. Agar maxsus admin emaili bo'lsa va local rejimda bo'lsa:
     if (isAdmin && password === '7540084@OJr') {
       return {
         success: true,
@@ -86,7 +86,6 @@ export async function authenticateWithSupabase(email: string, password: string):
       error: signInError?.message || "Email yoki parol noto'g'ri",
     };
   } catch (err: any) {
-    // Admin fallback tekshiruvi
     if (isAdminUser(email) && password === '7540084@OJr') {
       return {
         success: true,
@@ -118,59 +117,6 @@ export async function signOutFromSupabase() {
 }
 
 /**
- * Nasiya arizasi yoki buyurtmani Supabase bazasiga saqlash
- */
-export async function saveOrderToSupabase(orderPayload: {
-  contractNumber?: string;
-  customerName: string;
-  pinfl: string;
-  phone: string;
-  city: string;
-  address: string;
-  totalPrice: number;
-  monthlyPayment?: number;
-  paymentMode: string;
-  installmentMonths?: number;
-  items: any[];
-  scoringScore?: number;
-  status: string;
-}) {
-  try {
-    const { data, error } = await supabase
-      .from('nasiya_orders')
-      .insert([
-        {
-          contract_number: orderPayload.contractNumber,
-          customer_name: orderPayload.customerName,
-          pinfl: orderPayload.pinfl,
-          phone: orderPayload.phone,
-          city: orderPayload.city,
-          address: orderPayload.address,
-          total_price: orderPayload.totalPrice,
-          monthly_payment: orderPayload.monthlyPayment,
-          payment_mode: orderPayload.paymentMode,
-          installment_months: orderPayload.installmentMonths,
-          items: orderPayload.items,
-          scoring_score: orderPayload.scoringScore,
-          status: orderPayload.status,
-          created_at: new Date().toISOString(),
-        },
-      ])
-      .select();
-
-    if (error) {
-      console.warn('Supabase nasiya_orders ga yozishda jadval topilmadi yoki cheklov bor, lokal saqlandi:', error.message);
-      return { success: false, error: error.message };
-    }
-
-    return { success: true, data };
-  } catch (err: any) {
-    console.warn('Supabase bilan ulanishda xatolik (Lokal saqlash davom etadi):', err.message);
-    return { success: false, error: err.message };
-  }
-}
-
-/**
  * Supabase ulanishini tekshirish
  */
 export async function checkSupabaseConnection(): Promise<boolean> {
@@ -185,10 +131,69 @@ export async function checkSupabaseConnection(): Promise<boolean> {
   }
 }
 
-/**
- * Supabase dan real arizalar/buyurtmalarni olish
- */
-export async function fetchOrdersFromSupabase(): Promise<any[]> {
+// ==============================================================================
+// 1. ORDERS / BUYURTMALAR (nasiya_orders)
+// ==============================================================================
+
+export async function saveOrderToSupabase(orderPayload: {
+  contractNumber?: string;
+  customerName: string;
+  pinfl?: string;
+  phone: string;
+  city?: string;
+  address: string;
+  totalPrice: number;
+  monthlyPayment?: number;
+  paymentMode: string;
+  installmentMonths?: number;
+  items: any[];
+  scoringScore?: number;
+  status: string;
+  promoCode?: string;
+  discountAmount?: number;
+  cashbackEarned?: number;
+  cashbackSpent?: number;
+}) {
+  try {
+    const { data, error } = await supabase
+      .from('nasiya_orders')
+      .upsert([
+        {
+          contract_number: orderPayload.contractNumber,
+          customer_name: orderPayload.customerName,
+          pinfl: orderPayload.pinfl,
+          phone: orderPayload.phone,
+          city: orderPayload.city || 'Toshkent',
+          address: orderPayload.address,
+          total_price: orderPayload.totalPrice,
+          monthly_payment: orderPayload.monthlyPayment,
+          payment_mode: orderPayload.paymentMode,
+          installment_months: orderPayload.installmentMonths,
+          items: orderPayload.items,
+          scoring_score: orderPayload.scoringScore || 750,
+          status: orderPayload.status,
+          promo_code: orderPayload.promoCode,
+          discount_amount: orderPayload.discountAmount || 0,
+          cashback_earned: orderPayload.cashbackEarned || 0,
+          cashback_spent: orderPayload.cashbackSpent || 0,
+          updated_at: new Date().toISOString(),
+        },
+      ], { onConflict: 'contract_number' })
+      .select();
+
+    if (error) {
+      console.warn('Supabase nasiya_orders error:', error.message);
+      return { success: false, error: error.message };
+    }
+
+    return { success: true, data };
+  } catch (err: any) {
+    console.warn('Supabase saveOrder error:', err.message);
+    return { success: false, error: err.message };
+  }
+}
+
+export async function fetchOrdersFromSupabase(): Promise<Order[]> {
   try {
     const { data, error } = await supabase
       .from('nasiya_orders')
@@ -203,7 +208,6 @@ export async function fetchOrdersFromSupabase(): Promise<any[]> {
       customerPhone: d.phone || '',
       pinfl: d.pinfl || '',
       deliveryAddress: d.address || '',
-      city: d.city || 'Toshkent',
       totalPrice: Number(d.total_price) || 0,
       monthlyPayment: Number(d.monthly_payment) || 0,
       installmentMonths: Number(d.installment_months) || 12,
@@ -212,15 +216,44 @@ export async function fetchOrdersFromSupabase(): Promise<any[]> {
       createdAt: d.created_at || new Date().toISOString(),
       paymentMode: d.payment_mode || 'installment',
       items: Array.isArray(d.items) ? d.items : [],
+      appliedPromoCode: d.promo_code,
+      discountAmount: Number(d.discount_amount) || 0,
+      cashbackEarned: Number(d.cashback_earned) || 0,
+      cashbackSpent: Number(d.cashback_spent) || 0,
     }));
   } catch {
     return [];
   }
 }
 
-/**
- * Supabase ma'lumotlarini Product formatiga o'tkazish
- */
+export async function updateOrderStatusInSupabase(contractNumber: string, status: string): Promise<boolean> {
+  try {
+    const { error } = await supabase
+      .from('nasiya_orders')
+      .update({ status, updated_at: new Date().toISOString() })
+      .eq('contract_number', contractNumber);
+    return !error;
+  } catch {
+    return false;
+  }
+}
+
+export async function deleteOrderFromSupabase(contractNumber: string): Promise<boolean> {
+  try {
+    const { error } = await supabase
+      .from('nasiya_orders')
+      .delete()
+      .eq('contract_number', contractNumber);
+    return !error;
+  } catch {
+    return false;
+  }
+}
+
+// ==============================================================================
+// 2. PRODUCTS / TOVARLAR (products)
+// ==============================================================================
+
 export function mapProductFromSupabase(d: any): Product {
   return {
     id: d.id,
@@ -250,9 +283,6 @@ export function mapProductFromSupabase(d: any): Product {
   };
 }
 
-/**
- * Product modelini Supabase jadvali ustunlariga moslashtirish
- */
 export function mapProductToSupabase(p: Product): any {
   return {
     id: p.id,
@@ -282,9 +312,6 @@ export function mapProductToSupabase(p: Product): any {
   };
 }
 
-/**
- * Supabase-dan mahsulotlarni olish
- */
 export async function fetchProductsFromSupabase(): Promise<Product[] | null> {
   try {
     const { data, error } = await supabase
@@ -304,9 +331,6 @@ export async function fetchProductsFromSupabase(): Promise<Product[] | null> {
   }
 }
 
-/**
- * Mahsulotni Supabase-ga qo'shish yoki mavjudini yangilash (upsert)
- */
 export async function saveProductToSupabase(product: Product): Promise<{ success: boolean; error?: string }> {
   try {
     const payload = mapProductToSupabase(product);
@@ -325,9 +349,6 @@ export async function saveProductToSupabase(product: Product): Promise<{ success
   }
 }
 
-/**
- * Mahsulotni Supabase-da tahrirlash / yangilash
- */
 export async function updateProductInSupabase(productId: string, updates: Partial<Product>): Promise<{ success: boolean; error?: string }> {
   try {
     const payload: any = {};
@@ -373,9 +394,6 @@ export async function updateProductInSupabase(productId: string, updates: Partia
   }
 }
 
-/**
- * Mahsulotni Supabase-dan o'chirish
- */
 export async function deleteProductFromSupabase(productId: string): Promise<{ success: boolean; error?: string }> {
   try {
     const { error } = await supabase
@@ -394,9 +412,6 @@ export async function deleteProductFromSupabase(productId: string): Promise<{ su
   }
 }
 
-/**
- * Boshlang'ich mahsulotlarni Supabase bo'sh bo'lganida avtomatik to'ldirish (seed)
- */
 export async function seedInitialProductsToSupabase(products: Product[]): Promise<boolean> {
   try {
     const { data, error } = await supabase.from('products').select('id').limit(1);
@@ -409,4 +424,246 @@ export async function seedInitialProductsToSupabase(products: Product[]): Promis
   } catch {
     return false;
   }
+}
+
+// ==============================================================================
+// 3. USER PROFILES / FOYDALANUVCHILAR (user_profiles)
+// ==============================================================================
+
+export async function fetchUserProfileFromSupabase(email: string): Promise<User | null> {
+  try {
+    const cleanEmail = email.trim().toLowerCase();
+    const { data, error } = await supabase
+      .from('user_profiles')
+      .select('*')
+      .eq('email', cleanEmail)
+      .maybeSingle();
+
+    if (error || !data) return null;
+
+    return {
+      id: data.id,
+      email: data.email,
+      fullName: data.full_name || '',
+      phone: data.phone || '',
+      city: data.city || 'Toshkent',
+      address: data.address || '',
+      passportOrPinfl: data.passport_or_pinfl || '',
+      avatarUrl: data.avatar_url || '',
+      scoringLimit: Number(data.scoring_limit) || 0,
+      usedLimit: Number(data.used_limit) || 0,
+      cashbackBalance: Number(data.cashback_balance) || 0,
+      loyaltyCardNumber: data.loyalty_card_number || '',
+      isAdmin: Boolean(data.is_admin),
+      role: data.role || (data.is_admin ? 'admin' : 'user'),
+      isVerified: true,
+    };
+  } catch {
+    return null;
+  }
+}
+
+export async function saveUserProfileToSupabase(user: User): Promise<{ success: boolean; error?: string }> {
+  try {
+    const cleanEmail = user.email.trim().toLowerCase();
+    const payload = {
+      id: user.id || `usr-${Date.now()}`,
+      email: cleanEmail,
+      full_name: user.fullName,
+      phone: user.phone || '',
+      city: user.city || 'Toshkent',
+      address: user.address || '',
+      passport_or_pinfl: user.passportOrPinfl || '',
+      avatar_url: user.avatarUrl || '',
+      scoring_limit: user.scoringLimit || 0,
+      used_limit: user.usedLimit || 0,
+      cashback_balance: user.cashbackBalance || 0,
+      loyalty_card_number: user.loyaltyCardNumber || '',
+      is_admin: Boolean(user.isAdmin),
+      role: user.role || (user.isAdmin ? 'admin' : 'user'),
+      updated_at: new Date().toISOString(),
+    };
+
+    const { error } = await supabase
+      .from('user_profiles')
+      .upsert(payload, { onConflict: 'email' });
+
+    if (error) {
+      console.warn("Supabase saveUserProfile error:", error.message);
+      return { success: false, error: error.message };
+    }
+    return { success: true };
+  } catch (err: any) {
+    console.warn("Supabase saveUserProfile exception:", err?.message);
+    return { success: false, error: err?.message };
+  }
+}
+
+// ==============================================================================
+// 4. PRODUCT REVIEWS / SHARHLAR (product_reviews)
+// ==============================================================================
+
+export async function fetchReviewsFromSupabase(): Promise<Record<string, Review[]> | null> {
+  try {
+    const { data, error } = await supabase
+      .from('product_reviews')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error || !data) return null;
+
+    const map: Record<string, Review[]> = {};
+    data.forEach((r: any) => {
+      const rev: Review = {
+        id: r.id,
+        productId: r.product_id,
+        userName: r.user_name,
+        rating: Number(r.rating) || 5,
+        comment: r.comment,
+        createdAt: r.created_at,
+        verifiedPurchase: Boolean(r.verified_purchase),
+        likesCount: Number(r.likes_count) || 0,
+      };
+      if (!map[r.product_id]) map[r.product_id] = [];
+      map[r.product_id].push(rev);
+    });
+
+    return map;
+  } catch {
+    return null;
+  }
+}
+
+export async function saveReviewToSupabase(review: Review): Promise<{ success: boolean; error?: string }> {
+  try {
+    const { error } = await supabase
+      .from('product_reviews')
+      .upsert({
+        id: review.id,
+        product_id: review.productId,
+        user_name: review.userName,
+        rating: review.rating,
+        comment: review.comment,
+        verified_purchase: review.verifiedPurchase !== false,
+        likes_count: review.likesCount || 0,
+        created_at: review.createdAt || new Date().toISOString(),
+      }, { onConflict: 'id' });
+
+    if (error) {
+      console.warn("Supabase saveReview error:", error.message);
+      return { success: false, error: error.message };
+    }
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, error: err?.message };
+  }
+}
+
+// ==============================================================================
+// 5. CASHBACK TRANSACTIONS / JAMG'ARMA KARTA (cashback_transactions)
+// ==============================================================================
+
+export async function fetchCashbackTransactionsFromSupabase(userEmail?: string): Promise<CashbackTransaction[] | null> {
+  try {
+    let query = supabase.from('cashback_transactions').select('*').order('created_at', { ascending: false });
+    if (userEmail) {
+      query = query.eq('user_email', userEmail.toLowerCase().trim());
+    }
+    const { data, error } = await query;
+    if (error || !data) return null;
+
+    return data.map((d: any) => ({
+      id: d.id,
+      orderId: d.order_id,
+      type: d.type as 'earned' | 'spent',
+      amount: Number(d.amount) || 0,
+      date: d.created_at,
+      description: d.description,
+    }));
+  } catch {
+    return null;
+  }
+}
+
+export async function saveCashbackTransactionToSupabase(tx: CashbackTransaction, userEmail?: string): Promise<{ success: boolean; error?: string }> {
+  try {
+    const { error } = await supabase
+      .from('cashback_transactions')
+      .upsert({
+        id: tx.id,
+        order_id: tx.orderId || null,
+        user_email: userEmail ? userEmail.toLowerCase().trim() : null,
+        type: tx.type,
+        amount: tx.amount,
+        description: tx.description,
+        created_at: tx.date || new Date().toISOString(),
+      }, { onConflict: 'id' });
+
+    if (error) {
+      console.warn("Supabase saveCashbackTransaction error:", error.message);
+      return { success: false, error: error.message };
+    }
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, error: err?.message };
+  }
+}
+
+// ==============================================================================
+// 6. PROMO CODES (promo_codes)
+// ==============================================================================
+
+export async function fetchPromoCodesFromSupabase(): Promise<PromoCode[] | null> {
+  try {
+    const { data, error } = await supabase
+      .from('promo_codes')
+      .select('*')
+      .eq('is_active', true);
+
+    if (error || !data) return null;
+
+    return data.map((d: any) => ({
+      id: d.id,
+      code: d.code,
+      discountType: d.discount_type,
+      discountValue: Number(d.discount_value),
+      description: d.description,
+      minOrderAmount: Number(d.min_order_amount) || 0,
+      isActive: Boolean(d.is_active),
+      usageCount: Number(d.usage_count) || 0,
+    }));
+  } catch {
+    return null;
+  }
+}
+
+// ==============================================================================
+// 7. REALTIME OBSERVER (Supabase Realtime Live Sync)
+// ==============================================================================
+
+export function setupSupabaseRealtime(handlers: {
+  onOrdersChange?: () => void;
+  onProductsChange?: () => void;
+  onReviewsChange?: () => void;
+  onProfilesChange?: () => void;
+}) {
+  const channel = supabase
+    .channel('elrizo-realtime-channel')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'nasiya_orders' }, () => {
+      handlers.onOrdersChange?.();
+    })
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, () => {
+      handlers.onProductsChange?.();
+    })
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'product_reviews' }, () => {
+      handlers.onReviewsChange?.();
+    })
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'user_profiles' }, () => {
+      handlers.onProfilesChange?.();
+    })
+    .subscribe();
+
+  return () => {
+    supabase.removeChannel(channel);
+  };
 }

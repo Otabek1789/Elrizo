@@ -11,11 +11,21 @@ import {
   signOutFromSupabase, 
   isAdminUser,
   fetchOrdersFromSupabase,
+  updateOrderStatusInSupabase,
+  deleteOrderFromSupabase,
   fetchProductsFromSupabase,
   saveProductToSupabase,
   updateProductInSupabase,
   deleteProductFromSupabase,
-  seedInitialProductsToSupabase
+  seedInitialProductsToSupabase,
+  fetchUserProfileFromSupabase,
+  saveUserProfileToSupabase,
+  fetchReviewsFromSupabase,
+  saveReviewToSupabase,
+  fetchCashbackTransactionsFromSupabase,
+  saveCashbackTransactionToSupabase,
+  fetchPromoCodesFromSupabase,
+  setupSupabaseRealtime
 } from '../lib/supabase';
 import { sendOrderNotificationToTelegram } from '../utils/telegramBot';
 import { Language, Theme, TranslationKey, getTranslation } from '../utils/translations';
@@ -537,7 +547,7 @@ export const useStore = create<StoreState>()(
         }
 
         try {
-          const res = await saveOrderToSupabase({
+          await saveOrderToSupabase({
             contractNumber: order.contractNumber,
             customerName: order.customerName,
             pinfl: order.pinfl || '',
@@ -551,6 +561,10 @@ export const useStore = create<StoreState>()(
             items: order.items,
             scoringScore: order.scoringScore,
             status: order.status,
+            promoCode: order.appliedPromoCode,
+            discountAmount: order.discountAmount,
+            cashbackEarned: order.cashbackEarned,
+            cashbackSpent: order.cashbackSpent,
           });
         } catch (e) {
           console.error("Supabase order sync error:", e);
@@ -558,18 +572,26 @@ export const useStore = create<StoreState>()(
       },
 
       updateOrderStatus: (orderId, newStatus) => {
+        const order = get().orders.find((o) => o.id === orderId);
         set((state) => ({
           orders: state.orders.map((o) =>
             o.id === orderId ? { ...o, status: newStatus } : o
           ),
         }));
+        if (order?.contractNumber) {
+          updateOrderStatusInSupabase(order.contractNumber, newStatus).catch(() => {});
+        }
         get().addToast(`Ariza holati yangilandi: ${newStatus}`, 'info');
       },
 
       deleteOrder: (orderId) => {
+        const order = get().orders.find((o) => o.id === orderId);
         set((state) => ({
           orders: state.orders.filter((o) => o.id !== orderId),
         }));
+        if (order?.contractNumber) {
+          deleteOrderFromSupabase(order.contractNumber).catch(() => {});
+        }
         get().addToast("Ariza o'chirildi", 'info');
       },
 
@@ -589,7 +611,10 @@ export const useStore = create<StoreState>()(
         if (res.success) {
           const isAdmin = res.isAdmin;
 
-          // Foydalanuvchining avval saqlangan profil ma'lumotlarini yuklash
+          // 1. Supabase bulutidan foydalanuvchi profilini yuklash
+          let cloudProfile = await fetchUserProfileFromSupabase(cleanEmail);
+
+          // 2. Agar bulutda hali yo'q bo'lsa, lokal keshdan tekshiramiz
           let savedProfile: Partial<User> | null = null;
           try {
             const raw = localStorage.getItem(`elrizo_user_profile_${cleanEmail}`);
@@ -597,23 +622,34 @@ export const useStore = create<StoreState>()(
           } catch (e) {}
 
           const userObj: User = {
-            id: res.user?.id || `usr-${Date.now()}`,
-            fullName: savedProfile?.fullName || (isAdmin ? "Otabek Jo'rayev" : cleanEmail.split('@')[0]),
+            id: cloudProfile?.id || res.user?.id || `usr-${Date.now()}`,
+            fullName: cloudProfile?.fullName || savedProfile?.fullName || (isAdmin ? "Otabek Jo'rayev" : cleanEmail.split('@')[0]),
             email: cleanEmail,
-            phone: savedProfile?.phone || '+998 90 777 00 00',
-            address: savedProfile?.address || '',
-            city: savedProfile?.city || 'Toshkent',
-            passportOrPinfl: savedProfile?.passportOrPinfl || '',
-            avatarUrl: savedProfile?.avatarUrl || '',
+            phone: cloudProfile?.phone || savedProfile?.phone || '+998 90 777 00 00',
+            address: cloudProfile?.address || savedProfile?.address || '',
+            city: cloudProfile?.city || savedProfile?.city || 'Toshkent',
+            passportOrPinfl: cloudProfile?.passportOrPinfl || savedProfile?.passportOrPinfl || '',
+            avatarUrl: cloudProfile?.avatarUrl || savedProfile?.avatarUrl || '',
             isVerified: true,
-            scoringLimit: 0,
-            usedLimit: 0,
+            scoringLimit: cloudProfile?.scoringLimit || 0,
+            usedLimit: cloudProfile?.usedLimit || 0,
             isAdmin,
             role: isAdmin ? 'admin' : 'user',
-            cashbackBalance: 0,
+            cashbackBalance: cloudProfile?.cashbackBalance || savedProfile?.cashbackBalance || 0,
+            loyaltyCardNumber: cloudProfile?.loyaltyCardNumber || (isAdmin ? 'ELR-777-VIP' : 'ELR-102-GOLD'),
           };
 
           set({ user: userObj, isAuthOpen: false });
+
+          // Supabase-ga profilni darhol saqlash / yangilash
+          saveUserProfileToSupabase(userObj).catch(() => {});
+
+          // Supabase-dan keshbek tranzaksiyalarini yuklash
+          fetchCashbackTransactionsFromSupabase(cleanEmail).then((txs) => {
+            if (txs && txs.length > 0) {
+              set({ cashbackTransactions: txs });
+            }
+          }).catch(() => {});
 
           if (isAdmin) {
             get().addToast(`Xush kelibsiz Administrator Otabek Jo'rayev! Admin panel ochildi`, 'success');
@@ -641,6 +677,11 @@ export const useStore = create<StoreState>()(
         const updatedUser = { ...currentUser, ...updates };
         set({ user: updatedUser });
 
+        // Supabase bulutli bazasiga to'g'ridan-to'g'ri saqlash
+        saveUserProfileToSupabase(updatedUser).catch((e) => {
+          console.warn("Supabase saveUserProfile error:", e);
+        });
+
         // Alohida lokal zaxiraga ham ishonchli saqlash
         try {
           if (updatedUser.email) {
@@ -663,10 +704,67 @@ export const useStore = create<StoreState>()(
         set({ supabaseConnected: isOk });
         if (isOk) {
           try {
+            // 1. Orders
             const remoteOrders = await fetchOrdersFromSupabase();
-            set({ orders: remoteOrders || [] });
+            if (remoteOrders && remoteOrders.length > 0) {
+              set({ orders: remoteOrders });
+            }
+
+            // 2. Reviews
+            const remoteReviews = await fetchReviewsFromSupabase();
+            if (remoteReviews && Object.keys(remoteReviews).length > 0) {
+              set((state) => ({
+                reviews: { ...state.reviews, ...remoteReviews }
+              }));
+            }
+
+            // 3. Promo Codes
+            const remotePromo = await fetchPromoCodesFromSupabase();
+            if (remotePromo && remotePromo.length > 0) {
+              set({ promoCodes: remotePromo });
+            }
+
+            // 4. Agar foydalanuvchi tizimda bo'lsa, profil va keshbekni yangilash
+            const currentUser = get().user;
+            if (currentUser?.email) {
+              const cloudProfile = await fetchUserProfileFromSupabase(currentUser.email);
+              if (cloudProfile) {
+                set({ user: { ...currentUser, ...cloudProfile } });
+              }
+              const cloudTxs = await fetchCashbackTransactionsFromSupabase(currentUser.email);
+              if (cloudTxs && cloudTxs.length > 0) {
+                set({ cashbackTransactions: cloudTxs });
+              }
+            }
+
+            // 5. Supabase Real-time o'rnatish
+            setupSupabaseRealtime({
+              onOrdersChange: async () => {
+                const refreshedOrders = await fetchOrdersFromSupabase();
+                if (refreshedOrders) set({ orders: refreshedOrders });
+              },
+              onProductsChange: async () => {
+                const refreshedProducts = await fetchProductsFromSupabase();
+                if (refreshedProducts && refreshedProducts.length > 0) {
+                  set({ products: refreshedProducts });
+                }
+              },
+              onReviewsChange: async () => {
+                const refreshedReviews = await fetchReviewsFromSupabase();
+                if (refreshedReviews) {
+                  set((state) => ({ reviews: { ...state.reviews, ...refreshedReviews } }));
+                }
+              },
+              onProfilesChange: async () => {
+                const u = get().user;
+                if (u?.email) {
+                  const p = await fetchUserProfileFromSupabase(u.email);
+                  if (p) set({ user: { ...u, ...p } });
+                }
+              }
+            });
           } catch (e) {
-            console.warn("Orders fetch from Supabase:", e);
+            console.warn("Supabase full sync warning:", e);
           }
         }
       },
@@ -732,6 +830,12 @@ export const useStore = create<StoreState>()(
             },
           };
         });
+
+        // Supabase-ga sharhni saqlash
+        saveReviewToSupabase(newRev).catch((e) => {
+          console.warn("Supabase saveReview error:", e);
+        });
+
         get().addToast("Sharhingiz qabul qilindi va chop etildi! Rahmat!", 'success');
       },
 
@@ -772,6 +876,11 @@ export const useStore = create<StoreState>()(
           user: updatedUser,
           cashbackTransactions: [newTx, ...state.cashbackTransactions],
         }));
+
+        // Supabase-ga keshbek harakati va yangilangan balansni saqlash
+        saveCashbackTransactionToSupabase(newTx, currentUser.email).catch(() => {});
+        saveUserProfileToSupabase(updatedUser).catch(() => {});
+
         get().addToast(`Jamg'arma kartangizga +${amount.toLocaleString()} so'm keshbek qo'shildi! 🎁`, 'success');
       },
 
@@ -794,6 +903,11 @@ export const useStore = create<StoreState>()(
           user: updatedUser,
           cashbackTransactions: [newTx, ...state.cashbackTransactions],
         }));
+
+        // Supabase-ga keshbek sarflanishi va yangilangan balansni saqlash
+        saveCashbackTransactionToSupabase(newTx, currentUser.email).catch(() => {});
+        saveUserProfileToSupabase(updatedUser).catch(() => {});
+
         return true;
       },
 
