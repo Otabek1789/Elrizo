@@ -300,162 +300,117 @@
     pointer-events: all;
 }
 
-/* ================= Responsive CSS ================= */
+/* ================= Responsive CSS (< 870px) ================= */
 
 @media (max-width: 870px) {
     .auth-103-container {
-        min-height: 850px;
-        height: 100vh;
+        min-height: 100vh;
+        min-height: 100dvh;
+        height: auto;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        padding: 56px 16px 36px;
+        overflow-x: hidden;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        background: #ffffff;
+    }
+
+    /* Hide the desktop sliding panels completely on mobile */
+    .auth-103-panels-container {
+        display: none !important;
+    }
+
+    /* Hide the 1500px background circle on mobile so it doesn't clip or overlap content */
+    .auth-103-container::before {
+        display: none !important;
+    }
+
+    .auth-103-forms-container {
+        position: relative;
+        width: 100%;
+        max-width: 420px;
+        height: auto;
+        top: auto;
+        left: auto;
+        margin: 0 auto;
     }
 
     .auth-103-signin-signup {
+        position: relative;
         width: 100%;
-        top: 92%;
-        transform: translate(-50%, -100%);
-        transition: 1s 0.8s ease-in-out;
+        top: auto;
+        left: auto;
+        transform: none !important;
+        transition: none;
+        display: block;
+        z-index: 10;
     }
 
-    .auth-103-signin-signup,
-    .auth-103-container.sign-up-mode .auth-103-signin-signup {
-        left: 50%;
-    }
-
-    .auth-103-panels-container {
-        grid-template-columns: 1fr;
-        grid-template-rows: 1fr 2fr 1fr;
-    }
-
-    .auth-103-panel {
-        flex-direction: row;
-        justify-content: space-around;
-        align-items: center;
-        padding: 2rem 8%;
-        grid-column: 1/2;
-    }
-
-    .auth-103-left-panel {
-        grid-row: 1/2;
-    }
-
-    .auth-103-right-panel {
-        grid-row: 3/4;
-    }
-
-    .auth-103-image {
-        width: 180px;
-        transition: transform 0.9s ease-in-out;
-        transition-delay: 0.6s;
-    }
-
-    .auth-103-panel .auth-103-content {
-        padding-right: 8%;
-        transition: transform 0.9s ease-in-out;
-        transition-delay: 0.8s;
-    }
-
-    .auth-103-panel h3 {
-        font-size: 1.3rem;
-    }
-
-    .auth-103-panel p {
-        font-size: 0.8rem;
-        padding: 0.3rem 0 0.8rem;
-    }
-
-    .auth-103-btn {
-        min-width: 170px;
-        width: auto;
-        padding: 0 32px;
-        height: 46px;
-        font-size: 0.8rem;
-    }
-
-    .auth-103-btn.transparent {
-        min-width: 170px;
-        width: auto;
-        padding: 0 32px;
-        height: 44px;
-        font-size: 0.8rem;
-    }
-
-    .auth-103-container::before {
-        width: 1500px;
-        height: 1500px;
-        transform: translateX(-50%);
-        left: 30%;
-        bottom: 68%;
-        right: initial;
-        top: initial;
-        transition: 2s ease-in-out;
-    }
-
-    .auth-103-container.sign-up-mode::before {
-        transform: translate(-50%, 100%);
-        bottom: 32%;
-        right: initial;
-    }
-
-    .auth-103-container.sign-up-mode .auth-103-right-panel .auth-103-image,
-    .auth-103-container.sign-up-mode .auth-103-right-panel .auth-103-content {
-        transform: translateY(0px);
-    }
-
-    .auth-103-container.sign-up-mode .auth-103-left-panel .auth-103-image,
-    .auth-103-container.sign-up-mode .auth-103-left-panel .auth-103-content {
-        transform: translateY(-300px);
-    }
-
-    .auth-103-right-panel .auth-103-image,
-    .auth-103-right-panel .auth-103-content {
-        transform: translateY(300px);
-    }
-
-    .auth-103-container.sign-up-mode .auth-103-signin-signup {
-        top: 8%;
-        transform: translate(-50%, 0);
-    }
-}
-
-@media (max-width: 570px) {
     .auth-103-form {
-        padding: 0 1.25rem;
-    }
-
-    .auth-103-image {
+        padding: 0;
+        width: 100%;
+        overflow: visible;
         display: none;
+        opacity: 0;
+        transition: opacity 0.2s ease;
     }
 
-    .auth-103-panel .auth-103-content {
-        padding: 0.5rem 0.5rem;
-        text-align: center;
+    /* Active form display on mobile */
+    .auth-103-container:not(.sign-up-mode) .auth-103-form.sign-in-form {
+        display: flex;
+        opacity: 1;
+        z-index: 10;
     }
 
-    .auth-103-container::before {
-        bottom: 74%;
-        left: 50%;
-    }
-
-    .auth-103-container.sign-up-mode::before {
-        bottom: 26%;
-        left: 50%;
+    .auth-103-container.sign-up-mode .auth-103-form.sign-up-form {
+        display: flex;
+        opacity: 1;
+        z-index: 10;
     }
 
     .auth-103-title {
-        font-size: 1.8rem;
+        font-size: 1.65rem;
+        text-align: center;
+        line-height: 1.2;
+    }
+
+    .auth-103-input-field {
+        height: 50px;
+        margin: 6px 0;
+        max-width: 100%;
+        border-radius: 16px;
+    }
+
+    .auth-103-input-field input {
+        font-size: 0.9rem;
     }
 
     .auth-103-btn {
-        min-width: 160px;
-        padding: 0 28px;
-        height: 44px;
-        font-size: 0.78rem;
+        width: 100%;
+        max-width: 100%;
+        height: 48px;
+        margin: 12px 0 6px;
+        font-size: 0.85rem;
+        border-radius: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .auth-103-container {
+        padding: 50px 14px 30px;
     }
 
-    .auth-103-btn.transparent {
-        min-width: 160px;
-        padding: 0 28px;
-        height: 42px;
-        font-size: 0.78rem;
+    .auth-103-title {
+        font-size: 1.5rem;
+    }
+
+    .auth-103-input-field {
+        height: 48px;
+        padding: 0 1rem;
     }
 }
 

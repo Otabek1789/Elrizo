@@ -36,7 +36,7 @@ export const CartDrawer: React.FC = () => {
     const res = await sendCartToTelegram(cart, finalTotal, user);
     setIsSendingTg(false);
     if (res.success) {
-      addToast("Savatdagi barcha tovarlar Telegram botga yuborildi! @elrizo_bot ni tekshiring", 'success');
+      addToast(t('telegramSentSuccess'), 'success');
     } else {
       addToast(res.message, 'error');
     }
@@ -313,12 +313,12 @@ export const CartDrawer: React.FC = () => {
                 {isSendingTg ? (
                   <>
                     <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                    <span>Telegram botga yuborilmoqda...</span>
+                    <span>{t('telegramProductSending')}</span>
                   </>
                 ) : (
                   <>
                     <Send className="w-3.5 h-3.5 -rotate-12" />
-                    <span>Savatdagi tovarlarni Telegram botga yuborish</span>
+                    <span>{t('telegramSendCart')}</span>
                   </>
                 )}
               </button>

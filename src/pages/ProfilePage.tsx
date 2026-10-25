@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import { useStore } from '../store/useStore';
 import { formatPrice } from '../utils/calculator';
+import { useTranslation } from '../utils/translations';
 
 // Zamonaviy tayyor avatarlar to'plami
 const PRESET_AVATARS = [
@@ -96,6 +97,7 @@ const compressImage = (file: File): Promise<string> => {
 export const ProfilePage: React.FC = () => {
   const navigate = useNavigate();
   const { user, updateUserProfile, logoutUser, orders, favorites, language, openCashbackCardModal } = useStore();
+  const { t } = useTranslation();
 
   const [activeTab, setActiveTab] = useState<'info' | 'orders' | 'security'>('info');
 
@@ -130,20 +132,16 @@ export const ProfilePage: React.FC = () => {
           <UserIcon className="w-8 h-8" />
         </div>
         <h2 className="text-xl font-black text-gray-900 dark:text-white mb-2">
-          {language === 'ru' ? 'Вы не вошли в систему' : language === 'en' ? 'You are not logged in' : 'Siz tizimga kirmagansiz'}
+          {t('profileNotLoggedIn')}
         </h2>
         <p className="text-sm text-gray-500 dark:text-slate-400 max-w-sm mb-6">
-          {language === 'ru' 
-            ? 'Для просмотра и редактирования профиля войдите в свой аккаунт' 
-            : language === 'en' 
-            ? 'To view and edit your profile, please log in to your account' 
-            : 'Profilingizni ko\'rish va tahrirlash uchun avval shaxsiy kabinetingizga kiring'}
+          {t('profileNotLoggedInDesc')}
         </p>
         <Link
           to="/login"
           className="px-6 py-3 rounded-2xl bg-uzum-primary hover:bg-[#520080] text-white font-extrabold text-sm shadow-lg shadow-purple-500/25 transition-all no-underline inline-block"
         >
-          {language === 'ru' ? 'Войти в аккаунт' : language === 'en' ? 'Sign In' : 'Tizimga kirish'}
+          {t('profileSignInBtn')}
         </Link>
       </div>
     );
@@ -208,11 +206,11 @@ export const ProfilePage: React.FC = () => {
             className="inline-flex items-center gap-1.5 text-xs font-bold text-gray-500 hover:text-uzum-primary dark:text-slate-400 dark:hover:text-purple-300 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span>{language === 'ru' ? 'Главная' : language === 'en' ? 'Home' : 'Bosh sahifa'}</span>
+            <span>{t('profileHome')}</span>
           </Link>
 
           <span className="text-xs font-extrabold text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/60 px-3 py-1 rounded-full border border-purple-200 dark:border-purple-800/40">
-            {language === 'ru' ? 'Личный кабинет' : language === 'en' ? 'My Account' : 'Shaxsiy profil'}
+            {t('profileMyAccount')}
           </span>
         </div>
 
@@ -239,7 +237,7 @@ export const ProfilePage: React.FC = () => {
                 type="button"
                 onClick={() => setShowAvatarModal(true)}
                 className="absolute -bottom-2 -right-2 p-2.5 rounded-2xl bg-uzum-primary hover:bg-[#520080] text-white shadow-lg transition-transform hover:scale-110 flex items-center justify-center cursor-pointer"
-                title={language === 'ru' ? 'Изменить фото' : language === 'en' ? 'Change photo' : 'Rasmni almashtirish'}
+                title={t('profileChangePhoto')}
               >
                 <Camera className="w-4 h-4" />
               </button>
@@ -249,17 +247,17 @@ export const ProfilePage: React.FC = () => {
             <div className="flex-1 text-center sm:text-left space-y-2">
               <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
                 <h1 className="text-xl sm:text-2xl font-black text-gray-900 dark:text-white">
-                  {fullName || "Hurmatli Mijoz"}
+                  {fullName || t('profileDearCustomer')}
                 </h1>
                 {user.isAdmin && (
                   <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-black bg-amber-100 text-amber-900 dark:bg-amber-500/20 dark:text-amber-300 border border-amber-300 dark:border-amber-500/40">
                     <Crown className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
-                    <span>Bosh Administrator</span>
+                    <span>{t('loginAdminRole')}</span>
                   </span>
                 )}
                 <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-emerald-50 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-500/30">
                   <Check className="w-3 h-3 text-emerald-500" />
-                  <span>{language === 'ru' ? 'Верифицирован' : language === 'en' ? 'Verified' : 'Tasdiqlangan hisob'}</span>
+                  <span>{t('profileVerified')}</span>
                 </span>
               </div>
 
@@ -296,7 +294,7 @@ export const ProfilePage: React.FC = () => {
                   className="w-full px-4 py-2.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-black text-xs flex items-center justify-center gap-1.5 shadow-lg shadow-emerald-500/25 transition-all cursor-pointer ring-2 ring-emerald-300"
                 >
                   <Save className="w-3.5 h-3.5" />
-                  <span>Saqlash</span>
+                  <span>{t('profileSaveBtn')}</span>
                 </motion.button>
               )}
 
@@ -316,13 +314,13 @@ export const ProfilePage: React.FC = () => {
                 className="flex-1 sm:flex-none px-4 py-2 rounded-2xl bg-gradient-to-r from-amber-500/10 to-yellow-500/10 hover:bg-amber-500/20 border border-amber-300 dark:border-amber-600/40 text-amber-900 dark:text-amber-200 font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-xs"
               >
                 <CreditCard className="w-4 h-4 text-amber-600 dark:text-amber-400" />
-                <span>Jamg'arma: {formatPrice(user.cashbackBalance ?? 0, true, language)}</span>
+                <span>{t('profileSavingsTitle')}: {formatPrice(user.cashbackBalance ?? 0, true, language)}</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => {
-                  if (window.confirm(language === 'ru' ? 'Выйти из аккаунта?' : language === 'en' ? 'Log out from account?' : 'Akkauntdan chiqishni tasdiqlaysizmi?')) {
+                  if (window.confirm(t('profileLogoutConfirm'))) {
                     logoutUser();
                     navigate('/');
                   }
@@ -330,7 +328,7 @@ export const ProfilePage: React.FC = () => {
                 className="px-4 py-2 rounded-2xl bg-gray-100 hover:bg-rose-50 dark:bg-slate-700/60 dark:hover:bg-rose-950/40 text-gray-700 hover:text-rose-600 dark:text-slate-300 dark:hover:text-rose-400 font-bold text-xs flex items-center justify-center gap-1.5 transition-colors"
               >
                 <LogOut className="w-3.5 h-3.5" />
-                <span>{language === 'ru' ? 'Выйти' : language === 'en' ? 'Sign out' : 'Chiqish'}</span>
+                <span>{t('profileLogout')}</span>
               </button>
             </div>
           </div>
@@ -344,10 +342,10 @@ export const ProfilePage: React.FC = () => {
             </div>
             <div>
               <span className="text-[11px] font-bold text-gray-400 uppercase block">
-                {language === 'ru' ? 'Мои заказы' : language === 'en' ? 'My Orders' : 'Buyurtmalarim'}
+                {t('profileMyOrders')}
               </span>
               <span className="text-lg font-black text-gray-900 dark:text-white">
-                {orders.length} {language === 'ru' ? 'заказов' : language === 'en' ? 'orders' : 'ta'}
+                {orders.length} {t('profileOrdersCount')}
               </span>
             </div>
           </div>
@@ -358,10 +356,10 @@ export const ProfilePage: React.FC = () => {
             </div>
             <div>
               <span className="text-[11px] font-bold text-gray-400 uppercase block">
-                {language === 'ru' ? 'Избранное' : language === 'en' ? 'Favorites' : 'Sevimlilar'}
+                {t('profileFavorites')}
               </span>
               <span className="text-lg font-black text-gray-900 dark:text-white">
-                {favorites.length} {language === 'ru' ? 'товаров' : language === 'en' ? 'items' : 'ta tovar'}
+                {favorites.length} {t('profileFavoritesCount')}
               </span>
             </div>
           </div>
@@ -372,10 +370,10 @@ export const ProfilePage: React.FC = () => {
             </div>
             <div>
               <span className="text-[11px] font-bold text-gray-400 uppercase block">
-                {language === 'ru' ? 'Условия покупки' : language === 'en' ? 'Terms' : 'Xarid sharti'}
+                {t('profilePurchaseTerms')}
               </span>
               <span className="text-sm font-black text-emerald-600 dark:text-emerald-400">
-                0-0-12 Nasiya (Ustamasiz)
+                {t('profileZeroTerms')}
               </span>
             </div>
           </div>
@@ -393,7 +391,7 @@ export const ProfilePage: React.FC = () => {
             }`}
           >
             <UserIcon className="w-4 h-4" />
-            <span>{language === 'ru' ? 'Персональные данные' : language === 'en' ? 'Personal Details' : 'Shaxsiy ma\'lumotlar'}</span>
+            <span>{t('profilePersonalDetails')}</span>
           </button>
 
           <button
@@ -406,7 +404,7 @@ export const ProfilePage: React.FC = () => {
             }`}
           >
             <Package className="w-4 h-4" />
-            <span>{language === 'ru' ? 'История заказов' : language === 'en' ? 'Order History' : 'Buyurtmalar tarixi'} ({orders.length})</span>
+            <span>{t('profileOrderHistory')} ({orders.length})</span>
           </button>
         </div>
 
@@ -423,14 +421,10 @@ export const ProfilePage: React.FC = () => {
             >
               <div>
                 <h3 className="text-base font-black text-gray-900 dark:text-white">
-                  {language === 'ru' ? 'Редактировать данные профиля' : language === 'en' ? 'Edit Profile Information' : 'Profil ma\'lumotlarini tahrirlash'}
+                  {t('profileEditTitle')}
                 </h3>
                 <p className="text-xs text-gray-500 dark:text-slate-400">
-                  {language === 'ru' 
-                    ? 'Эти данные будут использоваться для быстрого оформления заказов на рассрочку' 
-                    : language === 'en' 
-                    ? 'This information will be used for auto-filling your installment orders' 
-                    : 'Ushbu ma\'lumotlar saytda tezkor xarid qilish va nasiya shartnomalarida ishlatiladi'}
+                  {t('profileEditDesc')}
                 </p>
               </div>
 
@@ -439,14 +433,14 @@ export const ProfilePage: React.FC = () => {
                 <div className="space-y-1.5">
                   <label className="text-xs font-bold text-gray-700 dark:text-slate-300 flex items-center gap-1.5">
                     <UserIcon className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
-                    <span>{language === 'ru' ? 'Ф.И.О (Имя и Фамилия)' : language === 'en' ? 'Full Name' : 'To\'liq Ism-Familiya'}</span>
+                    <span>{t('profileFullNameLabel')}</span>
                   </label>
                   <input
                     type="text"
                     required
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
-                    placeholder="Masalan: Otabek Jo'rayev"
+                    placeholder={t('profileFullNamePlaceholder')}
                     className="w-full px-4 py-3 rounded-2xl bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-xs font-semibold text-gray-900 dark:text-white outline-none focus:border-uzum-primary focus:ring-2 focus:ring-purple-200 dark:focus:ring-purple-900 transition-all"
                   />
                 </div>
@@ -455,7 +449,7 @@ export const ProfilePage: React.FC = () => {
                 <div className="space-y-1.5">
                   <label className="text-xs font-bold text-gray-700 dark:text-slate-300 flex items-center gap-1.5">
                     <Phone className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
-                    <span>{language === 'ru' ? 'Номер телефона' : language === 'en' ? 'Phone Number' : 'Telefon raqamingiz'}</span>
+                    <span>{t('profilePhoneLabel')}</span>
                   </label>
                   <input
                     type="tel"
@@ -470,7 +464,7 @@ export const ProfilePage: React.FC = () => {
                 <div className="space-y-1.5">
                   <label className="text-xs font-bold text-gray-700 dark:text-slate-300 flex items-center gap-1.5">
                     <Mail className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
-                    <span>Email {language === 'ru' ? '(Не изменяется)' : language === 'en' ? '(Read-only)' : '(Asosiy hisob)'}</span>
+                    <span>Email {t('profileEmailLabel')}</span>
                   </label>
                   <input
                     type="email"
@@ -484,7 +478,7 @@ export const ProfilePage: React.FC = () => {
                 <div className="space-y-1.5">
                   <label className="text-xs font-bold text-gray-700 dark:text-slate-300 flex items-center gap-1.5">
                     <MapPin className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
-                    <span>{language === 'ru' ? 'Город / Регион' : language === 'en' ? 'City / Region' : 'Shahar / Viloyat'}</span>
+                    <span>{t('profileCityLabel')}</span>
                   </label>
                   <select
                     value={city}
@@ -501,13 +495,13 @@ export const ProfilePage: React.FC = () => {
                 <div className="sm:col-span-2 space-y-1.5">
                   <label className="text-xs font-bold text-gray-700 dark:text-slate-300 flex items-center gap-1.5">
                     <MapPin className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
-                    <span>{language === 'ru' ? 'Адрес доставки' : language === 'en' ? 'Default Delivery Address' : 'Doimiy yetkazib berish manzili'}</span>
+                    <span>{t('profileAddressLabel')}</span>
                   </label>
                   <input
                     type="text"
                     value={address}
                     onChange={(e) => setAddress(e.target.value)}
-                    placeholder="Masalan: Chilonzor tumani, 9-mavze, 24-uy, 15-xonadon"
+                    placeholder={t('profileAddressPlaceholder')}
                     className="w-full px-4 py-3 rounded-2xl bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-xs font-semibold text-gray-900 dark:text-white outline-none focus:border-uzum-primary focus:ring-2 focus:ring-purple-200 dark:focus:ring-purple-900 transition-all"
                   />
                 </div>
@@ -516,14 +510,14 @@ export const ProfilePage: React.FC = () => {
                 <div className="sm:col-span-2 space-y-1.5">
                   <label className="text-xs font-bold text-gray-700 dark:text-slate-300 flex items-center gap-1.5">
                     <Shield className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
-                    <span>JShShIR (PINFL) {language === 'ru' ? '(для быстрой рассрочки)' : language === 'en' ? '(for instant BNPL)' : '(Tezkor Nasiya skoringi uchun)'}</span>
+                    <span>JShShIR (PINFL) {t('profilePinflLabel')}</span>
                   </label>
                   <input
                     type="text"
                     maxLength={14}
                     value={passportOrPinfl}
                     onChange={(e) => setPassportOrPinfl(e.target.value.replace(/\D/g, ''))}
-                    placeholder="14 xonali JShShIR raqamingiz (ixtiyoriy)"
+                    placeholder={t('profilePinflPlaceholder')}
                     className="w-full px-4 py-3 rounded-2xl bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-xs font-mono font-semibold text-gray-900 dark:text-white outline-none focus:border-uzum-primary transition-all"
                   />
                 </div>
@@ -535,12 +529,12 @@ export const ProfilePage: React.FC = () => {
                   {hasUnsavedChanges ? (
                     <span className="text-amber-600 dark:text-amber-400 font-bold flex items-center gap-1.5">
                       <span className="w-2 h-2 rounded-full bg-amber-500 animate-ping" />
-                      <span>{language === 'ru' ? 'Есть несохраненные изменения' : language === 'en' ? 'Unsaved changes pending' : 'Saqlanmagan o\'zgarishlar mavjud'}</span>
+                      <span>{t('profileUnsavedChanges')}</span>
                     </span>
                   ) : (
                     <span className="text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1.5">
                       <Check className="w-3.5 h-3.5" />
-                      <span>{language === 'ru' ? 'Все данные сохранены' : language === 'en' ? 'All data saved' : 'Barcha ma\'lumotlar saqlangan'}</span>
+                      <span>{t('profileAllSaved')}</span>
                     </span>
                   )}
                 </div>
@@ -558,7 +552,7 @@ export const ProfilePage: React.FC = () => {
                   {saveSuccess ? (
                     <>
                       <Check className="w-4 h-4 text-white" />
-                      <span>{language === 'ru' ? 'Успешно сохранено!' : language === 'en' ? 'Successfully saved!' : 'Muvaffaqiyatli saqlandi!'}</span>
+                      <span>{t('profileSaveSuccess')}</span>
                     </>
                   ) : isSaving ? (
                     <>
@@ -567,12 +561,12 @@ export const ProfilePage: React.FC = () => {
                         transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}
                         className="w-4 h-4 border-2 border-white border-t-transparent rounded-full"
                       />
-                      <span>{language === 'ru' ? 'Сохранение...' : language === 'en' ? 'Saving...' : 'Saqlanmoqda...'}</span>
+                      <span>{t('profileSaving')}</span>
                     </>
                   ) : (
                     <>
                       <Save className="w-4 h-4" />
-                      <span>{language === 'ru' ? 'Сохранить изменения' : language === 'en' ? 'Save Changes' : 'O\'zgarishlarni saqlash'}</span>
+                      <span>{t('profileSaveChanges')}</span>
                     </>
                   )}
                 </button>
@@ -591,10 +585,10 @@ export const ProfilePage: React.FC = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="text-base font-black text-gray-900 dark:text-white">
-                    {language === 'ru' ? 'Мои заказы и рассрочки' : language === 'en' ? 'My Orders & Installments' : 'Buyurtmalar va Nasiyalar tarixi'}
+                    {t('profileOrdersTitle')}
                   </h3>
                   <p className="text-xs text-gray-500 dark:text-slate-400">
-                    {language === 'ru' ? 'Все оформленные через сайт договоры' : language === 'en' ? 'All contracts registered through the site' : 'Sayt orqali rasmiylashtirilgan barcha shartnomalar'}
+                    {t('profileOrdersDesc')}
                   </p>
                 </div>
               </div>
@@ -605,20 +599,16 @@ export const ProfilePage: React.FC = () => {
                     <Package className="w-7 h-7" />
                   </div>
                   <h4 className="text-sm font-bold text-gray-900 dark:text-white">
-                    {language === 'ru' ? 'У вас пока нет заказов (0)' : language === 'en' ? 'You have no orders yet (0)' : 'Sizda hali buyurtmalar mavjud emas (0 ta)'}
+                    {t('profileNoOrders')}
                   </h4>
                   <p className="text-xs text-gray-500 dark:text-slate-400 max-w-sm mx-auto">
-                    {language === 'ru' 
-                      ? 'Выберите нужный товар из каталога и оформите его в рассрочку под 0-0-12!' 
-                      : language === 'en' 
-                      ? 'Choose a product from our catalog and get it with 0-0-12 installment!' 
-                      : 'Katalogimizdan o\'zingizga yoqqan mahsulotni tanlang va 0-0-12 sharti bilan nasiyaga oling!'}
+                    {t('profileNoOrdersDesc')}
                   </p>
                   <button
                     onClick={() => navigate('/catalog')}
                     className="mt-2 px-5 py-2.5 rounded-2xl bg-uzum-primary hover:bg-[#520080] text-white font-bold text-xs shadow-md transition-all cursor-pointer"
                   >
-                    {language === 'ru' ? 'Перейти в каталог' : language === 'en' ? 'Browse Catalog' : 'Katalogni ko\'rish'}
+                    {t('profileBrowseCatalog')}
                   </button>
                 </div>
               ) : (
@@ -635,7 +625,7 @@ export const ProfilePage: React.FC = () => {
                           </span>
                         </div>
                         <div className="text-gray-500 dark:text-slate-400">
-                          {new Date(ord.createdAt).toLocaleDateString()} • {ord.installmentMonths || 12} oy muddat
+                          {new Date(ord.createdAt).toLocaleDateString()} • {ord.installmentMonths || 12} {t('monthsUnit')}
                         </div>
                       </div>
 
@@ -644,7 +634,7 @@ export const ProfilePage: React.FC = () => {
                           {formatPrice(ord.totalPrice, true, language)}
                         </span>
                         <span className="text-[11px] text-gray-500 dark:text-slate-400">
-                          {formatPrice(ord.monthlyPayment || Math.round(ord.totalPrice / 12), true, language)} / oy
+                          {formatPrice(ord.monthlyPayment || Math.round(ord.totalPrice / 12), true, language)} {t('profilePerMonth')}
                         </span>
                       </div>
                     </div>
@@ -670,7 +660,7 @@ export const ProfilePage: React.FC = () => {
               <div className="flex items-center justify-between">
                 <h3 className="text-base font-black text-gray-900 dark:text-white flex items-center gap-2">
                   <ImageIcon className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-                  <span>{language === 'ru' ? 'Выберите фото профиля' : language === 'en' ? 'Select Profile Picture' : 'Profil rasmini tanlang'}</span>
+                  <span>{t('profileSelectAvatar')}</span>
                 </h3>
                 <button
                   onClick={() => setShowAvatarModal(false)}
@@ -683,7 +673,7 @@ export const ProfilePage: React.FC = () => {
               {/* Preset avatarlar */}
               <div className="space-y-2">
                 <span className="text-xs font-bold text-gray-600 dark:text-slate-300 block">
-                  {language === 'ru' ? 'Готовые стильные аватары:' : language === 'en' ? 'Preset avatars:' : 'Tayyor avatarlar to\'plami:'}
+                  {t('profilePresetAvatars')}
                 </span>
                 <div className="grid grid-cols-4 gap-3">
                   {PRESET_AVATARS.map((url, idx) => (
@@ -711,7 +701,7 @@ export const ProfilePage: React.FC = () => {
               <div className="pt-2 border-t border-gray-100 dark:border-slate-700 space-y-3">
                 <label className="flex items-center justify-center gap-2 w-full py-3 px-4 rounded-2xl border-2 border-dashed border-gray-300 dark:border-slate-600 hover:border-uzum-primary dark:hover:border-purple-400 text-xs font-bold text-gray-700 dark:text-slate-200 cursor-pointer transition-colors">
                   <Upload className="w-4 h-4 text-purple-600 dark:text-purple-400" />
-                  <span>{language === 'ru' ? 'Загрузить файл с устройства' : language === 'en' ? 'Upload from device' : 'Qurilmangizdan rasm yuklash'}</span>
+                  <span>{t('profileUploadFile')}</span>
                   <input
                     type="file"
                     accept="image/*"
@@ -723,7 +713,7 @@ export const ProfilePage: React.FC = () => {
                 <div className="flex gap-2">
                   <input
                     type="url"
-                    placeholder="Yoki rasm URL manzilini kiriting..."
+                    placeholder={t('profileUrlPlaceholder')}
                     value={customAvatarInput}
                     onChange={(e) => setCustomAvatarInput(e.target.value)}
                     className="flex-1 px-3 py-2 rounded-xl bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-xs text-gray-900 dark:text-white outline-none"

@@ -60,6 +60,32 @@ const getCategoryIcon = (iconName: string) => {
   }
 };
 
+const formatCity = (name: string, lang: string): string => {
+  if (lang === 'ru') {
+    if (name.toLowerCase().includes('toshkent')) return 'Ташкент';
+    if (name.toLowerCase().includes('samarqand')) return 'Самарканд';
+    if (name.toLowerCase().includes('buxoro')) return 'Бухара';
+    if (name.toLowerCase().includes('andijon')) return 'Андижан';
+    if (name.toLowerCase().includes('namangan')) return 'Наманган';
+    if (name.toLowerCase().includes("farg'ona")) return 'Фергана';
+    if (name.toLowerCase().includes('qashqadaryo')) return 'Кашкадарья';
+    if (name.toLowerCase().includes('surxondaryo')) return 'Сурхандарья';
+    if (name.toLowerCase().includes('xorazm')) return 'Хорезм';
+    if (name.toLowerCase().includes('jizzax')) return 'Джизак';
+    if (name.toLowerCase().includes('navoiy')) return 'Навои';
+    if (name.toLowerCase().includes('sirdaryo')) return 'Сырдарья';
+    if (name.toLowerCase().includes("qoraqalpog'iston")) return 'Каракалпакстан';
+  }
+  if (lang === 'en') {
+    if (name.toLowerCase().includes('toshkent')) return 'Tashkent';
+    if (name.toLowerCase().includes('samarqand')) return 'Samarkand';
+    if (name.toLowerCase().includes('buxoro')) return 'Bukhara';
+    if (name.toLowerCase().includes('andijon')) return 'Andijan';
+    if (name.toLowerCase().includes("farg'ona")) return 'Fergana';
+  }
+  return name;
+};
+
 export const Header: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -241,7 +267,7 @@ export const Header: React.FC = () => {
             className={`absolute right-1 sm:right-1.5 bg-uzum-primary hover:bg-uzum-hover text-white ${isMobile ? 'text-[11px] px-2.5 py-1' : 'text-xs px-3 sm:px-3.5 py-1 sm:py-1.5'} font-bold rounded-xl transition-colors shadow-sm flex items-center justify-center gap-1`}
           >
             <Search className="w-3.5 h-3.5 sm:hidden" />
-            <span className="hidden sm:inline">{language === 'ru' ? 'Поиск' : language === 'en' ? 'Search' : 'Qidirish'}</span>
+            <span className="hidden sm:inline">{t('headerSearchBtn')}</span>
           </motion.button>
         </motion.div>
 
@@ -371,42 +397,42 @@ export const Header: React.FC = () => {
     <header className="sticky top-0 z-40 bg-white/95 dark:bg-[#0F172A]/95 backdrop-blur-md border-b border-gray-200 dark:border-slate-800 shadow-sm transition-colors">
       {/* Top utility bar */}
       <div className="bg-gray-50 dark:bg-slate-900 border-b border-gray-100 dark:border-slate-800 text-xs text-gray-500 dark:text-gray-300 py-1.5 px-4 hidden md:block">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-5">
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-3 overflow-x-auto no-scrollbar">
+          <div className="flex items-center gap-3 xl:gap-5 shrink-0 whitespace-nowrap">
             <motion.div 
               whileHover={{ scale: 1.04 }}
               whileTap={{ scale: 0.96 }}
               onClick={openCityModal}
-              className="flex items-center gap-1.5 text-gray-600 dark:text-gray-200 hover:text-uzum-primary dark:hover:text-purple-300 cursor-pointer transition-colors group py-0.5 px-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800"
-              title="Shaharni o'zgartirish"
+              className="flex items-center gap-1.5 text-gray-600 dark:text-gray-200 hover:text-uzum-primary dark:hover:text-purple-300 cursor-pointer transition-colors group py-0.5 px-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 shrink-0 whitespace-nowrap"
+              title={language === 'ru' ? "Изменить город" : language === 'en' ? "Change city" : "Shaharni o'zgartirish"}
             >
-              <MapPin className="w-3.5 h-3.5 text-uzum-primary dark:text-purple-400 group-hover:scale-110 transition-transform" />
-              <span>{t('cityLabel')} <strong className="text-gray-800 dark:text-white underline decoration-dotted decoration-purple-400 underline-offset-2 font-bold">{selectedCity}</strong></span>
+              <MapPin className="w-3.5 h-3.5 text-uzum-primary dark:text-purple-400 group-hover:scale-110 transition-transform shrink-0" />
+              <span>{t('cityLabel')} <strong className="text-gray-800 dark:text-white underline decoration-dotted decoration-purple-400 underline-offset-2 font-bold">{formatCity(selectedCity, language)}</strong></span>
             </motion.div>
-            <div className="flex items-center gap-1.5 text-gray-600 dark:text-gray-200 hover:text-uzum-primary dark:hover:text-white cursor-pointer transition-colors">
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400" />
+            <div className="flex items-center gap-1.5 text-gray-600 dark:text-gray-200 hover:text-uzum-primary dark:hover:text-white cursor-pointer transition-colors shrink-0 whitespace-nowrap">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400 shrink-0" />
               <span>{t('installment')}: <span className="font-semibold text-uzum-primary dark:text-purple-300">{t('scoringNotice')}</span></span>
             </div>
-            <div className="text-gray-600 dark:text-gray-200 hover:text-uzum-primary dark:hover:text-white cursor-pointer transition-colors">
+            <div className="text-gray-600 dark:text-gray-200 hover:text-uzum-primary dark:hover:text-white cursor-pointer transition-colors shrink-0 whitespace-nowrap hidden lg:block">
               {t('freeDelivery')}
             </div>
             <button
               type="button"
               onClick={openOrderTracking}
-              className="flex items-center gap-1.5 text-gray-700 dark:text-gray-200 hover:text-uzum-primary dark:hover:text-purple-300 font-bold cursor-pointer transition-colors bg-purple-50/60 dark:bg-purple-950/40 px-2 py-0.5 rounded-lg border border-purple-200/40 dark:border-purple-900/30"
-              title="Shartnoma yoki buyurtma holatini kuzatish"
+              className="flex items-center gap-1.5 text-gray-700 dark:text-gray-200 hover:text-uzum-primary dark:hover:text-purple-300 font-bold cursor-pointer transition-colors bg-purple-50/60 dark:bg-purple-950/40 px-2 py-0.5 rounded-lg border border-purple-200/40 dark:border-purple-900/30 shrink-0 whitespace-nowrap"
+              title={language === 'ru' ? "Отследить статус заказа" : language === 'en' ? "Track order status" : "Shartnoma yoki buyurtma holatini kuzatish"}
             >
-              <Truck className="w-3.5 h-3.5 text-uzum-primary dark:text-purple-400" />
-              <span>Buyurtmani kuzatish</span>
+              <Truck className="w-3.5 h-3.5 text-uzum-primary dark:text-purple-400 shrink-0" />
+              <span>{t('headerTrackOrder')}</span>
             </button>
-            <div className="hidden lg:flex items-center gap-1 text-[11px] font-bold text-uzum-primary dark:text-purple-300 bg-purple-50/90 dark:bg-purple-950/50 px-2.5 py-0.5 rounded-full border border-purple-200/50 dark:border-purple-900/40">
+            <div className="hidden xl:flex items-center gap-1 text-[11px] font-bold text-uzum-primary dark:text-purple-300 bg-purple-50/90 dark:bg-purple-950/50 px-2.5 py-0.5 rounded-full border border-purple-200/50 dark:border-purple-900/40 shrink-0 whitespace-nowrap">
               <span>«{t('slogan')}»</span>
             </div>
           </div>
           <div className="flex items-center gap-4">
-            <a href="tel:+998712000000" className="flex items-center gap-1 text-gray-600 dark:text-gray-200 hover:text-uzum-primary dark:hover:text-white transition-colors font-medium">
+            <a href="tel:+998943335522" className="flex items-center gap-1 text-gray-600 dark:text-gray-200 hover:text-uzum-primary dark:hover:text-white transition-colors font-medium">
               <PhoneCall className="w-3.5 h-3.5" />
-              <span>+998 71 200 00 00</span>
+              <span>+998 94 333 55 22</span>
             </a>
 
             {/* Language Selector in Top Bar */}
@@ -578,10 +604,10 @@ export const Header: React.FC = () => {
             whileTap={{ scale: 0.94 }}
             onClick={openCityModal}
             className="flex md:hidden items-center gap-1 px-1.5 py-1 rounded-xl text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-800 text-[10px] sm:text-xs font-bold transition-colors border border-gray-200/70 dark:border-slate-700/60 shrink-0"
-            title="Shaharni tanlash"
+            title={language === 'ru' ? "Выбрать город" : language === 'en' ? "Select city" : "Shaharni tanlash"}
           >
             <MapPin className="w-3.5 h-3.5 text-uzum-primary dark:text-purple-400 shrink-0" />
-            <span className="max-w-[42px] sm:max-w-[65px] truncate text-[10px] sm:text-[11px] font-bold">{selectedCity}</span>
+            <span className="max-w-[48px] sm:max-w-[65px] truncate text-[10px] sm:text-[11px] font-bold">{formatCity(selectedCity, language)}</span>
           </motion.button>
 
           {/* Theme Switcher Button (Mobile only) */}
@@ -598,22 +624,33 @@ export const Header: React.FC = () => {
             )}
           </motion.button>
 
-          {/* Language Selector in Main Header (Mobile only) */}
-          <div className="flex md:hidden items-center bg-gray-100 dark:bg-slate-800 p-0.5 rounded-xl text-[9px] font-bold shrink-0">
-            {(['uz', 'ru', 'en'] as const).map((l) => (
-              <button
-                key={l}
-                onClick={() => setLanguage(l)}
-                className={`px-1 py-0.5 rounded-md uppercase transition-all ${
-                  language === l
-                    ? 'bg-white dark:bg-slate-700 text-uzum-primary dark:text-purple-300 shadow-xs font-black'
-                    : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white'
-                }`}
-              >
-                {l}
-              </button>
-            ))}
-          </div>
+          {/* Language Selector in Main Header (Mobile only: Compact cycling badge) */}
+          <button
+            type="button"
+            onClick={() => {
+              const nextLang = language === 'uz' ? 'ru' : language === 'ru' ? 'en' : 'uz';
+              setLanguage(nextLang);
+            }}
+            className="flex md:hidden items-center gap-1 px-2 py-1 rounded-xl bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 text-gray-700 dark:text-gray-200 text-[10px] font-black uppercase transition-all shrink-0 border border-gray-200/60 dark:border-slate-700/60 cursor-pointer"
+            title={language === 'ru' ? "Сменить язык (UZ / RU / EN)" : language === 'en' ? "Change language (UZ / RU / EN)" : "Tilni o'zgartirish (UZ / RU / EN)"}
+          >
+            <Globe className="w-3 h-3 text-uzum-primary dark:text-purple-400" />
+            <span>{language}</span>
+          </button>
+
+          {/* Favorites Heart Icon in Mobile Header */}
+          <Link 
+            to="/favorites" 
+            className="relative p-1.5 rounded-xl text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-slate-800 md:hidden shrink-0 transition-colors" 
+            title={t('favorites')}
+          >
+            <Heart className={`w-4 h-4 ${favorites.length > 0 ? 'fill-rose-500 text-rose-500' : ''}`} />
+            {favorites.length > 0 && (
+              <span className="absolute -top-1 -right-1 min-w-[15px] h-[15px] px-0.5 bg-rose-500 text-white text-[9px] font-black rounded-full flex items-center justify-center shadow-xs">
+                {favorites.length}
+              </span>
+            )}
+          </Link>
 
           {/* Nakapitelniy Karta (Keshbek) Button */}
           <motion.button
@@ -622,7 +659,7 @@ export const Header: React.FC = () => {
             whileTap={{ scale: 0.95 }}
             onClick={openCashbackCardModal}
             className="hidden md:flex relative items-center gap-2 p-2 sm:px-3 sm:py-2 rounded-2xl bg-gradient-to-r from-amber-500/10 via-yellow-500/10 to-amber-500/15 dark:from-amber-500/20 dark:to-yellow-500/20 text-amber-900 dark:text-amber-200 hover:bg-amber-100/80 dark:hover:bg-amber-900/40 border border-amber-300/60 dark:border-amber-600/40 transition-all shadow-xs"
-            title="1% Jamg'arma Keshbek Kartasi"
+            title={language === 'ru' ? "1% Накопительная карта кэшбэка" : language === 'en' ? "1% Savings Cashback Card" : "1% Jamg'arma Keshbek Kartasi"}
           >
             <div className="relative">
               <CreditCard className="w-5 h-5 text-amber-600 dark:text-amber-400" />
@@ -631,7 +668,7 @@ export const Header: React.FC = () => {
               </span>
             </div>
             <div className="hidden xl:flex flex-col text-left">
-              <span className="text-[11px] font-bold leading-none text-amber-950 dark:text-amber-200">Jamg'arma</span>
+              <span className="text-[11px] font-bold leading-none text-amber-950 dark:text-amber-200">{t('headerSavingsCard')}</span>
               <span className="text-[11px] font-black text-amber-600 dark:text-amber-400 mt-0.5">
                 {formatPrice(user?.cashbackBalance ?? 0, true, language)}
               </span>
@@ -645,7 +682,7 @@ export const Header: React.FC = () => {
             whileTap={{ scale: 0.92 }}
             onClick={openComparisonModal}
             className="hidden md:flex relative p-2.5 rounded-2xl transition-colors items-center gap-1 text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-slate-800 hover:text-uzum-primary dark:hover:text-purple-300"
-            title="Tovarlarni taqqoslash"
+            title={language === 'ru' ? "Сравнение товаров" : language === 'en' ? "Product comparison" : "Tovarlarni taqqoslash"}
           >
             <Scale className={`w-5 h-5 ${comparisonList.length > 0 ? 'text-primary-600 dark:text-primary-400' : ''}`} />
             {comparisonList.length > 0 && (
@@ -657,7 +694,7 @@ export const Header: React.FC = () => {
                 {comparisonList.length}
               </motion.span>
             )}
-            <span className="hidden xl:inline text-xs font-bold ml-1 text-gray-700 dark:text-white">Taqqoslash</span>
+            <span className="hidden xl:inline text-xs font-bold ml-1 text-gray-700 dark:text-white">{t('headerComparison')}</span>
           </motion.button>
 
           {/* Favorites */}
@@ -721,62 +758,66 @@ export const Header: React.FC = () => {
 
           {/* User / Profile Dropdown Wrapper (Navbarni eng chetida) */}
           <div className="relative" ref={userMenuRef}>
-            <motion.button
-              id="user-profile-btn"
-              whileHover={{ scale: 1.04 }}
-              whileTap={{ scale: 0.96 }}
-              onClick={() => {
-                if (!user) {
-                  navigate('/login');
-                } else {
-                  setIsUserMenuOpen(!isUserMenuOpen);
-                }
-              }}
-              className="flex items-center gap-2 p-2 sm:px-3 sm:py-2 rounded-2xl text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors text-sm font-medium cursor-pointer"
-            >
-              <div className="relative">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs overflow-hidden shadow-sm ${
-                  user?.isAdmin ? 'bg-amber-100 text-amber-800 border border-amber-300 dark:border-amber-500/50' : 'bg-purple-100 dark:bg-purple-950/60 text-uzum-primary dark:text-purple-300'
-                }`}>
-                  {user ? (
-                    user.avatarUrl ? (
+            {!user ? (
+              /* Kirish tugmasi (Unauthenticated) — Mobil va Desktopda ochiq-oydin "Kirish" yozuvi bilan */
+              <motion.button
+                id="header-user-enter-btn"
+                whileHover={{ scale: 1.04 }}
+                whileTap={{ scale: 0.96 }}
+                onClick={() => navigate('/login')}
+                className="flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl bg-uzum-primary hover:bg-uzum-hover text-white text-xs font-black shadow-sm transition-all shrink-0 cursor-pointer"
+                title={t('enter')}
+              >
+                <UserIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white stroke-[2.5]" />
+                <span className="text-[11px] sm:text-xs font-black">{t('enter')}</span>
+              </motion.button>
+            ) : (
+              /* Foydalanuvchi tizimga kirgan holat */
+              <motion.button
+                id="user-profile-btn"
+                whileHover={{ scale: 1.04 }}
+                whileTap={{ scale: 0.96 }}
+                onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                className="flex items-center gap-1.5 sm:gap-2 p-1.5 sm:px-3 sm:py-2 rounded-2xl text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors text-sm font-medium cursor-pointer"
+              >
+                <div className="relative">
+                  <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center font-bold text-xs overflow-hidden shadow-sm ${
+                    user?.isAdmin ? 'bg-amber-100 text-amber-800 border border-amber-300 dark:border-amber-500/50' : 'bg-purple-100 dark:bg-purple-950/60 text-uzum-primary dark:text-purple-300'
+                  }`}>
+                    {user.avatarUrl ? (
                       <img src={user.avatarUrl} alt={user.fullName} className="w-full h-full object-cover" />
                     ) : user.isAdmin ? (
-                      <Crown className="w-4 h-4 text-amber-600" />
+                      <Crown className="w-3.5 h-3.5 text-amber-600" />
                     ) : (
                       user.fullName.charAt(0)
-                    )
-                  ) : (
-                    <UserIcon className="w-4 h-4 text-uzum-primary" />
+                    )}
+                  </div>
+                  {user?.isAdmin && user?.avatarUrl && (
+                    <span className="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-amber-400 text-amber-950 rounded-full flex items-center justify-center p-0.5 shadow-sm border border-white dark:border-slate-800">
+                      <Crown className="w-2.5 h-2.5" />
+                    </span>
                   )}
                 </div>
-                {user?.isAdmin && user?.avatarUrl && (
-                  <span className="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-amber-400 text-amber-950 rounded-full flex items-center justify-center p-0.5 shadow-sm border border-white dark:border-slate-800">
-                    <Crown className="w-2.5 h-2.5" />
-                  </span>
-                )}
-              </div>
-              <div className="hidden lg:flex flex-col text-left justify-center">
-                <span className="text-xs font-bold text-gray-900 dark:text-white line-clamp-1 flex items-center gap-1">
-                  {user ? user.fullName.split(' ')[0] : t('enter')}
-                  {user && (
+                <div className="hidden lg:flex flex-col text-left justify-center">
+                  <span className="text-xs font-bold text-gray-900 dark:text-white line-clamp-1 flex items-center gap-1">
+                    {user.fullName.split(' ')[0]}
                     <ChevronDown className={`w-3 h-3 text-gray-400 transition-transform ${isUserMenuOpen ? 'rotate-180' : ''}`} />
-                  )}
-                </span>
-                {user && (user.isAdmin || user.scoringLimit > 0) && (
-                  <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1">
-                    {user.isAdmin ? (
-                      <>
-                        <Crown className="w-3 h-3 text-amber-500" />
-                        <span>Admin</span>
-                      </>
-                    ) : (
-                      `${t('nasiyaLimit')} ${Math.round((user.scoringLimit - user.usedLimit) / 1000000)} ${t('mln')}`
-                    )}
                   </span>
-                )}
-              </div>
-            </motion.button>
+                  {(user.isAdmin || user.scoringLimit > 0) && (
+                    <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1">
+                      {user.isAdmin ? (
+                        <>
+                          <Crown className="w-3 h-3 text-amber-500" />
+                          <span>Admin</span>
+                        </>
+                      ) : (
+                        `${t('nasiyaLimit')} ${Math.round((user.scoringLimit - user.usedLimit) / 1000000)} ${t('mln')}`
+                      )}
+                    </span>
+                  )}
+                </div>
+              </motion.button>
+            )}
 
             {/* Dropdown Menu when user is logged in */}
             <AnimatePresence>
@@ -819,8 +860,8 @@ export const Header: React.FC = () => {
                     >
                       <UserIcon className="w-4 h-4 text-purple-600 dark:text-purple-400 group-hover:scale-110 transition-transform" />
                       <div className="text-left flex-1">
-                        <div className="font-extrabold text-gray-900 dark:text-white">Profil</div>
-                        <div className="text-[10px] text-gray-400 font-normal">Ism, rasm va ma'lumotlarni tahrirlash</div>
+                        <div className="font-extrabold text-gray-900 dark:text-white">{t('myProfile')}</div>
+                        <div className="text-[10px] text-gray-400 font-normal">{t('headerUserCardDesc')}</div>
                       </div>
                       <ChevronRight className="w-3.5 h-3.5 text-gray-400 group-hover:translate-x-0.5 transition-transform" />
                     </button>
@@ -835,7 +876,7 @@ export const Header: React.FC = () => {
                       className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-slate-700/60 text-gray-700 dark:text-slate-200 font-bold transition-colors cursor-pointer group"
                     >
                       <Package className="w-4 h-4 text-indigo-500 group-hover:scale-110 transition-transform" />
-                      <span>Buyurtmalarim tarixi</span>
+                      <span>{t('headerUserOrders')}</span>
                     </button>
 
                     {/* Jamg'arma karta */}
@@ -849,7 +890,7 @@ export const Header: React.FC = () => {
                     >
                       <div className="flex items-center gap-2.5">
                         <CreditCard className="w-4 h-4 text-amber-500 group-hover:scale-110 transition-transform" />
-                        <span>Jamg'arma karta</span>
+                        <span>{t('headerUserCard')}</span>
                       </div>
                       <span className="text-[10px] font-black text-amber-600 dark:text-amber-400 bg-amber-100 dark:bg-amber-900/50 px-2 py-0.5 rounded-full">
                         {formatPrice(user.cashbackBalance ?? 0, true, language)}
@@ -884,7 +925,7 @@ export const Header: React.FC = () => {
                       className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-rose-50 dark:hover:bg-rose-950/40 text-rose-600 dark:text-rose-400 font-bold transition-colors cursor-pointer"
                     >
                       <LogOut className="w-4 h-4" />
-                      <span>Tizimdan chiqish</span>
+                      <span>{t('profileLogout')}</span>
                     </button>
                   </div>
                 </motion.div>

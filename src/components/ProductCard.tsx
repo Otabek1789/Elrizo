@@ -56,7 +56,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     const res = await sendProductToTelegram(product, { user });
     setIsSendingTg(false);
     if (res.success) {
-      addToast(`«${product.title}» Telegram botga muvaffaqiyatli yuborildi! @elrizo_bot ni tekshiring`, 'success');
+      addToast(`«${product.title}» ${t('telegramProductSent')}`, 'success');
     } else {
       addToast(res.message, 'error');
     }
@@ -130,7 +130,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                 ? 'bg-primary-600 text-white shadow-md shadow-primary-500/30'
                 : 'bg-white/85 hover:bg-white dark:bg-slate-800/80 dark:hover:bg-slate-700 text-gray-400 dark:text-gray-300 hover:text-primary-600'
             }`}
-            title={isCompared ? "Taqqoslashdan o'chirish" : "Taqqoslashga qo'shish"}
+            title={isCompared ? t('productCompareRemoveTooltip') : t('productCompareAddTooltip')}
           >
             <Scale className="w-4 h-4" />
           </motion.button>
@@ -141,7 +141,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             onClick={handleSendProductToTelegram}
             disabled={isSendingTg}
             className="p-2 rounded-full bg-white/85 hover:bg-sky-50 dark:bg-slate-800/80 dark:hover:bg-sky-950/40 backdrop-blur-md text-sky-500 hover:text-sky-600 transition-colors shadow-sm cursor-pointer"
-            title="Tovarni Telegram botga yuborish (@elrizo_bot)"
+            title={`${t('telegramSendProduct')} (@elrizo_bot)`}
           >
             <Send className={`w-4 h-4 -rotate-12 ${isSendingTg ? 'animate-spin' : ''}`} />
           </motion.button>

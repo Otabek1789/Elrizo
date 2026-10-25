@@ -92,7 +92,7 @@ export const MobileBottomNav: React.FC = () => {
           type="button"
           onClick={openCashbackCardModal}
           className="flex flex-col items-center justify-center py-1 px-1 rounded-xl text-amber-600 dark:text-amber-400 font-bold transition-all group"
-          title="1% Jamg'arma Karta"
+          title={`1% ${t('headerSavingsCard')}`}
         >
           <div className="relative">
             <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-amber-500 to-yellow-400 text-white flex items-center justify-center shadow-md shadow-amber-500/25 group-active:scale-95 transition-transform">
@@ -103,39 +103,11 @@ export const MobileBottomNav: React.FC = () => {
             </span>
           </div>
           <span className="text-[9px] mt-0.5 font-black text-amber-700 dark:text-amber-300 truncate">
-            Jamg'arma
+            {t('headerSavingsCard')}
           </span>
         </button>
 
-        {/* 4. Sevimlilar (Favorites) */}
-        <Link
-          to="/favorites"
-          className={`flex flex-col items-center justify-center py-1 px-1 rounded-xl transition-all ${
-            currentPath === '/favorites' 
-              ? 'text-uzum-primary dark:text-purple-400 font-extrabold' 
-              : 'text-gray-500 dark:text-gray-400 font-medium hover:text-gray-900 dark:hover:text-white'
-          }`}
-        >
-          <div className="relative">
-            <Heart className={`w-5 h-5 ${currentPath === '/favorites' ? 'fill-uzum-primary dark:fill-purple-400 stroke-uzum-primary dark:stroke-purple-400' : 'stroke-2'}`} />
-            {favoritesCount > 0 && (
-              <span className="absolute -top-1.5 -right-2 min-w-[15px] h-[15px] px-0.5 bg-rose-500 text-white text-[9px] font-black rounded-full flex items-center justify-center shadow-xs">
-                {favoritesCount}
-              </span>
-            )}
-            {currentPath === '/favorites' && (
-              <motion.div 
-                layoutId="bottomNavIndicator"
-                className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-uzum-primary dark:bg-purple-400"
-              />
-            )}
-          </div>
-          <span className="text-[10px] mt-1 tracking-tight truncate">
-            {t('favorites')}
-          </span>
-        </Link>
-
-        {/* 5. Savat (Cart) */}
+        {/* 4. Savat (Cart) */}
         <button
           type="button"
           onClick={openCart}
@@ -153,6 +125,33 @@ export const MobileBottomNav: React.FC = () => {
             {cartTotal > 0 ? formatPrice(cartTotal, false, language) : t('cart')}
           </span>
         </button>
+
+        {/* 5. Kirish / Profil (User / Login Tab) */}
+        <Link
+          to={user ? (user.isAdmin ? '/admin' : '/profile') : '/login'}
+          className={`flex flex-col items-center justify-center py-1 px-1 rounded-xl transition-all ${
+            currentPath === '/login' || currentPath === '/auth' || currentPath === '/profile' || currentPath.startsWith('/admin')
+              ? 'text-uzum-primary dark:text-purple-400 font-extrabold' 
+              : 'text-gray-500 dark:text-gray-400 font-medium hover:text-gray-900 dark:hover:text-white'
+          }`}
+          title={user ? t('myProfile') : t('enter')}
+        >
+          <div className="relative">
+            <UserIcon className={`w-5 h-5 ${(currentPath === '/login' || currentPath === '/profile' || currentPath.startsWith('/admin')) ? 'stroke-[2.5]' : 'stroke-2'}`} />
+            {(currentPath === '/login' || currentPath === '/profile' || currentPath.startsWith('/admin')) && (
+              <motion.div 
+                layoutId="bottomNavIndicator"
+                className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-uzum-primary dark:bg-purple-400"
+              />
+            )}
+            {!user && (
+              <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-uzum-primary dark:bg-purple-400 animate-pulse" />
+            )}
+          </div>
+          <span className={`text-[10px] mt-1 tracking-tight truncate font-bold ${!user ? 'text-uzum-primary dark:text-purple-300' : ''}`}>
+            {user ? t('myProfile') : t('enter')}
+          </span>
+        </Link>
       </div>
     </nav>
   );

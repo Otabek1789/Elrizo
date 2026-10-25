@@ -151,7 +151,7 @@ export const ProductDetail: React.FC = () => {
     setIsSendingToTelegram(false);
 
     if (res.success) {
-      addToast(`«${product.title}» Telegram botga muvaffaqiyatli yuborildi! @elrizo_bot ni tekshiring`, 'success');
+      addToast(`«${product.title}» ${t('telegramProductSent')}`, 'success');
     } else {
       addToast(res.message, 'error');
     }
@@ -261,7 +261,10 @@ export const ProductDetail: React.FC = () => {
                     ? 'bg-primary-600 text-white border-primary-600 ring-2 ring-primary-300'
                     : 'bg-white/90 dark:bg-slate-700/90 hover:bg-white text-gray-500 hover:text-primary-600 dark:text-slate-300 dark:hover:text-primary-400 border-gray-200/60 dark:border-slate-700'
                 }`}
-                title={isCompared ? "Taqqoslashdan o'chirish" : "Taqqoslashga qo'shish"}
+                title={isCompared 
+                  ? (language === 'ru' ? "Удалить из сравнения" : language === 'en' ? "Remove from comparison" : "Taqqoslashdan o'chirish") 
+                  : (language === 'ru' ? "Добавить к сравнению" : language === 'en' ? "Add to comparison" : "Taqqoslashga qo'shish")
+                }
               >
                 <Scale className="w-4 h-4" />
               </button>
@@ -321,7 +324,7 @@ export const ProductDetail: React.FC = () => {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 text-xs font-bold text-slate-700 dark:text-slate-300">
                 <Palette className="w-4 h-4 text-primary-500" />
-                <span>Rangni tanlang:</span>
+                <span>{t('productSelectColor')}</span>
               </div>
               <span className="text-xs font-semibold text-primary-600 dark:text-primary-400">
                 {selectedColor.name}
@@ -363,7 +366,7 @@ export const ProductDetail: React.FC = () => {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 text-xs font-bold text-slate-700 dark:text-slate-300">
                 <HardDrive className="w-4 h-4 text-indigo-500" />
-                <span>Xotira hajmi:</span>
+                <span>{t('productStorageSize')}</span>
               </div>
               <span className="text-xs font-semibold text-indigo-600 dark:text-indigo-400">
                 {selectedStorage.size}
@@ -386,7 +389,7 @@ export const ProductDetail: React.FC = () => {
                   >
                     <div className="text-sm font-bold">{opt.size}</div>
                     <div className="text-[10px] text-slate-400 mt-0.5">
-                      {(opt.priceOffset || 0) === 0 ? "Boshlang'ich" : `+${((opt.priceOffset || 0) / 1000000).toFixed(1)} mln`}
+                      {(opt.priceOffset || 0) === 0 ? t('productBaselineStorage') : `+${((opt.priceOffset || 0) / 1000000).toFixed(1)} ${t('mln')}`}
                     </div>
                   </button>
                 );
@@ -463,15 +466,15 @@ export const ProductDetail: React.FC = () => {
                 </div>
                 <div>
                   <div className="font-bold text-amber-950 dark:text-amber-200">
-                    1% Jamg'arma Keshbek Karta
+                    {t('productCashbackCardBadge')}
                   </div>
                   <div className="text-[11px] text-amber-700 dark:text-amber-400">
-                    Xariddan so'ng kartangizga <strong className="font-black text-amber-900 dark:text-amber-200">+{formatPrice(Math.round(effectivePrice * quantity * 0.01), false, language)}</strong> tushadi
+                    {t('productCashbackCardHint')} <strong className="font-black text-amber-900 dark:text-amber-200">+{formatPrice(Math.round(effectivePrice * quantity * 0.01), false, language)}</strong>
                   </div>
                 </div>
               </div>
               <span className="text-[10px] font-extrabold text-amber-800 dark:text-amber-300 bg-amber-200/60 dark:bg-amber-900/60 px-2 py-1 rounded-md">
-                Yig'ish / Ishlatish
+                {t('productCashbackCardCollect')}
               </span>
             </div>
 
@@ -507,12 +510,12 @@ export const ProductDetail: React.FC = () => {
               {isSendingToTelegram ? (
                 <>
                   <RefreshCw className="w-4 h-4 animate-spin" />
-                  <span>Telegram botga yuborilmoqda...</span>
+                  <span>{t('telegramProductSending')}</span>
                 </>
               ) : (
                 <>
                   <Send className="w-4 h-4 -rotate-12" />
-                  <span>Telegram Botga Yuborish (1-klikda)</span>
+                  <span>{t('telegramSendProduct')}</span>
                 </>
               )}
             </button>
@@ -631,11 +634,11 @@ export const ProductDetail: React.FC = () => {
                   ))}
                 </div>
                 <p className="text-xs text-slate-500 dark:text-slate-400">
-                  {productReviews.length || product.reviewsCount} ta tasdiqlangan baholash
+                  {productReviews.length || product.reviewsCount} {t('productVerifiedReviewsCount')}
                 </p>
                 <div className="mt-2 text-xs font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
                   <CheckCircle2 className="w-3.5 h-3.5" />
-                  <span>98% xaridorlar tavsiya qiladi</span>
+                  <span>{t('productRecommendRate')}</span>
                 </div>
               </div>
 
@@ -670,7 +673,7 @@ export const ProductDetail: React.FC = () => {
             <div className="p-6 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-4 shadow-sm">
               <h4 className="font-bold text-base text-slate-900 dark:text-white flex items-center gap-2">
                 <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
-                <span>Mahsulot haqida fikringizni qoldiring</span>
+                <span>{t('productLeaveReview')}</span>
               </h4>
 
               <form onSubmit={handleSubmitReview} className="space-y-4">
@@ -678,7 +681,7 @@ export const ProductDetail: React.FC = () => {
                   {/* Rating Stars Selector */}
                   <div>
                     <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1.5">
-                      Bahoingizni bering:
+                      {t('productYourRate')}
                     </label>
                     <div className="flex items-center gap-2">
                       {[1, 2, 3, 4, 5].map((s) => (
@@ -698,7 +701,7 @@ export const ProductDetail: React.FC = () => {
                         </button>
                       ))}
                       <span className="text-xs font-bold text-slate-700 dark:text-slate-300 ml-2">
-                        {newReviewRating === 5 ? 'Ajoyib' : newReviewRating === 4 ? 'Yaxshi' : newReviewRating === 3 ? "O'rtacha" : 'Qoniqarsiz'}
+                        {newReviewRating === 5 ? t('productRatingGreat') : newReviewRating === 4 ? t('productRatingGood') : newReviewRating === 3 ? t('productRatingAverage') : t('productRatingPoor')}
                       </span>
                     </div>
                   </div>
@@ -706,13 +709,13 @@ export const ProductDetail: React.FC = () => {
                   {/* Name Input */}
                   <div>
                     <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1.5">
-                      Ismingiz:
+                      {t('productYourName')}
                     </label>
                     <input
                       type="text"
                       value={newReviewAuthor}
                       onChange={(e) => setNewReviewAuthor(e.target.value)}
-                      placeholder="Ism va familiyangiz"
+                      placeholder={t('productYourNamePlaceholder')}
                       className="w-full px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-sm focus:ring-2 focus:ring-primary-500 focus:outline-none dark:text-white"
                     />
                   </div>
@@ -721,13 +724,13 @@ export const ProductDetail: React.FC = () => {
                 {/* Comment Textarea */}
                 <div>
                   <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1.5">
-                    Sharh matni:
+                    {t('productReviewText')}
                   </label>
                   <textarea
                     rows={3}
                     value={newReviewComment}
                     onChange={(e) => setNewReviewComment(e.target.value)}
-                    placeholder="Mahsulot sifati, yetkazib berish tezligi va foydalanish taassurotlaringiz haqida yozing..."
+                    placeholder={t('productReviewPlaceholder')}
                     className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-sm focus:ring-2 focus:ring-primary-500 focus:outline-none dark:text-white resize-none"
                   />
                 </div>
@@ -739,7 +742,7 @@ export const ProductDetail: React.FC = () => {
                     className="flex items-center gap-2 px-6 py-2.5 bg-primary-600 hover:bg-primary-700 text-white rounded-xl text-xs font-bold shadow-md shadow-primary-500/20 transition-all disabled:opacity-50"
                   >
                     <Send className="w-3.5 h-3.5" />
-                    <span>{isSubmittingReview ? "Chop etilmoqda..." : "Sharhni chop etish"}</span>
+                    <span>{isSubmittingReview ? t('productPublishingReview') : t('productPublishReview')}</span>
                   </button>
                 </div>
               </form>
@@ -748,12 +751,12 @@ export const ProductDetail: React.FC = () => {
             {/* Reviews List */}
             <div className="space-y-4">
               <h4 className="font-bold text-sm text-slate-900 dark:text-white">
-                Mijozlar sharhlari ({productReviews.length})
+                {t('productCustomerReviews')} ({productReviews.length})
               </h4>
 
               {productReviews.length === 0 ? (
                 <div className="text-center py-8 text-slate-400 text-xs">
-                  Bu tovar bo'yicha hali yangi sharhlar yo'q. Birinchi bo'lib sharh qoldiring!
+                  {t('productNoReviewsYet')}
                 </div>
               ) : (
                 productReviews.map((rev) => {
@@ -779,7 +782,7 @@ export const ProductDetail: React.FC = () => {
                               {rev.verifiedPurchase && (
                                 <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 px-2 py-0.5 rounded-md">
                                   <CheckCircle2 className="w-3 h-3" />
-                                  Xarid tasdiqlangan
+                                  {t('productVerifiedPurchase')}
                                 </span>
                               )}
                             </div>
@@ -793,7 +796,7 @@ export const ProductDetail: React.FC = () => {
                                 ))}
                               </div>
                               <span className="text-[11px] text-slate-400 font-mono">
-                                {rev.createdAt ? new Date(rev.createdAt).toLocaleDateString() : 'Yaqinda'}
+                                {rev.createdAt ? new Date(rev.createdAt).toLocaleDateString() : t('productRecentTime')}
                               </span>
                             </div>
                           </div>

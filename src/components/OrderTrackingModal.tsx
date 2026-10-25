@@ -15,6 +15,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { useStore } from '../store/useStore';
+import { useTranslation } from '../utils/translations';
 import { generateAndPrintContract } from '../lib/pdfContractGenerator';
 
 interface TrackingStatusStep {
@@ -113,6 +114,7 @@ const DEMO_ORDERS: Record<string, MockOrderTrackingData> = {
 
 export const OrderTrackingModal: React.FC = () => {
   const { isOrderTrackingOpen, closeOrderTracking, orders } = useStore();
+  const { t, language } = useTranslation();
   const [searchInput, setSearchInput] = useState('');
   const [activeOrder, setActiveOrder] = useState<MockOrderTrackingData | null>(null);
   const [notFound, setNotFound] = useState(false);
@@ -217,10 +219,10 @@ export const OrderTrackingModal: React.FC = () => {
             </div>
             <div>
               <h3 className="font-bold text-base sm:text-lg text-slate-900 dark:text-white">
-                Buyurtmani jonli kuzatish
+                {t('trackModalTitle')}
               </h3>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                Shartnoma raqami orqali yetkazib berish holati va PDF hujjatlar
+                {t('trackModalSubtitle')}
               </p>
             </div>
           </div>
@@ -243,34 +245,32 @@ export const OrderTrackingModal: React.FC = () => {
                 type="text"
                 value={searchInput}
                 onChange={e => setSearchInput(e.target.value)}
-                placeholder="Shartnoma raqami (masalan: ELR-849201 yoki telefon)"
+                placeholder={t('trackModalSearchPlaceholder')}
                 className="w-full pl-11 pr-4 py-3 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 text-sm font-medium focus:ring-2 focus:ring-primary-500 focus:outline-none dark:text-white"
               />
             </div>
             <button
               type="submit"
               className="px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-semibold text-sm transition-colors shadow-md shadow-primary-500/20"
-            >
-              Kuzatish
-            </button>
+            >{t('trackModalSubmitBtn')}</button>
           </form>
 
           {/* Quick Demo Chips */}
           <div className="flex items-center gap-2 mt-3 text-xs text-slate-500 dark:text-slate-400 overflow-x-auto">
-            <span>Namunalar:</span>
+            <span>{t('trackModalDemoTitle')}</span>
             <button
               type="button"
               onClick={() => { setSearchInput('ELR-849201'); setActiveOrder(DEMO_ORDERS['ELR-849201']); setNotFound(false); }}
               className="px-2.5 py-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg font-mono text-[11px] text-primary-600 dark:text-primary-400 hover:border-primary-400 transition"
             >
-              ELR-849201 (Yo'lda)
+              ELR-849201 ({language === 'ru' ? "В пути" : language === 'en' ? "In transit" : "Yo'lda"})
             </button>
             <button
               type="button"
               onClick={() => { setSearchInput('ELR-731904'); setActiveOrder(DEMO_ORDERS['ELR-731904']); setNotFound(false); }}
               className="px-2.5 py-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg font-mono text-[11px] text-primary-600 dark:text-primary-400 hover:border-primary-400 transition"
             >
-              ELR-731904 (Omborda)
+              ELR-731904 ({language === 'ru' ? "На складе" : language === 'en' ? "In warehouse" : "Omborda"})
             </button>
           </div>
         </div>
@@ -283,10 +283,14 @@ export const OrderTrackingModal: React.FC = () => {
                 <AlertCircle className="w-8 h-8" />
               </div>
               <h4 className="font-semibold text-slate-900 dark:text-white text-base mb-1">
-                Buyurtma topilmadi
+                {t('trackModalNotFound')}
               </h4>
               <p className="text-sm text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
-                "{searchInput}" raqamli shartnoma mavjud emas. Iltimos raqamni to'g'ri kiritganingizni tekshiring yoki yuqoridagi namunalarni tanlang.
+                {language === 'ru' 
+                  ? `Договор с номером "${searchInput}" не найден. Проверьте номер или выберите демо-заказ.` 
+                  : language === 'en' 
+                  ? `Contract with number "${searchInput}" was not found. Please verify the number or select a demo order.` 
+                  : `"${searchInput}" raqamli shartnoma mavjud emas. Iltimos raqamni to'g'ri kiritganingizni tekshiring yoki yuqoridagi namunalarni tanlang.`}
               </p>
             </div>
           ) : activeOrder ? (
@@ -296,17 +300,21 @@ export const OrderTrackingModal: React.FC = () => {
                 <div>
                   <div className="flex items-center gap-2 mb-1">
                     <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-400">
-                      Faol shartnoma
+                      {t('trackModalActiveContract')}
                     </span>
                     <span className="text-xs text-slate-500 font-mono">
                       № {activeOrder.orderNumber}
                     </span>
                   </div>
                   <h4 className="font-bold text-slate-900 dark:text-white text-lg">
-                    {activeOrder.totalAmount.toLocaleString()} so'm
+                    {activeOrder.totalAmount.toLocaleString()} {language === 'ru' ? 'сум' : language === 'en' ? 'UZS' : "so'm"}
                   </h4>
                   <p className="text-xs text-slate-500 dark:text-slate-400">
-                    Muddatli to'lov: {activeOrder.months} oy davomida har oy {activeOrder.monthlyPayment.toLocaleString()} so'mdan
+                    {t('trackModalInstallmentDesc')} {language === 'ru' 
+                      ? `в течение ${activeOrder.months} мес. по ${activeOrder.monthlyPayment.toLocaleString()} сум/мес` 
+                      : language === 'en' 
+                      ? `for ${activeOrder.months} months, ${activeOrder.monthlyPayment.toLocaleString()} UZS/mo` 
+                      : `${activeOrder.months} oy davomida har oy ${activeOrder.monthlyPayment.toLocaleString()} so'mdan`}
                   </p>
                 </div>
 
@@ -316,7 +324,7 @@ export const OrderTrackingModal: React.FC = () => {
                   className="flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 shadow-sm transition-all hover:scale-[1.02]"
                 >
                   <Download className="w-4 h-4 text-primary-500" />
-                  <span>Nasiya Shartnomasi PDF</span>
+                  <span>{t('trackModalDownloadPdf')}</span>
                 </button>
               </div>
 
@@ -324,7 +332,7 @@ export const OrderTrackingModal: React.FC = () => {
               <div>
                 <h5 className="font-semibold text-sm text-slate-900 dark:text-white mb-4 flex items-center gap-2">
                   <Clock className="w-4 h-4 text-primary-500" />
-                  Yetkazib berish bosqichlari
+                  {t('trackModalDeliverySteps')}
                 </h5>
 
                 <div className="relative pl-6 space-y-6 before:absolute before:left-2.5 before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-200 dark:before:bg-slate-700">
@@ -374,7 +382,7 @@ export const OrderTrackingModal: React.FC = () => {
                 <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/60">
                   <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 dark:text-slate-400 mb-2">
                     <User className="w-4 h-4 text-primary-500" />
-                    <span>Qabul qiluvchi</span>
+                    <span>{t('trackModalRecipient')}</span>
                   </div>
                   <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">
                     {activeOrder.buyerName}
@@ -393,7 +401,7 @@ export const OrderTrackingModal: React.FC = () => {
                   <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/60">
                     <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 dark:text-slate-400 mb-2">
                       <Truck className="w-4 h-4 text-emerald-500" />
-                      <span>Mas'ul kuryer</span>
+                      <span>{t('trackModalResponsibleCourier')}</span>
                     </div>
                     <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">
                       {activeOrder.courierName}
@@ -412,7 +420,7 @@ export const OrderTrackingModal: React.FC = () => {
               {/* Items in order */}
               <div>
                 <h5 className="font-semibold text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">
-                  Buyurtmadagi tovarlar ({activeOrder.items.length})
+                  {t('trackModalItemsTitle')} ({activeOrder.items.length})
                 </h5>
                 <div className="space-y-2">
                   {activeOrder.items.map((item, i) => (
@@ -447,10 +455,10 @@ export const OrderTrackingModal: React.FC = () => {
                 <Package className="w-8 h-8" />
               </div>
               <h4 className="font-bold text-slate-900 dark:text-white text-base mb-1">
-                Shartnoma yoki buyurtma raqamini kiriting
+                {t('trackModalTitle')}
               </h4>
               <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
-                Xaridingiz holatini real vaqtda kuzatish uchun yuqoridagi maydonga shartnoma raqamingizni kiriting va "Kuzatish" tugmasini bosing.
+                {t('trackModalSubtitle')}
               </p>
             </div>
           )}
@@ -460,15 +468,13 @@ export const OrderTrackingModal: React.FC = () => {
         <div className="px-6 py-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/80 flex items-center justify-between">
           <div className="flex items-center gap-1.5 text-xs text-slate-400">
             <ShieldCheck className="w-4 h-4 text-emerald-500" />
-            <span>ELRIZO Kafolatlangan yetkazib berish tizimi</span>
+            <span>{t('trackModalGuaranteedSystem')}</span>
           </div>
           <button
             type="button"
             onClick={closeOrderTracking}
             className="px-5 py-2 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-xl transition"
-          >
-            Yopish
-          </button>
+          >{t('trackModalCloseBtn')}</button>
         </div>
       </div>
     </div>

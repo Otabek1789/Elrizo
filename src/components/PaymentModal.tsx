@@ -10,6 +10,7 @@ import {
   ArrowRight
 } from 'lucide-react';
 import { generatePaymentLink, PaymentInvoiceParams } from '../lib/paymentService';
+import { useTranslation } from '../utils/translations';
 
 interface PaymentModalProps {
   isOpen: boolean;
@@ -24,6 +25,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
   orderParams,
   onPaymentSuccess
 }) => {
+  const { t, language } = useTranslation();
   const [selectedProvider, setSelectedProvider] = useState<'click' | 'payme' | 'uzumpay'>('click');
   const [hasOpenedLink, setHasOpenedLink] = useState(false);
 
@@ -51,10 +53,10 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
             </div>
             <div>
               <h3 className="font-bold text-base text-slate-900 dark:text-white">
-                Onlayn to'lov tizimlari
+                {t('paymentModalTitle')}
               </h3>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                O'zbekistonning rasmiy to'lov tizimlari orqali to'lash
+                {t('paymentModalSubtitle')}
               </p>
             </div>
           </div>
@@ -73,13 +75,13 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
           {/* Order amount pill */}
           <div className="bg-slate-50 dark:bg-slate-800/60 rounded-2xl p-4 border border-slate-200 dark:border-slate-700 flex items-center justify-between">
             <div>
-              <span className="text-xs text-slate-500 dark:text-slate-400">To'lov miqdori:</span>
+              <span className="text-xs text-slate-500 dark:text-slate-400">{t('paymentModalAmount')}</span>
               <p className="text-2xl font-black text-slate-900 dark:text-white">
                 {orderParams.amount.toLocaleString()} <span className="text-sm font-semibold text-slate-500">so'm</span>
               </p>
             </div>
             <div className="text-right">
-              <span className="text-[11px] text-slate-400 block font-mono">Buyurtma №</span>
+              <span className="text-[11px] text-slate-400 block font-mono">{t('paymentModalOrderNumber')}</span>
               <span className="text-xs font-mono font-bold text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950 px-2 py-0.5 rounded-md">
                 {orderParams.contractNumber}
               </span>
@@ -89,7 +91,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
           {/* Provider Selection */}
           <div>
             <label className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 block mb-3">
-              To'lov tizimini tanlang:
+              {t('paymentModalSelectProvider')}
             </label>
 
             <div className="grid grid-cols-3 gap-3">
@@ -109,7 +111,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
                 <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
                   Click Up
                 </span>
-                <span className="text-[10px] text-slate-400">0% komissiya</span>
+                <span className="text-[10px] text-slate-400">{t('paymentModalZeroFee')}</span>
               </button>
 
               {/* Payme */}
@@ -128,7 +130,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
                 <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
                   Payme
                 </span>
-                <span className="text-[10px] text-slate-400">Humo / Uzcard</span>
+                <span className="text-[10px] text-slate-400">{t('paymentModalCardsList')}</span>
               </button>
 
               {/* Uzum Pay */}
@@ -147,7 +149,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
                 <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
                   Uzum Pay
                 </span>
-                <span className="text-[10px] text-slate-400">Keshbek bilan</span>
+                <span className="text-[10px] text-slate-400">{t('paymentModalWithCashback')}</span>
               </button>
             </div>
           </div>
@@ -156,7 +158,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
           <div className="p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/50 flex items-start gap-3">
             <ShieldCheck className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
             <div className="text-xs text-amber-900 dark:text-amber-200 leading-relaxed">
-              Tugmani bosganingizda, <strong>{selectedProvider.toUpperCase()}</strong> xavfsiz to'lov sahifasi ochiladi. Karta raqamini kiritib yoki QR-kodni ilovada skaner qilib to'lovni tasdiqlaysiz.
+              {t('paymentModalDisclaimer')}
             </div>
           </div>
 
@@ -173,7 +175,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
                   : 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 shadow-purple-500/25'
               }`}
             >
-              <span>{selectedProvider.toUpperCase()} orqali to'lash</span>
+              <span>{selectedProvider.toUpperCase()} {t('paymentModalPayVia')}</span>
               <ExternalLink className="w-4 h-4" />
             </button>
 
@@ -187,7 +189,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
                 className="w-full py-2.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 rounded-xl transition flex items-center justify-center gap-1.5"
               >
                 <CheckCircle2 className="w-4 h-4" />
-                <span>To'lovni muvaffaqiyatli yakunladim</span>
+                <span>{t('paymentModalCompletedSuccess')}</span>
               </button>
             )}
           </div>
@@ -196,7 +198,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
         {/* Footer */}
         <div className="px-6 py-3.5 bg-slate-50 dark:bg-slate-900/80 border-t border-slate-100 dark:border-slate-800 text-center">
           <p className="text-[11px] text-slate-400">
-            To'lovlar 256-bitli SSL shifrlash orqali to'liq himoyalangan
+            {t('paymentModalSecuredNotice')}
           </p>
         </div>
       </div>

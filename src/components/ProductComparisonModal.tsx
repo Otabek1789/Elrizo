@@ -66,10 +66,10 @@ export const ProductComparisonModal: React.FC = () => {
               </div>
               <div>
                 <h3 className="text-base sm:text-lg font-black text-gray-900 dark:text-white leading-tight">
-                  Tovarlarni o'zaro taqqoslash ({comparedProducts.length})
+                  {t('compareModalTitle')} ({comparedProducts.length})
                 </h3>
                 <p className="text-xs text-gray-400 dark:text-slate-400">
-                  Parametrlar, oylik to'lov va narxlarni yonma-yon solishtiring
+                  {t('compareModalSubtitle')}
                 </p>
               </div>
             </div>
@@ -81,7 +81,7 @@ export const ProductComparisonModal: React.FC = () => {
                   className="px-3 py-1.5 rounded-xl text-xs font-bold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors flex items-center gap-1.5"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">Tozalash</span>
+                  <span className="hidden sm:inline">{t('compareModalClear')}</span>
                 </button>
               )}
               <button
@@ -101,10 +101,10 @@ export const ProductComparisonModal: React.FC = () => {
                   <Scale className="w-8 h-8" />
                 </div>
                 <h4 className="text-base font-bold text-gray-800 dark:text-white">
-                  Taqqoslash ro'yxati bo'sh
+                  {t('compareModalEmptyTitle')}
                 </h4>
                 <p className="text-xs text-gray-400 max-w-sm mx-auto">
-                  Istalgan tovar kartochkasidagi tarozi belgisini bosib, tovarlarni taqqoslashga qo'shishingiz mumkin.
+                  {t('compareModalEmptyHint')}
                 </p>
               </div>
             ) : (
@@ -112,7 +112,7 @@ export const ProductComparisonModal: React.FC = () => {
                 {/* Product Headers Row */}
                 <div className="grid grid-cols-5 gap-4 pb-6 border-b border-gray-100 dark:border-slate-800 items-start">
                   <div className="text-xs font-extrabold text-gray-400 uppercase tracking-wider pt-8">
-                    Mahsulotlar
+                    {t('compareModalProductsLabel')}
                   </div>
 
                   {comparedProducts.map((p) => {
@@ -122,7 +122,7 @@ export const ProductComparisonModal: React.FC = () => {
                         <button
                           onClick={() => removeFromComparison(p.id)}
                           className="absolute top-2 right-2 p-1 text-gray-400 hover:text-rose-500 rounded-lg hover:bg-white dark:hover:bg-slate-700 transition-colors"
-                          title="Taqqoslashdan o'chirish"
+                          title={t('compareModalRemove')}
                         >
                           <X className="w-3.5 h-3.5" />
                         </button>
@@ -147,7 +147,7 @@ export const ProductComparisonModal: React.FC = () => {
                             {formatPrice(p.price, true, language)}
                           </div>
                           <div className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400">
-                            {formatPrice(monthly, true, language)} / oy (12 oy)
+                            {formatPrice(monthly, true, language)} {t('compareModalMonthSuffix')} (12 {t('monthsTerm')})
                           </div>
                         </div>
 
@@ -156,7 +156,7 @@ export const ProductComparisonModal: React.FC = () => {
                           className="w-full py-2 px-3 rounded-xl bg-uzum-primary hover:bg-uzum-hover text-white text-xs font-black shadow-sm flex items-center justify-center gap-1.5 transition-all active:scale-95"
                         >
                           <ShoppingBag className="w-3.5 h-3.5" />
-                          <span>Savatga</span>
+                          <span>{t('toCartBtn')}</span>
                         </button>
                       </div>
                     );
@@ -167,7 +167,7 @@ export const ProductComparisonModal: React.FC = () => {
                 <div className="divide-y divide-gray-100 dark:divide-slate-800/60 text-xs">
                   {/* Category */}
                   <div className="grid grid-cols-5 gap-4 py-3 items-center">
-                    <span className="font-bold text-gray-400">Toifasi</span>
+                    <span className="font-bold text-gray-400">{t('compareModalCategoryLabel')}</span>
                     {comparedProducts.map((p) => (
                       <span key={p.id} className="text-gray-800 dark:text-slate-200 font-semibold text-center truncate">
                         {p.categoryName}
@@ -177,12 +177,12 @@ export const ProductComparisonModal: React.FC = () => {
 
                   {/* Nasiya 0-0-12 */}
                   <div className="grid grid-cols-5 gap-4 py-3 items-center">
-                    <span className="font-bold text-gray-400">0% Boshlang'ich to'lov</span>
+                    <span className="font-bold text-gray-400">{t('compareModalZeroDownLabel')}</span>
                     {comparedProducts.map((p) => (
                       <div key={p.id} className="flex justify-center">
                         <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400">
                           <Check className="w-3 h-3" />
-                          Mavjud (0-0-12)
+                          {t('compareModalZeroDownAvailable')}
                         </span>
                       </div>
                     ))}
@@ -190,10 +190,10 @@ export const ProductComparisonModal: React.FC = () => {
 
                   {/* Stock */}
                   <div className="grid grid-cols-5 gap-4 py-3 items-center">
-                    <span className="font-bold text-gray-400">Omborda</span>
+                    <span className="font-bold text-gray-400">{t('compareModalInStockLabel')}</span>
                     {comparedProducts.map((p) => (
                       <span key={p.id} className="text-center font-bold text-emerald-600 dark:text-emerald-400">
-                        {p.inStock ? 'Mavjud' : 'Tugagan'}
+                        {p.inStock ? t('compareModalInStock') : t('compareModalOutOfStock')}
                       </span>
                     ))}
                   </div>

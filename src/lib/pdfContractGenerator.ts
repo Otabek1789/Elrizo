@@ -159,7 +159,7 @@ export const generateAndPrintContract = (order: Order) => {
         <div>
           <div class="logo">ELRIZO NASIYA</div>
           <div style="font-size: 11px; color: #64748b;">"ELRIZO SAVDO" MCHJ | Toshkent sh., Chilonzor 9-mavze</div>
-          <div style="font-size: 11px; color: #64748b;">Tel: +998 71 200 00 00 | Veb-sayt: elrizonasiya.vercel.app</div>
+          <div style="font-size: 11px; color: #64748b;">Tel: +998 94 333 55 22 | Veb-sayt: elrizonasiya.vercel.app</div>
         </div>
         <div style="text-align: right;">
           <div style="font-size: 13px; font-weight: 800; color: #640199;">SHARTNOMA: ${contractNumber}</div>

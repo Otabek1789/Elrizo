@@ -39,9 +39,9 @@ export const CitySelectModal: React.FC = () => {
   if (!isCityModalOpen) return null;
 
   const handleSelectCity = (city: CityOption) => {
-    const chosenName = getCityShortName(city);
-    setSelectedCity(chosenName);
-    addToast(`${t('cityChangedToast')} ${chosenName}`, 'success');
+    setSelectedCity(city.shortUz);
+    const displayName = getCityDisplayName(city);
+    addToast(`${t('cityChangedToast')} ${displayName}`, 'success');
     closeCityModal();
   };
 
@@ -74,7 +74,7 @@ export const CitySelectModal: React.FC = () => {
                   {t('selectCityTitle')}
                 </h3>
                 <p className="text-xs text-gray-400 dark:text-slate-400 mt-0.5">
-                  O'zbekiston bo'ylab 1 kunda yetkazib berish
+                  {t('freeDelivery')}
                 </p>
               </div>
             </div>

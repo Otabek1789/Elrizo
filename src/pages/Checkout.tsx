@@ -443,28 +443,28 @@ export const Checkout: React.FC = () => {
             <div className="flex items-center justify-between">
               <span className="font-extrabold text-amber-950 dark:text-amber-200 flex items-center gap-1.5">
                 <CreditCard className="w-4 h-4 text-amber-600" />
-                <span>ELRIZO Jamg'arma Kartasi</span>
+                <span>{t('cardModalTitle')}</span>
               </span>
               <button
                 type="button"
                 onClick={openCashbackCardModal}
                 className="text-[11px] font-bold text-amber-700 dark:text-amber-300 underline hover:text-amber-900 cursor-pointer"
               >
-                Kartani ko'rish
+                {t('headerSavingsCard')}
               </button>
             </div>
             {completedOrder?.cashbackSpent && (
               <div className="flex justify-between text-gray-700 dark:text-slate-300">
-                <span>Keshbek hisobidan to'landi:</span>
+                <span>{t('cardModalSpent')}:</span>
                 <strong className="text-rose-600 dark:text-rose-400 font-bold">-{formatPrice(completedOrder.cashbackSpent, true, language)}</strong>
               </div>
             )}
             <div className="flex justify-between text-gray-700 dark:text-slate-300">
-              <span>Kartangizga tushgan 1% keshbek:</span>
+              <span>{t('cardModalEarned')}:</span>
               <strong className="text-emerald-600 dark:text-emerald-400 font-black">+{formatPrice(completedOrder?.cashbackEarned || earnedCashbackAmount, true, language)} 🎁</strong>
             </div>
             <div className="flex justify-between text-gray-700 dark:text-slate-300 pt-1.5 border-t border-amber-200/60 dark:border-amber-800/40 font-medium">
-              <span>Kartangizdagi yangi balans:</span>
+              <span>{t('cardModalCurrentBalance')}:</span>
               <strong className="text-amber-900 dark:text-amber-200 font-black">{formatPrice(user?.cashbackBalance ?? 0, true, language)}</strong>
             </div>
           </div>
@@ -482,7 +482,7 @@ export const Checkout: React.FC = () => {
               className="w-full sm:w-auto py-3 px-5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold text-xs rounded-xl transition-all shadow-md shadow-emerald-600/20 flex items-center justify-center gap-2"
             >
               <Download className="w-4 h-4" />
-              <span>Nasiya Shartnomasi PDF</span>
+              <span>{t('trackModalDownloadPdf')}</span>
             </button>
 
             <button
@@ -490,7 +490,7 @@ export const Checkout: React.FC = () => {
               className="w-full sm:w-auto py-3 px-5 bg-primary-600 hover:bg-primary-700 text-white font-bold text-xs rounded-xl transition-all shadow-md shadow-primary-500/20 flex items-center justify-center gap-2"
             >
               <Truck className="w-4 h-4" />
-              <span>Buyurtmani kuzatish</span>
+              <span>{t('headerTrackOrder')}</span>
             </button>
           </div>
         </div>
@@ -1115,14 +1115,14 @@ export const Checkout: React.FC = () => {
               <div className="flex items-center justify-between mb-2">
                 <label className="text-xs font-bold text-gray-700 dark:text-slate-300 flex items-center gap-1.5">
                   <CreditCard className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
-                  <span>Jamg'arma Karta (1% Keshbek)</span>
+                  <span>{language === 'ru' ? 'Накопительная карта (1% Кэшбэк)' : language === 'en' ? 'Savings Card (1% Cashback)' : "Jamg'arma Karta (1% Keshbek)"}</span>
                 </label>
                 <button
                   type="button"
                   onClick={openCashbackCardModal}
                   className="text-[11px] font-bold text-amber-600 dark:text-amber-400 hover:underline cursor-pointer"
                 >
-                  Kartani ochish
+                  {language === 'ru' ? 'Открыть карту' : language === 'en' ? 'Open card' : 'Kartani ochish'}
                 </button>
               </div>
 
@@ -1134,10 +1134,11 @@ export const Checkout: React.FC = () => {
                     </div>
                     <div>
                       <div className="text-[11px] font-bold text-amber-950 dark:text-amber-200">
-                        Jamg'arma hisobingiz
+                        {language === 'ru' ? 'Ваш накопительный счет' : language === 'en' ? 'Your savings account' : "Jamg'arma hisobingiz"}
                       </div>
                       <div className="text-[10px] text-amber-700 dark:text-amber-400">
-                        Mavjud balans: <strong className="font-black text-amber-900 dark:text-amber-200">{formatPrice(availableCashback, true, language)}</strong>
+                        {language === 'ru' ? 'Доступный баланс: ' : language === 'en' ? 'Available balance: ' : 'Mavjud balans: '}
+                        <strong className="font-black text-amber-900 dark:text-amber-200">{formatPrice(availableCashback, true, language)}</strong>
                       </div>
                     </div>
                   </div>
@@ -1154,7 +1155,7 @@ export const Checkout: React.FC = () => {
                         className="w-4 h-4 rounded text-amber-600 focus:ring-amber-500 border-gray-300"
                       />
                       <span className="text-xs font-bold text-gray-800 dark:text-slate-200">
-                        Keshbek hisobidan to'lash
+                        {language === 'ru' ? 'Оплатить с баланса кэшбэка' : language === 'en' ? 'Pay with cashback balance' : "Keshbek hisobidan to'lash"}
                       </span>
                     </div>
                     {useCashbackInCheckout && (
@@ -1165,14 +1166,20 @@ export const Checkout: React.FC = () => {
                   </label>
                 ) : (
                   <div className="text-[11px] text-amber-800 dark:text-amber-400 italic">
-                    Ushbu xarid orqali kartangizga ilk 1% keshbek yig'iladi!
+                    {language === 'ru' ? 'С этой покупки будет начислен первый 1% кэшбэк на карту!' : language === 'en' ? 'Your first 1% cashback will be credited from this purchase!' : "Ushbu xarid orqali kartangizga ilk 1% keshbek yig'iladi!"}
                   </div>
                 )}
 
                 {/* 1% accumulation guarantee badge */}
                 <div className="flex items-center gap-1.5 text-[10px] text-amber-800 dark:text-amber-300 font-bold bg-amber-200/50 dark:bg-amber-900/40 px-2 py-1 rounded-lg">
                   <Sparkles className="w-3.5 h-3.5 text-amber-600 shrink-0" />
-                  <span>Xariddan kartangizga +{formatPrice(earnedCashbackAmount, true, language)} (+1%) tushadi</span>
+                  <span>
+                    {language === 'ru' 
+                      ? `С покупки на карту будет начислено +${formatPrice(earnedCashbackAmount, true, language)} (+1%)` 
+                      : language === 'en' 
+                      ? `+${formatPrice(earnedCashbackAmount, true, language)} (+1%) will be added to your card` 
+                      : `Xariddan kartangizga +${formatPrice(earnedCashbackAmount, true, language)} (+1%) tushadi`}
+                  </span>
                 </div>
               </div>
             </div>

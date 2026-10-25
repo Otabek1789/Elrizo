@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { useTranslation } from '../utils/translations';
 
 interface LogoProps {
   size?: 'sm' | 'md' | 'lg' | 'xl';
@@ -32,6 +33,7 @@ export const Logo: React.FC<LogoProps> = ({
   variant = 'light',
   className = '' 
 }) => {
+  const { t, language } = useTranslation();
   const iconSize = size === 'sm' ? 28 : size === 'lg' ? 48 : size === 'xl' ? 56 : 38;
   const titleSize = size === 'sm' ? 'text-base sm:text-lg' : size === 'lg' ? 'text-2xl' : size === 'xl' ? 'text-3xl' : 'text-lg sm:text-xl md:text-2xl';
   const sloganSize = size === 'sm' ? 'text-[9px]' : size === 'lg' ? 'text-[12px]' : size === 'xl' ? 'text-sm' : 'text-[10px] md:text-[11px]';
@@ -60,16 +62,16 @@ export const Logo: React.FC<LogoProps> = ({
 
           {showBadge && (
             <span className="text-[9px] uppercase font-extrabold tracking-wide text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/60 px-1.5 py-0.5 rounded border border-purple-200/60 dark:border-purple-800/50 hidden sm:inline-block">
-              Nasiya
+              {language === 'ru' ? 'РАССРОЧКА' : language === 'en' ? 'INSTALLMENT' : 'NASIYA'}
             </span>
           )}
         </div>
 
-        {/* Official Slogan: Siz rozi — biz rozi! */}
+        {/* Official Slogan */}
         {showSlogan && (
           <div className="hidden sm:flex items-center gap-1.5 mt-1">
             <span className={`font-semibold tracking-normal ${sloganSize} ${isLight ? 'text-gray-700 dark:text-gray-200' : 'text-gray-200'}`}>
-              Siz rozi — biz rozi!
+              {t('slogan')}
             </span>
           </div>
         )}

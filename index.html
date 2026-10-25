@@ -11,9 +11,20 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+      vercel-live-feedback,
+      #vercel-live-feedback-host,
+      [data-vercel-toolbar],
+      [data-vercel-edit-mode] {
+        display: none !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+        opacity: 0 !important;
+      }
+    </style>
     <script>
       try {
-        const stored = localStorage.getItem('elrizo_nasiya_storage');
+        const stored = localStorage.getItem('elrizo_store_v3') || localStorage.getItem('elrizo_nasiya_storage');
         if (stored) {
           const parsed = JSON.parse(stored);
           if (parsed?.state?.theme === 'dark') {
@@ -22,6 +33,17 @@
             document.documentElement.classList.remove('dark');
           }
         }
+      } catch (e) {}
+
+      // Vercel toolbar injection blocker
+      try {
+        const removeVercelToolbar = () => {
+          const els = document.querySelectorAll('vercel-live-feedback, #vercel-live-feedback-host, [data-vercel-toolbar]');
+          els.forEach(el => el.remove());
+        };
+        const obs = new MutationObserver(removeVercelToolbar);
+        obs.observe(document.documentElement, { childList: true, subtree: true });
+        window.addEventListener('DOMContentLoaded', removeVercelToolbar);
       } catch (e) {}
     </script>
   </head>

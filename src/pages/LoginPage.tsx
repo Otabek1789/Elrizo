@@ -22,6 +22,7 @@ import { ADMIN_EMAIL, supabase } from '../lib/supabase';
 import { User } from '../types';
 import { useTranslation } from '../utils/translations';
 import { findTelegramChatIdByUsername, sendTelegramLoginCode, TELEGRAM_BOT_USERNAME } from '../utils/telegramBot';
+import { Logo } from '../components/Logo';
 import '../styles/auth103.css';
 
 export const LoginPage: React.FC = () => {
@@ -439,13 +440,51 @@ export const LoginPage: React.FC = () => {
         to="/" 
         replace
         onClick={() => window.scrollTo(0, 0)}
-        className="absolute top-5 left-5 z-20 flex items-center gap-2 text-xs font-bold text-gray-700 dark:text-slate-200 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md px-3.5 py-2 rounded-xl shadow-sm hover:text-uzum-primary dark:hover:text-purple-300 hover:bg-white dark:hover:bg-slate-800 transition-colors border border-gray-200 dark:border-slate-700"
+        className="absolute top-3.5 left-3.5 sm:top-5 sm:left-5 z-20 flex items-center gap-1.5 sm:gap-2 text-xs font-bold text-gray-700 dark:text-slate-200 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl shadow-sm hover:text-uzum-primary dark:hover:text-purple-300 hover:bg-white dark:hover:bg-slate-800 transition-colors border border-gray-200/80 dark:border-slate-700 cursor-pointer"
       >
         <ArrowLeft className="w-4 h-4" />
-        <span>{t('loginBackHome')}</span>
+        <span className="hidden sm:inline">{t('loginBackHome')}</span>
       </Link>
 
       <div className="auth-103-forms-container">
+        {/* Mobil qurilmalar uchun Logo va Tab Switcher (Desktopda yashirin: md:hidden) */}
+        <div className="md:hidden w-full flex flex-col items-center mb-4">
+          <div className="mb-3 scale-95">
+            <Logo size="md" />
+          </div>
+
+          <div className="flex items-center bg-gray-100 dark:bg-slate-800 p-1 rounded-2xl w-full max-w-[360px] border border-gray-200/80 dark:border-slate-700 shadow-xs">
+            <button
+              type="button"
+              onClick={() => {
+                setIsSignUpMode(false);
+                setErrorMessage(null);
+              }}
+              className={`flex-1 py-2.5 rounded-xl font-black text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                !isSignUpMode
+                  ? 'bg-uzum-primary text-white shadow-md'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+              }`}
+            >
+              <span>{t('loginSignInTab')}</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setIsSignUpMode(true);
+                setErrorMessage(null);
+              }}
+              className={`flex-1 py-2.5 rounded-xl font-black text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                isSignUpMode
+                  ? 'bg-uzum-primary text-white shadow-md'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+              }`}
+            >
+              <span>{t('loginSignUpTab')}</span>
+            </button>
+          </div>
+        </div>
+
         <div className="auth-103-signin-signup">
 
           {/* 1. SIGN IN FORMASI */}
@@ -487,7 +526,7 @@ export const LoginPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setShowSignInPassword(!showSignInPassword)}
-                className="text-gray-400 hover:text-gray-600 p-1"
+                className="text-gray-400 hover:text-gray-600 p-1 cursor-pointer"
               >
                 {showSignInPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
@@ -498,6 +537,23 @@ export const LoginPage: React.FC = () => {
             </button>
 
             {renderSocialButtons()}
+
+            {/* Mobil rejimda ro'yxatdan o'tishga o'tish havolasi */}
+            <div className="md:hidden mt-4 text-center pb-2">
+              <span className="text-xs text-gray-500 dark:text-slate-400">
+                {t('loginNewUserQ')}{' '}
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsSignUpMode(true);
+                  setErrorMessage(null);
+                }}
+                className="font-extrabold text-xs text-uzum-primary dark:text-purple-400 hover:underline cursor-pointer ml-1"
+              >
+                {t('loginSignUpTab')}
+              </button>
+            </div>
           </form>
 
           {/* 2. SIGN UP FORMASI */}
@@ -561,7 +617,7 @@ export const LoginPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setShowSignUpPassword(!showSignUpPassword)}
-                className="text-gray-400 hover:text-gray-600 p-1"
+                className="text-gray-400 hover:text-gray-600 p-1 cursor-pointer"
               >
                 {showSignUpPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
@@ -572,6 +628,23 @@ export const LoginPage: React.FC = () => {
             </button>
 
             {renderSocialButtons()}
+
+            {/* Mobil rejimda kirishga o'tish havolasi */}
+            <div className="md:hidden mt-4 text-center pb-2">
+              <span className="text-xs text-gray-500 dark:text-slate-400">
+                {t('loginExistingUserQ')}{' '}
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsSignUpMode(false);
+                  setErrorMessage(null);
+                }}
+                className="font-extrabold text-xs text-uzum-primary dark:text-purple-400 hover:underline cursor-pointer ml-1"
+              >
+                {t('loginSignInTab')}
+              </button>
+            </div>
           </form>
 
         </div>

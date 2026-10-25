@@ -16,9 +16,11 @@ import {
 } from 'lucide-react';
 import { useStore } from '../store/useStore';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from '../utils/translations';
 
 export const NakapitelniyCardModal: React.FC = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { 
     user, 
     isCashbackCardModalOpen, 
@@ -49,13 +51,13 @@ export const NakapitelniyCardModal: React.FC = () => {
             </div>
             <div>
               <h3 className="font-black text-sm sm:text-lg text-slate-900 dark:text-white flex items-center gap-1.5 sm:gap-2">
-                <span>ELRIZO Jamg'arma Kartasi</span>
+                <span>{t('cardModalTitle')}</span>
                 <span className="text-[9px] sm:text-[10px] font-black uppercase px-1.5 sm:px-2 py-0.5 rounded-full bg-amber-400 text-purple-950">
-                  1% Keshbek
+                  {t('cardModalCashbackBadge')}
                 </span>
               </h3>
               <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 line-clamp-1">
-                Har bir xariddan 1% yig'iladi, jamg'arish yoki to'lovga ishlatish mumkin
+                {t('cardModalSubtitle')}
               </p>
             </div>
           </div>
@@ -80,10 +82,10 @@ export const NakapitelniyCardModal: React.FC = () => {
                 </div>
                 <div>
                   <p className="text-xs font-bold text-amber-950 dark:text-amber-200">
-                    Akkauntga kirmagansiz
+                    {t('cardModalNotLoggedIn')}
                   </p>
                   <p className="text-[11px] text-amber-800 dark:text-amber-300">
-                    Keshbek yig'ish va xaridlarda sarflash uchun hisobingizga kiring.
+                    {t('cardModalNotLoggedInDesc')}
                   </p>
                 </div>
               </div>
@@ -94,9 +96,7 @@ export const NakapitelniyCardModal: React.FC = () => {
                   openAuth();
                 }}
                 className="px-3.5 py-1.5 text-xs font-bold bg-amber-500 hover:bg-amber-600 text-slate-950 rounded-xl shrink-0 transition cursor-pointer shadow-xs active:scale-95"
-              >
-                Kirish
-              </button>
+              >{t('cardModalLoginBtn')}</button>
             </div>
           )}
 
@@ -117,7 +117,7 @@ export const NakapitelniyCardModal: React.FC = () => {
                     ELRIZO CLUB
                   </span>
                   <span className="text-[10px] text-purple-300 font-mono tracking-wider">
-                    JAMG'ARMA KARTASI
+                    {t('cardModalClubCard')}
                   </span>
                 </div>
               </div>
@@ -126,7 +126,7 @@ export const NakapitelniyCardModal: React.FC = () => {
                 {user ? (
                   <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
                     <Sparkles className="w-3 h-3 text-emerald-400" />
-                    Faol status
+                    {t('cardModalStatusActive')}
                   </span>
                 ) : (
                   <span >                   
@@ -155,7 +155,7 @@ export const NakapitelniyCardModal: React.FC = () => {
             {/* Card Balance Display */}
             <div className="space-y-1 relative z-10">
               <span className="text-xs uppercase font-medium text-purple-300 tracking-wider">
-                Jamg'arilgan Keshbek Balansi:
+                {t('cardModalCurrentBalance')}
               </span>
               <div className="flex items-baseline gap-2">
                 <span className="text-2xl sm:text-4xl font-black text-white tracking-tight">
@@ -170,13 +170,13 @@ export const NakapitelniyCardModal: React.FC = () => {
             {/* Card Bottom: Member Name & Card Type (Karta raqami olib tashlangan) */}
             <div className="mt-4 sm:mt-5 pt-3 border-t border-white/10 flex items-center justify-between text-xs font-mono relative z-10">
               <div>
-                <span className="text-[10px] text-purple-300/80 block uppercase">Karta Egasi</span>
+                <span className="text-[10px] text-purple-300/80 block uppercase">{t('cardModalOwner')}</span>
                 <span className="text-xs sm:text-sm tracking-wide text-slate-100 font-bold block">
                   {user ? user.fullName.toUpperCase() : <></>}
                 </span>
               </div>
               <div className="text-right">
-                <span className="text-[10px] text-purple-300/80 block uppercase">Keshbek Tizimi</span>
+                <span className="text-[10px] text-purple-300/80 block uppercase">{t('cardModalSystemTitle')}</span>
                 <span className="text-[11px] sm:text-xs font-bold text-amber-300 truncate max-w-[130px] sm:max-w-[170px] block">
                   1% Jamg'arma
                 </span>
@@ -191,9 +191,9 @@ export const NakapitelniyCardModal: React.FC = () => {
                 <ShoppingBag className="w-4 h-4" />
               </div>
               <div>
-                <span className="text-xs font-bold text-slate-900 dark:text-white block">1. Xarid qiling</span>
+                <span className="text-xs font-bold text-slate-900 dark:text-white block">{t('cardModalStep1Title')}</span>
                 <span className="text-[11px] text-slate-500 dark:text-slate-400 leading-tight block mt-0.5">
-                  Har qanday tovar uchun narxining 1% i kartangizga qaytadi.
+                  {t('cardModalStep1Desc')}
                 </span>
               </div>
             </div>
@@ -203,9 +203,9 @@ export const NakapitelniyCardModal: React.FC = () => {
                 <TrendingUp className="w-4 h-4" />
               </div>
               <div>
-                <span className="text-xs font-bold text-slate-900 dark:text-white block">2. Yig'ib boring</span>
+                <span className="text-xs font-bold text-slate-900 dark:text-white block">{t('cardModalStep2Title')}</span>
                 <span className="text-[11px] text-slate-500 dark:text-slate-400 leading-tight block mt-0.5">
-                  Keshbek balansingiz muddatsiz saqlanadi va cheksiz to'planadi.
+                  {t('cardModalStep2Desc')}
                 </span>
               </div>
             </div>
@@ -215,9 +215,9 @@ export const NakapitelniyCardModal: React.FC = () => {
                 <CheckCircle2 className="w-4 h-4" />
               </div>
               <div>
-                <span className="text-xs font-bold text-slate-900 dark:text-white block">3. Xohlaganda sarflang</span>
+                <span className="text-xs font-bold text-slate-900 dark:text-white block">{t('cardModalStep3Title')}</span>
                 <span className="text-[11px] text-slate-500 dark:text-slate-400 leading-tight block mt-0.5">
-                  Checkout sahifasida balansingizni 100% gacha to'lovga ishlating.
+                  {t('cardModalStep3Desc')}
                 </span>
               </div>
             </div>
@@ -226,7 +226,7 @@ export const NakapitelniyCardModal: React.FC = () => {
           {/* Cashback Transaction History */}
           <div className="space-y-3">
             <h4 className="font-bold text-sm text-slate-900 dark:text-white flex items-center justify-between">
-              <span>Keshbek hisob-kitob tarixi</span>
+              <span>{t('cardModalHistoryTitle')}</span>
               <span className="text-xs text-slate-400 font-normal">
                 {validTransactions.length} ta operatsiya
               </span>
@@ -238,10 +238,10 @@ export const NakapitelniyCardModal: React.FC = () => {
                   <Gift className="w-5 h-5" />
                 </div>
                 <p className="text-xs font-bold text-slate-800 dark:text-slate-200">
-                  Hozircha keshbek operatsiyalari mavjud emas (0 so'm)
+                  {t('cardModalNoHistory')}
                 </p>
                 <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 max-w-xs mx-auto">
-                  Saytdan xarid amalga oshirilganda, umumiy to'lovning 1% miqdori ushbu kartangizga keshbek sifatida avtomatik jamg'ariladi.
+                  {t('cardModalNoHistoryDesc')}
                 </p>
               </div>
             ) : (
@@ -286,7 +286,7 @@ export const NakapitelniyCardModal: React.FC = () => {
         <div className="px-6 py-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/80 flex items-center justify-between">
           <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
             <ShieldCheck className="w-4 h-4 text-emerald-500" />
-            <span>ELRIZO Kafolatlangan Keshbek Tizimi</span>
+            <span>{t('cardModalGuaranteed')}</span>
           </div>
 
           <div className="flex items-center gap-2">
@@ -294,9 +294,7 @@ export const NakapitelniyCardModal: React.FC = () => {
               type="button"
               onClick={closeCashbackCardModal}
               className="px-4 py-2 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-xl transition"
-            >
-              Yopish
-            </button>
+            >{t('cardModalCloseBtn')}</button>
             <button
               type="button"
               onClick={() => {
@@ -304,9 +302,7 @@ export const NakapitelniyCardModal: React.FC = () => {
                 navigate('/catalog');
               }}
               className="px-5 py-2.5 text-xs font-bold bg-uzum-primary hover:bg-uzum-hover text-white rounded-xl shadow-md shadow-purple-500/25 transition-all hover:scale-[1.02] cursor-pointer"
-            >
-              Xarid qilish va yig'ish
-            </button>
+            >{t('cardModalShopCollectBtn')}</button>
           </div>
         </div>
       </div>
