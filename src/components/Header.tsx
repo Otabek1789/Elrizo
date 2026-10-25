@@ -397,8 +397,8 @@ export const Header: React.FC = () => {
     <header className="sticky top-0 z-40 bg-white/95 dark:bg-[#0F172A]/95 backdrop-blur-md border-b border-gray-200 dark:border-slate-800 shadow-sm transition-colors">
       {/* Top utility bar */}
       <div className="bg-gray-50 dark:bg-slate-900 border-b border-gray-100 dark:border-slate-800 text-xs text-gray-500 dark:text-gray-300 py-1.5 px-4 hidden md:block">
-        <div className="max-w-7xl mx-auto flex items-center justify-between gap-3 overflow-x-auto no-scrollbar">
-          <div className="flex items-center gap-3 xl:gap-5 shrink-0 whitespace-nowrap">
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-3 overflow-x-auto no-scrollbar whitespace-nowrap">
+          <div className="flex items-center gap-2.5 lg:gap-4 xl:gap-5 shrink-0 whitespace-nowrap">
             <motion.div 
               whileHover={{ scale: 1.04 }}
               whileTap={{ scale: 0.96 }}
@@ -407,13 +407,13 @@ export const Header: React.FC = () => {
               title={language === 'ru' ? "Изменить город" : language === 'en' ? "Change city" : "Shaharni o'zgartirish"}
             >
               <MapPin className="w-3.5 h-3.5 text-uzum-primary dark:text-purple-400 group-hover:scale-110 transition-transform shrink-0" />
-              <span>{t('cityLabel')} <strong className="text-gray-800 dark:text-white underline decoration-dotted decoration-purple-400 underline-offset-2 font-bold">{formatCity(selectedCity, language)}</strong></span>
+              <span className="whitespace-nowrap">{t('cityLabel')} <strong className="text-gray-800 dark:text-white underline decoration-dotted decoration-purple-400 underline-offset-2 font-bold whitespace-nowrap">{formatCity(selectedCity, language)}</strong></span>
             </motion.div>
             <div className="flex items-center gap-1.5 text-gray-600 dark:text-gray-200 hover:text-uzum-primary dark:hover:text-white cursor-pointer transition-colors shrink-0 whitespace-nowrap">
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400 shrink-0" />
-              <span>{t('installment')}: <span className="font-semibold text-uzum-primary dark:text-purple-300">{t('scoringNotice')}</span></span>
+              <span className="whitespace-nowrap">{t('installment')}: <span className="font-semibold text-uzum-primary dark:text-purple-300 whitespace-nowrap">{t('scoringNotice')}</span></span>
             </div>
-            <div className="text-gray-600 dark:text-gray-200 hover:text-uzum-primary dark:hover:text-white cursor-pointer transition-colors shrink-0 whitespace-nowrap hidden lg:block">
+            <div className="text-gray-600 dark:text-gray-200 hover:text-uzum-primary dark:hover:text-white cursor-pointer transition-colors shrink-0 whitespace-nowrap hidden xl:block">
               {t('freeDelivery')}
             </div>
             <button
@@ -423,25 +423,25 @@ export const Header: React.FC = () => {
               title={language === 'ru' ? "Отследить статус заказа" : language === 'en' ? "Track order status" : "Shartnoma yoki buyurtma holatini kuzatish"}
             >
               <Truck className="w-3.5 h-3.5 text-uzum-primary dark:text-purple-400 shrink-0" />
-              <span>{t('headerTrackOrder')}</span>
+              <span className="whitespace-nowrap">{t('headerTrackOrder')}</span>
             </button>
-            <div className="hidden xl:flex items-center gap-1 text-[11px] font-bold text-uzum-primary dark:text-purple-300 bg-purple-50/90 dark:bg-purple-950/50 px-2.5 py-0.5 rounded-full border border-purple-200/50 dark:border-purple-900/40 shrink-0 whitespace-nowrap">
-              <span>«{t('slogan')}»</span>
+            <div className="hidden 2xl:flex items-center gap-1 text-[11px] font-bold text-uzum-primary dark:text-purple-300 bg-purple-50/90 dark:bg-purple-950/50 px-2.5 py-0.5 rounded-full border border-purple-200/50 dark:border-purple-900/40 shrink-0 whitespace-nowrap">
+              <span className="whitespace-nowrap">«{t('slogan')}»</span>
             </div>
           </div>
-          <div className="flex items-center gap-4">
-            <a href="tel:+998943335522" className="flex items-center gap-1 text-gray-600 dark:text-gray-200 hover:text-uzum-primary dark:hover:text-white transition-colors font-medium">
-              <PhoneCall className="w-3.5 h-3.5" />
-              <span>+998 94 333 55 22</span>
+          <div className="flex items-center gap-3 shrink-0 whitespace-nowrap">
+            <a href="tel:+998943335522" className="flex items-center gap-1 text-gray-600 dark:text-gray-200 hover:text-uzum-primary dark:hover:text-white transition-colors font-medium shrink-0 whitespace-nowrap">
+              <PhoneCall className="w-3.5 h-3.5 shrink-0" />
+              <span className="whitespace-nowrap font-semibold">+998 94 333 55 22</span>
             </a>
 
             {/* Language Selector in Top Bar */}
-            <div className="flex items-center bg-gray-200/70 dark:bg-slate-800 p-0.5 rounded-lg text-[11px] font-bold">
+            <div className="flex items-center bg-gray-200/70 dark:bg-slate-800 p-0.5 rounded-lg text-[11px] font-bold shrink-0 whitespace-nowrap">
               {(['uz', 'ru', 'en'] as const).map((lang) => (
                 <button
                   key={lang}
                   onClick={() => setLanguage(lang)}
-                  className={`px-2 py-0.5 rounded-md uppercase transition-all ${
+                  className={`px-2 py-0.5 rounded-md uppercase transition-all whitespace-nowrap ${
                     language === lang
                       ? 'bg-white dark:bg-slate-700 text-uzum-primary dark:text-purple-300 shadow-xs font-black'
                       : 'text-gray-500 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white'
@@ -455,7 +455,7 @@ export const Header: React.FC = () => {
             {/* Theme Toggle Button */}
             <button
               onClick={toggleTheme}
-              className="p-1 rounded-lg text-gray-500 hover:text-uzum-primary hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors"
+              className="p-1 rounded-lg text-gray-500 hover:text-uzum-primary hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors shrink-0"
               title={theme === 'dark' ? t('themeLight') : t('themeDark')}
             >
               {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-slate-700 dark:text-gray-200" />}
