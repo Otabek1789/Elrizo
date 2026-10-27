@@ -312,7 +312,7 @@
         flex-direction: column;
         align-items: center;
         justify-content: flex-start;
-        padding: 56px 16px 36px;
+        padding: 56px 16px 96px;
         overflow-x: hidden;
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;
@@ -401,7 +401,7 @@
 
 @media (max-width: 480px) {
     .auth-103-container {
-        padding: 50px 14px 30px;
+        padding: 50px 14px 96px;
     }
 
     .auth-103-title {

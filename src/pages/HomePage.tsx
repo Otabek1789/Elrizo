@@ -28,7 +28,7 @@ export const HomePage: React.FC = () => {
   const bestSellers = products.filter((p) => p.isBestSeller);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-4 sm:py-6 space-y-10">
+    <div className="max-w-7xl mx-auto px-4 py-4 sm:py-6 space-y-10 pb-24 md:pb-8">
       {/* 1. Asosiy Promo Bannerlar Slayderi */}
       <BannerSlider />
 

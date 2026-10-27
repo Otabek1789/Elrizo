@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { generatePaymentLink, PaymentInvoiceParams } from '../lib/paymentService';
 import { useTranslation } from '../utils/translations';
+import { formatPrice } from '../utils/calculator';
 
 interface PaymentModalProps {
   isOpen: boolean;
@@ -77,7 +78,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
             <div>
               <span className="text-xs text-slate-500 dark:text-slate-400">{t('paymentModalAmount')}</span>
               <p className="text-2xl font-black text-slate-900 dark:text-white">
-                {orderParams.amount.toLocaleString()} <span className="text-sm font-semibold text-slate-500">so'm</span>
+                {formatPrice(orderParams.amount, true, language)}
               </p>
             </div>
             <div className="text-right">

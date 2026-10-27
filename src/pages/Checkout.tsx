@@ -158,9 +158,23 @@ export const Checkout: React.FC = () => {
     setCurrentStep(2);
 
     if (smsRes.isRealSmsSent) {
-      addToast(`${formData.phone} raqamiga haqiqiy SMS yuborildi!`, 'success');
+      addToast(
+        language === 'ru'
+          ? `На номер ${formData.phone} отправлено реальное SMS!`
+          : language === 'en'
+          ? `Real SMS sent to ${formData.phone}!`
+          : `${formData.phone} raqamiga haqiqiy SMS yuborildi!`,
+        'success'
+      );
     } else {
-      addToast(`${formData.phone} raqamiga tasdiqlash kodi: ${smsRes.code}`, 'info');
+      addToast(
+        language === 'ru'
+          ? `Код подтверждения для ${formData.phone}: ${smsRes.code}`
+          : language === 'en'
+          ? `Verification code for ${formData.phone}: ${smsRes.code}`
+          : `${formData.phone} raqamiga tasdiqlash kodi: ${smsRes.code}`,
+        'info'
+      );
     }
   };
 
@@ -335,7 +349,14 @@ export const Checkout: React.FC = () => {
     });
 
     window.open(paymentLink.paymentUrl, '_blank', 'noopener,noreferrer');
-    addToast(`${provider.toUpperCase()} rasmiy to'lov sahifasi ochildi!`, 'info');
+    addToast(
+      language === 'ru'
+        ? `Открыта страница оплаты ${provider.toUpperCase()}!`
+        : language === 'en'
+        ? `Opened ${provider.toUpperCase()} payment gateway!`
+        : `${provider.toUpperCase()} rasmiy to'lov sahifasi ochildi!`,
+      'info'
+    );
 
     setCurrentStep(4);
     clearCart();
@@ -373,17 +394,32 @@ export const Checkout: React.FC = () => {
     setPromoError('');
     const res = applyPromoCode(code);
     if (!res.success) {
-      const msg = res.message || 'Promokod topilmadi yoki muddati o\'tgan';
+      const msg = res.message || (
+        language === 'ru'
+          ? 'Промокод не найден или срок действия истек'
+          : language === 'en'
+          ? 'Promo code not found or expired'
+          : "Promokod topilmadi yoki muddati o'tgan"
+      );
       setPromoError(msg);
       addToast(msg, 'error');
     } else {
       setPromoInput('');
-      addToast(res.message || 'Promokod muvaffaqiyatli qo\'llandi', 'success');
+      addToast(
+        res.message || (
+          language === 'ru'
+            ? 'Промокод успешно применен'
+            : language === 'en'
+            ? 'Promo code successfully applied'
+            : "Promokod muvaffaqiyatli qo'llandi"
+        ),
+        'success'
+      );
     }
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-6 sm:py-8 space-y-8 animate-in fade-in duration-300">
+    <div className="max-w-7xl mx-auto px-4 py-6 sm:py-8 pb-24 md:pb-8 space-y-8 animate-in fade-in duration-300">
       {/* Sarlavha */}
       <div>
         <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white">
@@ -682,7 +718,7 @@ export const Checkout: React.FC = () => {
                       {isSendingSms ? (
                         <>
                           <Loader2 className="w-4 h-4 animate-spin" />
-                          <span>SMS kod yuborilmoqda...</span>
+                          <span>{language === 'ru' ? 'Отправка SMS...' : language === 'en' ? 'Sending SMS...' : 'SMS kod yuborilmoqda...'}</span>
                         </>
                       ) : (
                         <>
@@ -722,10 +758,10 @@ export const Checkout: React.FC = () => {
                         {isRealSmsDelivered ? (
                           <>
                             <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                            <span>Telefoningizga haqiqiy SMS xabar yuborildi</span>
+                            <span>{language === 'ru' ? 'На ваш телефон отправлено реальное SMS-сообщение' : language === 'en' ? 'Real SMS sent to your phone' : 'Telefoningizga haqiqiy SMS xabar yuborildi'}</span>
                           </>
                         ) : (
-                          <span>Tasdiqlash kodi: <strong className="text-amber-600 dark:text-amber-400 font-mono text-sm">{serverOtpCode}</strong></span>
+                          <span>{language === 'ru' ? 'Код подтверждения:' : language === 'en' ? 'Verification code:' : 'Tasdiqlash kodi:'} <strong className="text-amber-600 dark:text-amber-400 font-mono text-sm">{serverOtpCode}</strong></span>
                         )}
                       </div>
 
@@ -740,14 +776,30 @@ export const Checkout: React.FC = () => {
                             setServerOtpCode(smsRes.code);
                             setIsRealSmsDelivered(smsRes.isRealSmsSent);
                             if (smsRes.isRealSmsSent) {
-                              addToast(`${formData.phone} raqamiga haqiqiy SMS yuborildi!`, 'success');
+                              addToast(
+                                language === 'ru'
+                                  ? `На номер ${formData.phone} отправлено реальное SMS!`
+                                  : language === 'en'
+                                  ? `Real SMS sent to ${formData.phone}!`
+                                  : `${formData.phone} raqamiga haqiqiy SMS yuborildi!`,
+                                'success'
+                              );
                             } else {
-                              addToast(`Yangi SMS kod: ${smsRes.code}`, 'info');
+                              addToast(
+                                language === 'ru'
+                                  ? `Новый SMS код: ${smsRes.code}`
+                                  : language === 'en'
+                                  ? `New SMS code: ${smsRes.code}`
+                                  : `Yangi SMS kod: ${smsRes.code}`,
+                                'info'
+                              );
                             }
                           }}
                           className="text-xs text-purple-600 dark:text-purple-400 hover:underline font-bold"
                         >
-                          {isSendingSms ? "SMS yuborilmoqda..." : "Kodni qayta yuborish"}
+                          {isSendingSms 
+                            ? (language === 'ru' ? 'SMS отправляется...' : language === 'en' ? 'Sending SMS...' : 'SMS yuborilmoqda...') 
+                            : (language === 'ru' ? 'Отправить код повторно' : language === 'en' ? 'Resend code' : 'Kodni qayta yuborish')}
                         </button>
                       </div>
                     </div>
@@ -845,7 +897,9 @@ export const Checkout: React.FC = () => {
             ) : (
               /* Agar To'liq To'lov tanlangan bo'lsa */
               <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700/60 p-6 space-y-5 shadow-sm">
-                <h3 className="text-base font-bold text-gray-900 dark:text-white">To'lov usulini tanlang:</h3>
+                <h3 className="text-base font-bold text-gray-900 dark:text-white">
+                  {language === 'ru' ? 'Выберите способ оплаты:' : language === 'en' ? 'Select payment method:' : "To'lov usulini tanlang:"}
+                </h3>
                 
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   {/* Uzum Pay */}
@@ -862,7 +916,9 @@ export const Checkout: React.FC = () => {
                       uzum
                     </div>
                     <span className="font-extrabold text-xs sm:text-sm text-gray-900 dark:text-white">Uzum Pay</span>
-                    <span className="text-[10px] text-purple-600 dark:text-purple-400 font-bold mt-0.5">1% Keshbek</span>
+                    <span className="text-[10px] text-purple-600 dark:text-purple-400 font-bold mt-0.5">
+                      {language === 'ru' ? '1% Кэшбэк' : language === 'en' ? '1% Cashback' : '1% Keshbek'}
+                    </span>
                     {selectedOnlineProvider === 'uzumpay' && (
                       <span className="absolute top-2 right-2 w-4 h-4 rounded-full bg-purple-600 text-white flex items-center justify-center text-[10px] font-bold">
                         ✓
@@ -906,7 +962,9 @@ export const Checkout: React.FC = () => {
                       CLICK
                     </div>
                     <span className="font-extrabold text-xs sm:text-sm text-gray-900 dark:text-white">Click Up</span>
-                    <span className="text-[10px] text-blue-600 dark:text-blue-400 font-bold mt-0.5">Tezkor to'lov</span>
+                    <span className="text-[10px] text-blue-600 dark:text-blue-400 font-bold mt-0.5">
+                      {language === 'ru' ? 'Быстрая оплата' : language === 'en' ? 'Fast payment' : "Tezkor to'lov"}
+                    </span>
                     {selectedOnlineProvider === 'click' && (
                       <span className="absolute top-2 right-2 w-4 h-4 rounded-full bg-blue-600 text-white flex items-center justify-center text-[10px] font-bold">
                         ✓
@@ -927,8 +985,12 @@ export const Checkout: React.FC = () => {
                     <div className="w-9 h-9 rounded-xl bg-emerald-600 text-white font-black text-[11px] flex items-center justify-center shadow mb-1.5">
                       <Banknote className="w-5 h-5 text-white" />
                     </div>
-                    <span className="font-extrabold text-xs sm:text-sm text-gray-900 dark:text-white">Naqd pul</span>
-                    <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold mt-0.5">Yetkazilganda</span>
+                    <span className="font-extrabold text-xs sm:text-sm text-gray-900 dark:text-white">
+                      {language === 'ru' ? 'Наличные' : language === 'en' ? 'Cash' : 'Naqd pul'}
+                    </span>
+                    <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold mt-0.5">
+                      {language === 'ru' ? 'При получении' : language === 'en' ? 'Upon delivery' : 'Yetkazilganda'}
+                    </span>
                     {selectedOnlineProvider === 'cash' && (
                       <span className="absolute top-2 right-2 w-4 h-4 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[10px] font-bold">
                         ✓
@@ -970,10 +1032,19 @@ export const Checkout: React.FC = () => {
                 <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700/60 flex items-center justify-between text-xs">
                   <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
                     <ShieldCheck className="w-4 h-4 text-emerald-500" />
-                    <span>Tanlangan to'lov usuli: <strong className="uppercase font-bold text-slate-900 dark:text-white">{selectedOnlineProvider === 'cash' ? 'Qabul qilganda naqd' : selectedOnlineProvider}</strong></span>
+                    <span>
+                      {language === 'ru' ? 'Выбранный метод оплаты:' : language === 'en' ? 'Selected payment method:' : "Tanlangan to'lov usuli:"}{' '}
+                      <strong className="uppercase font-bold text-slate-900 dark:text-white">
+                        {selectedOnlineProvider === 'cash' 
+                          ? (language === 'ru' ? 'Наличные при получении' : language === 'en' ? 'Cash on delivery' : 'Qabul qilganda naqd') 
+                          : selectedOnlineProvider}
+                      </strong>
+                    </span>
                   </div>
                   <span className="text-emerald-600 dark:text-emerald-400 font-bold">
-                    {selectedOnlineProvider === 'cash' ? 'Kuryer orqali' : 'Rasmiy Gateway'}
+                    {selectedOnlineProvider === 'cash' 
+                      ? (language === 'ru' ? 'Через курьера' : language === 'en' ? 'Via courier' : 'Kuryer orqali') 
+                      : (language === 'ru' ? 'Официальный шлюз' : language === 'en' ? 'Official Gateway' : 'Rasmiy Gateway')}
                   </span>
                 </div>
 
@@ -984,7 +1055,9 @@ export const Checkout: React.FC = () => {
                     className="w-full py-4 text-white font-black text-sm rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 shadow-emerald-600/25 transform active:scale-98"
                   >
                     <CheckCircle2 className="w-4 h-4" />
-                    <span>Buyurtmani tasdiqlash ({formatPrice(finalTotal, true, language)})</span>
+                    <span>
+                      {language === 'ru' ? 'Подтвердить заказ' : language === 'en' ? 'Confirm order' : 'Buyurtmani tasdiqlash'} ({formatPrice(finalTotal, true, language)})
+                    </span>
                   </button>
                 ) : (
                   <button
@@ -998,7 +1071,9 @@ export const Checkout: React.FC = () => {
                         : 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 shadow-purple-500/25'
                     }`}
                   >
-                    <span>{selectedOnlineProvider.toUpperCase()} orqali to'lovga o'tish ({formatPrice(finalTotal, true, language)})</span>
+                    <span>
+                      {selectedOnlineProvider.toUpperCase()} {language === 'ru' ? 'оплатить через' : language === 'en' ? 'pay with' : "orqali to'lovga o'tish"} ({formatPrice(finalTotal, true, language)})
+                    </span>
                     <ExternalLink className="w-4 h-4" />
                   </button>
                 )}
@@ -1198,7 +1273,7 @@ export const Checkout: React.FC = () => {
               )}
               {cashbackDiscount > 0 && (
                 <div className="flex justify-between text-amber-600 dark:text-amber-400 font-bold">
-                  <span>Jamg'arma karta (Keshbek)</span>
+                  <span>{language === 'ru' ? 'Накопительная карта (Кэшбэк)' : language === 'en' ? 'Savings card (Cashback)' : "Jamg'arma karta (Keshbek)"}</span>
                   <span>-{formatPrice(cashbackDiscount, true, language)}</span>
                 </div>
               )}

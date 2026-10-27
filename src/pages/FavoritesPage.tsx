@@ -13,7 +13,7 @@ export const FavoritesPage: React.FC = () => {
   const favoriteProducts = products.filter((p) => favorites.includes(p.id));
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-6 sm:py-8 space-y-6 animate-in fade-in duration-300">
+    <div className="max-w-7xl mx-auto px-4 py-6 sm:py-8 pb-24 md:pb-8 space-y-6 animate-in fade-in duration-300">
       <div className="flex items-center justify-between border-b border-gray-200 dark:border-slate-800 pb-4">
         <div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white flex items-center gap-2.5">

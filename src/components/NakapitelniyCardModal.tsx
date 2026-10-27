@@ -17,10 +17,11 @@ import {
 import { useStore } from '../store/useStore';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from '../utils/translations';
+import { formatPrice } from '../utils/calculator';
 
 export const NakapitelniyCardModal: React.FC = () => {
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   const { 
     user, 
     isCashbackCardModalOpen, 
@@ -162,23 +163,23 @@ export const NakapitelniyCardModal: React.FC = () => {
                   {currentBalance.toLocaleString()}
                 </span>
                 <span className="text-sm sm:text-base font-bold text-amber-300">
-                  so'm
+                  {language === 'ru' ? 'сум' : language === 'en' ? 'UZS' : "so'm"}
                 </span>
               </div>
             </div>
 
-            {/* Card Bottom: Member Name & Card Type (Karta raqami olib tashlangan) */}
+            {/* Card Bottom: Member Name & Card Type */}
             <div className="mt-4 sm:mt-5 pt-3 border-t border-white/10 flex items-center justify-between text-xs font-mono relative z-10">
               <div>
                 <span className="text-[10px] text-purple-300/80 block uppercase">{t('cardModalOwner')}</span>
                 <span className="text-xs sm:text-sm tracking-wide text-slate-100 font-bold block">
-                  {user ? user.fullName.toUpperCase() : <></>}
+                  {user ? user.fullName.toUpperCase() : ''}
                 </span>
               </div>
               <div className="text-right">
                 <span className="text-[10px] text-purple-300/80 block uppercase">{t('cardModalSystemTitle')}</span>
                 <span className="text-[11px] sm:text-xs font-bold text-amber-300 truncate max-w-[130px] sm:max-w-[170px] block">
-                  1% Jamg'arma
+                  {language === 'ru' ? '1% Накопительная' : language === 'en' ? '1% Savings' : "1% Jamg'arma"}
                 </span>
               </div>
             </div>
@@ -228,7 +229,7 @@ export const NakapitelniyCardModal: React.FC = () => {
             <h4 className="font-bold text-sm text-slate-900 dark:text-white flex items-center justify-between">
               <span>{t('cardModalHistoryTitle')}</span>
               <span className="text-xs text-slate-400 font-normal">
-                {validTransactions.length} ta operatsiya
+                {validTransactions.length} {language === 'ru' ? 'операций' : language === 'en' ? 'transactions' : 'ta operatsiya'}
               </span>
             </h4>
 
@@ -273,7 +274,7 @@ export const NakapitelniyCardModal: React.FC = () => {
                     <span className={`text-sm font-black font-mono shrink-0 ${
                       tx.type === 'earned' ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'
                     }`}>
-                      {tx.type === 'earned' ? '+' : '-'}{tx.amount.toLocaleString()} so'm
+                      {tx.type === 'earned' ? '+' : '-'}{formatPrice(tx.amount, true, language)}
                     </span>
                   </div>
                 ))}

@@ -247,7 +247,7 @@ export const CatalogPage: React.FC = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-4 sm:py-6 space-y-6">
+    <div className="max-w-7xl mx-auto px-4 py-4 sm:py-6 space-y-6 pb-24 md:pb-8">
       {/* 1. Breadcrumb va Sarlavha */}
       <div className="space-y-2">
         <nav className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-slate-400">
@@ -407,7 +407,7 @@ export const CatalogPage: React.FC = () => {
 
           {(priceRange[0] > 0 || priceRange[1] < 25000000) && (
             <span className="inline-flex items-center gap-1.5 bg-amber-100 dark:bg-amber-950/60 text-amber-900 dark:text-amber-300 font-bold px-2.5 py-1 rounded-lg">
-              {t('priceBadgeLabel')} {formatPrice(priceRange[0])} — {formatPrice(priceRange[1])}
+              {t('priceBadgeLabel')} {formatPrice(priceRange[0], true, language)} — {formatPrice(priceRange[1], true, language)}
               <button onClick={() => setPriceRange([0, 25000000])} className="hover:text-black dark:hover:text-white">
                 <X className="w-3 h-3" />
               </button>

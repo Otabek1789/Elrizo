@@ -28,3 +28,6 @@ tsconfig.tsbuildinfo
 .env
 .env.*
 !.env.example
+
+# Local temporary scratch files
+scratch/

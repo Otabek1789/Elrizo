@@ -119,9 +119,24 @@ export const ProductDetail: React.FC = () => {
   const handleToggleComparison = () => {
     if (isCompared) {
       removeFromComparison(product.id);
-      addToast("Taqqoslashdan olib tashlandi", 'info');
+      addToast(
+        language === 'ru'
+          ? 'Товар удален из сравнения'
+          : language === 'en'
+          ? 'Removed from comparison'
+          : 'Taqqoslashdan olib tashlandi',
+        'info'
+      );
     } else {
       addToComparison(product.id);
+      addToast(
+        language === 'ru'
+          ? 'Товар добавлен к сравнению'
+          : language === 'en'
+          ? 'Added to comparison'
+          : "Taqqoslashga qo'shildi",
+        'success'
+      );
     }
   };
 
@@ -160,19 +175,33 @@ export const ProductDetail: React.FC = () => {
   const handleSubmitReview = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newReviewComment.trim()) {
-      addToast("Iltimos, sharh matnini kiriting", 'warning');
+      addToast(
+        language === 'ru'
+          ? 'Пожалуйста, введите текст отзыва'
+          : language === 'en'
+          ? 'Please enter your review text'
+          : 'Iltimos, sharh matnini kiriting',
+        'warning'
+      );
       return;
     }
     setIsSubmittingReview(true);
     setTimeout(() => {
       addReview(product.id, {
-        userName: newReviewAuthor.trim() || 'Mijoz',
+        userName: newReviewAuthor.trim() || (language === 'ru' ? 'Покупатель' : language === 'en' ? 'Customer' : 'Mijoz'),
         rating: newReviewRating,
         comment: newReviewComment.trim(),
       });
       setNewReviewComment('');
       setIsSubmittingReview(false);
-      addToast("Sharhingiz qabul qilindi va chop etildi!", 'success');
+      addToast(
+        language === 'ru'
+          ? 'Ваш отзыв принят и опубликован!'
+          : language === 'en'
+          ? 'Your review has been published!'
+          : 'Sharhingiz qabul qilindi va chop etildi!',
+        'success'
+      );
     }, 400);
   };
 
@@ -181,7 +210,7 @@ export const ProductDetail: React.FC = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-4 sm:py-6 space-y-8 animate-in fade-in duration-300">
+    <div className="max-w-7xl mx-auto px-4 py-4 sm:py-6 pb-24 md:pb-8 space-y-8 animate-in fade-in duration-300">
       {/* Breadcrumb Navigation */}
       <nav className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 overflow-x-auto pb-1 no-scrollbar">
         <Link
