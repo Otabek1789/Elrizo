@@ -208,7 +208,8 @@ export const Header: React.FC = () => {
 
   const handleCategoryClick = (categorySlug: string) => {
     navigateToCategory(categorySlug);
-    navigate(`/catalog?category=${encodeURIComponent(categorySlug)}`);
+    const isAlreadyCatalog = location.pathname.startsWith('/catalog') || location.pathname.startsWith('/products');
+    navigate(`/catalog?category=${encodeURIComponent(categorySlug)}`, { replace: isAlreadyCatalog });
     setIsCatalogOpen(false);
   };
 
@@ -920,28 +921,48 @@ export const Header: React.FC = () => {
             </Link>
             <Link
               to="/catalog?category=smartphones"
-              onClick={() => handleCategoryClick('smartphones')}
+              onClick={(e) => {
+                if (location.pathname.startsWith('/catalog') || location.pathname.startsWith('/products')) {
+                  e.preventDefault();
+                }
+                handleCategoryClick('smartphones');
+              }}
               className="text-gray-700 dark:text-white hover:text-uzum-primary dark:hover:text-purple-300 font-medium transition-colors no-underline"
             >
               {t('smartphonesNav')}
             </Link>
             <Link
               to="/catalog?category=appliances"
-              onClick={() => handleCategoryClick('appliances')}
+              onClick={(e) => {
+                if (location.pathname.startsWith('/catalog') || location.pathname.startsWith('/products')) {
+                  e.preventDefault();
+                }
+                handleCategoryClick('appliances');
+              }}
               className="text-gray-700 dark:text-white hover:text-uzum-primary dark:hover:text-purple-300 font-medium transition-colors no-underline"
             >
               {t('appliancesNav')}
             </Link>
             <Link
               to="/catalog?category=computers"
-              onClick={() => handleCategoryClick('computers')}
+              onClick={(e) => {
+                if (location.pathname.startsWith('/catalog') || location.pathname.startsWith('/products')) {
+                  e.preventDefault();
+                }
+                handleCategoryClick('computers');
+              }}
               className="text-gray-700 dark:text-white hover:text-uzum-primary dark:hover:text-purple-300 font-medium transition-colors no-underline"
             >
               {t('laptopsNav')}
             </Link>
             <Link
               to="/catalog?category=beauty"
-              onClick={() => handleCategoryClick('beauty')}
+              onClick={(e) => {
+                if (location.pathname.startsWith('/catalog') || location.pathname.startsWith('/products')) {
+                  e.preventDefault();
+                }
+                handleCategoryClick('beauty');
+              }}
               className="text-gray-700 dark:text-white hover:text-uzum-primary dark:hover:text-purple-300 font-medium transition-colors no-underline"
             >
               {t('beautyNav')}

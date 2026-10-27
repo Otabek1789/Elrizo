@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { 
   SlidersHorizontal, 
   RotateCcw, 
@@ -84,6 +84,7 @@ const isProductInBrand = (product: Product, brand: string): boolean => {
 
 export const CatalogPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
   const { 
     products, 
     searchQuery, 
@@ -104,16 +105,23 @@ export const CatalogPage: React.FC = () => {
   // URL query parametrlarini sinxronlash (React Router bilan)
   useEffect(() => {
     const cat = searchParams.get('category');
-    if (cat !== null) {
-      if (cat !== selectedCategorySlug) {
-        navigateToCategory(cat || null);
-      }
+    if (cat !== selectedCategorySlug) {
+      navigateToCategory(cat || null);
     }
     const q = searchParams.get('search') ?? searchParams.get('q');
     if (q !== null && q !== searchQuery) {
       setSearchQuery(q);
     }
   }, [searchParams]);
+
+  // Har qanday toifada turganda ortga qaytish (barcha mahsulotlarga aylanmasdan to'g'ri ortga qaytadi)
+  const handleGoBack = () => {
+    if (window.history.length > 1) {
+      navigate(-1);
+    } else {
+      navigate('/');
+    }
+  };
 
   const handleSelectCategory = (slug: string | null) => {
     navigateToCategory(slug);
@@ -123,7 +131,8 @@ export const CatalogPage: React.FC = () => {
     } else {
       params.delete('category');
     }
-    setSearchParams(params);
+    // replace: true orqali brauzer tarixiga ortiqcha oraliq qadam qo'shilmaydi
+    setSearchParams(params, { replace: true });
     setCurrentPage(1);
   };
 
@@ -311,7 +320,7 @@ export const CatalogPage: React.FC = () => {
     setInStockOnly(false);
     setSearchQuery('');
     navigateToCategory(null);
-    setSearchParams({});
+    setSearchParams({}, { replace: true });
     setCurrentPage(1);
   };
 
@@ -336,19 +345,31 @@ export const CatalogPage: React.FC = () => {
     <div className="max-w-7xl mx-auto px-4 py-4 sm:py-6 space-y-6 pb-24 md:pb-8">
       {/* 1. Breadcrumb va Sarlavha Paneli */}
       <div className="space-y-3">
-        <nav className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-slate-400">
-          <Link to="/" className="text-gray-600 dark:text-slate-300 hover:text-uzum-primary dark:hover:text-purple-400 transition-colors font-medium">
-            {t('home')}
-          </Link>
-          <ChevronRight className="w-3.5 h-3.5 text-gray-400 dark:text-slate-600" />
-          <span className="text-gray-800 dark:text-slate-100 font-semibold">{t('catalogAndFilters')}</span>
-          {currentCategory && (
-            <>
-              <ChevronRight className="w-3.5 h-3.5 text-gray-400 dark:text-slate-600" />
-              <span className="text-uzum-primary dark:text-purple-300 font-bold">{getCategoryTitle(currentCategory.slug, language)}</span>
-            </>
-          )}
-        </nav>
+        <div className="flex items-center gap-2.5 flex-wrap">
+          <button
+            type="button"
+            onClick={handleGoBack}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-xs font-bold text-gray-700 dark:text-slate-200 hover:bg-gray-100 dark:hover:bg-slate-700 transition-all shadow-xs cursor-pointer group shrink-0"
+            title="Ortga qaytish"
+          >
+            <ChevronLeft className="w-4 h-4 text-gray-500 group-hover:text-black dark:text-gray-400 dark:group-hover:text-white group-hover:-translate-x-0.5 transition-transform" />
+            <span>{language === 'ru' ? 'Назад' : language === 'en' ? 'Back' : 'Ortga'}</span>
+          </button>
+
+          <nav className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-slate-400 overflow-x-auto no-scrollbar py-0.5">
+            <Link to="/" className="text-gray-600 dark:text-slate-300 hover:text-uzum-primary dark:hover:text-purple-400 transition-colors font-medium shrink-0">
+              {t('home')}
+            </Link>
+            <ChevronRight className="w-3.5 h-3.5 text-gray-400 dark:text-slate-600 shrink-0" />
+            <span className="text-gray-800 dark:text-slate-100 font-semibold shrink-0">{t('catalogAndFilters')}</span>
+            {currentCategory && (
+              <>
+                <ChevronRight className="w-3.5 h-3.5 text-gray-400 dark:text-slate-600 shrink-0" />
+                <span className="text-uzum-primary dark:text-purple-300 font-bold shrink-0">{getCategoryTitle(currentCategory.slug, language)}</span>
+              </>
+            )}
+          </nav>
+        </div>
 
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
