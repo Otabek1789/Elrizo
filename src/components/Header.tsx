@@ -109,7 +109,6 @@ export const Header: React.FC = () => {
     openOrderTracking,
     comparisonList,
     openComparisonModal,
-    openCashbackCardModal,
     logoutUser,
   } = useStore();
 
@@ -652,29 +651,6 @@ export const Header: React.FC = () => {
             )}
           </Link>
 
-          {/* Nakapitelniy Karta (Keshbek) Button */}
-          <motion.button
-            id="nakapitelniy-card-header-btn"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={openCashbackCardModal}
-            className="hidden md:flex relative items-center gap-2 p-2 sm:px-3 sm:py-2 rounded-2xl bg-gradient-to-r from-amber-500/10 via-yellow-500/10 to-amber-500/15 dark:from-amber-500/20 dark:to-yellow-500/20 text-amber-900 dark:text-amber-200 hover:bg-amber-100/80 dark:hover:bg-amber-900/40 border border-amber-300/60 dark:border-amber-600/40 transition-all shadow-xs"
-            title={language === 'ru' ? "1% Накопительная карта кэшбэка" : language === 'en' ? "1% Savings Cashback Card" : "1% Jamg'arma Keshbek Kartasi"}
-          >
-            <div className="relative">
-              <CreditCard className="w-5 h-5 text-amber-600 dark:text-amber-400" />
-              <span className="absolute -top-1 -right-1 text-[8px] font-black bg-amber-500 text-white px-1 rounded-full shadow-xs">
-                1%
-              </span>
-            </div>
-            <div className="hidden xl:flex flex-col text-left">
-              <span className="text-[11px] font-bold leading-none text-amber-950 dark:text-amber-200">{t('headerSavingsCard')}</span>
-              <span className="text-[11px] font-black text-amber-600 dark:text-amber-400 mt-0.5">
-                {formatPrice(user?.cashbackBalance ?? 0, true, language)}
-              </span>
-            </div>
-          </motion.button>
-
           {/* Product Comparison (Taqqoslash) */}
           <motion.button
             id="comparison-btn"
@@ -877,24 +853,6 @@ export const Header: React.FC = () => {
                     >
                       <Package className="w-4 h-4 text-indigo-500 group-hover:scale-110 transition-transform" />
                       <span>{t('headerUserOrders')}</span>
-                    </button>
-
-                    {/* Jamg'arma karta */}
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setIsUserMenuOpen(false);
-                        openCashbackCardModal();
-                      }}
-                      className="w-full flex items-center justify-between px-3 py-2 rounded-xl hover:bg-amber-50 dark:hover:bg-amber-950/40 text-gray-700 dark:text-slate-200 font-bold transition-colors cursor-pointer group"
-                    >
-                      <div className="flex items-center gap-2.5">
-                        <CreditCard className="w-4 h-4 text-amber-500 group-hover:scale-110 transition-transform" />
-                        <span>{t('headerUserCard')}</span>
-                      </div>
-                      <span className="text-[10px] font-black text-amber-600 dark:text-amber-400 bg-amber-100 dark:bg-amber-900/50 px-2 py-0.5 rounded-full">
-                        {formatPrice(user.cashbackBalance ?? 0, true, language)}
-                      </span>
                     </button>
 
                     {/* Admin panel (faqat admin uchun) */}

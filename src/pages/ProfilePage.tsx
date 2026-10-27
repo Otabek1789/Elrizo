@@ -9,7 +9,6 @@ import {
   Shield, 
   Camera, 
   Save, 
-  CreditCard, 
   Package, 
   Heart, 
   LogOut, 
@@ -96,7 +95,7 @@ const compressImage = (file: File): Promise<string> => {
 
 export const ProfilePage: React.FC = () => {
   const navigate = useNavigate();
-  const { user, updateUserProfile, logoutUser, orders, favorites, language, openCashbackCardModal } = useStore();
+  const { user, updateUserProfile, logoutUser, orders, favorites, language } = useStore();
   const { t } = useTranslation();
 
   const [activeTab, setActiveTab] = useState<'info' | 'orders' | 'security'>('info');
@@ -307,15 +306,6 @@ export const ProfilePage: React.FC = () => {
                   <span>Admin Panel</span>
                 </Link>
               )}
-
-              <button
-                type="button"
-                onClick={openCashbackCardModal}
-                className="flex-1 sm:flex-none px-4 py-2 rounded-2xl bg-gradient-to-r from-amber-500/10 to-yellow-500/10 hover:bg-amber-500/20 border border-amber-300 dark:border-amber-600/40 text-amber-900 dark:text-amber-200 font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-xs"
-              >
-                <CreditCard className="w-4 h-4 text-amber-600 dark:text-amber-400" />
-                <span>{t('profileSavingsTitle')}: {formatPrice(user.cashbackBalance ?? 0, true, language)}</span>
-              </button>
 
               <button
                 type="button"

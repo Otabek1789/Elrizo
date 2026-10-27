@@ -18,7 +18,6 @@ import { InstallmentCalculator } from './components/InstallmentCalculator';
 import { ProductComparisonModal } from './components/ProductComparisonModal';
 import { ComparisonBar } from './components/ComparisonBar';
 import { OrderTrackingModal } from './components/OrderTrackingModal';
-import { NakapitelniyCardModal } from './components/NakapitelniyCardModal';
 import { MobileBottomNav } from './components/MobileBottomNav';
 import { Footer } from './components/Footer';
 import { ScrollProgressBar, ScrollToTopButton } from './components/ScrollFeatures';
@@ -159,7 +158,6 @@ export const App: React.FC = () => {
       <ProductComparisonModal />
       <ComparisonBar />
       <OrderTrackingModal />
-      <NakapitelniyCardModal />
 
       {/* 7. Global Tezkor Nasiya Kalkulyatori Modali */}
       {isCalculatorOpen && calculatorProduct && (
