@@ -56,11 +56,25 @@ export default async function handler(req: any, res: any) {
   }
 
   if (req.method !== 'POST') {
+    let reconnected = false;
+    try {
+      const webhookUrl = `${SITE_URL}/api/telegram`;
+      const infoRes = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/getWebhookInfo`);
+      const info = await infoRes.json();
+      if (info.ok && info.result?.url !== webhookUrl) {
+        await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/setWebhook?url=${encodeURIComponent(webhookUrl)}&drop_pending_updates=true`);
+        reconnected = true;
+      }
+    } catch (e) {
+      // Ignore network errors in status check
+    }
+
     return res.status(200).json({
       ok: true,
       message: 'ELRIZO Telegram Bot Webhook endpoint active',
       bot: '@elrizo_bot',
-      web_app_url: WEBAPP_URL
+      web_app_url: WEBAPP_URL,
+      reconnected
     });
   }
 
