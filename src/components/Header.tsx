@@ -393,7 +393,7 @@ export const Header: React.FC = () => {
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-white/95 dark:bg-[#0F172A]/95 backdrop-blur-md border-b border-gray-200 dark:border-slate-800 shadow-sm transition-colors">
+    <header className="sticky top-0 z-40 bg-white/95 dark:bg-[#0C0D14]/95 backdrop-blur-md border-b border-gray-200 dark:border-slate-800 shadow-sm transition-colors">
       {/* Top utility bar */}
       <div className="bg-gray-50 dark:bg-slate-900 border-b border-gray-100 dark:border-slate-800 text-xs text-gray-500 dark:text-gray-300 py-1.5 px-4 hidden md:block">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-3 overflow-x-auto no-scrollbar whitespace-nowrap">
@@ -900,7 +900,7 @@ export const Header: React.FC = () => {
     </div>
 
       {/* Sub-header navigation (Quick Categories) */}
-      <div className="border-t border-gray-100 dark:border-slate-800 px-4 py-2 hidden sm:block bg-white dark:bg-[#0F172A] text-xs transition-colors">
+      <div className="border-t border-gray-100 dark:border-slate-800 px-4 py-2 hidden sm:block bg-white dark:bg-[#090A0F] text-xs transition-colors">
         <div className="max-w-7xl mx-auto flex items-center justify-between overflow-x-auto gap-4 no-scrollbar">
           <div className="flex items-center gap-5 shrink-0">
             <Link

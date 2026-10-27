@@ -116,7 +116,7 @@ export const App: React.FC = () => {
   const isTgPage = location.pathname.startsWith('/tg') || location.pathname.startsWith('/webapp');
 
   return (
-    <div className={`flex flex-col w-full max-w-full overflow-x-hidden bg-[#F8F9FA] dark:bg-[#0B0F19] text-gray-900 dark:text-gray-100 relative selection:bg-purple-200 selection:text-purple-900 ${
+    <div className={`flex flex-col w-full max-w-full overflow-x-hidden bg-[#F8F9FA] dark:bg-[#060709] text-gray-900 dark:text-gray-100 relative selection:bg-purple-200 selection:text-purple-900 ${
       isAdminPage ? 'h-screen overflow-hidden' : 'min-h-screen'
     }`}>
       {/* 1. Scroll Progress Bar (Sayt bo'ylab scroll animatsiyasi) */}

@@ -17,7 +17,7 @@
     color-scheme: dark;
   }
   html.dark *, html.dark ::before, html.dark ::after {
-    border-color: #1E293B;
+    border-color: #1F222E;
   }
   body {
     background-color: #F8F9FA;
@@ -35,19 +35,19 @@
     min-height: 100vh;
   }
   html.dark body {
-    background-color: #0B0F19;
-    color: #F3F4F6;
+    background-color: #060709;
+    color: #F4F4F6;
   }
 }
 
 html.dark ::-webkit-scrollbar-track {
-  background: #0F172A;
+  background: #08090C;
 }
 html.dark ::-webkit-scrollbar-thumb {
-  background: #334155;
+  background: #202330;
 }
 html.dark ::-webkit-scrollbar-thumb:hover {
-  background: #7000FF;
+  background: #8B5CF6;
 }
 
 /* Custom scrollbars */

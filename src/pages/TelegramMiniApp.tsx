@@ -302,7 +302,7 @@ export const TelegramMiniApp: React.FC = () => {
   };
 
   return (
-    <div className="w-full max-w-md mx-auto min-h-screen bg-[#F4F6F8] dark:bg-[#0B0F19] text-gray-900 dark:text-gray-100 flex flex-col font-sans select-none pb-28 relative">
+    <div className="w-full max-w-md mx-auto min-h-screen bg-[#F4F6F8] dark:bg-[#060709] text-gray-900 dark:text-gray-100 flex flex-col font-sans select-none pb-28 relative">
       {/* 1. TOP MOBILE HEADER */}
       <header className="sticky top-0 z-40 bg-gradient-to-r from-[#640199] via-[#7B0FB5] to-[#50007A] text-white px-4 pt-3 pb-3 shadow-lg">
         <div className="flex items-center justify-between gap-2 mb-2.5">
@@ -393,7 +393,7 @@ export const TelegramMiniApp: React.FC = () => {
                   className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all shrink-0 ${
                     isActive
                       ? 'bg-gradient-to-r from-[#640199] to-[#7B0FB5] text-white shadow-md shadow-purple-500/25 scale-105'
-                      : 'bg-white dark:bg-[#161D2E] text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-800'
+                      : 'bg-white dark:bg-[#111319] text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-800'
                   }`}
                 >
                   <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-amber-300' : 'text-purple-600 dark:text-purple-400'}`} />
@@ -470,7 +470,7 @@ export const TelegramMiniApp: React.FC = () => {
                   <div
                     key={product.id}
                     onClick={() => handleOpenProduct(product)}
-                    className="bg-white dark:bg-[#161D2E] rounded-2xl p-2.5 flex flex-col justify-between border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-md transition-all active:scale-[0.98] cursor-pointer relative"
+                    className="bg-white dark:bg-[#111319] rounded-2xl p-2.5 flex flex-col justify-between border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-md transition-all active:scale-[0.98] cursor-pointer relative"
                   >
                     {/* Top Badges & Favorite Heart */}
                     <div className="relative w-full aspect-square bg-gray-50 dark:bg-gray-800/60 rounded-xl overflow-hidden mb-2 p-2 flex items-center justify-center">
@@ -622,7 +622,7 @@ export const TelegramMiniApp: React.FC = () => {
                     setSelectedCategory(cat.id);
                     setActiveTab('home');
                   }}
-                  className="bg-white dark:bg-[#161D2E] rounded-2xl p-3 border border-gray-100 dark:border-gray-800 flex items-center justify-between gap-3 shadow-sm active:scale-[0.98] cursor-pointer"
+                  className="bg-white dark:bg-[#111319] rounded-2xl p-3 border border-gray-100 dark:border-gray-800 flex items-center justify-between gap-3 shadow-sm active:scale-[0.98] cursor-pointer"
                 >
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 rounded-xl bg-purple-50 dark:bg-purple-950/50 p-1 shrink-0 overflow-hidden border border-purple-200/50 dark:border-purple-800/50 flex items-center justify-center">
@@ -680,7 +680,7 @@ export const TelegramMiniApp: React.FC = () => {
                   <div
                     key={product.id}
                     onClick={() => handleOpenProduct(product)}
-                    className="bg-white dark:bg-[#161D2E] rounded-2xl p-2.5 flex flex-col justify-between border border-gray-100 dark:border-gray-800 shadow-sm relative cursor-pointer"
+                    className="bg-white dark:bg-[#111319] rounded-2xl p-2.5 flex flex-col justify-between border border-gray-100 dark:border-gray-800 shadow-sm relative cursor-pointer"
                   >
                     <div className="relative w-full aspect-square bg-gray-50 dark:bg-gray-800/60 rounded-xl overflow-hidden mb-2 p-2 flex items-center justify-center">
                       <img src={product.images[0]} alt={product.title} className="w-full h-full object-contain" />
@@ -762,7 +762,7 @@ export const TelegramMiniApp: React.FC = () => {
                 {cart.map(item => (
                   <div
                     key={item.product.id}
-                    className="bg-white dark:bg-[#161D2E] rounded-2xl p-3 border border-gray-100 dark:border-gray-800 flex items-center justify-between gap-3 shadow-sm"
+                    className="bg-white dark:bg-[#111319] rounded-2xl p-3 border border-gray-100 dark:border-gray-800 flex items-center justify-between gap-3 shadow-sm"
                   >
                     <img
                       src={item.product.images[0]}
@@ -801,7 +801,7 @@ export const TelegramMiniApp: React.FC = () => {
               </div>
 
               {/* Cart Summary Card */}
-              <div className="bg-white dark:bg-[#161D2E] rounded-2xl p-3.5 border border-gray-100 dark:border-gray-800 space-y-2 text-xs">
+              <div className="bg-white dark:bg-[#111319] rounded-2xl p-3.5 border border-gray-100 dark:border-gray-800 space-y-2 text-xs">
                 <div className="flex items-center justify-between text-gray-500 dark:text-gray-400">
                   <span>Mahsulotlar jami:</span>
                   <span className="font-semibold text-gray-900 dark:text-white">
@@ -874,7 +874,7 @@ export const TelegramMiniApp: React.FC = () => {
             </h4>
 
             {orders.length === 0 ? (
-              <div className="bg-white dark:bg-[#161D2E] rounded-2xl p-4 text-center text-xs text-gray-500 border border-gray-100 dark:border-gray-800">
+              <div className="bg-white dark:bg-[#111319] rounded-2xl p-4 text-center text-xs text-gray-500 border border-gray-100 dark:border-gray-800">
                 Sizda hali faol buyurtmalar mavjud emas.
               </div>
             ) : (
@@ -882,7 +882,7 @@ export const TelegramMiniApp: React.FC = () => {
                 {orders.slice(0, 5).map(ord => (
                   <div
                     key={ord.id}
-                    className="bg-white dark:bg-[#161D2E] rounded-2xl p-3 border border-gray-100 dark:border-gray-800 space-y-1.5 text-xs shadow-sm"
+                    className="bg-white dark:bg-[#111319] rounded-2xl p-3 border border-gray-100 dark:border-gray-800 space-y-1.5 text-xs shadow-sm"
                   >
                     <div className="flex items-center justify-between">
                       <span className="font-bold text-[#640199] dark:text-purple-300">
@@ -913,7 +913,7 @@ export const TelegramMiniApp: React.FC = () => {
           </div>
 
           {/* Quick Support / Contact */}
-          <div className="bg-white dark:bg-[#161D2E] rounded-2xl p-3.5 border border-gray-100 dark:border-gray-800 space-y-2.5">
+          <div className="bg-white dark:bg-[#111319] rounded-2xl p-3.5 border border-gray-100 dark:border-gray-800 space-y-2.5">
             <h4 className="font-bold text-xs text-gray-900 dark:text-white flex items-center gap-1.5">
               <Phone className="w-3.5 h-3.5 text-[#640199] dark:text-purple-400" />
               <span>Operator bilan bog'lanish</span>
@@ -948,7 +948,7 @@ export const TelegramMiniApp: React.FC = () => {
       {/* 7. PRODUCT DETAIL BOTTOM SHEET */}
       {isDetailOpen && selectedProduct && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex flex-col justify-end">
-          <div className="w-full max-w-md mx-auto bg-white dark:bg-[#161D2E] rounded-t-3xl max-h-[85vh] flex flex-col overflow-hidden animate-in slide-in-from-bottom duration-200">
+          <div className="w-full max-w-md mx-auto bg-white dark:bg-[#111319] rounded-t-3xl max-h-[85vh] flex flex-col overflow-hidden animate-in slide-in-from-bottom duration-200">
             {/* Sheet Handle & Close */}
             <div className="px-4 pt-3 pb-2 flex items-center justify-between border-b border-gray-100 dark:border-gray-800">
               <div className="w-10 h-1 bg-gray-300 dark:bg-gray-700 rounded-full mx-auto" />
@@ -1069,7 +1069,7 @@ export const TelegramMiniApp: React.FC = () => {
             </div>
 
             {/* Sticky Sheet Action Bar */}
-            <div className="p-3 bg-white dark:bg-[#161D2E] border-t border-gray-100 dark:border-gray-800 grid grid-cols-2 gap-2">
+            <div className="p-3 bg-white dark:bg-[#111319] border-t border-gray-100 dark:border-gray-800 grid grid-cols-2 gap-2">
               <button
                 onClick={(e) => {
                   handleAdd(e, selectedProduct);
@@ -1095,7 +1095,7 @@ export const TelegramMiniApp: React.FC = () => {
       {/* 8. FAST CHECKOUT / NASIYA MODAL (1-Step Order) */}
       {isCheckoutOpen && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex flex-col justify-end">
-          <div className="w-full max-w-md mx-auto bg-white dark:bg-[#161D2E] rounded-t-3xl max-h-[90vh] flex flex-col overflow-hidden animate-in slide-in-from-bottom duration-200">
+          <div className="w-full max-w-md mx-auto bg-white dark:bg-[#111319] rounded-t-3xl max-h-[90vh] flex flex-col overflow-hidden animate-in slide-in-from-bottom duration-200">
             {/* Header */}
             <div className="px-4 pt-3 pb-2.5 flex items-center justify-between border-b border-gray-100 dark:border-gray-800">
               <div className="flex items-center gap-1.5 font-bold text-sm text-gray-900 dark:text-white">
@@ -1272,7 +1272,7 @@ export const TelegramMiniApp: React.FC = () => {
       {/* 9. ORDER SUCCESS MODAL */}
       {orderSuccessData && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="w-full max-w-sm bg-white dark:bg-[#161D2E] rounded-3xl p-5 text-center space-y-3.5 shadow-2xl border border-purple-500/30 animate-in zoom-in-95 duration-200">
+          <div className="w-full max-w-sm bg-white dark:bg-[#111319] rounded-3xl p-5 text-center space-y-3.5 shadow-2xl border border-purple-500/30 animate-in zoom-in-95 duration-200">
             <div className="w-14 h-14 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-300 flex items-center justify-center mx-auto shadow-inner">
               <Check className="w-7 h-7 stroke-[3]" />
             </div>
@@ -1326,7 +1326,7 @@ export const TelegramMiniApp: React.FC = () => {
       )}
 
       {/* 10. FIXED NATIVE BOTTOM NAVIGATION BAR */}
-      <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-[#161D2E]/95 backdrop-blur-md border-t border-gray-200/80 dark:border-gray-800/80 py-2 px-3 shadow-2xl">
+      <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-[#111319]/95 backdrop-blur-md border-t border-gray-200/80 dark:border-gray-800/80 py-2 px-3 shadow-2xl">
         <div className="max-w-md mx-auto grid grid-cols-5 gap-1">
           {[
             { id: 'home', label: 'Asosiy', icon: Home },

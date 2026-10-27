@@ -665,7 +665,7 @@ export const AdminPanel: React.FC = () => {
   ];
 
   return (
-    <div className="h-full w-full bg-[#F8F9FA] dark:bg-[#0B0F19] text-gray-900 dark:text-gray-100 flex overflow-hidden selection:bg-purple-200 selection:text-purple-900">
+    <div className="h-full w-full bg-[#F8F9FA] dark:bg-[#060709] text-gray-900 dark:text-gray-100 flex overflow-hidden selection:bg-purple-200 selection:text-purple-900">
       {/* 1. PROFESSIONAL ENTERPRISE COLLAPSIBLE SIDEBAR */}
       <motion.aside
         animate={{ width: isSidebarCollapsed ? 80 : 280 }}
