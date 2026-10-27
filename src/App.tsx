@@ -22,6 +22,7 @@ import { MobileBottomNav } from './components/MobileBottomNav';
 import { Footer } from './components/Footer';
 import { ScrollProgressBar, ScrollToTopButton } from './components/ScrollFeatures';
 import { TelegramFloatingButton } from './components/TelegramFloatingButton';
+import { TelegramMiniApp } from './pages/TelegramMiniApp';
 import { useStore } from './store/useStore';
 import { supabase, isAdminUser, ADMIN_EMAIL } from './lib/supabase';
 import { User } from './types';
@@ -112,21 +113,25 @@ export const App: React.FC = () => {
 
   const isAdminPage = location.pathname.startsWith('/admin');
   const isAuthPage = location.pathname === '/login' || location.pathname === '/auth';
+  const isTgPage = location.pathname.startsWith('/tg') || location.pathname.startsWith('/webapp');
 
   return (
     <div className={`flex flex-col w-full max-w-full overflow-x-hidden bg-[#F8F9FA] dark:bg-[#0B0F19] text-gray-900 dark:text-gray-100 relative selection:bg-purple-200 selection:text-purple-900 ${
       isAdminPage ? 'h-screen overflow-hidden' : 'min-h-screen'
     }`}>
       {/* 1. Scroll Progress Bar (Sayt bo'ylab scroll animatsiyasi) */}
-      {!isAuthPage && !isAdminPage && <ScrollProgressBar />}
+      {!isAuthPage && !isAdminPage && !isTgPage && <ScrollProgressBar />}
 
-      {/* 2. Global Header (Admin panel yoki Login sahifasida bo'lmaganda) */}
-      {!isAdminPage && !isAuthPage && <Header />}
+      {/* 2. Global Header (Admin panel, Login yoki Telegram Mini App da bo'lmaganda) */}
+      {!isAdminPage && !isAuthPage && !isTgPage && <Header />}
 
       {/* 3. Main Dynamic Routes (Tezkor va qotishlarsiz o'tish) */}
-      <main className={isAdminPage ? "flex-1 h-full overflow-hidden" : "flex-1 w-full max-w-full overflow-x-hidden pb-20 md:pb-0"}>
+      <main className={isAdminPage ? "flex-1 h-full overflow-hidden" : isTgPage ? "flex-1 w-full" : "flex-1 w-full max-w-full overflow-x-hidden pb-20 md:pb-0"}>
         <Routes>
           <Route path="/" element={<HomePage />} />
+          <Route path="/tg" element={<TelegramMiniApp />} />
+          <Route path="/tg/*" element={<TelegramMiniApp />} />
+          <Route path="/webapp" element={<TelegramMiniApp />} />
           <Route path="/catalog" element={<CatalogPage />} />
           <Route path="/products" element={<CatalogPage />} />
           <Route path="/product/:id" element={<ProductDetail />} />
@@ -140,32 +145,36 @@ export const App: React.FC = () => {
         </Routes>
       </main>
 
-      {/* 4. Global Footer (Admin panel va Login sahifasida ko'rinmaydi) */}
-      {!isAdminPage && !isAuthPage && <Footer />}
+      {/* 4. Global Footer (Admin panel, Login va Telegram Mini App da ko'rinmaydi) */}
+      {!isAdminPage && !isAuthPage && !isTgPage && <Footer />}
 
       {/* 5. Suzuvchi Telegram Bot Tugmasi (@elrizo_bot) & Tepaga Qaytish */}
-      {!isAdminPage && <TelegramFloatingButton />}
-      {!isAdminPage && <ScrollToTopButton />}
+      {!isAdminPage && !isTgPage && <TelegramFloatingButton />}
+      {!isAdminPage && !isTgPage && <ScrollToTopButton />}
 
-      {/* 5.1. Mobil Pastki Navigatsiya (Faqat telefonlarda ko'rinadi) */}
-      {!isAdminPage && !isAuthPage && <MobileBottomNav />}
+      {/* 5.1. Mobil Pastki Navigatsiya (Faqat oddiy saytda ko'rinadi) */}
+      {!isAdminPage && !isAuthPage && !isTgPage && <MobileBottomNav />}
 
-      {/* 6. Global Modallar & Mini-Drawerlar */}
-      <CartDrawer />
-      <AuthModal />
-      <LoginRequiredModal />
-      <CitySelectModal />
-      <ProductComparisonModal />
-      <ComparisonBar />
-      <OrderTrackingModal />
+      {/* 6. Global Modallar & Mini-Drawerlar (Faqat asosiy saytda) */}
+      {!isTgPage && (
+        <>
+          <CartDrawer />
+          <AuthModal />
+          <LoginRequiredModal />
+          <CitySelectModal />
+          <ProductComparisonModal />
+          <ComparisonBar />
+          <OrderTrackingModal />
 
-      {/* 7. Global Tezkor Nasiya Kalkulyatori Modali */}
-      {isCalculatorOpen && calculatorProduct && (
-        <InstallmentCalculator
-          product={calculatorProduct}
-          isModal={true}
-          onClose={closeCalculator}
-        />
+          {/* 7. Global Tezkor Nasiya Kalkulyatori Modali */}
+          {isCalculatorOpen && calculatorProduct && (
+            <InstallmentCalculator
+              product={calculatorProduct}
+              isModal={true}
+              onClose={closeCalculator}
+            />
+          )}
+        </>
       )}
 
       {/* 8. Toast Bildirishnomalar Animatsiyasi */}

@@ -2,7 +2,18 @@
 
 const BOT_TOKEN = '8969024175:AAEzzmDhUJJaq9mtMM2EbCceL5QRalqra1U';
 const ADMIN_CHAT_ID = '7373118052';
-const SITE_URL = 'https://elrizo.uz';
+// Doimiy ishlaydigan Vercel domeni:
+const SITE_URL = 'https://elrizonasiya.vercel.app';
+const WEBAPP_URL = `${SITE_URL}/tg`;
+
+function escapeHtml(str: string = ''): string {
+  return String(str || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
 
 async function sendTelegram(method: string, body: Record<string, any>) {
   try {
@@ -11,43 +22,88 @@ async function sendTelegram(method: string, body: Record<string, any>) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
     });
-    return await res.json();
+    const data = await res.json();
+    if (!data.ok) {
+      console.warn(`Telegram API error for ${method}:`, data);
+      // Agar HTML parse xatosi yuz bersa, parse_mode ni olib tashlab qayta yuboramiz
+      if (body.parse_mode && data.description?.toLowerCase().includes('entity')) {
+        const plainBody = { ...body };
+        delete plainBody.parse_mode;
+        plainBody.text = plainBody.text?.replace(/<[^>]*>/g, '');
+        const retryRes = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/${method}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(plainBody),
+        });
+        return await retryRes.json();
+      }
+    }
+    return data;
   } catch (err) {
-    console.error(`Telegram API ${method} error:`, err);
+    console.error(`Telegram API ${method} fetch error:`, err);
     return null;
   }
 }
 
 export default async function handler(req: any, res: any) {
-  if (req.method !== 'POST') {
-    return res.status(200).json({ ok: true, message: 'ELRIZO Telegram Bot Webhook endpoint active' });
+  // CORS sarlavhalari
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
   }
 
-  const update = req.body;
+  if (req.method !== 'POST') {
+    return res.status(200).json({
+      ok: true,
+      message: 'ELRIZO Telegram Bot Webhook endpoint active',
+      bot: '@elrizo_bot',
+      web_app_url: WEBAPP_URL
+    });
+  }
+
+  let update = req.body;
+  if (typeof update === 'string') {
+    try {
+      update = JSON.parse(update);
+    } catch (e) {
+      console.error("Failed to parse body string:", e);
+    }
+  }
+
   if (!update) {
     return res.status(200).json({ ok: true });
   }
 
   try {
-    // 1. Foydalanuvchi xabar yozganda
+    // 1. Foydalanuvchi xabar yozganda (Message)
     if (update.message) {
       const msg = update.message;
-      const chatId = msg.chat.id;
-      const text = (msg.text || '').trim();
-      const firstName = msg.from?.first_name || 'Hurmatli mijoz';
+      const chatId = msg.chat?.id;
+      const rawText = (msg.text || msg.caption || '').trim();
+      const text = rawText.toLowerCase();
+      const safeFirstName = escapeHtml(msg.from?.first_name || 'Hurmatli mijoz');
+      const username = msg.from?.username ? `@${escapeHtml(msg.from.username)}` : 'username_yoq';
 
-      // /start komandasi
-      if (text.startsWith('/start')) {
-        const welcomeText = `Assalomu alaykum, <b>${firstName}</b>! 👋
+      if (!chatId) {
+        return res.status(200).json({ ok: true });
+      }
 
-🌟 <b>ELRIZO Online Market</b> — 0-0-12 Halol Nasiya Savdo rasmiy botiga xush kelibsiz!
+      // /start yoki start buyrug'i (har qanday parametrlar bilan: /start, /start app, /start@elrizo_bot)
+      if (text.startsWith('/start') || text === 'start' || text === 'boshlash' || text === 'menu') {
+        const welcomeText = `Assalomu alaykum, <b>${safeFirstName}</b>! 👋
 
-Bizning do'konda:
-⚡ <b>0% boshlang'ich to'lov</b> bilan smartfon va barcha maishiy texnikalarni muddatli to'lovga olishingiz mumkin.
-🚚 Butun O'zbekiston bo'ylab <b>24 soatda bepul yetkazib berish</b>!
-🛡️ <b>1 yillik rasmiy kafolat</b>.
+🌟 <b>ELRIZO Online Market</b> — 0-0-12 Halol Nasiya Savdo rasmiy Telegram do'koniga xush kelibsiz!
 
-Quyidagi tugmalar orqali xarid qiling yoki ma'lumot oling:`;
+Biz bilan qulay va xavfsiz xarid qiling:
+⚡ <b>0% Boshlang'ich to'lov</b> — oldindan hech narsa to'lamaysiz
+⚡ <b>0% Ustama (foizsiz)</b> — 12 oygacha qulay muddat
+🚚 Butun O'zbekiston bo'ylab <b>24 soatda bepul yetkazib berish</b>
+🛡️ <b>1 yillik rasmiy kafolat</b> barcha tovarlarga
+
+👇 <b>Do'konni ochish uchun quyidagi tugmani bosing:</b>`;
 
         await sendTelegram('sendMessage', {
           chat_id: chatId,
@@ -56,15 +112,15 @@ Quyidagi tugmalar orqali xarid qiling yoki ma'lumot oling:`;
           reply_markup: {
             inline_keyboard: [
               [
-                { text: "🛍️ Internet Do'konni Ochish", web_app: { url: SITE_URL } }
+                { text: "🛍️ ELRIZO Mini App (Do'konni ochish)", web_app: { url: WEBAPP_URL } }
               ],
               [
                 { text: "⚡ 0-0-12 Nasiya shartlari", callback_data: "info_installment" },
-                { text: "📱 Smartfonlar", callback_data: "cat_smartphones" }
+                { text: "📱 Smartfonlar", web_app: { url: `${WEBAPP_URL}?cat=smartphones` } }
               ],
               [
-                { text: "📺 Maishiy texnika", callback_data: "cat_appliances" },
-                { text: "💻 Noutbuklar", callback_data: "cat_computers" }
+                { text: "📺 Maishiy texnika", web_app: { url: `${WEBAPP_URL}?cat=appliances` } },
+                { text: "💻 Noutbuklar", web_app: { url: `${WEBAPP_URL}?cat=computers` } }
               ],
               [
                 { text: "📞 Operator bilan bog'lanish", callback_data: "info_contact" }
@@ -73,23 +129,42 @@ Quyidagi tugmalar orqali xarid qiling yoki ma'lumot oling:`;
           }
         });
 
+        // Shuningdek doimiy Reply Keyboard ham yuboramiz (foydalanuvchi doim 1 bosishda ochishi uchun)
+        await sendTelegram('sendMessage', {
+          chat_id: chatId,
+          text: `📱 Do'konga istalgan vaqtda quyidagi menyu orqali kirishingiz mumkin:`,
+          reply_markup: {
+            keyboard: [
+              [
+                { text: "🛍️ Do'konni ochish", web_app: { url: WEBAPP_URL } }
+              ],
+              [
+                { text: "⚡ 0-0-12 Nasiya shartlari" },
+                { text: "📞 Operator bilan bog'lanish" }
+              ]
+            ],
+            resize_keyboard: true,
+            is_persistent: true
+          }
+        });
+
         return res.status(200).json({ ok: true });
       }
 
-      // /nasiya komandasi
-      if (text === '/nasiya') {
+      // /nasiya yoki nasiya shartlari haqida
+      if (text.startsWith('/nasiya') || text.includes('nasiya') || text.includes('shartlar')) {
         const installmentText = `⚡ <b>ELRIZO 0-0-12 HALOL NASIYA SHARTLARI:</b>
 ━━━━━━━━━━━━━━━━━━━━
-✅ <b>0% Boshlang'ich to'lov</b> — oldindan hech narsa to'lamaysiz!
-✅ <b>0% Ortiqcha to'lov</b> — tanlangan tovarlarda 12 oygacha foizsiz va ustamasiz!
-✅ <b>12 oygacha qulay muddat</b>.
-✅ Hech qanday garov va kafilsiz!
+✅ <b>0% Boshlang'ich to'lov:</b> xarid kuni bir so'm ham to'lamaysiz!
+✅ <b>0% Ortiqcha to'lov:</b> 12 oygacha ortiqcha foizsiz teng bo'lib to'laysiz!
+✅ <b>Hech qanday garov va kafilsiz!</b>
+✅ <b>2 daqiqada onlayn skoring!</b>
 
-Kerakli hujjatlar:
+📋 <b>Kerakli hujjatlar:</b>
 🪪 Pasport yoki ID-karta (JShShIR)
-💳 Plastik karta (Uzcard / Humo)
+💳 Plastik karta (Uzcard yoki Humo)
 
-Skoring tekshiruvi saytimizda 2 daqiqada avtomatik amalga oshiriladi.`;
+Tovarlarni tanlash va 2 daqiqada nasiya rasmiylashtirish uchun pastdagi tugmani bosing:`;
 
         await sendTelegram('sendMessage', {
           chat_id: chatId,
@@ -97,7 +172,7 @@ Skoring tekshiruvi saytimizda 2 daqiqada avtomatik amalga oshiriladi.`;
           parse_mode: 'HTML',
           reply_markup: {
             inline_keyboard: [
-              [{ text: "🛍️ Nasiyaga xarid qilish", web_app: { url: SITE_URL } }]
+              [{ text: "🛍️ Nasiyaga tovarlarni tanlash", web_app: { url: WEBAPP_URL } }]
             ]
           }
         });
@@ -105,13 +180,38 @@ Skoring tekshiruvi saytimizda 2 daqiqada avtomatik amalga oshiriladi.`;
         return res.status(200).json({ ok: true });
       }
 
-      // Oddiy xabar yuborsa, adminga yetkazish
+      // /aloqa yoki operator so'rovi
+      if (text.startsWith('/aloqa') || text.startsWith('/contact') || text.includes('operator') || text.includes('bog\'lanish') || text.includes('aloqa')) {
+        const contactText = `📞 <b>ELRIZO MIJOZLARGA XIZMAT KO'RSATISH MARKAZI:</b>
+━━━━━━━━━━━━━━━━━━━━
+☎️ <b>Telefon:</b> +998 71 200 00 00 / +998 90 123 45 67
+💬 <b>Telegram admin:</b> @yahyo0526
+⏰ <b>Ish vaqti:</b> Har kuni 09:00 dan 21:00 gacha (dam olishsiz)
+📍 <b>Manzil:</b> Toshkent shahri, Chilonzor tumani
+🌐 <b>Rasmiy sayt:</b> ${SITE_URL}`;
+
+        await sendTelegram('sendMessage', {
+          chat_id: chatId,
+          text: contactText,
+          parse_mode: 'HTML',
+          reply_markup: {
+            inline_keyboard: [
+              [{ text: "💬 Telegramda adminga yozish", url: "https://t.me/yahyo0526" }],
+              [{ text: "🛍️ Do'konni ochish", web_app: { url: WEBAPP_URL } }]
+            ]
+          }
+        });
+
+        return res.status(200).json({ ok: true });
+      }
+
+      // Oddiy savol yoki xabar yozsa: adminga forward qilib, mijozga javob berish
       if (text && !text.startsWith('/')) {
         const notifyAdmin = `📩 <b>BOTDAN YANGI FOYDALANUVCHI XABARI:</b>
 ━━━━━━━━━━━━━━━━━━━━
-👤 <b>Kimdan:</b> ${firstName} (@${msg.from?.username || 'username_yoq'})
+👤 <b>Kimdan:</b> ${safeFirstName} (${username})
 🆔 <b>Chat ID:</b> <code>${chatId}</code>
-💬 <b>Xabar:</b> ${text}`;
+💬 <b>Xabar:</b> ${escapeHtml(rawText)}`;
 
         await sendTelegram('sendMessage', {
           chat_id: ADMIN_CHAT_ID,
@@ -121,8 +221,15 @@ Skoring tekshiruvi saytimizda 2 daqiqada avtomatik amalga oshiriladi.`;
 
         await sendTelegram('sendMessage', {
           chat_id: chatId,
-          text: `Rahmat, <b>${firstName}</b>! Xabaringiz ELRIZO operatorlariga yetkazildi. Tez orada siz bilan bog'lanamiz.`,
-          parse_mode: 'HTML'
+          text: `Rahmat, <b>${safeFirstName}</b>! Xabaringiz qabul qilindi va ELRIZO operatorlariga yetkazildi. Tez orada javob beramiz.
+
+Shuningdek, tovarlarni ko'rish va xarid qilish uchun Mini App do'konimizdan foydalanishingiz mumkin:`,
+          parse_mode: 'HTML',
+          reply_markup: {
+            inline_keyboard: [
+              [{ text: "🛍️ Do'konni ochish (Mini App)", web_app: { url: WEBAPP_URL } }]
+            ]
+          }
         });
 
         return res.status(200).json({ ok: true });
@@ -138,38 +245,32 @@ Skoring tekshiruvi saytimizda 2 daqiqada avtomatik amalga oshiriladi.`;
       if (data === 'info_installment') {
         await sendTelegram('sendMessage', {
           chat_id: chatId,
-          text: `⚡ <b>ELRIZO 0-0-12 HALOL NASIYA SHARTLARI:</b>
+          text: `⚡ <b>ELRIZO 0-0-12 HALOL NASIYA:</b>
 ━━━━━━━━━━━━━━━━━━━━
 ✅ <b>0% Boshlang'ich to'lov</b>
-✅ <b>0% Ortiqcha to'lov</b> (12 oygacha belgilangan tovarlarga)
-✅ <b>Hujjatsiz:</b> faqat Pasport / ID va plastik karta kerak
-✅ <b>Muddat:</b> 3, 6, 12 oy`,
+✅ <b>0% Ustama</b> (12 oygacha belgilangan tovarlarga)
+✅ <b>Hujjatsiz:</b> faqat Pasport / ID va plastik karta
+✅ <b>Muddat:</b> 3, 6, 12, 24 oy`,
           parse_mode: 'HTML',
           reply_markup: {
             inline_keyboard: [
-              [{ text: "🛍️ Katalogga o'tish", web_app: { url: SITE_URL } }]
+              [{ text: "🛍️ Do'konni ochish", web_app: { url: WEBAPP_URL } }]
             ]
           }
         });
       } else if (data === 'info_contact') {
         await sendTelegram('sendMessage', {
           chat_id: chatId,
-          text: `📞 <b>ELRIZO BOG'LANISH MARKAZI:</b>
+          text: `📞 <b>ELRIZO ALOQA:</b>
 ━━━━━━━━━━━━━━━━━━━━
-☎️ <b>Aloqa telefoni:</b> +998 71 200 00 00 / +998 90 123 45 67
-⏰ <b>Ish vaqti:</b> Har kuni 09:00 dan 21:00 gacha
-📍 <b>Bosh ofis:</b> Toshkent shahri
-🌐 <b>Rasmiy sayt:</b> https://elrizo.uz`,
-          parse_mode: 'HTML'
-        });
-      } else if (data?.startsWith('cat_')) {
-        const cat = data.replace('cat_', '');
-        await sendTelegram('sendMessage', {
-          chat_id: chatId,
-          text: `📦 Tanlangan toifadagi tovarlarni ko'rish uchun quyidagi tugmani bosing:`,
+☎️ <b>Telefon:</b> +998 71 200 00 00 / +998 90 123 45 67
+💬 <b>Admin:</b> @yahyo0526
+🌐 <b>Sayt:</b> ${SITE_URL}`,
+          parse_mode: 'HTML',
           reply_markup: {
             inline_keyboard: [
-              [{ text: "📱 Tovarlarni ochish", web_app: { url: `${SITE_URL}/catalog?category=${cat}` } }]
+              [{ text: "💬 Telegramda bog'lanish", url: "https://t.me/yahyo0526" }],
+              [{ text: "🛍️ Do'konga kirish", web_app: { url: WEBAPP_URL } }]
             ]
           }
         });
@@ -184,7 +285,7 @@ Skoring tekshiruvi saytimizda 2 daqiqada avtomatik amalga oshiriladi.`;
 
     return res.status(200).json({ ok: true });
   } catch (err: any) {
-    console.error("Handler error:", err);
+    console.error("Telegram handler error:", err);
     return res.status(200).json({ ok: false, error: err.message });
   }
 }
