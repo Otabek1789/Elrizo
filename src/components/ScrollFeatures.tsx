@@ -1,22 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { motion, useScroll, useSpring, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowUp } from 'lucide-react';
 import { useStore } from '../store/useStore';
 
 export const ScrollProgressBar: React.FC = () => {
-  const { scrollYProgress } = useScroll();
-  const scaleX = useSpring(scrollYProgress, {
-    stiffness: 100,
-    damping: 30,
-    restDelta: 0.001,
-  });
-
-  return (
-    <motion.div
-      className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-uzum-primary via-purple-400 to-amber-400 z-50 origin-left shadow-sm"
-      style={{ scaleX }}
-    />
-  );
+  return null;
 };
 
 export const ScrollToTopButton: React.FC = () => {

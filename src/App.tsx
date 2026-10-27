@@ -20,7 +20,7 @@ import { ComparisonBar } from './components/ComparisonBar';
 import { OrderTrackingModal } from './components/OrderTrackingModal';
 import { MobileBottomNav } from './components/MobileBottomNav';
 import { Footer } from './components/Footer';
-import { ScrollProgressBar, ScrollToTopButton } from './components/ScrollFeatures';
+import { ScrollToTopButton } from './components/ScrollFeatures';
 import { TelegramFloatingButton } from './components/TelegramFloatingButton';
 import { TelegramMiniApp } from './pages/TelegramMiniApp';
 import { useStore } from './store/useStore';
@@ -119,10 +119,7 @@ export const App: React.FC = () => {
     <div className={`flex flex-col w-full max-w-full overflow-x-hidden bg-[#F8F9FA] dark:bg-[#060709] text-gray-900 dark:text-gray-100 relative selection:bg-purple-200 selection:text-purple-900 ${
       isAdminPage ? 'h-screen overflow-hidden' : 'min-h-screen'
     }`}>
-      {/* 1. Scroll Progress Bar (Sayt bo'ylab scroll animatsiyasi) */}
-      {!isAuthPage && !isAdminPage && !isTgPage && <ScrollProgressBar />}
-
-      {/* 2. Global Header (Admin panel, Login yoki Telegram Mini App da bo'lmaganda) */}
+      {/* Global Header (Admin panel, Login yoki Telegram Mini App da bo'lmaganda) */}
       {!isAdminPage && !isAuthPage && !isTgPage && <Header />}
 
       {/* 3. Main Dynamic Routes (Tezkor va qotishlarsiz o'tish) */}
