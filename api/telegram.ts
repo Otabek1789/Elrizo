@@ -112,45 +112,30 @@ Biz bilan qulay va xavfsiz xarid qiling:
 
 👇 <b>Do'konni ochish uchun quyidagi tugmani bosing:</b>`;
 
-        const startInlineKeyboard = [
-          [
-            { text: "🛍️ ELRIZO Mini App (Do'konni ochish)", web_app: { url: WEBAPP_URL } }
-          ],
-          [
-            { text: "⚡ 0-0-12 Nasiya shartlari", callback_data: "info_installment" },
-            { text: "🏢 Do'kon haqida ma'lumot", callback_data: "info_about" }
-          ],
-          [
-            { text: "📱 Smartfonlar", web_app: { url: `${WEBAPP_URL}?cat=smartphones` } },
-            { text: "📺 Maishiy texnika", web_app: { url: `${WEBAPP_URL}?cat=appliances` } }
-          ],
-          [
-            { text: "💬 Telegram Admin (@yahyo0526)", url: "https://t.me/yahyo0526" },
-            { text: "☎️ Aloqa va Manzil", callback_data: "info_contact" }
-          ]
-        ];
-
-        const brandPhoto = `${SITE_URL}/elrizo-brand.png`;
-        const photoRes = await sendTelegram('sendPhoto', {
+        await sendTelegram('sendMessage', {
           chat_id: chatId,
-          photo: brandPhoto,
-          caption: welcomeText,
+          text: welcomeText,
           parse_mode: 'HTML',
           reply_markup: {
-            inline_keyboard: startInlineKeyboard
+            inline_keyboard: [
+              [
+                { text: "🛍️ ELRIZO Mini App (Do'konni ochish)", web_app: { url: WEBAPP_URL } }
+              ],
+              [
+                { text: "⚡ 0-0-12 Nasiya shartlari", callback_data: "info_installment" },
+                { text: "🏢 Do'kon haqida ma'lumot", callback_data: "info_about" }
+              ],
+              [
+                { text: "📱 Smartfonlar", web_app: { url: `${WEBAPP_URL}?cat=smartphones` } },
+                { text: "📺 Maishiy texnika", web_app: { url: `${WEBAPP_URL}?cat=appliances` } }
+              ],
+              [
+                { text: "💬 Telegram Admin (@yahyo0526)", url: "https://t.me/yahyo0526" },
+                { text: "☎️ Aloqa va Manzil", callback_data: "info_contact" }
+              ]
+            ]
           }
         });
-
-        if (!photoRes || !photoRes.ok) {
-          await sendTelegram('sendMessage', {
-            chat_id: chatId,
-            text: welcomeText,
-            parse_mode: 'HTML',
-            reply_markup: {
-              inline_keyboard: startInlineKeyboard
-            }
-          });
-        }
 
         // Shuningdek doimiy Reply Keyboard ham yuboramiz (foydalanuvchi doim 1 bosishda ochishi uchun)
         await sendTelegram('sendMessage', {
