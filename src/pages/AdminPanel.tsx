@@ -2892,59 +2892,6 @@ export const AdminPanel: React.FC = () => {
                     )}
                   </motion.div>
 
-                  {/* Email Jo'natuvchi & SMTP Sozlamalari (Elrizo / me) */}
-                  <motion.div 
-                    whileHover={{ scale: 1.005 }}
-                    className="p-5 bg-gradient-to-br from-purple-50/60 to-indigo-50/40 dark:from-slate-900 dark:to-purple-950/20 rounded-2xl border border-purple-200/80 dark:border-purple-800/40 space-y-3"
-                  >
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                      <div className="flex items-center gap-2.5">
-                        <div className="w-8 h-8 rounded-xl bg-purple-600 text-white flex items-center justify-center font-bold text-xs shadow-sm">
-                          <Mail className="w-4 h-4" />
-                        </div>
-                        <div>
-                          <div className="font-bold text-gray-900 dark:text-white text-sm">
-                            {language === 'ru' ? 'Настройки почты и отправителя' : language === 'en' ? 'Email & Sender Settings' : "Pochta va Jo'natuvchi Sozlamalari"}
-                          </div>
-                          <div className="text-gray-500 dark:text-slate-400 text-[11px]">
-                            {language === 'ru' ? 'Правило отображения: «me» для админа и «Elrizo» для клиентов' : language === 'en' ? 'Display rule: "me" for admin and "Elrizo" for clients' : "Ko'rinish qoidasi: Admin uchun «me» va mijozlar uchun «Elrizo»"}
-                          </div>
-                        </div>
-                      </div>
-                      <span className="text-xs px-2.5 py-1 rounded-full font-bold bg-purple-100 dark:bg-purple-900/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800 w-fit">
-                        Sender: Elrizo / me
-                      </span>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1 text-xs">
-                      <div className="p-3 bg-white/80 dark:bg-slate-800/80 rounded-xl border border-purple-100 dark:border-slate-700 space-y-1">
-                        <div className="text-gray-500 dark:text-slate-400 text-[11px] font-semibold flex items-center gap-1.5">
-                          <ShieldCheck className="w-3.5 h-3.5 text-purple-600" />
-                          <span>{language === 'ru' ? 'Для Администратора' : language === 'en' ? 'For Administrator' : "Administrator uchun"}</span>
-                        </div>
-                        <div className="font-bold text-gray-900 dark:text-white">
-                          Pochtadagi nom: <span className="text-purple-600 dark:text-purple-300 font-mono">me</span>
-                        </div>
-                        <p className="text-[11px] text-gray-500 dark:text-slate-400 leading-tight">
-                          {ADMIN_EMAIL} o'ziga o'zi yuborgani sababli Gmail pochta oynasida jo'natuvchini «me» deb ko'rsatadi.
-                        </p>
-                      </div>
-
-                      <div className="p-3 bg-white/80 dark:bg-slate-800/80 rounded-xl border border-purple-100 dark:border-slate-700 space-y-1">
-                        <div className="text-gray-500 dark:text-slate-400 text-[11px] font-semibold flex items-center gap-1.5">
-                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                          <span>{language === 'ru' ? 'Для всех остальных клиентов' : language === 'en' ? 'For all other clients' : "Barcha mijozlar uchun"}</span>
-                        </div>
-                        <div className="font-bold text-gray-900 dark:text-white">
-                          Pochtadagi nom: <span className="text-emerald-600 dark:text-emerald-400 font-mono">Elrizo</span>
-                        </div>
-                        <p className="text-[11px] text-gray-500 dark:text-slate-400 leading-tight">
-                          Mijozlar pochtasiga xat borganida rasmiy brend sifatida jo'natuvchi «Elrizo» bo'lib chiqadi.
-                        </p>
-                      </div>
-                    </div>
-                  </motion.div>
-
                   <motion.div 
                     whileHover={{ scale: 1.01 }}
                     className="p-4 bg-gray-50 dark:bg-slate-900 rounded-2xl border border-gray-200 dark:border-slate-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3"
