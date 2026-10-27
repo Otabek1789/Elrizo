@@ -2050,7 +2050,7 @@ export const AdminPanel: React.FC = () => {
 
                   <div className="relative z-10 flex flex-wrap items-center gap-2 shrink-0">
                     <div className="bg-white/15 backdrop-blur-md rounded-2xl px-4 py-2.5 border border-white/20 text-xs">
-                      <div className="text-sky-200 text-[10px] font-bold uppercase">Uланган Bot</div>
+                      <div className="text-sky-200 text-[10px] font-bold uppercase">{language === 'ru' ? 'Подключенный бот' : language === 'en' ? 'Connected Bot' : 'Ulangan bot'}</div>
                       <div className="font-extrabold text-white flex items-center gap-1.5 mt-0.5">
                         <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
                         @{TELEGRAM_BOT_USERNAME}
