@@ -142,7 +142,7 @@ ${paymentText}${monthlyText}
 ${itemsList || "  <i>(Tovarlar ro'yxati biriktirilmagan)</i>"}
 ━━━━━━━━━━━━━━━━━━━━
 ⏰ <b>Sana va vaqt:</b> ${now}
-🌐 <b>Manba:</b> ELRIZO.UZ Online Market`;
+🌐 <b>Manba:</b> ELRIZO NASIYA SAVDO (https://elrizonasiya.vercel.app)`;
 
   const res = await sendTelegramMessage(message);
   return res.success;
@@ -183,28 +183,40 @@ export async function sendProductToTelegram(
   });
 
   let caption = '';
+  const notePart = options?.customNote ? ('\nIzoh: ' + escapeHtml(options.customNote) + '\n') : '';
+  const colorPart = options?.color ? ('Rangi: ' + escapeHtml(options.color) + '\n') : '';
+  const storagePart = options?.storage ? ('Xotirasi: ' + escapeHtml(options.storage) + '\n') : '';
+  const zeroDownPart = product.hasZeroDown ? "Aksiya: 0-0-12 Boshlang'ich to'lovsiz Nasiya!\n" : '';
 
   if (options?.isMarketingPost) {
-    caption = `🔥 <b>ELRIZO ONLINE MARKET — MAXSUS TAKLIF</b>
-━━━━━━━━━━━━━━━━━━━━
-📱 <b>${escapeHtml(product.title)}</b>
-
-💰 <b>Narxi:</b> <b>${totalPrice.toLocaleString('uz-UZ')} so'm</b>
-⚡ <b>Muddatli to'lov:</b> <code>${monthly.toLocaleString('uz-UZ')} so'm / oy</code> (12 oy)
-${product.hasZeroDown ? '✅ <b>Aksiya: 0-0-12 Boshlang\'ich to\'lovsiz Nasiya!</b>\n' : ''}${options?.color ? `🎨 <b>Rangi:</b> ${escapeHtml(options.color)}\n` : ''}${options?.storage ? `💾 <b>Xotirasi:</b> ${escapeHtml(options.storage)}\n` : ''}${options?.customNote ? `\n📝 <i>${escapeHtml(options.customNote)}</i>\n` : ''}━━━━━━━━━━━━━━━━━━━━
-🚚 <b>Yetkazib berish:</b> Butun O'zbekiston bo'ylab 1 kunda!
-🛡️ <b>Kafolat:</b> 1 yil rasmiy kafolat
-🌐 <b>Saytda xarid qilish:</b> https://elrizo.uz/product/${product.id}
-⏰ <b>Vaqt:</b> ${now}`;
+    caption =
+      "🔥 <b>ELRIZO NASIYA SAVDO — MAXSUS TAKLIF</b>\n" +
+      "━━━━━━━━━━━━━━━━━━━━\n" +
+      "📱 <b>" + escapeHtml(product.title) + "</b>\n\n" +
+      "💰 <b>Narxi:</b> <b>" + totalPrice.toLocaleString('uz-UZ') + " so'm</b>\n" +
+      "⚡ <b>Muddatli to'lov:</b> <code>" + monthly.toLocaleString('uz-UZ') + " so'm / oy</code> (12 oy)\n" +
+      zeroDownPart + colorPart + storagePart + notePart +
+      "━━━━━━━━━━━━━━━━━━━━\n" +
+      "🚚 <b>Yetkazib berish:</b> Butun O'zbekiston bo'ylab 1 kunda!\n" +
+      "🛡️ <b>Kafolat:</b> 1 yil rasmiy kafolat\n" +
+      "🌐 <b>Saytda xarid qilish:</b> https://elrizonasiya.vercel.app/product/" + product.id + "\n" +
+      "⏰ <b>Vaqt:</b> " + now;
   } else {
-    caption = `🛍️ <b>ELRIZO — MAHSULOT SO'ROVI</b>
-━━━━━━━━━━━━━━━━━━━━
-📦 <b>Mahsulot:</b> <b>${escapeHtml(product.title)}</b>
-💰 <b>Narxi:</b> <b>${totalPrice.toLocaleString('uz-UZ')} so'm</b> ${qty > 1 ? `(${qty} dona)` : ''}
-📅 <b>Nasiyaga (12 oy):</b> <code>${monthly.toLocaleString('uz-UZ')} so'm/oy</code>
-${options?.color ? `🎨 <b>Rangi:</b> ${escapeHtml(options.color)}\n` : ''}${options?.storage ? `💾 <b>Xotirasi:</b> ${escapeHtml(options.storage)}\n` : ''}${product.hasZeroDown ? '⚡ <b>Aksiya: 0-0-12 Boshlang\'ich to\'lovsiz</b>\n' : ''}━━━━━━━━━━━━━━━━━━━━
-${options?.user ? `👤 <b>Mijoz:</b> <b>${escapeHtml(options.user.fullName)}</b>\n📞 <b>Telefon:</b> <code>${escapeHtml(options.user.phone || 'Kiritilmagan')}</code>\n` : '👤 <b>Mijoz:</b> Sayt foydalanuvchisi\n'}⏰ <b>Vaqt:</b> ${now}
-🌐 <b>Sayt havolasi:</b> https://elrizo.uz/product/${product.id}`;
+    const userPart = options?.user 
+      ? ("👤 <b>Mijoz:</b> <b>" + escapeHtml(options.user.fullName) + "</b>\n📞 <b>Telefon:</b> <code>" + escapeHtml(options.user.phone || 'Kiritilmagan') + "</code>\n")
+      : "👤 <b>Mijoz:</b> Sayt foydalanuvchisi\n";
+
+    caption =
+      "🛍️ <b>ELRIZO — MAHSULOT SO'ROVI</b>\n" +
+      "━━━━━━━━━━━━━━━━━━━━\n" +
+      "📦 <b>Mahsulot:</b> <b>" + escapeHtml(product.title) + "</b>\n" +
+      "💰 <b>Narxi:</b> <b>" + totalPrice.toLocaleString('uz-UZ') + " so'm</b>" + (qty > 1 ? (" (" + qty + " dona)") : "") + "\n" +
+      "📅 <b>Nasiyaga (12 oy):</b> <code>" + monthly.toLocaleString('uz-UZ') + " so'm/oy</code>\n" +
+      colorPart + storagePart + (product.hasZeroDown ? "⚡ <b>Aksiya: 0-0-12 Boshlang'ich to'lovsiz</b>\n" : "") +
+      "━━━━━━━━━━━━━━━━━━━━\n" +
+      userPart +
+      "⏰ <b>Vaqt:</b> " + now + "\n" +
+      "🌐 <b>Sayt havolasi:</b> https://elrizonasiya.vercel.app/product/" + product.id;
   }
 
   const res = await sendTelegramPhoto(photo, caption, targetChat);
@@ -248,7 +260,7 @@ ${itemsText}
 ━━━━━━━━━━━━━━━━━━━━
 💰 <b>Jami summa:</b> <b>${totalPrice.toLocaleString('uz-UZ')} so'm</b>
 ${user ? `👤 <b>Xaridor:</b> ${escapeHtml(user.fullName)}\n📞 <b>Telefon:</b> <code>${escapeHtml(user.phone || '')}</code>\n` : ''}⏰ <b>Vaqt:</b> ${now}
-🌐 <b>ELRIZO.UZ Online Market</b>`;
+🌐 <b>ELRIZO NASIYA SAVDO</b> (https://elrizonasiya.vercel.app)`;
 
   const res = await sendTelegramMessage(text);
   if (res.success) {
@@ -417,7 +429,7 @@ Sayt profilingizga kirish uchun tasdiqlash kodingiz:
 ⚠️ <i>Ushbu maxfiy kodni hech kimga bermang. Kod 5 daqiqa davomida amal qiladi.</i>
 ━━━━━━━━━━━━━━━━━━━━
 ⏰ <b>Vaqt:</b> ${now}
-🌐 <b>Sayt:</b> https://elrizo.uz`;
+🌐 <b>Sayt:</b> https://elrizonasiya.vercel.app`;
 
   return sendTelegramMessage(text, chatId);
 }

@@ -1112,11 +1112,15 @@ export const TelegramMiniApp: React.FC = () => {
           <div className="bg-white dark:bg-[#111319] rounded-2xl p-3.5 border border-gray-100 dark:border-gray-800 space-y-2.5">
             <h4 className="font-bold text-xs text-gray-900 dark:text-white flex items-center gap-1.5">
               <Phone className="w-3.5 h-3.5 text-[#640199] dark:text-purple-400" />
-              <span>Operator bilan bog'lanish</span>
+              <span>ELRIZO NASIYA SAVDO — Rasmiy ma'lumotlar</span>
             </h4>
-            <p className="text-[11px] text-gray-500 leading-relaxed">
-              Savollaringiz yoki buyurtma bo'yicha yordam kerak bo'lsa, mutaxassislarimiz har kuni 09:00 dan 21:00 gacha xizmat ko'rsatishadi.
-            </p>
+            <div className="text-[11px] text-gray-600 dark:text-gray-300 space-y-1 leading-relaxed">
+              <p>☎️ <b>Telefon:</b> <a href="tel:+998943335522" className="text-purple-600 dark:text-purple-400 font-bold">+998 94 333 55 22</a></p>
+              <p>💬 <b>Telegram admin:</b> <a href="https://t.me/yahyo0526" target="_blank" rel="noreferrer" className="text-purple-600 dark:text-purple-400 font-bold">@yahyo0526</a></p>
+              <p>⏰ <b>Ish vaqti:</b> Har kuni 09:00 dan 21:00 gacha (dam olishsiz)</p>
+              <p>📍 <b>Manzil:</b> Namangan shahri, Yangiqo'rg'on tumani</p>
+              <p>🌐 <b>Rasmiy sayt:</b> <a href="https://elrizonasiya.vercel.app" target="_blank" rel="noreferrer" className="text-purple-600 dark:text-purple-400 font-bold underline">elrizonasiya.vercel.app</a></p>
+            </div>
             <div className="grid grid-cols-2 gap-2 pt-1">
               <a
                 href="https://t.me/yahyo0526"
@@ -1129,7 +1133,7 @@ export const TelegramMiniApp: React.FC = () => {
                 <ExternalLink className="w-3 h-3" />
               </a>
               <a
-                href="tel:+998712000000"
+                href="tel:+998943335522"
                 onClick={() => tgHaptic('light')}
                 className="py-2 px-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 font-semibold text-xs flex items-center justify-center gap-1 border border-emerald-200/60 dark:border-emerald-800/60"
               >

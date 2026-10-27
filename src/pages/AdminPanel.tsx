@@ -2310,7 +2310,7 @@ export const AdminPanel: React.FC = () => {
                             <div>🚚 Yetkazib berish: Butun O'zbekiston bo'ylab 1 kunda!</div>
                             <div>🛡️ Kafolat: 1 yil rasmiy kafolat</div>
                             <div className="text-sky-600 dark:text-sky-400 font-bold truncate">
-                              🌐 Saytda: https://elrizo.uz/product/{selectedTelegramProductId || 'new'}
+                              🌐 Saytda: https://elrizonasiya.vercel.app/product/{selectedTelegramProductId || 'new'}
                             </div>
                           </div>
 

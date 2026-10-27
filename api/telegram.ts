@@ -95,13 +95,20 @@ export default async function handler(req: any, res: any) {
       if (text.startsWith('/start') || text === 'start' || text === 'boshlash' || text === 'menu') {
         const welcomeText = `Assalomu alaykum, <b>${safeFirstName}</b>! 👋
 
-🌟 <b>ELRIZO Online Market</b> — 0-0-12 Halol Nasiya Savdo rasmiy Telegram do'koniga xush kelibsiz!
+🌟 <b>ELRIZO NASIYA SAVDO</b> — 0-0-12 Halol Nasiya Savdo rasmiy Telegram do'koniga xush kelibsiz!
 
 Biz bilan qulay va xavfsiz xarid qiling:
 ⚡ <b>0% Boshlang'ich to'lov</b> — oldindan hech narsa to'lamaysiz
 ⚡ <b>0% Ustama (foizsiz)</b> — 12 oygacha qulay muddat
 🚚 Butun O'zbekiston bo'ylab <b>24 soatda bepul yetkazib berish</b>
 🛡️ <b>1 yillik rasmiy kafolat</b> barcha tovarlarga
+
+🏢 <b>Do'konimiz ma'lumotlari:</b>
+☎️ <b>Telefon:</b> +998 94 333 55 22
+💬 <b>Telegram admin:</b> @yahyo0526
+⏰ <b>Ish vaqti:</b> Har kuni 09:00 dan 21:00 gacha (dam olishsiz)
+📍 <b>Manzil:</b> Namangan shahri, Yangiqo'rg'on tumani
+🌐 <b>Rasmiy sayt:</b> https://elrizonasiya.vercel.app
 
 👇 <b>Do'konni ochish uchun quyidagi tugmani bosing:</b>`;
 
@@ -116,14 +123,15 @@ Biz bilan qulay va xavfsiz xarid qiling:
               ],
               [
                 { text: "⚡ 0-0-12 Nasiya shartlari", callback_data: "info_installment" },
-                { text: "📱 Smartfonlar", web_app: { url: `${WEBAPP_URL}?cat=smartphones` } }
+                { text: "🏢 Do'kon haqida ma'lumot", callback_data: "info_about" }
               ],
               [
-                { text: "📺 Maishiy texnika", web_app: { url: `${WEBAPP_URL}?cat=appliances` } },
-                { text: "💻 Noutbuklar", web_app: { url: `${WEBAPP_URL}?cat=computers` } }
+                { text: "📱 Smartfonlar", web_app: { url: `${WEBAPP_URL}?cat=smartphones` } },
+                { text: "📺 Maishiy texnika", web_app: { url: `${WEBAPP_URL}?cat=appliances` } }
               ],
               [
-                { text: "📞 Operator bilan bog'lanish", callback_data: "info_contact" }
+                { text: "💬 Telegram Admin (@yahyo0526)", url: "https://t.me/yahyo0526" },
+                { text: "☎️ Aloqa va Manzil", callback_data: "info_contact" }
               ]
             ]
           }
@@ -140,7 +148,10 @@ Biz bilan qulay va xavfsiz xarid qiling:
               ],
               [
                 { text: "⚡ 0-0-12 Nasiya shartlari" },
-                { text: "📞 Operator bilan bog'lanish" }
+                { text: "🏢 Do'kon ma'lumotlari va Manzil" }
+              ],
+              [
+                { text: "☎️ Operator bilan bog'lanish" }
               ]
             ],
             resize_keyboard: true,
@@ -164,6 +175,10 @@ Biz bilan qulay va xavfsiz xarid qiling:
 🪪 Pasport yoki ID-karta (JShShIR)
 💳 Plastik karta (Uzcard yoki Humo)
 
+☎️ <b>Telefon:</b> +998 94 333 55 22
+💬 <b>Admin:</b> @yahyo0526
+📍 <b>Manzil:</b> Namangan shahri, Yangiqo'rg'on tumani
+
 Tovarlarni tanlash va 2 daqiqada nasiya rasmiylashtirish uchun pastdagi tugmani bosing:`;
 
         await sendTelegram('sendMessage', {
@@ -172,7 +187,8 @@ Tovarlarni tanlash va 2 daqiqada nasiya rasmiylashtirish uchun pastdagi tugmani 
           parse_mode: 'HTML',
           reply_markup: {
             inline_keyboard: [
-              [{ text: "🛍️ Nasiyaga tovarlarni tanlash", web_app: { url: WEBAPP_URL } }]
+              [{ text: "🛍️ Nasiyaga tovarlarni tanlash", web_app: { url: WEBAPP_URL } }],
+              [{ text: "💬 Telegramda adminga yozish", url: "https://t.me/yahyo0526" }]
             ]
           }
         });
@@ -180,15 +196,32 @@ Tovarlarni tanlash va 2 daqiqada nasiya rasmiylashtirish uchun pastdagi tugmani 
         return res.status(200).json({ ok: true });
       }
 
-      // /aloqa yoki operator so'rovi
-      if (text.startsWith('/aloqa') || text.startsWith('/contact') || text.includes('operator') || text.includes('bog\'lanish') || text.includes('aloqa')) {
-        const contactText = `📞 <b>ELRIZO MIJOZLARGA XIZMAT KO'RSATISH MARKAZI:</b>
+      // /info, /haqida, /manzil, /aloqa yoki operator so'rovi
+      if (
+        text.startsWith('/aloqa') ||
+        text.startsWith('/contact') ||
+        text.startsWith('/info') ||
+        text.startsWith('/haqida') ||
+        text.startsWith('/about') ||
+        text.startsWith('/manzil') ||
+        text.includes('operator') ||
+        text.includes('bog\'lanish') ||
+        text.includes('aloqa') ||
+        text.includes('manzil') ||
+        text.includes('haqida') ||
+        text.includes('malumot') ||
+        text.includes('ma\'lumot') ||
+        text.includes('telefon') ||
+        text.includes('nomer') ||
+        text.includes('admin')
+      ) {
+        const contactText = `🏢 <b>ELRIZO NASIYA SAVDO</b>
 ━━━━━━━━━━━━━━━━━━━━
-☎️ <b>Telefon:</b> +998 71 200 00 00 / +998 90 123 45 67
+☎️ <b>Telefon:</b> +998 94 333 55 22
 💬 <b>Telegram admin:</b> @yahyo0526
 ⏰ <b>Ish vaqti:</b> Har kuni 09:00 dan 21:00 gacha (dam olishsiz)
-📍 <b>Manzil:</b> Toshkent shahri, Chilonzor tumani
-🌐 <b>Rasmiy sayt:</b> ${SITE_URL}`;
+📍 <b>Manzil:</b> Namangan shahri, Yangiqo'rg'on tumani
+🌐 <b>Rasmiy sayt:</b> https://elrizonasiya.vercel.app`;
 
         await sendTelegram('sendMessage', {
           chat_id: chatId,
@@ -197,7 +230,8 @@ Tovarlarni tanlash va 2 daqiqada nasiya rasmiylashtirish uchun pastdagi tugmani 
           reply_markup: {
             inline_keyboard: [
               [{ text: "💬 Telegramda adminga yozish", url: "https://t.me/yahyo0526" }],
-              [{ text: "🛍️ Do'konni ochish", web_app: { url: WEBAPP_URL } }]
+              [{ text: "🛍️ Do'konni ochish (Mini App)", web_app: { url: WEBAPP_URL } }],
+              [{ text: "🌐 Rasmiy saytga o'tish", url: "https://elrizonasiya.vercel.app" }]
             ]
           }
         });
@@ -221,13 +255,18 @@ Tovarlarni tanlash va 2 daqiqada nasiya rasmiylashtirish uchun pastdagi tugmani 
 
         await sendTelegram('sendMessage', {
           chat_id: chatId,
-          text: `Rahmat, <b>${safeFirstName}</b>! Xabaringiz qabul qilindi va ELRIZO operatorlariga yetkazildi. Tez orada javob beramiz.
+          text: `Rahmat, <b>${safeFirstName}</b>! Xabaringiz qabul qilindi va ELRIZO administratoriga yetkazildi. Tez orada javob beramiz.
+
+☎️ <b>Telefon:</b> +998 94 333 55 22
+💬 <b>Admin:</b> @yahyo0526
+📍 <b>Manzil:</b> Namangan shahri, Yangiqo'rg'on tumani
 
 Shuningdek, tovarlarni ko'rish va xarid qilish uchun Mini App do'konimizdan foydalanishingiz mumkin:`,
           parse_mode: 'HTML',
           reply_markup: {
             inline_keyboard: [
-              [{ text: "🛍️ Do'konni ochish (Mini App)", web_app: { url: WEBAPP_URL } }]
+              [{ text: "🛍️ Do'konni ochish (Mini App)", web_app: { url: WEBAPP_URL } }],
+              [{ text: "💬 Adminga to'g'ridan-to'g'ri yozish", url: "https://t.me/yahyo0526" }]
             ]
           }
         });
@@ -250,27 +289,34 @@ Shuningdek, tovarlarni ko'rish va xarid qilish uchun Mini App do'konimizdan foyd
 ✅ <b>0% Boshlang'ich to'lov</b>
 ✅ <b>0% Ustama</b> (12 oygacha belgilangan tovarlarga)
 ✅ <b>Hujjatsiz:</b> faqat Pasport / ID va plastik karta
-✅ <b>Muddat:</b> 3, 6, 12, 24 oy`,
+✅ <b>Muddat:</b> 3, 6, 12, 24 oy
+☎️ <b>Telefon:</b> +998 94 333 55 22
+💬 <b>Admin:</b> @yahyo0526
+📍 <b>Manzil:</b> Namangan shahri, Yangiqo'rg'on tumani`,
           parse_mode: 'HTML',
           reply_markup: {
             inline_keyboard: [
-              [{ text: "🛍️ Do'konni ochish", web_app: { url: WEBAPP_URL } }]
+              [{ text: "🛍️ Do'konni ochish", web_app: { url: WEBAPP_URL } }],
+              [{ text: "💬 Telegramda bog'lanish", url: "https://t.me/yahyo0526" }]
             ]
           }
         });
-      } else if (data === 'info_contact') {
+      } else if (data === 'info_contact' || data === 'info_about') {
         await sendTelegram('sendMessage', {
           chat_id: chatId,
-          text: `📞 <b>ELRIZO ALOQA:</b>
+          text: `🏢 <b>ELRIZO NASIYA SAVDO</b>
 ━━━━━━━━━━━━━━━━━━━━
-☎️ <b>Telefon:</b> +998 71 200 00 00 / +998 90 123 45 67
-💬 <b>Admin:</b> @yahyo0526
-🌐 <b>Sayt:</b> ${SITE_URL}`,
+☎️ <b>Telefon:</b> +998 94 333 55 22
+💬 <b>Telegram admin:</b> @yahyo0526
+⏰ <b>Ish vaqti:</b> Har kuni 09:00 dan 21:00 gacha (dam olishsiz)
+📍 <b>Manzil:</b> Namangan shahri, Yangiqo'rg'on tumani
+🌐 <b>Rasmiy sayt:</b> https://elrizonasiya.vercel.app`,
           parse_mode: 'HTML',
           reply_markup: {
             inline_keyboard: [
               [{ text: "💬 Telegramda bog'lanish", url: "https://t.me/yahyo0526" }],
-              [{ text: "🛍️ Do'konga kirish", web_app: { url: WEBAPP_URL } }]
+              [{ text: "🛍️ Do'konga kirish (Mini App)", web_app: { url: WEBAPP_URL } }],
+              [{ text: "🌐 Rasmiy sayt", url: "https://elrizonasiya.vercel.app" }]
             ]
           }
         });
