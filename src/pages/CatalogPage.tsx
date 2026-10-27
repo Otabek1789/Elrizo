@@ -1,6 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
 import { 
   SlidersHorizontal, 
   RotateCcw, 
@@ -443,11 +442,7 @@ export const CatalogPage: React.FC = () => {
 
       {/* 3. Tanlangan Toifa Uchun Maxsus Spotlight Banner */}
       {currentCategory && (
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="relative overflow-hidden rounded-3xl p-5 sm:p-6 bg-gradient-to-r from-purple-900 via-indigo-900 to-slate-900 text-white shadow-lg border border-purple-800/40"
-        >
+        <div className="relative overflow-hidden rounded-3xl p-5 sm:p-6 bg-gradient-to-r from-purple-900 via-indigo-900 to-slate-900 text-white shadow-lg border border-purple-800/40">
           <div className="absolute right-0 top-0 bottom-0 w-1/3 opacity-15 pointer-events-none bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-amber-400 via-purple-500 to-transparent" />
           <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="space-y-1.5 max-w-xl">
@@ -483,13 +478,13 @@ export const CatalogPage: React.FC = () => {
 
             <button
               onClick={() => handleSelectCategory(null)}
-              className="self-start sm:self-center px-4 py-2 rounded-2xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs backdrop-blur-md border border-white/20 transition-all flex items-center gap-1.5 cursor-pointer shrink-0"
+              className="self-start sm:self-center px-4 py-2 rounded-2xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs backdrop-blur-md border border-white/20 flex items-center gap-1.5 cursor-pointer shrink-0"
             >
               <RotateCcw className="w-3.5 h-3.5" />
               <span>{t('categoryBannerClear')}</span>
             </button>
           </div>
-        </motion.div>
+        </div>
       )}
 
       {/* 4. Yuqori Saralash (Sort), Ko'rinish (View), va 1-bosqichli Tezkor Filtrlar */}
@@ -1103,21 +1098,13 @@ export const CatalogPage: React.FC = () => {
           ) : viewMode === 'grid' ? (
             /* Grid Ko'rinishi (Responsive 2-4 ustun) */
             <div className="space-y-6">
-              <motion.div 
-                layout
-                className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3.5 sm:gap-5"
-              >
-                {paginatedProducts.map((p, idx) => (
-                  <motion.div
-                    key={p.id}
-                    initial={{ opacity: 0, y: 15 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: Math.min(idx * 0.03, 0.3) }}
-                  >
+              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3.5 sm:gap-5">
+                {paginatedProducts.map((p) => (
+                  <div key={p.id}>
                     <ProductCard product={p} />
-                  </motion.div>
+                  </div>
                 ))}
-              </motion.div>
+              </div>
 
               {/* Pagination va Sahifalar Paneli */}
               {totalPages > 1 && (
@@ -1353,209 +1340,200 @@ export const CatalogPage: React.FC = () => {
       </div>
 
       {/* 7. Mobile Filter Drawer / Modal */}
-      <AnimatePresence>
-        {isMobileFilterOpen && (
-          <div className="fixed inset-0 z-50 flex justify-end lg:hidden">
-            {/* Backdrop */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setIsMobileFilterOpen(false)}
-              className="absolute inset-0 bg-black/60 backdrop-blur-xs"
-            />
+      {isMobileFilterOpen && (
+        <div className="fixed inset-0 z-50 flex justify-end lg:hidden">
+          {/* Backdrop */}
+          <div
+            onClick={() => setIsMobileFilterOpen(false)}
+            className="absolute inset-0 bg-black/60 backdrop-blur-xs"
+          />
 
-            {/* Drawer Content */}
-            <motion.div
-              initial={{ x: '100%' }}
-              animate={{ x: 0 }}
-              exit={{ x: '100%' }}
-              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-              className="relative w-full max-w-sm bg-white dark:bg-slate-800 h-full overflow-y-auto p-5 space-y-6 shadow-2xl flex flex-col justify-between transition-colors"
-            >
-              <div className="space-y-6">
-                <div className="flex items-center justify-between border-b border-gray-100 dark:border-slate-700/60 pb-3">
-                  <div className="flex items-center gap-2">
-                    <SlidersHorizontal className="w-4 h-4 text-uzum-primary dark:text-purple-400" />
-                    <h3 className="text-base font-black text-gray-900 dark:text-white">{t('filters')}</h3>
-                    {activeFilterCount > 0 && (
-                      <span className="w-5 h-5 rounded-full bg-purple-100 dark:bg-purple-950 text-uzum-primary dark:text-purple-300 text-[10px] font-black flex items-center justify-center">
-                        {activeFilterCount}
-                      </span>
-                    )}
-                  </div>
-                  <button
-                    onClick={() => setIsMobileFilterOpen(false)}
-                    className="p-1.5 rounded-full hover:bg-gray-100 dark:hover:bg-slate-700 text-gray-400 hover:text-gray-700 dark:hover:text-white cursor-pointer"
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
+          {/* Drawer Content */}
+          <div
+            className="relative w-full max-w-sm bg-white dark:bg-slate-800 h-full overflow-y-auto p-5 space-y-6 shadow-2xl flex flex-col justify-between"
+          >
+            <div className="space-y-6">
+              <div className="flex items-center justify-between border-b border-gray-100 dark:border-slate-700/60 pb-3">
+                <div className="flex items-center gap-2">
+                  <SlidersHorizontal className="w-4 h-4 text-uzum-primary dark:text-purple-400" />
+                  <h3 className="text-base font-black text-gray-900 dark:text-white">{t('filters')}</h3>
+                  {activeFilterCount > 0 && (
+                    <span className="w-5 h-5 rounded-full bg-purple-100 dark:bg-purple-950 text-uzum-primary dark:text-purple-300 text-[10px] font-black flex items-center justify-center">
+                      {activeFilterCount}
+                    </span>
+                  )}
                 </div>
+                <button
+                  onClick={() => setIsMobileFilterOpen(false)}
+                  className="p-1.5 rounded-full hover:bg-gray-100 dark:hover:bg-slate-700 text-gray-400 hover:text-gray-700 dark:hover:text-white cursor-pointer"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
 
-                {/* 0-0-12 */}
-                <label className="flex items-center justify-between p-3.5 rounded-2xl bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-950/40 dark:to-indigo-950/40 border border-purple-200/60 dark:border-purple-800/50 cursor-pointer">
-                  <div className="flex items-center gap-2">
-                    <Zap className="w-4 h-4 text-uzum-primary dark:text-purple-300" />
-                    <div>
-                      <span className="text-xs font-bold text-gray-900 dark:text-white block">0-0-12 {t('installment')}</span>
-                      <span className="text-[10px] text-purple-700 dark:text-purple-300 font-semibold">{t('zeroMarkup')}</span>
-                    </div>
-                  </div>
-                  <input
-                    type="checkbox"
-                    checked={onlyZeroDown}
-                    onChange={(e) => {
-                      setOnlyZeroDown(e.target.checked);
-                      setCurrentPage(1);
-                    }}
-                    className="w-4 h-4 accent-purple-600 rounded cursor-pointer"
-                  />
-                </label>
-
-                {/* Narx presetlari va Slider */}
-                <div className="space-y-2">
-                  <span className="text-xs font-bold text-gray-700 dark:text-slate-300">{t('priceRange')}</span>
-                  <div className="grid grid-cols-2 gap-1.5">
-                    {[
-                      { label: t('quickPriceUpTo3m'), max: 3000000 },
-                      { label: t('quickPriceUpTo5m'), max: 5000000 },
-                      { label: t('quickPriceUpTo10m'), max: 10000000 },
-                      { label: t('quickPriceAll'), max: 25000000 },
-                    ].map((qp) => (
-                      <button
-                        key={qp.max}
-                        type="button"
-                        onClick={() => setQuickPrice(qp.max)}
-                        className={`py-1.5 px-2 rounded-xl text-[11px] font-bold border transition-all text-center cursor-pointer ${
-                          priceRange[1] === qp.max && priceRange[0] === 0
-                            ? 'bg-uzum-primary text-white border-uzum-primary shadow-xs'
-                            : 'bg-gray-50 dark:bg-slate-700/50 text-gray-700 dark:text-slate-300 border-gray-200 dark:border-slate-700'
-                        }`}
-                      >
-                        {qp.label}
-                      </button>
-                    ))}
-                  </div>
-
-                  <input
-                    type="range"
-                    min={1000000}
-                    max={25000000}
-                    step={500000}
-                    value={priceRange[1]}
-                    onChange={(e) => {
-                      setPriceRange([priceRange[0], Number(e.target.value)]);
-                      setCurrentPage(1);
-                    }}
-                    className="w-full accent-purple-600 cursor-pointer mt-2"
-                  />
-                  <div className="text-xs font-bold text-uzum-primary dark:text-purple-300 text-right">
-                    {formatPrice(priceRange[1], true, language)}
+              {/* 0-0-12 */}
+              <label className="flex items-center justify-between p-3.5 rounded-2xl bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-950/40 dark:to-indigo-950/40 border border-purple-200/60 dark:border-purple-800/50 cursor-pointer">
+                <div className="flex items-center gap-2">
+                  <Zap className="w-4 h-4 text-uzum-primary dark:text-purple-300" />
+                  <div>
+                    <span className="text-xs font-bold text-gray-900 dark:text-white block">0-0-12 {t('installment')}</span>
+                    <span className="text-[10px] text-purple-700 dark:text-purple-300 font-semibold">{t('zeroMarkup')}</span>
                   </div>
                 </div>
+                <input
+                  type="checkbox"
+                  checked={onlyZeroDown}
+                  onChange={(e) => {
+                    setOnlyZeroDown(e.target.checked);
+                    setCurrentPage(1);
+                  }}
+                  className="w-4 h-4 accent-purple-600 rounded cursor-pointer"
+                />
+              </label>
 
-                {/* Muddat */}
-                <div className="space-y-2">
-                  <span className="text-xs font-bold text-gray-700 dark:text-slate-300">{t('maxMonths')}:</span>
-                  <div className="grid grid-cols-2 gap-2">
-                    {[3, 6, 12, 24].map((m) => (
-                      <button
-                        key={m}
-                        type="button"
-                        onClick={() => {
-                          setSelectedMonths(selectedMonths === m ? null : m);
-                          setCurrentPage(1);
-                        }}
-                        className={`py-2 px-3 rounded-xl text-xs font-bold border transition-colors cursor-pointer ${
-                          selectedMonths === m
-                            ? 'bg-uzum-primary text-white border-uzum-primary'
-                            : 'bg-gray-50 dark:bg-slate-700/50 text-gray-700 dark:text-slate-300 border-gray-200 dark:border-slate-700'
-                        }`}
-                      >
-                        {m} {t('monthsUnit')}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Toifalar (Mobile) */}
-                <div className="space-y-2">
-                  <span className="text-xs font-bold text-gray-700 dark:text-slate-300">{t('allCategories')}:</span>
-                  <div className="space-y-1 max-h-36 overflow-y-auto pr-1">
+              {/* Narx presetlari va Slider */}
+              <div className="space-y-2">
+                <span className="text-xs font-bold text-gray-700 dark:text-slate-300">{t('priceRange')}</span>
+                <div className="grid grid-cols-2 gap-1.5">
+                  {[
+                    { label: t('quickPriceUpTo3m'), max: 3000000 },
+                    { label: t('quickPriceUpTo5m'), max: 5000000 },
+                    { label: t('quickPriceUpTo10m'), max: 10000000 },
+                    { label: t('quickPriceAll'), max: 25000000 },
+                  ].map((qp) => (
                     <button
-                      onClick={() => handleSelectCategory(null)}
-                      className={`w-full text-left px-3 py-1.5 rounded-xl text-xs font-semibold cursor-pointer ${
-                        selectedCategorySlug === null
-                          ? 'bg-purple-100 dark:bg-purple-900/50 text-uzum-primary dark:text-purple-300 font-bold'
-                          : 'text-gray-600 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-700'
+                      key={qp.max}
+                      type="button"
+                      onClick={() => setQuickPrice(qp.max)}
+                      className={`py-1.5 px-2 rounded-xl text-[11px] font-bold border text-center cursor-pointer ${
+                        priceRange[1] === qp.max && priceRange[0] === 0
+                          ? 'bg-uzum-primary text-white border-uzum-primary shadow-xs'
+                          : 'bg-gray-50 dark:bg-slate-700/50 text-gray-700 dark:text-slate-300 border-gray-200 dark:border-slate-700'
                       }`}
                     >
-                      {t('allCategories')} ({products.length})
+                      {qp.label}
                     </button>
-                    {CATEGORIES.map((c) => {
-                      const count = products.filter((p) => isProductInCategory(p, c.slug)).length;
-                      return (
-                        <button
-                          key={c.id}
-                          onClick={() => handleSelectCategory(c.slug)}
-                          className={`w-full text-left px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center justify-between cursor-pointer ${
-                            selectedCategorySlug === c.slug
-                              ? 'bg-purple-100 dark:bg-purple-900/50 text-uzum-primary dark:text-purple-300 font-bold'
-                              : 'text-gray-600 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-700'
-                          }`}
-                        >
-                          <span className="truncate">{getCategoryTitle(c.slug, language)}</span>
-                          <span className="text-[10px] text-gray-400 dark:text-slate-500">({count})</span>
-                        </button>
-                      );
-                    })}
-                  </div>
+                  ))}
                 </div>
 
-                {/* Brendlar (Mobile) */}
-                {availableBrands.length > 0 && (
-                  <div className="space-y-2">
-                    <span className="text-xs font-bold text-gray-700 dark:text-slate-300">{t('brands')}:</span>
-                    <div className="space-y-1.5 max-h-32 overflow-y-auto pr-1">
-                      {availableBrands.map((b) => (
-                        <label key={b} className="flex items-center gap-2 text-xs text-gray-700 dark:text-slate-300 cursor-pointer">
-                          <input
-                            type="checkbox"
-                            checked={selectedBrands.includes(b)}
-                            onChange={() => toggleBrand(b)}
-                            className="w-3.5 h-3.5 accent-purple-600 rounded"
-                          />
-                          <span>{b}</span>
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-                )}
+                <input
+                  type="range"
+                  min={1000000}
+                  max={25000000}
+                  step={500000}
+                  value={priceRange[1]}
+                  onChange={(e) => {
+                    setPriceRange([priceRange[0], Number(e.target.value)]);
+                    setCurrentPage(1);
+                  }}
+                  className="w-full accent-purple-600 cursor-pointer mt-2"
+                />
+                <div className="text-xs font-bold text-uzum-primary dark:text-purple-300 text-right">
+                  {formatPrice(priceRange[1], true, language)}
+                </div>
               </div>
 
-              {/* Qo'llash va Tozalash tugmalari */}
-              <div className="pt-4 border-t border-gray-100 dark:border-slate-700/60 space-y-2">
+              {/* Muddat */}
+              <div className="space-y-2">
+                <span className="text-xs font-bold text-gray-700 dark:text-slate-300">{t('maxMonths')}:</span>
+                <div className="grid grid-cols-2 gap-2">
+                  {[3, 6, 12, 24].map((m) => (
+                    <button
+                      key={m}
+                      type="button"
+                      onClick={() => {
+                        setSelectedMonths(selectedMonths === m ? null : m);
+                        setCurrentPage(1);
+                      }}
+                      className={`py-2 px-3 rounded-xl text-xs font-bold border cursor-pointer ${
+                        selectedMonths === m
+                          ? 'bg-uzum-primary text-white border-uzum-primary'
+                          : 'bg-gray-50 dark:bg-slate-700/50 text-gray-700 dark:text-slate-300 border-gray-200 dark:border-slate-700'
+                      }`}
+                    >
+                      {m} {t('monthsUnit')}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Toifalar (Mobile) */}
+              <div className="space-y-2">
+                <span className="text-xs font-bold text-gray-700 dark:text-slate-300">{t('allCategories')}:</span>
+                <div className="space-y-1 max-h-36 overflow-y-auto pr-1">
+                  <button
+                    onClick={() => handleSelectCategory(null)}
+                    className={`w-full text-left px-3 py-1.5 rounded-xl text-xs font-semibold cursor-pointer ${
+                      selectedCategorySlug === null
+                        ? 'bg-purple-100 dark:bg-purple-900/50 text-uzum-primary dark:text-purple-300 font-bold'
+                        : 'text-gray-600 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-700'
+                    }`}
+                  >
+                    {t('allCategories')} ({products.length})
+                  </button>
+                  {CATEGORIES.map((c) => {
+                    const count = products.filter((p) => isProductInCategory(p, c.slug)).length;
+                    return (
+                      <button
+                        key={c.id}
+                        onClick={() => handleSelectCategory(c.slug)}
+                        className={`w-full text-left px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center justify-between cursor-pointer ${
+                          selectedCategorySlug === c.slug
+                            ? 'bg-purple-100 dark:bg-purple-900/50 text-uzum-primary dark:text-purple-300 font-bold'
+                            : 'text-gray-600 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-700'
+                        }`}
+                      >
+                        <span className="truncate">{getCategoryTitle(c.slug, language)}</span>
+                        <span className="text-[10px] text-gray-400 dark:text-slate-500">({count})</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Brendlar (Mobile) */}
+              {availableBrands.length > 0 && (
+                <div className="space-y-2">
+                  <span className="text-xs font-bold text-gray-700 dark:text-slate-300">{t('brands')}:</span>
+                  <div className="space-y-1.5 max-h-32 overflow-y-auto pr-1">
+                    {availableBrands.map((b) => (
+                      <label key={b} className="flex items-center gap-2 text-xs text-gray-700 dark:text-slate-300 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={selectedBrands.includes(b)}
+                          onChange={() => toggleBrand(b)}
+                          className="w-3.5 h-3.5 accent-purple-600 rounded"
+                        />
+                        <span>{b}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Qo'llash va Tozalash tugmalari */}
+            <div className="pt-4 border-t border-gray-100 dark:border-slate-700/60 space-y-2">
+              <button
+                type="button"
+                onClick={() => setIsMobileFilterOpen(false)}
+                className="w-full py-3 bg-uzum-primary text-white font-bold rounded-2xl text-xs shadow-md shadow-purple-500/25 active:scale-95 cursor-pointer"
+              >
+                {t('showResults')} ({filteredAndSortedProducts.length})
+              </button>
+              {hasActiveFilters && (
                 <button
                   type="button"
-                  onClick={() => setIsMobileFilterOpen(false)}
-                  className="w-full py-3 bg-uzum-primary text-white font-bold rounded-2xl text-xs shadow-md shadow-purple-500/25 active:scale-95 transition-all cursor-pointer"
+                  onClick={resetAllFilters}
+                  className="w-full py-2.5 bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-200 font-bold rounded-2xl text-xs hover:bg-gray-200 cursor-pointer"
                 >
-                  {t('showResults')} ({filteredAndSortedProducts.length})
+                  {t('clearAll')}
                 </button>
-                {hasActiveFilters && (
-                  <button
-                    type="button"
-                    onClick={resetAllFilters}
-                    className="w-full py-2.5 bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-200 font-bold rounded-2xl text-xs hover:bg-gray-200 transition-colors cursor-pointer"
-                  >
-                    {t('clearAll')}
-                  </button>
-                )}
-              </div>
-            </motion.div>
+              )}
+            </div>
           </div>
-        )}
-      </AnimatePresence>
+        </div>
+      )}
     </div>
   );
 };
