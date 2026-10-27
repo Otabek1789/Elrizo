@@ -5,7 +5,11 @@ import { PROMO_BANNERS } from '../data/mockData';
 import { useStore } from '../store/useStore';
 import { useTranslation, getBannerContent } from '../utils/translations';
 
-export const BannerSlider: React.FC = () => {
+interface BannerSliderProps {
+  onBannerAction?: (targetCategory?: string) => void;
+}
+
+export const BannerSlider: React.FC<BannerSliderProps> = ({ onBannerAction }) => {
   const navigate = useNavigate();
   const { navigateToCategory } = useStore();
   const { language } = useTranslation();
@@ -30,6 +34,10 @@ export const BannerSlider: React.FC = () => {
   const localizedBanner = getBannerContent(banner.id, language) || banner;
 
   const handleBannerAction = (targetCat?: string) => {
+    if (onBannerAction) {
+      onBannerAction(targetCat);
+      return;
+    }
     const slug = (targetCat || 'smartphones').replace('cat-', '');
     navigateToCategory(slug);
     navigate(`/catalog?category=${slug}`);
@@ -40,37 +48,51 @@ export const BannerSlider: React.FC = () => {
       {/* Banner Card Container */}
       <div 
         onClick={() => handleBannerAction(banner.targetCategory)}
-        className={`w-full min-h-[220px] sm:min-h-[300px] md:min-h-[360px] bg-gradient-to-r ${banner.gradient} text-white p-6 sm:p-10 md:p-14 flex items-center justify-between cursor-pointer relative overflow-hidden transition-all duration-700`}
+        className={`w-full min-h-[190px] sm:min-h-[300px] md:min-h-[360px] bg-gradient-to-r ${banner.gradient} text-white p-4 sm:p-10 md:p-14 flex items-center justify-between cursor-pointer relative overflow-hidden transition-all duration-700`}
       >
         {/* Ambient Glow */}
         <div className="absolute -right-20 -bottom-20 w-80 h-80 bg-white/10 rounded-full blur-3xl pointer-events-none" />
 
         {/* Left Text Block */}
-        <div className="max-w-xl z-10 space-y-3 sm:space-y-4">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-amber-300 font-extrabold text-[11px] sm:text-xs tracking-wider uppercase shadow-sm">
+        <div className="max-w-xl z-10 space-y-2 sm:space-y-4">
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-white/20 backdrop-blur-md text-amber-300 font-extrabold text-[10px] sm:text-xs tracking-wider uppercase shadow-sm">
             <Sparkles className="w-3.5 h-3.5" />
             <span>{localizedBanner.badge}</span>
           </div>
 
-          <h2 className="text-xl sm:text-3xl md:text-4xl lg:text-5xl font-black leading-tight tracking-tight drop-shadow-sm">
+          <h2 className="text-base sm:text-3xl md:text-4xl lg:text-5xl font-black leading-tight tracking-tight drop-shadow-sm">
             {localizedBanner.title}
           </h2>
 
-          <p className="text-xs sm:text-base text-purple-100 font-medium max-w-md line-clamp-2">
+          <p className="text-[11px] sm:text-base text-purple-100 font-medium max-w-md line-clamp-2">
             {localizedBanner.subtitle}
           </p>
 
-          <Link 
-            to={`/catalog?category=${(banner.targetCategory || 'smartphones').replace('cat-', '')}`}
-            onClick={(e) => {
-              e.stopPropagation();
-              handleBannerAction(banner.targetCategory);
-            }}
-            className="mt-2 px-5 py-2.5 sm:px-6 sm:py-3 rounded-xl bg-white text-gray-900 font-extrabold text-xs sm:text-sm hover:bg-yellow-300 hover:text-gray-900 transition-all shadow-lg active:scale-95 flex items-center gap-1.5 w-fit cursor-pointer no-underline"
-          >
-            <span>{localizedBanner.ctaText}</span>
-            <ArrowRight className="w-4 h-4" />
-          </Link>
+          {onBannerAction ? (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleBannerAction(banner.targetCategory);
+              }}
+              className="mt-1.5 sm:mt-2 px-4 py-2 sm:px-6 sm:py-3 rounded-xl bg-white text-gray-900 font-extrabold text-xs sm:text-sm hover:bg-yellow-300 hover:text-gray-900 transition-all shadow-lg active:scale-95 flex items-center gap-1.5 w-fit cursor-pointer"
+            >
+              <span>{localizedBanner.ctaText}</span>
+              <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            </button>
+          ) : (
+            <Link 
+              to={`/catalog?category=${(banner.targetCategory || 'smartphones').replace('cat-', '')}`}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleBannerAction(banner.targetCategory);
+              }}
+              className="mt-1.5 sm:mt-2 px-4 py-2 sm:px-6 sm:py-3 rounded-xl bg-white text-gray-900 font-extrabold text-xs sm:text-sm hover:bg-yellow-300 hover:text-gray-900 transition-all shadow-lg active:scale-95 flex items-center gap-1.5 w-fit cursor-pointer no-underline"
+            >
+              <span>{localizedBanner.ctaText}</span>
+              <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            </Link>
+          )}
         </div>
 
         {/* Right Image */}

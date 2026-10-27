@@ -10,9 +10,17 @@ import { sendProductToTelegram } from '../utils/telegramBot';
 
 interface ProductCardProps {
   product: Product;
+  onClick?: (product: Product) => void;
+  onInstallmentClick?: (product: Product) => void;
+  onAddToCart?: (product: Product) => void;
 }
 
-export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
+export const ProductCard: React.FC<ProductCardProps> = ({
+  product,
+  onClick,
+  onInstallmentClick,
+  onAddToCart,
+}) => {
   const navigate = useNavigate();
   const {
     toggleFavorite,
@@ -35,16 +43,28 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const monthlyPayment = calculateMonthlyPaymentQuick(product.price, 12);
 
   const handleCardClick = () => {
+    if (onClick) {
+      onClick(product);
+      return;
+    }
     navigate(`/product/${product.id}`);
   };
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.stopPropagation();
+    if (onAddToCart) {
+      onAddToCart(product);
+      return;
+    }
     addToCart(product, 12, 'installment');
   };
 
   const handleBuyOnInstallment = (e: React.MouseEvent) => {
     e.stopPropagation();
+    if (onInstallmentClick) {
+      onInstallmentClick(product);
+      return;
+    }
     openCalculator(product);
   };
 
@@ -189,18 +209,32 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       <div className="p-3 sm:p-4 flex flex-col flex-1 justify-between gap-2.5 sm:gap-3">
         <div>
           {/* Title */}
-          <Link
-            to={`/product/${product.id}`}
-            onClick={(e) => e.stopPropagation()}
-            className="block group-hover:text-uzum-primary dark:group-hover:text-purple-400 transition-colors no-underline"
-          >
-            <h3 
-              className="text-xs sm:text-sm font-semibold text-gray-800 dark:text-gray-100 line-clamp-2 leading-snug"
-              title={product.title}
+          {onClick ? (
+            <div
+              onClick={handleCardClick}
+              className="block group-hover:text-uzum-primary dark:group-hover:text-purple-400 transition-colors cursor-pointer"
             >
-              {product.title}
-            </h3>
-          </Link>
+              <h3 
+                className="text-xs sm:text-sm font-semibold text-gray-800 dark:text-gray-100 line-clamp-2 leading-snug"
+                title={product.title}
+              >
+                {product.title}
+              </h3>
+            </div>
+          ) : (
+            <Link
+              to={`/product/${product.id}`}
+              onClick={(e) => e.stopPropagation()}
+              className="block group-hover:text-uzum-primary dark:group-hover:text-purple-400 transition-colors no-underline"
+            >
+              <h3 
+                className="text-xs sm:text-sm font-semibold text-gray-800 dark:text-gray-100 line-clamp-2 leading-snug"
+                title={product.title}
+              >
+                {product.title}
+              </h3>
+            </Link>
+          )}
 
           {/* Rating & Reviews */}
           <div className="flex items-center gap-1.5 mt-1.5">

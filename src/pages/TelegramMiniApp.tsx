@@ -33,8 +33,16 @@ import {
   Moon,
   Sun,
   Globe,
-  SlidersHorizontal
+  SlidersHorizontal,
+  Flame,
+  Zap,
+  ArrowRight
 } from 'lucide-react';
+import { BannerSlider } from '../components/BannerSlider';
+import { CategoryList } from '../components/CategoryList';
+import { ProductCard } from '../components/ProductCard';
+import { CATEGORIES } from '../data/mockData';
+import { useTranslation, getCategoryTitle } from '../utils/translations';
 
 const REGIONS = [
   "Toshkent shahri",
@@ -80,6 +88,7 @@ export const TelegramMiniApp: React.FC = () => {
     language,
     setLanguage
   } = useStore();
+  const { t } = useTranslation();
 
   // Telegram User & Context
   const [tgUser, setTgUser] = useState<any>(null);
@@ -89,6 +98,9 @@ export const TelegramMiniApp: React.FC = () => {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [selectedMonths, setSelectedMonths] = useState<3 | 6 | 12 | 24>(12);
+
+  const weeklyOffers = useMemo(() => products.filter((p) => p.isWeeklyOffer), [products]);
+  const zeroDownProducts = useMemo(() => products.filter((p) => p.hasZeroDown), [products]);
 
   // Fast Checkout Modal / Drawer State
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
@@ -139,8 +151,20 @@ export const TelegramMiniApp: React.FC = () => {
       list = list.filter(p => p.categoryId.includes('appliances') || p.categoryName.toLowerCase().includes('maishiy') || p.categoryName.toLowerCase().includes('televizor'));
     } else if (selectedCategory === 'computers') {
       list = list.filter(p => p.categoryId.includes('computers') || p.categoryName.toLowerCase().includes('noutbuk'));
+    } else if (selectedCategory === 'beauty') {
+      list = list.filter(p => p.categoryId.includes('beauty') || p.categoryName.toLowerCase().includes('parvarish'));
+    } else if (selectedCategory === 'auto') {
+      list = list.filter(p => p.categoryId.includes('auto') || p.categoryName.toLowerCase().includes('avto'));
+    } else if (selectedCategory === 'home-goods' || selectedCategory === 'home') {
+      list = list.filter(p => p.categoryId.includes('home') || p.categoryName.toLowerCase().includes('uy-ro') || p.categoryName.toLowerCase().includes('ro‘zg‘or'));
     } else if (selectedCategory === 'discounts') {
       list = list.filter(p => (p.discountPercentage && p.discountPercentage > 0) || (p.originalPrice && p.originalPrice > p.price));
+    } else if (selectedCategory !== 'all') {
+      const cleanSlug = selectedCategory.replace('cat-', '').toLowerCase();
+      list = list.filter(p => 
+        p.categoryId.toLowerCase().includes(cleanSlug) ||
+        p.categoryName.toLowerCase().includes(cleanSlug)
+      );
     }
 
     return list;
@@ -177,6 +201,11 @@ export const TelegramMiniApp: React.FC = () => {
   // Cart quantity controls with haptic
   const handleAdd = (e: React.MouseEvent, product: Product) => {
     e.stopPropagation();
+    tgHaptic('medium');
+    addToCart(product, 12, 'installment');
+  };
+
+  const handleAddDirect = (product: Product) => {
     tgHaptic('medium');
     addToCart(product, 12, 'installment');
   };
@@ -377,267 +406,457 @@ export const TelegramMiniApp: React.FC = () => {
 
       {/* 2. MAIN BODY ACCORDING TO ACTIVE TAB */}
       {activeTab === 'home' && (
-        <main className="flex-1 px-3 pt-3 space-y-3.5">
-          {/* Quick Categories Bar (Stories/Circles) */}
-          <div className="overflow-x-auto no-scrollbar flex items-center gap-2 py-1">
-            {CATEGORY_CHIPS.map(chip => {
-              const Icon = chip.icon;
-              const isActive = selectedCategory === chip.id;
-              return (
+        <main className="flex-1 px-3 pt-3 space-y-4">
+          {/* A. Search Active View */}
+          {searchQuery.trim() ? (
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <h3 className="font-bold text-sm text-gray-900 dark:text-white flex items-center gap-1.5">
+                  <span>"{searchQuery}" {language === 'ru' ? 'результаты' : 'bo\'yicha natijalar'}</span>
+                  <span className="text-[11px] font-medium text-purple-600 dark:text-purple-400 bg-purple-100 dark:bg-purple-950/60 px-2 py-0.5 rounded-full">
+                    {filteredProducts.length} ta
+                  </span>
+                </h3>
                 <button
-                  key={chip.id}
                   onClick={() => {
                     tgHaptic('light');
-                    setSelectedCategory(chip.id);
+                    setSearchQuery('');
                   }}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all shrink-0 ${
-                    isActive
-                      ? 'bg-gradient-to-r from-[#640199] to-[#7B0FB5] text-white shadow-md shadow-purple-500/25 scale-105'
-                      : 'bg-white dark:bg-[#111319] text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-800'
-                  }`}
+                  className="text-xs font-semibold text-rose-500 hover:underline"
                 >
-                  <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-amber-300' : 'text-purple-600 dark:text-purple-400'}`} />
-                  <span>{chip.label}</span>
+                  Tozalash
                 </button>
-              );
-            })}
-          </div>
-
-          {/* Hero Promotional Card (0-0-12 Halol Nasiya) */}
-          {!searchQuery && selectedCategory === 'all' && (
-            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#640199] via-[#4A0072] to-[#240038] p-4 text-white shadow-xl border border-purple-500/20">
-              <div className="relative z-10 space-y-1.5">
-                <div className="inline-flex items-center gap-1 bg-amber-400 text-gray-950 font-black text-[10px] px-2 py-0.5 rounded-full uppercase tracking-wider shadow">
-                  <Percent className="w-3 h-3" /> 0-0-12 Halol Nasiya
-                </div>
-                <h2 className="text-base font-extrabold leading-snug">
-                  0% Boshlang'ich to'lov, 12 oygacha foizsiz!
-                </h2>
-                <p className="text-[11px] text-purple-200/90 leading-relaxed">
-                  Barcha smartfon va maishiy texnikalarni ortiqcha to'lovlarsiz muddatli to'lovga oling. 2 daqiqada onlayn skoring!
-                </p>
-                <div className="pt-1 flex items-center gap-3 text-[10px] font-medium text-purple-200">
-                  <span className="flex items-center gap-1">
-                    <Truck className="w-3 h-3 text-amber-300" /> Bepul yetkazish
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <ShieldCheck className="w-3 h-3 text-emerald-300" /> 1 yil kafolat
-                  </span>
-                </div>
               </div>
 
-              {/* Decorative background glow */}
-              <div className="absolute -right-6 -bottom-6 w-32 h-32 bg-purple-500/30 rounded-full blur-2xl pointer-events-none" />
+              {filteredProducts.length === 0 ? (
+                <div className="py-14 text-center space-y-2">
+                  <Package className="w-12 h-12 text-gray-400 mx-auto" />
+                  <p className="font-semibold text-sm text-gray-700 dark:text-gray-300">Mahsulot topilmadi</p>
+                  <p className="text-xs text-gray-500">Qidiruv so'zini o'zgartirib ko'ring yoki boshqa toifani tanlang</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 gap-2.5">
+                  {filteredProducts.map(product => (
+                    <ProductCard
+                      key={product.id}
+                      product={product}
+                      onClick={handleOpenProduct}
+                      onInstallmentClick={handleBuyNow}
+                      onAddToCart={handleAddDirect}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
-          )}
+          ) : selectedCategory !== 'all' ? (
+            /* B. Category Filtered Active View */
+            <div className="space-y-3">
+              {/* Quick Categories Bar (Scrollable chips) */}
+              <div className="overflow-x-auto no-scrollbar flex items-center gap-2 py-1">
+                {CATEGORY_CHIPS.map(chip => {
+                  const Icon = chip.icon;
+                  const isActive = selectedCategory === chip.id;
+                  return (
+                    <button
+                      key={chip.id}
+                      onClick={() => {
+                        tgHaptic('light');
+                        setSelectedCategory(chip.id);
+                      }}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all shrink-0 ${
+                        isActive
+                          ? 'bg-gradient-to-r from-[#640199] to-[#7B0FB5] text-white shadow-md shadow-purple-500/25 scale-105'
+                          : 'bg-white dark:bg-[#111319] text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-800'
+                      }`}
+                    >
+                      <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-amber-300' : 'text-purple-600 dark:text-purple-400'}`} />
+                      <span>{chip.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
 
-          {/* Product Feed Header */}
-          <div className="flex items-center justify-between pt-1">
-            <h3 className="font-bold text-sm text-gray-900 dark:text-white flex items-center gap-1.5">
-              <span>Mahsulotlar</span>
-              <span className="text-[11px] font-medium text-purple-600 dark:text-purple-400 bg-purple-100 dark:bg-purple-950/60 px-1.5 py-0.2 rounded-full">
-                {filteredProducts.length} ta
-              </span>
-            </h3>
-            {selectedCategory !== 'all' && (
-              <button
-                onClick={() => {
-                  tgHaptic('light');
-                  setSelectedCategory('all');
-                }}
-                className="text-xs font-semibold text-purple-600 dark:text-purple-400"
-              >
-                Filtrni tozalash
-              </button>
-            )}
-          </div>
+              <div className="flex items-center justify-between pt-1">
+                <h3 className="font-bold text-sm text-gray-900 dark:text-white flex items-center gap-1.5">
+                  <span>{getCategoryTitle(selectedCategory, language)}</span>
+                  <span className="text-[11px] font-medium text-purple-600 dark:text-purple-400 bg-purple-100 dark:bg-purple-950/60 px-2 py-0.5 rounded-full">
+                    {filteredProducts.length} ta
+                  </span>
+                </h3>
+                <button
+                  onClick={() => {
+                    tgHaptic('light');
+                    setSelectedCategory('all');
+                  }}
+                  className="text-xs font-semibold text-purple-600 dark:text-purple-400 hover:underline"
+                >
+                  Barcha tovarlar
+                </button>
+              </div>
 
-          {/* 2-Column Product Grid */}
-          {filteredProducts.length === 0 ? (
-            <div className="py-12 text-center space-y-2">
-              <Package className="w-12 h-12 text-gray-400 mx-auto" />
-              <p className="font-semibold text-sm text-gray-700 dark:text-gray-300">Mahsulot topilmadi</p>
-              <p className="text-xs text-gray-500">Qidiruv so'zini o'zgartirib ko'ring yoki boshqa toifani tanlang</p>
+              {filteredProducts.length === 0 ? (
+                <div className="py-14 text-center space-y-2">
+                  <Package className="w-12 h-12 text-gray-400 mx-auto" />
+                  <p className="font-semibold text-sm text-gray-700 dark:text-gray-300">Bu toifada tovar mavjud emas</p>
+                  <button
+                    onClick={() => {
+                      tgHaptic('light');
+                      setSelectedCategory('all');
+                    }}
+                    className="px-4 py-2 rounded-xl bg-[#640199] text-white font-semibold text-xs shadow-md mt-2"
+                  >
+                    Barcha tovarlarga qaytish
+                  </button>
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 gap-2.5">
+                  {filteredProducts.map(product => (
+                    <ProductCard
+                      key={product.id}
+                      product={product}
+                      onClick={handleOpenProduct}
+                      onInstallmentClick={handleBuyNow}
+                      onAddToCart={handleAddDirect}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
           ) : (
-            <div className="grid grid-cols-2 gap-2.5">
-              {filteredProducts.map(product => {
-                const inCartItem = cart.find(c => c.product.id === product.id);
-                const isFav = isFavorite(product.id);
-                const monthly = Math.round(product.price / 12);
+            /* C. FULL DEFAULT HOMEPAGE (Identical to main website sections!) */
+            <div className="space-y-6">
+              {/* 1. Asosiy Promo Bannerlar Slayderi */}
+              <BannerSlider
+                onBannerAction={(targetCat) => {
+                  tgHaptic('light');
+                  if (targetCat) {
+                    setSelectedCategory(targetCat.replace('cat-', ''));
+                  } else {
+                    setActiveTab('catalog');
+                  }
+                }}
+              />
 
-                return (
-                  <div
-                    key={product.id}
-                    onClick={() => handleOpenProduct(product)}
-                    className="bg-white dark:bg-[#111319] rounded-2xl p-2.5 flex flex-col justify-between border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-md transition-all active:scale-[0.98] cursor-pointer relative"
+              {/* 2. Ommabop Toifalar Karuseli / Ro'yxati */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-sm font-black text-gray-900 dark:text-white tracking-tight flex items-center gap-1.5">
+                    <span>{t('popularCategories')}</span>
+                  </h2>
+                  <button
+                    onClick={() => {
+                      tgHaptic('light');
+                      setActiveTab('catalog');
+                    }}
+                    className="text-xs font-bold text-uzum-primary hover:text-uzum-hover flex items-center gap-1 group"
                   >
-                    {/* Top Badges & Favorite Heart */}
-                    <div className="relative w-full aspect-square bg-gray-50 dark:bg-gray-800/60 rounded-xl overflow-hidden mb-2 p-2 flex items-center justify-center">
-                      <img
-                        src={product.images[0] || 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=300'}
-                        alt={product.title}
-                        className="w-full h-full object-contain pointer-events-none"
-                        loading="lazy"
-                      />
+                    <span>{t('allCategories')}</span>
+                    <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                  </button>
+                </div>
+                <CategoryList
+                  onSelectCategory={(slug) => {
+                    tgHaptic('light');
+                    setSelectedCategory(slug);
+                  }}
+                />
+              </div>
 
-                      {/* Discount pill */}
-                      {product.discountPercentage && product.discountPercentage > 0 && (
-                        <div className="absolute top-1.5 left-1.5 bg-rose-500 text-white font-black text-[9px] px-1.5 py-0.5 rounded-md shadow">
-                          -{product.discountPercentage}%
-                        </div>
-                      )}
-
-                      {/* Favorite Button */}
-                      <button
-                        onClick={(e) => handleToggleFavorite(e, product.id)}
-                        className={`absolute top-1.5 right-1.5 p-1.5 rounded-full backdrop-blur-md transition-all ${
-                          isFav
-                            ? 'bg-rose-50 text-rose-500 dark:bg-rose-950/80 shadow'
-                            : 'bg-white/80 dark:bg-gray-900/80 text-gray-400 hover:text-rose-500'
-                        }`}
-                        title="Sevimlilarga qo'shish"
-                      >
-                        <Heart className={`w-3.5 h-3.5 ${isFav ? 'fill-rose-500' : ''}`} />
-                      </button>
-
-                      {/* 0-0-12 mini badge */}
-                      {product.hasZeroDown && (
-                        <div className="absolute bottom-1.5 left-1.5 bg-purple-900/90 text-amber-300 font-extrabold text-[8px] px-1.5 py-0.5 rounded border border-purple-500/30">
-                          0-0-12
-                        </div>
-                      )}
+              {/* 3. ELRIZO Ishonch va FinTech Afzalliklari Bloki */}
+              <div className="grid grid-cols-2 gap-2">
+                {[
+                  {
+                    icon: Zap,
+                    title: t('trust1Title'),
+                    desc: t('trust1Desc'),
+                    bg: "bg-purple-50/80 dark:bg-[#111319] text-purple-700 dark:text-purple-300 border-purple-200/50 dark:border-gray-800",
+                  },
+                  {
+                    icon: Percent,
+                    title: t('trust2Title'),
+                    desc: t('trust2Desc'),
+                    bg: "bg-emerald-50/80 dark:bg-[#111319] text-emerald-700 dark:text-emerald-300 border-emerald-200/50 dark:border-gray-800",
+                  },
+                  {
+                    icon: Truck,
+                    title: t('trust3Title'),
+                    desc: t('trust3Desc'),
+                    bg: "bg-blue-50/80 dark:bg-[#111319] text-blue-700 dark:text-blue-300 border-blue-200/50 dark:border-gray-800",
+                  },
+                  {
+                    icon: ShieldCheck,
+                    title: t('trust4Title'),
+                    desc: t('trust4Desc'),
+                    bg: "bg-amber-50/80 dark:bg-[#111319] text-amber-800 dark:text-amber-300 border-amber-200/50 dark:border-gray-800",
+                  },
+                ].map((item, idx) => (
+                  <div
+                    key={idx}
+                    className={`p-2.5 rounded-2xl border ${item.bg} flex items-start gap-2 shadow-xs`}
+                  >
+                    <div className="p-2 rounded-xl bg-white/80 dark:bg-gray-800/80 shadow-xs shrink-0">
+                      <item.icon className="w-4 h-4" />
                     </div>
-
-                    {/* Product Info */}
-                    <div className="space-y-1">
-                      <h4 className="text-xs font-semibold text-gray-900 dark:text-gray-100 line-clamp-2 leading-tight">
-                        {product.title}
-                      </h4>
-
-                      {/* Monthly Nasiya Badge */}
-                      <div className="bg-purple-50 dark:bg-purple-950/60 text-[#640199] dark:text-purple-300 font-bold text-[10px] px-1.5 py-0.5 rounded-md inline-block">
-                        ⚡ {monthly.toLocaleString('uz-UZ')} so'm/oy
+                    <div className="space-y-0.5 min-w-0">
+                      <div className="font-black text-xs text-gray-900 dark:text-white truncate">
+                        {item.title}
                       </div>
-
-                      {/* Total Price */}
-                      <div className="pt-0.5">
-                        <div className="font-extrabold text-xs text-gray-900 dark:text-white">
-                          {product.price.toLocaleString('uz-UZ')} so'm
-                        </div>
-                        {product.originalPrice && product.originalPrice > product.price && (
-                          <div className="text-[10px] text-gray-400 line-through">
-                            {product.originalPrice.toLocaleString('uz-UZ')} so'm
-                          </div>
-                        )}
+                      <div className="text-[10px] text-gray-600 dark:text-gray-300 line-clamp-2 leading-tight">
+                        {item.desc}
                       </div>
-                    </div>
-
-                    {/* Bottom Cart Button or Stepper */}
-                    <div className="pt-2">
-                      {inCartItem ? (
-                        <div
-                          onClick={(e) => e.stopPropagation()}
-                          className="flex items-center justify-between bg-purple-50 dark:bg-purple-950/60 border border-purple-200 dark:border-purple-800 rounded-xl p-1"
-                        >
-                          <button
-                            onClick={(e) => handleDecrement(e, product.id)}
-                            className="w-6 h-6 rounded-lg bg-white dark:bg-gray-800 flex items-center justify-center text-gray-700 dark:text-gray-200 shadow-sm active:scale-90"
-                          >
-                            <Minus className="w-3 h-3" />
-                          </button>
-                          <span className="font-bold text-xs text-[#640199] dark:text-purple-300">
-                            {inCartItem.quantity}
-                          </span>
-                          <button
-                            onClick={(e) => handleIncrement(e, product.id)}
-                            className="w-6 h-6 rounded-lg bg-[#640199] text-white flex items-center justify-center shadow-sm active:scale-90"
-                          >
-                            <Plus className="w-3 h-3" />
-                          </button>
-                        </div>
-                      ) : (
-                        <button
-                          onClick={(e) => handleAdd(e, product)}
-                          className="w-full py-1.5 rounded-xl bg-[#640199] hover:bg-[#7B0FB5] active:scale-95 text-white font-semibold text-xs flex items-center justify-center gap-1 shadow-sm transition-all"
-                        >
-                          <ShoppingCart className="w-3.5 h-3.5" />
-                          <span>Savatga</span>
-                        </button>
-                      )}
                     </div>
                   </div>
-                );
-              })}
+                ))}
+              </div>
+
+              {/* 4. Hafta Takliflari (Hot Weekly Offers) */}
+              {weeklyOffers.length > 0 && (
+                <section className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="p-1.5 rounded-xl bg-rose-100 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400">
+                        <Flame className="w-4 h-4 fill-rose-500 text-rose-500 animate-pulse" />
+                      </div>
+                      <div>
+                        <h2 className="text-sm font-black text-gray-900 dark:text-white tracking-tight">
+                          {t('weeklyOffers')}
+                        </h2>
+                        <p className="text-[10px] text-gray-500 dark:text-gray-400">{t('weeklyOffersDesc')}</p>
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={() => {
+                        tgHaptic('light');
+                        setSelectedCategory('discounts');
+                      }}
+                      className="text-xs font-bold text-uzum-primary hover:underline flex items-center gap-0.5"
+                    >
+                      <span>{t('viewAll')}</span>
+                      <ChevronRight className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2.5">
+                    {weeklyOffers.slice(0, 4).map((product) => (
+                      <ProductCard
+                        key={product.id}
+                        product={product}
+                        onClick={handleOpenProduct}
+                        onInstallmentClick={handleBuyNow}
+                        onAddToCart={handleAddDirect}
+                      />
+                    ))}
+                  </div>
+                </section>
+              )}
+
+              {/* 5. 0-0-12 Nasiya Savdo Saralangan Tovar To'plami */}
+              {zeroDownProducts.length > 0 && (
+                <section className="space-y-3 bg-gradient-to-br from-purple-50/70 via-white to-purple-50/30 dark:from-[#0E1017] dark:via-[#111319] dark:to-[#0E1017] p-3.5 rounded-2xl border border-purple-100/80 dark:border-gray-800 shadow-xs">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="p-1.5 rounded-xl bg-[#640199] text-white shadow-sm">
+                        <Zap className="w-4 h-4 fill-white" />
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-1.5">
+                          <h2 className="text-sm font-black text-gray-900 dark:text-white tracking-tight">
+                            {t('zeroDownTitle')}
+                          </h2>
+                          <span className="text-[9px] font-black uppercase text-purple-700 dark:text-purple-300 bg-purple-100 dark:bg-purple-950/60 px-1.5 py-0.2 rounded-full">
+                            {t('zeroDownBadge')}
+                          </span>
+                        </div>
+                        <p className="text-[10px] text-gray-500 dark:text-gray-400">{t('zeroDownDesc')}</p>
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={() => {
+                        tgHaptic('light');
+                        setSelectedCategory('zero_nasiya');
+                      }}
+                      className="text-xs font-bold text-uzum-primary hover:underline flex items-center gap-0.5"
+                    >
+                      <span>{t('viewAll')}</span>
+                      <ChevronRight className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2.5">
+                    {zeroDownProducts.slice(0, 4).map((product) => (
+                      <ProductCard
+                        key={product.id}
+                        product={product}
+                        onClick={handleOpenProduct}
+                        onInstallmentClick={handleBuyNow}
+                        onAddToCart={handleAddDirect}
+                      />
+                    ))}
+                  </div>
+                </section>
+              )}
+
+              {/* 6. Ommabop Mahsulotlar (Barcha tovarlar) */}
+              <section className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="p-1.5 rounded-xl bg-purple-100 dark:bg-purple-950/50 text-[#640199] dark:text-purple-300">
+                      <Sparkles className="w-4 h-4 fill-[#640199] dark:fill-purple-300" />
+                    </div>
+                    <div>
+                      <h2 className="text-sm font-black text-gray-900 dark:text-white tracking-tight">
+                        {t('popularProducts')}
+                      </h2>
+                      <p className="text-[10px] text-gray-500 dark:text-gray-400">{t('popularProductsDesc')}</p>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => {
+                      tgHaptic('light');
+                      setActiveTab('catalog');
+                    }}
+                    className="flex items-center gap-1 text-xs font-bold text-uzum-primary dark:text-purple-300 bg-purple-50 dark:bg-gray-800 px-2.5 py-1 rounded-lg border border-purple-200/50 dark:border-gray-700"
+                  >
+                    <SlidersHorizontal className="w-3 h-3" />
+                    <span>{t('filtersAndAll')}</span>
+                  </button>
+                </div>
+
+                {/* Quick category switcher pills */}
+                <div className="overflow-x-auto no-scrollbar flex items-center gap-2 py-0.5">
+                  {CATEGORY_CHIPS.map(chip => {
+                    const Icon = chip.icon;
+                    const isActive = selectedCategory === chip.id;
+                    return (
+                      <button
+                        key={chip.id}
+                        onClick={() => {
+                          tgHaptic('light');
+                          setSelectedCategory(chip.id);
+                        }}
+                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all shrink-0 ${
+                          isActive
+                            ? 'bg-gradient-to-r from-[#640199] to-[#7B0FB5] text-white shadow-md shadow-purple-500/25 scale-105'
+                            : 'bg-white dark:bg-[#111319] text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-800'
+                        }`}
+                      >
+                        <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-amber-300' : 'text-purple-600 dark:text-purple-400'}`} />
+                        <span>{chip.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <div className="grid grid-cols-2 gap-2.5">
+                  {filteredProducts.map((product) => (
+                    <ProductCard
+                      key={product.id}
+                      product={product}
+                      onClick={handleOpenProduct}
+                      onInstallmentClick={handleBuyNow}
+                      onAddToCart={handleAddDirect}
+                    />
+                  ))}
+                </div>
+              </section>
+
+              {/* 7. Katta Taklif Banneri (Bottom Banner) */}
+              <div className="p-4 sm:p-6 rounded-2xl bg-gradient-to-r from-[#640199] via-[#7C3AED] to-[#4F46E5] text-white flex flex-col items-center justify-between gap-3 shadow-lg relative overflow-hidden text-center">
+                <div className="space-y-1.5 z-10">
+                  <div className="inline-flex items-center gap-1 text-[10px] font-black uppercase text-amber-300 bg-white/10 px-2.5 py-0.5 rounded-full backdrop-blur-xs">
+                    <Sparkles className="w-3 h-3" />
+                    <span>{t('bottomBannerBadge')}</span>
+                  </div>
+                  <h3 className="text-base sm:text-lg font-black tracking-tight">
+                    {t('bottomBannerTitle')}
+                  </h3>
+                  <p className="text-[11px] text-purple-100 max-w-xs">
+                    {t('bottomBannerDesc')}
+                  </p>
+                </div>
+
+                <button
+                  onClick={() => {
+                    tgHaptic('medium');
+                    setActiveTab('catalog');
+                  }}
+                  className="z-10 px-5 py-2.5 rounded-xl bg-white text-gray-900 hover:bg-yellow-300 hover:text-black font-black text-xs transition-all shadow-md flex items-center gap-1.5 shrink-0 active:scale-95"
+                >
+                  <SlidersHorizontal className="w-3.5 h-3.5 text-purple-700" />
+                  <span>{t('bottomBannerBtn')}</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+
+                {/* Ambient glow */}
+                <div className="absolute -right-16 -top-16 w-40 h-40 bg-white/10 rounded-full blur-2xl pointer-events-none" />
+              </div>
             </div>
           )}
         </main>
       )}
 
-      {/* 3. CATALOG TAB (Category view) */}
+      {/* 3. CATALOG TAB (Category view with all real categories) */}
       {activeTab === 'catalog' && (
         <main className="flex-1 px-3 pt-3 space-y-3">
-          <h3 className="font-bold text-base text-gray-900 dark:text-white">Barcha Toifalar</h3>
-          <div className="space-y-2">
-            {[
-              {
-                id: 'smartphones',
-                name: 'Smartfonlar va gadjetlar',
-                count: '420+ ta tovar',
-                desc: 'iPhone, Samsung, Xiaomi, aqlli soatlar',
-                icon: Sparkles,
-                image: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=200'
-              },
-              {
-                id: 'appliances',
-                name: 'Maishiy texnika',
-                count: '310+ ta tovar',
-                desc: 'Smart TV, sovutgich, kir yuvish mashinalari',
-                icon: Package,
-                image: 'https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?w=200'
-              },
-              {
-                id: 'computers',
-                name: 'Noutbuk va kompyuterlar',
-                count: '215+ ta tovar',
-                desc: 'MacBook, ASUS, Lenovo, monitorlar',
-                icon: SlidersHorizontal,
-                image: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=200'
-              },
-              {
-                id: 'zero_nasiya',
-                name: "0-0-12 Halol Nasiya maxsus to'plam",
-                count: '150+ ta tovar',
-                desc: "0% boshlang'ich to'lov, ustamasiz",
-                icon: Percent,
-                image: 'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=200'
-              }
-            ].map(cat => {
-              const Icon = cat.icon;
+          <div className="flex items-center justify-between">
+            <h3 className="font-bold text-base text-gray-900 dark:text-white flex items-center gap-1.5">
+              <Grid className="w-4 h-4 text-[#640199] dark:text-purple-400" />
+              <span>{t('allCategories')} ({CATEGORIES.length})</span>
+            </h3>
+          </div>
+
+          <div className="space-y-2.5">
+            {CATEGORIES.map(cat => {
+              const catTitle = getCategoryTitle(cat.slug, language);
               return (
                 <div
                   key={cat.id}
                   onClick={() => {
                     tgHaptic('light');
-                    setSelectedCategory(cat.id);
+                    setSelectedCategory(cat.slug);
                     setActiveTab('home');
                   }}
-                  className="bg-white dark:bg-[#111319] rounded-2xl p-3 border border-gray-100 dark:border-gray-800 flex items-center justify-between gap-3 shadow-sm active:scale-[0.98] cursor-pointer"
+                  className="bg-white dark:bg-[#111319] rounded-2xl p-3 border border-gray-100 dark:border-gray-800 flex flex-col gap-2.5 shadow-sm active:scale-[0.99] cursor-pointer hover:border-purple-300 dark:hover:border-purple-800 transition-all"
                 >
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-xl bg-purple-50 dark:bg-purple-950/50 p-1 shrink-0 overflow-hidden border border-purple-200/50 dark:border-purple-800/50 flex items-center justify-center">
-                      <img src={cat.image} alt={cat.name} className="w-full h-full object-cover rounded-lg" />
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="w-12 h-12 rounded-xl bg-purple-50 dark:bg-purple-950/50 p-1 shrink-0 overflow-hidden border border-purple-200/50 dark:border-purple-800/50 flex items-center justify-center">
+                        <img src={cat.image} alt={catTitle} className="w-full h-full object-cover rounded-lg" />
+                      </div>
+                      <div className="min-w-0">
+                        <h4 className="font-bold text-xs text-gray-900 dark:text-white truncate">
+                          {catTitle}
+                        </h4>
+                        <span className="text-[10px] font-semibold text-purple-600 dark:text-purple-400">
+                          {cat.itemCount}+ {t('itemsUnit')}
+                        </span>
+                      </div>
                     </div>
-                    <div>
-                      <h4 className="font-bold text-xs text-gray-900 dark:text-white flex items-center gap-1">
-                        <Icon className="w-3.5 h-3.5 text-[#640199] dark:text-purple-400" />
-                        <span>{cat.name}</span>
-                      </h4>
-                      <p className="text-[10px] text-gray-500 dark:text-gray-400">{cat.desc}</p>
-                      <span className="text-[10px] font-semibold text-purple-600 dark:text-purple-400">{cat.count}</span>
-                    </div>
+                    <ChevronRight className="w-4 h-4 text-gray-400 shrink-0" />
                   </div>
-                  <ChevronRight className="w-4 h-4 text-gray-400 shrink-0" />
+
+                  {/* Subcategories pill tags */}
+                  {cat.subcategories && cat.subcategories.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 pt-1 border-t border-gray-100 dark:border-gray-800/60">
+                      {cat.subcategories.slice(0, 4).map(sub => (
+                        <span
+                          key={sub.id}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            tgHaptic('light');
+                            setSearchQuery(sub.name);
+                            setActiveTab('home');
+                          }}
+                          className="text-[10px] bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-300 px-2 py-0.5 rounded-md hover:bg-purple-50 dark:hover:bg-purple-950/60 hover:text-purple-700 dark:hover:text-purple-300 transition-colors"
+                        >
+                          {sub.name}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
               );
             })}
@@ -677,36 +896,13 @@ export const TelegramMiniApp: React.FC = () => {
               {products
                 .filter(p => favorites.includes(p.id))
                 .map(product => (
-                  <div
+                  <ProductCard
                     key={product.id}
-                    onClick={() => handleOpenProduct(product)}
-                    className="bg-white dark:bg-[#111319] rounded-2xl p-2.5 flex flex-col justify-between border border-gray-100 dark:border-gray-800 shadow-sm relative cursor-pointer"
-                  >
-                    <div className="relative w-full aspect-square bg-gray-50 dark:bg-gray-800/60 rounded-xl overflow-hidden mb-2 p-2 flex items-center justify-center">
-                      <img src={product.images[0]} alt={product.title} className="w-full h-full object-contain" />
-                      <button
-                        onClick={(e) => handleToggleFavorite(e, product.id)}
-                        className="absolute top-1.5 right-1.5 p-1.5 rounded-full bg-rose-50 text-rose-500 dark:bg-rose-950/80 shadow"
-                      >
-                        <Heart className="w-3.5 h-3.5 fill-rose-500" />
-                      </button>
-                    </div>
-                    <div className="space-y-1">
-                      <h4 className="text-xs font-semibold text-gray-900 dark:text-gray-100 line-clamp-2">
-                        {product.title}
-                      </h4>
-                      <div className="font-extrabold text-xs text-gray-900 dark:text-white">
-                        {product.price.toLocaleString('uz-UZ')} so'm
-                      </div>
-                    </div>
-                    <button
-                      onClick={(e) => handleAdd(e, product)}
-                      className="w-full mt-2 py-1.5 rounded-xl bg-[#640199] text-white font-semibold text-xs flex items-center justify-center gap-1 shadow-sm"
-                    >
-                      <ShoppingCart className="w-3.5 h-3.5" />
-                      <span>Savatga</span>
-                    </button>
-                  </div>
+                    product={product}
+                    onClick={handleOpenProduct}
+                    onInstallmentClick={handleBuyNow}
+                    onAddToCart={handleAddDirect}
+                  />
                 ))}
             </div>
           )}
