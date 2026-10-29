@@ -2,8 +2,8 @@
 export default {
   darkMode: 'class',
   content: [
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
+    "./src/**/*.{js,ts,jsx,tsx,mdx}",
+    "./app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
     extend: {
@@ -40,7 +40,7 @@ export default {
           text: '#8B4513',
           yellow: '#FFDD00',
         },
-        // Deep Obsidian & OLED Black Theme (zero blue wash, luxury dark aesthetic)
+        // Standard Clean Slate Dark Theme (comfort dark aesthetic)
         slate: {
           50: '#f8fafc',
           100: '#f1f5f9',
@@ -49,12 +49,12 @@ export default {
           400: '#94a3b8',
           500: '#64748b',
           600: '#475569',
-          700: '#1F222E', // Subtle obsidian border & controls
-          750: '#181A23',
-          800: '#111319', // Luxury obsidian card & surface
-          850: '#0E1015',
-          900: '#08090C', // Deep obsidian elevated header & surfaces
-          950: '#050608', // OLED obsidian pitch black root
+          700: '#334155', // Clean standard dark border
+          750: '#283548',
+          800: '#1e293b', // Standard dark card & surface
+          850: '#162235',
+          900: '#0f172a', // Standard dark root background
+          950: '#020617', // Deep contrast
         }
       },
       fontFamily: {

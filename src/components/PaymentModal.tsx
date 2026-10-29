@@ -1,3 +1,4 @@
+'use client';
 import React, { useState } from 'react';
 import { 
   X, 
@@ -150,7 +151,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
                 <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
                   Uzum Pay
                 </span>
-                <span className="text-[10px] text-slate-400">{t('paymentModalWithCashback')}</span>
+                <span className="text-[10px] text-slate-400">{t('paymentModalZeroFee')}</span>
               </button>
             </div>
           </div>

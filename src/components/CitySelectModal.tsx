@@ -1,3 +1,4 @@
+'use client';
 import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MapPin, Search, Check, X, Building2, Compass } from 'lucide-react';
@@ -12,7 +13,6 @@ export const CitySelectModal: React.FC = () => {
 
   const getCityDisplayName = (city: CityOption) => {
     if (language === 'ru') return city.nameRu;
-    if (language === 'en') return city.nameEn;
     return city.nameUz;
   };
 

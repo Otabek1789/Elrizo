@@ -1,10 +1,11 @@
+'use client';
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Scale, X, ShoppingBag, Trash2, Check, ArrowRight } from 'lucide-react';
 import { useStore } from '../store/useStore';
 import { formatPrice, calculateMonthlyPaymentQuick } from '../utils/calculator';
 import { useTranslation } from '../utils/translations';
-import { Link } from 'react-router-dom';
+import { Link } from '@/lib/navigation';
 
 export const ProductComparisonModal: React.FC = () => {
   const {

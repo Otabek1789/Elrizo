@@ -1,3 +1,4 @@
+'use client';
 import React from 'react';
 import { Scale, X, ArrowRight, Trash2 } from 'lucide-react';
 import { useStore } from '../store/useStore';
@@ -46,7 +47,7 @@ export const ComparisonBar: React.FC = () => {
                     removeFromComparison(product.id);
                   }}
                   className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-red-500 hover:bg-red-600 text-white flex items-center justify-center text-[10px] shadow"
-                  title={language === 'ru' ? "Удалить" : language === 'en' ? "Remove" : "O'chirish"}
+                  title={language === 'ru' ? "Удалить" : "O'chirish"}
                 >
                   <X className="w-2.5 h-2.5" />
                 </button>
@@ -64,7 +65,7 @@ export const ComparisonBar: React.FC = () => {
           </div>
 
           <div className="hidden sm:block text-xs text-slate-300 shrink-0">
-            <span className="font-semibold text-white">{comparedProducts.length}</span>/4 {language === 'ru' ? 'товара' : language === 'en' ? 'items' : 'tovar'}
+            <span className="font-semibold text-white">{comparedProducts.length}</span>/4 {language === 'ru' ? 'товара' : 'tovar'}
           </div>
         </div>
 
@@ -74,7 +75,7 @@ export const ComparisonBar: React.FC = () => {
             type="button"
             onClick={clearComparison}
             className="p-2 text-slate-400 hover:text-red-400 transition-colors text-xs flex items-center gap-1 cursor-pointer"
-            title={language === 'ru' ? "Очистить все" : language === 'en' ? "Clear all" : "Hammasini tozalash"}
+            title={language === 'ru' ? "Очистить все" : "Hammasini tozalash"}
           >
             <Trash2 className="w-4 h-4" />
             <span className="hidden md:inline text-xs">{t('clearAll')}</span>

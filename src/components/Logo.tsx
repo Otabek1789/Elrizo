@@ -1,3 +1,4 @@
+'use client';
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from '../utils/translations';
@@ -62,7 +63,7 @@ export const Logo: React.FC<LogoProps> = ({
 
           {showBadge && (
             <span className="text-[9px] uppercase font-extrabold tracking-wide text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/60 px-1.5 py-0.5 rounded border border-purple-200/60 dark:border-purple-800/50 hidden sm:inline-block">
-              {language === 'ru' ? 'РАССРОЧКА' : language === 'en' ? 'INSTALLMENT' : 'NASIYA'}
+              {language === 'ru' ? 'РАССРОЧКА' : 'NASIYA'}
             </span>
           )}
         </div>

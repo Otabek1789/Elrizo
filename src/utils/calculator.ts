@@ -8,7 +8,7 @@ export const INSTALLMENT_PLANS: InstallmentPlan[] = [
 ];
 
 export const getInstallmentPlans = (lang: string = 'uz'): InstallmentPlan[] => {
-  const monthWord = lang === 'ru' ? 'мес' : lang === 'en' ? 'mo' : 'oy';
+  const monthWord = lang === 'ru' ? 'мес' : 'oy';
   return [
     { months: 3, markupPercent: 0, label: `3 ${monthWord} (0%)`, isZeroPercent: true },
     { months: 6, markupPercent: 12, label: `6 ${monthWord} (12%)` },
@@ -18,15 +18,15 @@ export const getInstallmentPlans = (lang: string = 'uz'): InstallmentPlan[] => {
 };
 
 /**
- * Narxni ko'p tilli formatga o'tkazish (UZ: "so'm", RU: "сум", EN: "UZS")
- * Masalan: 1250000 -> "1 250 000 so'm" / "1 250 000 сум" / "1 250 000 UZS"
+ * Narxni ko'p tilli formatga o'tkazish (UZ: "so'm", RU: "сум")
+ * Masalan: 1250000 -> "1 250 000 so'm" / "1 250 000 сум"
  */
 export const formatPrice = (amount: number, includeCurrency = true, customLang?: string): string => {
   const rounded = Math.round(amount);
   const formatted = rounded.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
   if (!includeCurrency) return formatted;
   const currentLang = customLang || (typeof document !== 'undefined' ? document.documentElement.lang : 'uz') || 'uz';
-  const currencyUnit = currentLang === 'ru' ? 'сум' : currentLang === 'en' ? 'UZS' : "so'm";
+  const currencyUnit = currentLang === 'ru' ? 'сум' : "so'm";
   return `${formatted} ${currencyUnit}`;
 };
 

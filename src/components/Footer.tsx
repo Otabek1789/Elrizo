@@ -1,5 +1,6 @@
+'use client';
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from '@/lib/navigation';
 import { ShieldCheck, Truck, Headphones, RotateCcw, CreditCard } from 'lucide-react';
 import { LogoIcon } from './Logo';
 import { useTranslation } from '../utils/translations';
@@ -8,7 +9,7 @@ export const Footer: React.FC = () => {
   const { t } = useTranslation();
 
   return (
-    <footer className="bg-white dark:bg-[#060709] border-t border-gray-200 dark:border-slate-800 mt-16 text-xs text-gray-600 dark:text-gray-400 transition-colors">
+    <footer className="bg-white dark:bg-slate-900 border-t border-gray-200 dark:border-slate-800 mt-16 text-xs text-gray-600 dark:text-gray-400 transition-colors">
       {/* 4 ta ishonch ustunlari */}
       <div className="border-b border-gray-100 dark:border-slate-800 bg-gray-50/60 dark:bg-slate-900/60 py-6 px-4">
         <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-4">

@@ -1,5 +1,6 @@
+'use client';
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link } from '@/lib/navigation';
 import { X, Trash2, ShoppingBag, ArrowRight, CreditCard, Tag, Check, Sparkles, Send, RefreshCw } from 'lucide-react';
 import { useStore } from '../store/useStore';
 import { formatPrice, calculateMonthlyPaymentQuick } from '../utils/calculator';

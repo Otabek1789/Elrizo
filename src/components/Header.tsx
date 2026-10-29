@@ -1,5 +1,6 @@
+'use client';
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from '@/lib/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Search, 
@@ -75,13 +76,6 @@ const formatCity = (name: string, lang: string): string => {
     if (name.toLowerCase().includes('navoiy')) return 'Навои';
     if (name.toLowerCase().includes('sirdaryo')) return 'Сырдарья';
     if (name.toLowerCase().includes("qoraqalpog'iston")) return 'Каракалпакстан';
-  }
-  if (lang === 'en') {
-    if (name.toLowerCase().includes('toshkent')) return 'Tashkent';
-    if (name.toLowerCase().includes('samarqand')) return 'Samarkand';
-    if (name.toLowerCase().includes('buxoro')) return 'Bukhara';
-    if (name.toLowerCase().includes('andijon')) return 'Andijan';
-    if (name.toLowerCase().includes("farg'ona")) return 'Fergana';
   }
   return name;
 };
@@ -352,7 +346,7 @@ export const Header: React.FC = () => {
                           onMouseDown={() => handleExecuteSearch()}
                           className="w-full p-3 bg-gray-50 dark:bg-slate-900 text-center font-bold text-xs text-uzum-primary dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-slate-800 transition-colors flex items-center justify-center gap-1.5"
                         >
-                          <span>{language === 'ru' ? `Смотреть еще ${liveResults.length - 5} товаров в Каталоге` : language === 'en' ? `View ${liveResults.length - 5} more products in Catalog` : `Yana ${liveResults.length - 5} ta mahsulotni Katalogda ko'rish`}</span>
+                          <span>{language === 'ru' ? `Смотреть еще ${liveResults.length - 5} товаров в Каталоге` : `Yana ${liveResults.length - 5} ta mahsulotni Katalogda ko'rish`}</span>
                           <ArrowRight className="w-3.5 h-3.5" />
                         </button>
                       )}
@@ -363,7 +357,7 @@ export const Header: React.FC = () => {
                 <div className="p-4 space-y-3">
                   <div className="flex items-center gap-1.5 text-xs font-bold text-gray-500 dark:text-gray-400">
                     <TrendingUp className="w-3.5 h-3.5 text-uzum-primary dark:text-purple-400" />
-                    <span>{language === 'ru' ? 'Популярные поисковые запросы:' : language === 'en' ? 'Popular searches:' : 'Ommabop qidiruvlar:'}</span>
+                    <span>{language === 'ru' ? 'Популярные поисковые запросы:' : 'Ommabop qidiruvlar:'}</span>
                   </div>
                   <div className="flex flex-wrap gap-1.5">
                     {[
@@ -404,7 +398,7 @@ export const Header: React.FC = () => {
               whileTap={{ scale: 0.96 }}
               onClick={openCityModal}
               className="flex items-center gap-1.5 text-gray-600 dark:text-gray-200 hover:text-uzum-primary dark:hover:text-purple-300 cursor-pointer transition-colors group py-0.5 px-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 shrink-0 whitespace-nowrap"
-              title={language === 'ru' ? "Изменить город" : language === 'en' ? "Change city" : "Shaharni o'zgartirish"}
+              title={language === 'ru' ? "Изменить город" : "Shaharni o'zgartirish"}
             >
               <MapPin className="w-3.5 h-3.5 text-uzum-primary dark:text-purple-400 group-hover:scale-110 transition-transform shrink-0" />
               <span className="whitespace-nowrap">{t('cityLabel')} <strong className="text-gray-800 dark:text-white underline decoration-dotted decoration-purple-400 underline-offset-2 font-bold whitespace-nowrap">{formatCity(selectedCity, language)}</strong></span>
@@ -420,7 +414,7 @@ export const Header: React.FC = () => {
               type="button"
               onClick={openOrderTracking}
               className="flex items-center gap-1.5 text-gray-700 dark:text-gray-200 hover:text-uzum-primary dark:hover:text-purple-300 font-bold cursor-pointer transition-colors bg-purple-50/60 dark:bg-purple-950/40 px-2 py-0.5 rounded-lg border border-purple-200/40 dark:border-purple-900/30 shrink-0 whitespace-nowrap"
-              title={language === 'ru' ? "Отследить статус заказа" : language === 'en' ? "Track order status" : "Shartnoma yoki buyurtma holatini kuzatish"}
+              title={language === 'ru' ? "Отследить статус заказа" : "Shartnoma yoki buyurtma holatini kuzatish"}
             >
               <Truck className="w-3.5 h-3.5 text-uzum-primary dark:text-purple-400 shrink-0" />
               <span className="whitespace-nowrap">{t('headerTrackOrder')}</span>
@@ -437,7 +431,7 @@ export const Header: React.FC = () => {
 
             {/* Language Selector in Top Bar */}
             <div className="flex items-center bg-gray-200/70 dark:bg-slate-800 p-0.5 rounded-lg text-[11px] font-bold shrink-0 whitespace-nowrap">
-              {(['uz', 'ru', 'en'] as const).map((lang) => (
+              {(['uz', 'ru'] as const).map((lang) => (
                 <button
                   key={lang}
                   onClick={() => setLanguage(lang)}
@@ -604,7 +598,7 @@ export const Header: React.FC = () => {
             whileTap={{ scale: 0.94 }}
             onClick={openCityModal}
             className="flex md:hidden items-center gap-1 px-1.5 py-1 rounded-xl text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-800 text-[10px] sm:text-xs font-bold transition-colors border border-gray-200/70 dark:border-slate-700/60 shrink-0"
-            title={language === 'ru' ? "Выбрать город" : language === 'en' ? "Select city" : "Shaharni tanlash"}
+            title={language === 'ru' ? "Выбрать город" : "Shaharni tanlash"}
           >
             <MapPin className="w-3.5 h-3.5 text-uzum-primary dark:text-purple-400 shrink-0" />
             <span className="max-w-[48px] sm:max-w-[65px] truncate text-[10px] sm:text-[11px] font-bold">{formatCity(selectedCity, language)}</span>
@@ -628,11 +622,11 @@ export const Header: React.FC = () => {
           <button
             type="button"
             onClick={() => {
-              const nextLang = language === 'uz' ? 'ru' : language === 'ru' ? 'en' : 'uz';
+              const nextLang = language === 'uz' ? 'ru' : 'uz';
               setLanguage(nextLang);
             }}
             className="flex md:hidden items-center gap-1 px-2 py-1 rounded-xl bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 text-gray-700 dark:text-gray-200 text-[10px] font-black uppercase transition-all shrink-0 border border-gray-200/60 dark:border-slate-700/60 cursor-pointer"
-            title={language === 'ru' ? "Сменить язык (UZ / RU / EN)" : language === 'en' ? "Change language (UZ / RU / EN)" : "Tilni o'zgartirish (UZ / RU / EN)"}
+            title={language === 'ru' ? "Сменить язык (UZ / RU)" : "Tilni o'zgartirish (UZ / RU)"}
           >
             <Globe className="w-3 h-3 text-uzum-primary dark:text-purple-400" />
             <span>{language}</span>
@@ -659,7 +653,7 @@ export const Header: React.FC = () => {
             whileTap={{ scale: 0.92 }}
             onClick={openComparisonModal}
             className="hidden md:flex relative p-2.5 rounded-2xl transition-colors items-center gap-1 text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-slate-800 hover:text-uzum-primary dark:hover:text-purple-300"
-            title={language === 'ru' ? "Сравнение товаров" : language === 'en' ? "Product comparison" : "Tovarlarni taqqoslash"}
+            title={language === 'ru' ? "Сравнение товаров" : "Tovarlarni taqqoslash"}
           >
             <Scale className={`w-5 h-5 ${comparisonList.length > 0 ? 'text-primary-600 dark:text-primary-400' : ''}`} />
             {comparisonList.length > 0 && (

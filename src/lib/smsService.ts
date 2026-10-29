@@ -24,13 +24,22 @@ export const generateOtpCode = (): string => {
   return Math.floor(1000 + Math.random() * 9000).toString();
 };
 
+const getEnv = (key: string): string | undefined => {
+  if (typeof process !== 'undefined' && process.env) {
+    if (process.env[`NEXT_PUBLIC_${key}`]) return process.env[`NEXT_PUBLIC_${key}`];
+    if (process.env[key]) return process.env[key];
+    if (process.env[`VITE_${key}`]) return process.env[`VITE_${key}`];
+  }
+  return undefined;
+};
+
 /**
  * Eskiz.uz dan avtorizatsiya tokenini olish
  */
 const getEskizToken = async (): Promise<string | null> => {
-  const email = import.meta.env.VITE_ESKIZ_EMAIL;
-  const password = import.meta.env.VITE_ESKIZ_PASSWORD;
-  const directToken = import.meta.env.VITE_ESKIZ_TOKEN;
+  const email = getEnv('ESKIZ_EMAIL');
+  const password = getEnv('ESKIZ_PASSWORD');
+  const directToken = getEnv('ESKIZ_TOKEN');
 
   if (directToken) {
     return directToken;

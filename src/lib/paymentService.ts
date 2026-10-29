@@ -19,10 +19,19 @@ export interface PaymentGatewayResult {
   isTestMode: boolean;
 }
 
+const getEnv = (key: string, fallback: string) => {
+  if (typeof process !== 'undefined' && process.env) {
+    if (process.env[`NEXT_PUBLIC_${key}`]) return process.env[`NEXT_PUBLIC_${key}`] as string;
+    if (process.env[key]) return process.env[key] as string;
+    if (process.env[`VITE_${key}`]) return process.env[`VITE_${key}`] as string;
+  }
+  return fallback;
+};
+
 // Configurable Merchant IDs (Fallback to official demo/sandbox accounts)
-const PAYME_MERCHANT_ID = (import.meta as any).env?.VITE_PAYME_MERCHANT_ID || '64a938c1a938c10001';
-const CLICK_MERCHANT_ID = (import.meta as any).env?.VITE_CLICK_MERCHANT_ID || '24560';
-const CLICK_SERVICE_ID = (import.meta as any).env?.VITE_CLICK_SERVICE_ID || '31289';
+const PAYME_MERCHANT_ID = getEnv('PAYME_MERCHANT_ID', '64a938c1a938c10001');
+const CLICK_MERCHANT_ID = getEnv('CLICK_MERCHANT_ID', '24560');
+const CLICK_SERVICE_ID = getEnv('CLICK_SERVICE_ID', '31289');
 
 export const createPaymeInvoiceUrl = (params: PaymentInvoiceParams): string => {
   // Payme expects amount in Tiyin (1 UZS = 100 Tiyin)
@@ -30,12 +39,15 @@ export const createPaymeInvoiceUrl = (params: PaymentInvoiceParams): string => {
   const rawParams = `m=${PAYME_MERCHANT_ID};ac.order_id=${params.contractNumber};a=${amountInTiyin}`;
   
   // Safe Base64 encoding for browser
-  const encoded = btoa(unescape(encodeURIComponent(rawParams)));
+  const encoded = typeof btoa !== 'undefined' 
+    ? btoa(unescape(encodeURIComponent(rawParams)))
+    : Buffer.from(rawParams).toString('base64');
   return `https://checkout.paycom.uz/${encoded}`;
 };
 
 export const createClickInvoiceUrl = (params: PaymentInvoiceParams): string => {
-  const returnUrl = encodeURIComponent(params.returnUrl || window.location.origin + '/checkout?payment=success');
+  const origin = typeof window !== 'undefined' ? window.location.origin : 'https://elrizonasiya.vercel.app';
+  const returnUrl = encodeURIComponent(params.returnUrl || origin + '/checkout?payment=success');
   return `https://my.click.uz/services/pay?service_id=${CLICK_SERVICE_ID}&merchant_id=${CLICK_MERCHANT_ID}&amount=${params.amount}&transaction_param=${encodeURIComponent(params.contractNumber)}&return_url=${returnUrl}`;
 };
 
@@ -63,6 +75,6 @@ export const generatePaymentLink = (
   return {
     provider,
     paymentUrl: url,
-    isTestMode: !Boolean((import.meta as any).env?.VITE_PAYME_MERCHANT_ID),
+    isTestMode: !Boolean(getEnv('PAYME_MERCHANT_ID', '')),
   };
 };

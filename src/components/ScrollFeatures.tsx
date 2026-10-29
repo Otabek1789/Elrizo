@@ -1,3 +1,4 @@
+'use client';
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowUp } from 'lucide-react';
@@ -43,7 +44,7 @@ export const ScrollToTopButton: React.FC = () => {
           whileTap={{ scale: 0.9 }}
           transition={{ type: 'spring', stiffness: 400, damping: 25 }}
           className="fixed bottom-36 md:bottom-24 right-4 sm:right-6 z-40 p-3 sm:p-3.5 rounded-full bg-gradient-to-tr from-uzum-primary to-purple-600 text-white shadow-xl hover:shadow-purple-500/50 flex items-center justify-center border-2 border-white/30 backdrop-blur-sm"
-          title={language === 'ru' ? 'Наверх' : language === 'en' ? 'Back to top' : 'Tepaga qaytish'}
+          title={language === 'ru' ? 'Наверх' : 'Tepaga qaytish'}
         >
           <ArrowUp className="w-5 h-5" />
         </motion.button>

@@ -1,3 +1,4 @@
+'use client';
 import React, { useState } from 'react';
 import { 
   X, 
@@ -263,14 +264,14 @@ export const OrderTrackingModal: React.FC = () => {
               onClick={() => { setSearchInput('ELR-849201'); setActiveOrder(DEMO_ORDERS['ELR-849201']); setNotFound(false); }}
               className="px-2.5 py-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg font-mono text-[11px] text-primary-600 dark:text-primary-400 hover:border-primary-400 transition"
             >
-              ELR-849201 ({language === 'ru' ? "В пути" : language === 'en' ? "In transit" : "Yo'lda"})
+              ELR-849201 ({language === 'ru' ? "В пути" : "Yo'lda"})
             </button>
             <button
               type="button"
               onClick={() => { setSearchInput('ELR-731904'); setActiveOrder(DEMO_ORDERS['ELR-731904']); setNotFound(false); }}
               className="px-2.5 py-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg font-mono text-[11px] text-primary-600 dark:text-primary-400 hover:border-primary-400 transition"
             >
-              ELR-731904 ({language === 'ru' ? "На складе" : language === 'en' ? "In warehouse" : "Omborda"})
+              ELR-731904 ({language === 'ru' ? "На складе" : "Omborda"})
             </button>
           </div>
         </div>
@@ -288,8 +289,6 @@ export const OrderTrackingModal: React.FC = () => {
               <p className="text-sm text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
                 {language === 'ru' 
                   ? `Договор с номером "${searchInput}" не найден. Проверьте номер или выберите демо-заказ.` 
-                  : language === 'en' 
-                  ? `Contract with number "${searchInput}" was not found. Please verify the number or select a demo order.` 
                   : `"${searchInput}" raqamli shartnoma mavjud emas. Iltimos raqamni to'g'ri kiritganingizni tekshiring yoki yuqoridagi namunalarni tanlang.`}
               </p>
             </div>
@@ -307,13 +306,11 @@ export const OrderTrackingModal: React.FC = () => {
                     </span>
                   </div>
                   <h4 className="font-bold text-slate-900 dark:text-white text-lg">
-                    {activeOrder.totalAmount.toLocaleString()} {language === 'ru' ? 'сум' : language === 'en' ? 'UZS' : "so'm"}
+                    {activeOrder.totalAmount.toLocaleString()} {language === 'ru' ? 'сум' : "so'm"}
                   </h4>
                   <p className="text-xs text-slate-500 dark:text-slate-400">
                     {t('trackModalInstallmentDesc')} {language === 'ru' 
                       ? `в течение ${activeOrder.months} мес. по ${activeOrder.monthlyPayment.toLocaleString()} сум/мес` 
-                      : language === 'en' 
-                      ? `for ${activeOrder.months} months, ${activeOrder.monthlyPayment.toLocaleString()} UZS/mo` 
                       : `${activeOrder.months} oy davomida har oy ${activeOrder.monthlyPayment.toLocaleString()} so'mdan`}
                   </p>
                 </div>

@@ -1,5 +1,6 @@
+'use client';
 import React, { useState } from 'react';
-import { useNavigate, Link, Navigate } from 'react-router-dom';
+import { useNavigate, Link, Navigate } from '@/lib/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Mail, 

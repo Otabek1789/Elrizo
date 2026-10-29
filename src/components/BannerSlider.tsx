@@ -1,5 +1,6 @@
+'use client';
 import React, { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link } from '@/lib/navigation';
 import { ChevronLeft, ChevronRight, Sparkles, ArrowRight } from 'lucide-react';
 import { PROMO_BANNERS } from '../data/mockData';
 import { useStore } from '../store/useStore';
@@ -71,7 +72,7 @@ export const BannerSlider: React.FC<BannerSliderProps> = ({ onBannerAction }) =>
           {onBannerAction ? (
             <button
               type="button"
-              onClick={(e) => {
+              onClick={(e: React.MouseEvent) => {
                 e.stopPropagation();
                 handleBannerAction(banner.targetCategory);
               }}
@@ -83,7 +84,7 @@ export const BannerSlider: React.FC<BannerSliderProps> = ({ onBannerAction }) =>
           ) : (
             <Link 
               to={`/catalog?category=${(banner.targetCategory || 'smartphones').replace('cat-', '')}`}
-              onClick={(e) => {
+              onClick={(e: React.MouseEvent) => {
                 e.stopPropagation();
                 handleBannerAction(banner.targetCategory);
               }}
@@ -112,7 +113,7 @@ export const BannerSlider: React.FC<BannerSliderProps> = ({ onBannerAction }) =>
           handlePrev();
         }}
         className="absolute left-3 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/30 hover:bg-black/60 text-white backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity"
-        title={language === 'ru' ? 'Предыдущий' : language === 'en' ? 'Previous' : 'Oldingi'}
+        title={language === 'ru' ? 'Предыдущий' : 'Oldingi'}
       >
         <ChevronLeft className="w-5 h-5" />
       </button>
@@ -123,7 +124,7 @@ export const BannerSlider: React.FC<BannerSliderProps> = ({ onBannerAction }) =>
           handleNext();
         }}
         className="absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/30 hover:bg-black/60 text-white backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity"
-        title={language === 'ru' ? 'Следующий' : language === 'en' ? 'Next' : 'Keyingi'}
+        title={language === 'ru' ? 'Следующий' : 'Keyingi'}
       >
         <ChevronRight className="w-5 h-5" />
       </button>

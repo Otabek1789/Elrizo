@@ -1,4 +1,4 @@
-// Vercel Serverless Function: ELRIZO Rasmiy Telegram Bot Webhook Handler
+// Next.js Route Handler: ELRIZO Rasmiy Telegram Bot Webhook Handler
 
 const BOT_TOKEN = '8969024175:AAEzzmDhUJJaq9mtMM2EbCceL5QRalqra1U';
 const SITE_URL = 'https://elrizonasiya.vercel.app';
@@ -42,7 +42,6 @@ async function sendTelegram(method: string, body: Record<string, any>) {
   }
 }
 
-// Foydalanuvchi talab qilgan rasmiy ma'lumotlar matni:
 function getOfficialWelcomeCard(firstName: string = 'Hurmatli mijoz'): string {
   return `Assalomu alaykum, <b>${escapeHtml(firstName)}</b>! 👋
 
@@ -74,48 +73,58 @@ const officialInlineKeyboard = [
   ]
 ];
 
-export default async function handler(req: any, res: any) {
-  // CORS sarlavhalari
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type',
+};
 
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
+export async function OPTIONS() {
+  return new Response(null, {
+    status: 200,
+    headers: corsHeaders,
+  });
+}
 
-  // Webhookni tashqi xizmatlar (masalan panel.void.ltd) buzib qo'yishidan doimiy himoya qilish:
+export async function GET() {
+  return Response.json(
+    {
+      ok: true,
+      message: 'ELRIZO Telegram Bot Webhook endpoint active',
+      bot: '@elrizo_bot',
+      web_app_url: WEBAPP_URL,
+    },
+    { headers: corsHeaders }
+  );
+}
+
+export async function POST(req: Request) {
+  // Webhookni tashqi xizmatlar buzib qo'yishidan doimiy himoya qilish:
   try {
     const webhookUrl = `${SITE_URL}/api/telegram`;
     const infoRes = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/getWebhookInfo`);
     const info = await infoRes.json();
     if (info.ok && info.result?.url !== webhookUrl) {
-      await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/setWebhook?url=${encodeURIComponent(webhookUrl)}&drop_pending_updates=true`);
+      await fetch(
+        `https://api.telegram.org/bot${BOT_TOKEN}/setWebhook?url=${encodeURIComponent(
+          webhookUrl
+        )}&drop_pending_updates=true`
+      );
     }
   } catch (e) {
     // Tarmoq xatosi bo'lsa davom etish
   }
 
-  if (req.method !== 'POST') {
-    return res.status(200).json({
-      ok: true,
-      message: 'ELRIZO Telegram Bot Webhook endpoint active',
-      bot: '@elrizo_bot',
-      web_app_url: WEBAPP_URL
-    });
-  }
-
-  let update = req.body;
-  if (typeof update === 'string') {
-    try {
-      update = JSON.parse(update);
-    } catch (e) {
-      console.error("Failed to parse body string:", e);
-    }
+  let update: any;
+  try {
+    update = await req.json();
+  } catch (e) {
+    console.error('Failed to parse body JSON:', e);
+    return Response.json({ ok: true }, { headers: corsHeaders });
   }
 
   if (!update) {
-    return res.status(200).json({ ok: true });
+    return Response.json({ ok: true }, { headers: corsHeaders });
   }
 
   try {
@@ -126,20 +135,19 @@ export default async function handler(req: any, res: any) {
       const safeFirstName = msg.from?.first_name || 'Hurmatli mijoz';
 
       if (!chatId) {
-        return res.status(200).json({ ok: true });
+        return Response.json({ ok: true }, { headers: corsHeaders });
       }
 
-      // Foydalanuvchi nima yozishidan qat'iy nazar faqat rasmiy ma'lumotlar kartochkasini chiqarish:
       await sendTelegram('sendMessage', {
         chat_id: chatId,
         text: getOfficialWelcomeCard(safeFirstName),
         parse_mode: 'HTML',
         reply_markup: {
-          inline_keyboard: officialInlineKeyboard
-        }
+          inline_keyboard: officialInlineKeyboard,
+        },
       });
 
-      return res.status(200).json({ ok: true });
+      return Response.json({ ok: true }, { headers: corsHeaders });
     }
 
     // 2. Callback query (tugma bosilganda)
@@ -154,21 +162,25 @@ export default async function handler(req: any, res: any) {
           text: getOfficialWelcomeCard(safeFirstName),
           parse_mode: 'HTML',
           reply_markup: {
-            inline_keyboard: officialInlineKeyboard
-          }
+            inline_keyboard: officialInlineKeyboard,
+          },
         });
       }
 
       await sendTelegram('answerCallbackQuery', {
-        callback_query_id: cb.id
+        callback_query_id: cb.id,
       });
 
-      return res.status(200).json({ ok: true });
+      return Response.json({ ok: true }, { headers: corsHeaders });
     }
 
-    return res.status(200).json({ ok: true });
+    return Response.json({ ok: true }, { headers: corsHeaders });
   } catch (err: any) {
-    console.error("Telegram handler error:", err);
-    return res.status(200).json({ ok: false, error: err.message });
+    console.error('Telegram handler error:', err);
+    return Response.json(
+      { ok: false, error: err.message },
+      { headers: corsHeaders }
+    );
   }
 }
+

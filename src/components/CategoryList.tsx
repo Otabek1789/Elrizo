@@ -1,5 +1,6 @@
+'use client';
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from '@/lib/navigation';
 import { CATEGORIES } from '../data/mockData';
 import { useStore } from '../store/useStore';
 import { useTranslation, getCategoryTitle } from '../utils/translations';
@@ -24,7 +25,7 @@ export const CategoryList: React.FC<CategoryListProps> = ({ onSelectCategory }) 
               <div
                 key={cat.id}
                 onClick={() => onSelectCategory(cat.slug)}
-                className={`group flex flex-col items-center text-center p-2.5 sm:p-4 rounded-2xl bg-white dark:bg-[#111319] border cursor-pointer transition-all duration-300 ${
+                className={`group flex flex-col items-center text-center p-2.5 sm:p-4 rounded-2xl bg-white dark:bg-slate-800 border cursor-pointer transition-all duration-300 ${
                   isSelected
                     ? 'border-uzum-primary dark:border-purple-500 bg-purple-50/60 dark:bg-purple-950/40 shadow-md ring-2 ring-purple-200 dark:ring-purple-900'
                     : 'border-gray-200/70 dark:border-gray-800/80 hover:border-purple-300 dark:hover:border-purple-500/40 hover:shadow-card-hover'

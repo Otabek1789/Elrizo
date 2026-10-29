@@ -17,7 +17,7 @@
     color-scheme: dark;
   }
   html.dark *, html.dark ::before, html.dark ::after {
-    border-color: #1F222E;
+    border-color: #334155;
   }
   body {
     background-color: #F8F9FA;
@@ -35,16 +35,16 @@
     min-height: 100vh;
   }
   html.dark body {
-    background-color: #060709;
-    color: #F4F4F6;
+    background-color: #0f172a;
+    color: #F8FAFC;
   }
 }
 
 html.dark ::-webkit-scrollbar-track {
-  background: #08090C;
+  background: #0f172a;
 }
 html.dark ::-webkit-scrollbar-thumb {
-  background: #202330;
+  background: #334155;
 }
 html.dark ::-webkit-scrollbar-thumb:hover {
   background: #8B5CF6;

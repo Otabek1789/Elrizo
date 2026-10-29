@@ -1,5 +1,6 @@
+'use client';
 import React from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link } from '@/lib/navigation';
 import { Heart, ShoppingBag } from 'lucide-react';
 import { useStore } from '../store/useStore';
 import { ProductCard } from '../components/ProductCard';

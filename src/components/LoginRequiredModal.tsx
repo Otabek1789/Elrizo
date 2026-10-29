@@ -1,5 +1,6 @@
+'use client';
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from '@/lib/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Lock, LogIn, ArrowRight, X, ShieldAlert } from 'lucide-react';
 import { useStore } from '../store/useStore';

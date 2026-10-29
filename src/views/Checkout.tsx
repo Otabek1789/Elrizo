@@ -1,5 +1,6 @@
+'use client';
 import React, { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link } from '@/lib/navigation';
 import { 
   CreditCard, 
   ShieldCheck, 
@@ -846,7 +847,7 @@ export const Checkout: React.FC = () => {
                     </div>
                     <span className="font-extrabold text-xs sm:text-sm text-gray-900 dark:text-white">Uzum Pay</span>
                     <span className="text-[10px] text-purple-600 dark:text-purple-400 font-bold mt-0.5">
-                      {language === 'ru' ? '1% Кэшбэк' : language === 'en' ? '1% Cashback' : '1% Keshbek'}
+                      {language === 'ru' ? 'Быстрая оплата' : "Tezkor to'lov"}
                     </span>
                     {selectedOnlineProvider === 'uzumpay' && (
                       <span className="absolute top-2 right-2 w-4 h-4 rounded-full bg-purple-600 text-white flex items-center justify-center text-[10px] font-bold">

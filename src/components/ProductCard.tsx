@@ -1,5 +1,6 @@
+'use client';
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link } from '@/lib/navigation';
 import { motion } from 'framer-motion';
 import { Heart, Star, ShoppingBag, Calculator, Zap, Scale, Send } from 'lucide-react';
 import { Product } from '../types';

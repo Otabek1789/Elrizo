@@ -1,8 +1,26 @@
 import { createClient } from '@supabase/supabase-js';
 import { Product, User, Review, CashbackTransaction, Order, PromoCode, Category } from '../types';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://bdpmekcxbfeydodkyrbn.supabase.co';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJkcG1la2N4YmZleWRvZGt5cmJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIwNjI1NzcsImV4cCI6MjEwNzYzODU3N30.Ykj64EUX08JYpb0YMQFtjeVhtiyJU3pEnxqkA4tOt9E';
+const getEnvVar = (key: string, fallback: string): string => {
+  if (typeof process !== 'undefined' && process.env) {
+    if (process.env[`NEXT_PUBLIC_${key}`]) return process.env[`NEXT_PUBLIC_${key}`] as string;
+    if (process.env[key]) return process.env[key] as string;
+    if (process.env[`VITE_${key}`]) return process.env[`VITE_${key}`] as string;
+  }
+  try {
+    if (typeof (import.meta as any) !== 'undefined' && (import.meta as any).env) {
+      if ((import.meta as any).env[`VITE_${key}`]) return (import.meta as any).env[`VITE_${key}`];
+      if ((import.meta as any).env[key]) return (import.meta as any).env[key];
+    }
+  } catch (e) {}
+  return fallback;
+};
+
+const supabaseUrl = getEnvVar('SUPABASE_URL', 'https://bdpmekcxbfeydodkyrbn.supabase.co');
+const supabaseAnonKey = getEnvVar(
+  'SUPABASE_ANON_KEY',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJkcG1la2N4YmZleWRvZGt5cmJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIwNjI1NzcsImV4cCI6MjEwNzYzODU3N30.Ykj64EUX08JYpb0YMQFtjeVhtiyJU3pEnxqkA4tOt9E'
+);
 
 export const ADMIN_EMAIL = 'otabek1789@gmail.com';
 
@@ -13,7 +31,7 @@ export const isAdminUser = (email?: string): boolean => {
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     persistSession: true,
-    storage: window.localStorage,
+    storage: typeof window !== 'undefined' ? window.localStorage : undefined,
     autoRefreshToken: true,
   },
 });

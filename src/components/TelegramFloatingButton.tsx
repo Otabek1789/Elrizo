@@ -1,3 +1,4 @@
+'use client';
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Send, MessageCircle, X } from 'lucide-react';
@@ -22,8 +23,6 @@ export const TelegramFloatingButton: React.FC = () => {
             <span>
               {language === 'ru' 
                 ? 'Наш Telegram-бот: @elrizo_bot' 
-                : language === 'en' 
-                ? 'Our Telegram Bot: @elrizo_bot' 
                 : 'Bizning Telegram bot: @elrizo_bot'}
             </span>
           </motion.div>

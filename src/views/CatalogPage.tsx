@@ -1,5 +1,6 @@
+'use client';
 import React, { useState, useMemo, useEffect } from 'react';
-import { Link, useSearchParams, useNavigate } from 'react-router-dom';
+import { Link, useSearchParams, useNavigate } from '@/lib/navigation';
 import { 
   SlidersHorizontal, 
   RotateCcw, 
@@ -353,7 +354,7 @@ export const CatalogPage: React.FC = () => {
             title="Ortga qaytish"
           >
             <ChevronLeft className="w-4 h-4 text-gray-500 group-hover:text-black dark:text-gray-400 dark:group-hover:text-white group-hover:-translate-x-0.5 transition-transform" />
-            <span>{language === 'ru' ? 'Назад' : language === 'en' ? 'Back' : 'Ortga'}</span>
+            <span>{language === 'ru' ? 'Назад' : 'Ortga'}</span>
           </button>
 
           <nav className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-slate-400 overflow-x-auto no-scrollbar py-0.5">

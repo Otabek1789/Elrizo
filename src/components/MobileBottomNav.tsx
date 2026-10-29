@@ -1,5 +1,6 @@
+'use client';
 import React from 'react';
-import { useLocation, useNavigate, Link } from 'react-router-dom';
+import { useLocation, useNavigate, Link } from '@/lib/navigation';
 import { motion } from 'framer-motion';
 import { 
   Home, 
@@ -28,7 +29,6 @@ export const MobileBottomNav: React.FC = () => {
   const cartCount = getCartItemsCount();
   const cartTotal = getCartTotal();
   const favoritesCount = favorites.length;
-  const cashbackBalance = user?.cashbackBalance ?? 0;
 
   const currentPath = location.pathname;
 

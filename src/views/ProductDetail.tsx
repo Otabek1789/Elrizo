@@ -1,5 +1,6 @@
+'use client';
 import React, { useState } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate, Link } from '@/lib/navigation';
 import { 
   Star, 
   Heart, 
@@ -121,20 +122,14 @@ export const ProductDetail: React.FC = () => {
       removeFromComparison(product.id);
       addToast(
         language === 'ru'
-          ? 'Товар удален из сравнения'
-          : language === 'en'
-          ? 'Removed from comparison'
-          : 'Taqqoslashdan olib tashlandi',
+          ? 'Товар удален из сравнения' : 'Taqqoslashdan olib tashlandi',
         'info'
       );
     } else {
       addToComparison(product.id);
       addToast(
         language === 'ru'
-          ? 'Товар добавлен к сравнению'
-          : language === 'en'
-          ? 'Added to comparison'
-          : "Taqqoslashga qo'shildi",
+          ? 'Товар добавлен к сравнению' : "Taqqoslashga qo'shildi",
         'success'
       );
     }
@@ -177,10 +172,7 @@ export const ProductDetail: React.FC = () => {
     if (!newReviewComment.trim()) {
       addToast(
         language === 'ru'
-          ? 'Пожалуйста, введите текст отзыва'
-          : language === 'en'
-          ? 'Please enter your review text'
-          : 'Iltimos, sharh matnini kiriting',
+          ? 'Пожалуйста, введите текст отзыва' : 'Iltimos, sharh matnini kiriting',
         'warning'
       );
       return;
@@ -188,7 +180,7 @@ export const ProductDetail: React.FC = () => {
     setIsSubmittingReview(true);
     setTimeout(() => {
       addReview(product.id, {
-        userName: newReviewAuthor.trim() || (language === 'ru' ? 'Покупатель' : language === 'en' ? 'Customer' : 'Mijoz'),
+        userName: newReviewAuthor.trim() || (language === 'ru' ? 'Покупатель' : 'Mijoz'),
         rating: newReviewRating,
         comment: newReviewComment.trim(),
       });
@@ -196,10 +188,7 @@ export const ProductDetail: React.FC = () => {
       setIsSubmittingReview(false);
       addToast(
         language === 'ru'
-          ? 'Ваш отзыв принят и опубликован!'
-          : language === 'en'
-          ? 'Your review has been published!'
-          : 'Sharhingiz qabul qilindi va chop etildi!',
+          ? 'Ваш отзыв принят и опубликован!' : 'Sharhingiz qabul qilindi va chop etildi!',
         'success'
       );
     }, 400);
@@ -291,8 +280,8 @@ export const ProductDetail: React.FC = () => {
                     : 'bg-white/90 dark:bg-slate-700/90 hover:bg-white text-gray-500 hover:text-primary-600 dark:text-slate-300 dark:hover:text-primary-400 border-gray-200/60 dark:border-slate-700'
                 }`}
                 title={isCompared 
-                  ? (language === 'ru' ? "Удалить из сравнения" : language === 'en' ? "Remove from comparison" : "Taqqoslashdan o'chirish") 
-                  : (language === 'ru' ? "Добавить к сравнению" : language === 'en' ? "Add to comparison" : "Taqqoslashga qo'shish")
+                  ? (language === 'ru' ? "Удалить из сравнения" : "Taqqoslashdan o'chirish") 
+                  : (language === 'ru' ? "Добавить к сравнению" : "Taqqoslashga qo'shish")
                 }
               >
                 <Scale className="w-4 h-4" />

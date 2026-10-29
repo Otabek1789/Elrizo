@@ -22,8 +22,6 @@ import {
   saveUserProfileToSupabase,
   fetchReviewsFromSupabase,
   saveReviewToSupabase,
-  fetchCashbackTransactionsFromSupabase,
-  saveCashbackTransactionToSupabase,
   fetchPromoCodesFromSupabase,
   setupSupabaseRealtime
 } from '../lib/supabase';
@@ -635,21 +633,14 @@ export const useStore = create<StoreState>()(
             usedLimit: cloudProfile?.usedLimit || 0,
             isAdmin,
             role: isAdmin ? 'admin' : 'user',
-            cashbackBalance: cloudProfile?.cashbackBalance || savedProfile?.cashbackBalance || 0,
-            loyaltyCardNumber: cloudProfile?.loyaltyCardNumber || (isAdmin ? 'ELR-777-VIP' : 'ELR-102-GOLD'),
+            cashbackBalance: 0,
+            loyaltyCardNumber: undefined,
           };
 
-          set({ user: userObj, isAuthOpen: false });
+          set({ user: userObj, isAuthOpen: false, cashbackTransactions: [] });
 
           // Supabase-ga profilni darhol saqlash / yangilash
           saveUserProfileToSupabase(userObj).catch(() => {});
-
-          // Supabase-dan keshbek tranzaksiyalarini yuklash
-          fetchCashbackTransactionsFromSupabase(cleanEmail).then((txs) => {
-            if (txs && txs.length > 0) {
-              set({ cashbackTransactions: txs });
-            }
-          }).catch(() => {});
 
           if (isAdmin) {
             get().addToast(`Xush kelibsiz Administrator Otabek Jo'rayev! Admin panel ochildi`, 'success');
@@ -724,16 +715,12 @@ export const useStore = create<StoreState>()(
               set({ promoCodes: remotePromo });
             }
 
-            // 4. Agar foydalanuvchi tizimda bo'lsa, profil va keshbekni yangilash
+            // 4. Agar foydalanuvchi tizimda bo'lsa, profilni yangilash
             const currentUser = get().user;
             if (currentUser?.email) {
               const cloudProfile = await fetchUserProfileFromSupabase(currentUser.email);
               if (cloudProfile) {
-                set({ user: { ...currentUser, ...cloudProfile } });
-              }
-              const cloudTxs = await fetchCashbackTransactionsFromSupabase(currentUser.email);
-              if (cloudTxs && cloudTxs.length > 0) {
-                set({ cashbackTransactions: cloudTxs });
+                set({ user: { ...currentUser, ...cloudProfile, cashbackBalance: 0 } });
               }
             }
 
@@ -844,76 +831,17 @@ export const useStore = create<StoreState>()(
       openOrderTracking: () => set({ isOrderTrackingOpen: true }),
       closeOrderTracking: () => set({ isOrderTrackingOpen: false }),
 
-      // Jamg'arma Karta (Cashback Loyalty Program)
+      // Jamg'arma Karta (Loyalty program removed)
       cashbackTransactions: [],
       useCashbackInCheckout: false,
-      setUseCashbackInCheckout: (val: boolean) => set({ useCashbackInCheckout: val }),
-      toggleUseCashbackInCheckout: () => set((state) => ({ useCashbackInCheckout: !state.useCashbackInCheckout })),
-      
-      getCashbackDiscount: () => {
-        const { useCashbackInCheckout, user, getFinalTotal } = get();
-        if (!useCashbackInCheckout || !user || !user.cashbackBalance) return 0;
-        const total = getFinalTotal();
-        return Math.min(user.cashbackBalance, total);
-      },
-
-      addCashback: (amount: number, description: string, orderId?: string) => {
-        const currentUser = get().user;
-        if (!currentUser || amount <= 0) return;
-        const newTx: CashbackTransaction = {
-          id: `cb-${Date.now()}`,
-          orderId,
-          type: 'earned',
-          amount,
-          date: new Date().toLocaleDateString('uz-UZ', { day: 'numeric', month: 'short' }),
-          description,
-        };
-        const updatedUser = {
-          ...currentUser,
-          cashbackBalance: (currentUser.cashbackBalance || 0) + amount,
-        };
-        set((state) => ({
-          user: updatedUser,
-          cashbackTransactions: [newTx, ...state.cashbackTransactions],
-        }));
-
-        // Supabase-ga keshbek harakati va yangilangan balansni saqlash
-        saveCashbackTransactionToSupabase(newTx, currentUser.email).catch(() => {});
-        saveUserProfileToSupabase(updatedUser).catch(() => {});
-
-        get().addToast(`Jamg'arma kartangizga +${amount.toLocaleString()} so'm keshbek qo'shildi! 🎁`, 'success');
-      },
-
-      spendCashback: (amount: number, description: string, orderId?: string) => {
-        const currentUser = get().user;
-        if (!currentUser || (currentUser.cashbackBalance || 0) < amount || amount <= 0) return false;
-        const newTx: CashbackTransaction = {
-          id: `cb-${Date.now()}`,
-          orderId,
-          type: 'spent',
-          amount,
-          date: new Date().toLocaleDateString('uz-UZ', { day: 'numeric', month: 'short' }),
-          description,
-        };
-        const updatedUser = {
-          ...currentUser,
-          cashbackBalance: Math.max(0, (currentUser.cashbackBalance || 0) - amount),
-        };
-        set((state) => ({
-          user: updatedUser,
-          cashbackTransactions: [newTx, ...state.cashbackTransactions],
-        }));
-
-        // Supabase-ga keshbek sarflanishi va yangilangan balansni saqlash
-        saveCashbackTransactionToSupabase(newTx, currentUser.email).catch(() => {});
-        saveUserProfileToSupabase(updatedUser).catch(() => {});
-
-        return true;
-      },
-
+      setUseCashbackInCheckout: () => {},
+      toggleUseCashbackInCheckout: () => {},
+      getCashbackDiscount: () => 0,
+      addCashback: () => {},
+      spendCashback: () => false,
       isCashbackCardModalOpen: false,
-      openCashbackCardModal: () => set({ isCashbackCardModalOpen: true }),
-      closeCashbackCardModal: () => set({ isCashbackCardModalOpen: false }),
+      openCashbackCardModal: () => {},
+      closeCashbackCardModal: () => {},
 
       // Toasts
       toasts: [],
@@ -983,9 +911,18 @@ export const useStore = create<StoreState>()(
     }),
     {
       name: 'elrizo_store_v3', // Yangi toza kalit (0 dan boshlash uchun)
-      storage: createJSONStorage(() => localStorage),
+      storage: createJSONStorage(() => {
+        if (typeof window !== 'undefined' && window.localStorage) {
+          return window.localStorage;
+        }
+        return {
+          getItem: () => null,
+          setItem: () => {},
+          removeItem: () => {},
+        };
+      }),
       onRehydrateStorage: () => (state) => {
-        if (typeof window !== 'undefined') {
+        if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
           try {
             localStorage.removeItem('elrizo_nasiya_storage');
             localStorage.removeItem('elrizo_store_v2');
@@ -1024,16 +961,14 @@ export const useStore = create<StoreState>()(
         if (state?.user) {
           state.user.scoringLimit = 0;
           state.user.usedLimit = 0;
-          if (state.user.cashbackBalance === undefined || state.user.cashbackBalance === 245000) {
-            state.user.cashbackBalance = 0;
-          }
+          state.user.cashbackBalance = 0;
           if (state.user.loyaltyCardNumber) {
             delete state.user.loyaltyCardNumber;
           }
           // Saqlangan profil ma'lumotlarini tiklash
           if (state.user.email) {
             try {
-              const raw = localStorage.getItem(`elrizo_user_profile_${state.user.email.toLowerCase().trim()}`);
+              const raw = typeof localStorage !== 'undefined' ? localStorage.getItem(`elrizo_user_profile_${state.user.email.toLowerCase().trim()}`) : null;
               if (raw) {
                 const saved = JSON.parse(raw);
                 if (saved.fullName) state.user.fullName = saved.fullName;
@@ -1045,6 +980,9 @@ export const useStore = create<StoreState>()(
               }
             } catch (e) {}
           }
+        }
+        if (state && (state.language as any) === 'en') {
+          state.language = 'uz';
         }
         if (state && typeof document !== 'undefined') {
           if (state.theme === 'dark') {
@@ -1070,7 +1008,6 @@ export const useStore = create<StoreState>()(
         selectedCity: state.selectedCity,
         comparisonList: state.comparisonList,
         reviews: state.reviews,
-        cashbackTransactions: state.cashbackTransactions,
       }),
     }
   )
