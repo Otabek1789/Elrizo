@@ -415,10 +415,10 @@
 }
 
 /* ==============================================================================
-   DARK MODE OVERRIDES FOR AUTH 103
+   DARK MODE OVERRIDES FOR AUTH 103 (Uzum-style Violet Night Theme)
    ============================================================================== */
 html.dark .auth-103-container {
-    background: #0f172a;
+    background: #141021;
 }
 
 html.dark .auth-103-title {
@@ -426,14 +426,14 @@ html.dark .auth-103-title {
 }
 
 html.dark .auth-103-input-field {
-    background: #1e293b;
-    border-color: #334155;
+    background: #201A35;
+    border-color: #382E59;
 }
 
 html.dark .auth-103-input-field:focus-within {
-    background: #1e293b;
-    border-color: #8B5CF6;
-    box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.25);
+    background: #201A35;
+    border-color: #7000FF;
+    box-shadow: 0 0 0 4px rgba(112, 0, 255, 0.25);
 }
 
 html.dark .auth-103-input-field input {
@@ -441,16 +441,16 @@ html.dark .auth-103-input-field input {
 }
 
 html.dark .auth-103-input-field input::placeholder {
-    color: #64748B;
+    color: #A89CC8;
 }
 
 html.dark .auth-103-otp-digit-input {
-    background: #1E293B !important;
-    border-color: #334155 !important;
+    background: #201A35 !important;
+    border-color: #382E59 !important;
     color: #FFFFFF !important;
 }
 
 html.dark .auth-103-otp-digit-input:focus {
-    border-color: #8B5CF6 !important;
-    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.3) !important;
+    border-color: #7000FF !important;
+    box-shadow: 0 0 0 3px rgba(112, 0, 255, 0.3) !important;
 }

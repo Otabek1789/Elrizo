@@ -1218,10 +1218,10 @@ export const AdminPanel: React.FC = () => {
                         </defs>
 
                         {/* Grid lines */}
-                        <line x1="0" y1="40" x2="700" y2="40" stroke={theme === 'dark' ? '#334155' : '#E2E8F0'} strokeDasharray="4" />
-                        <line x1="0" y1="100" x2="700" y2="100" stroke={theme === 'dark' ? '#334155' : '#E2E8F0'} strokeDasharray="4" />
-                        <line x1="0" y1="160" x2="700" y2="160" stroke={theme === 'dark' ? '#334155' : '#E2E8F0'} strokeDasharray="4" />
-                        <line x1="0" y1="220" x2="700" y2="220" stroke={theme === 'dark' ? '#334155' : '#CBD5E1'} />
+                        <line x1="0" y1="40" x2="700" y2="40" stroke={theme === 'dark' ? '#382E59' : '#E2E8F0'} strokeDasharray="4" />
+                        <line x1="0" y1="100" x2="700" y2="100" stroke={theme === 'dark' ? '#382E59' : '#E2E8F0'} strokeDasharray="4" />
+                        <line x1="0" y1="160" x2="700" y2="160" stroke={theme === 'dark' ? '#382E59' : '#E2E8F0'} strokeDasharray="4" />
+                        <line x1="0" y1="220" x2="700" y2="220" stroke={theme === 'dark' ? '#382E59' : '#CBD5E1'} />
 
                         {/* Area Fill */}
                         <motion.polygon
@@ -1258,7 +1258,7 @@ export const AdminPanel: React.FC = () => {
                                 cy={pt.cy}
                                 r={isHovered ? "8" : "6"}
                                 fill="#FBBF24"
-                                stroke={theme === 'dark' ? '#1E293B' : '#FFFFFF'}
+                                stroke={theme === 'dark' ? '#201A35' : '#FFFFFF'}
                                 strokeWidth="2.5"
                                 initial={{ scale: 0 }}
                                 animate={{ scale: 1 }}
@@ -1477,7 +1477,7 @@ export const AdminPanel: React.FC = () => {
                           {orders.slice(0, 5).map((ord) => (
                             <motion.tr 
                               key={ord.id} 
-                              whileHover={{ backgroundColor: theme === 'dark' ? '#1e293b50' : '#faf5ff' }}
+                              whileHover={{ backgroundColor: theme === 'dark' ? '#201a3580' : '#faf5ff' }}
                               onClick={() => setSelectedOrder(ord)} 
                               className="cursor-pointer transition-colors"
                             >
@@ -1578,7 +1578,7 @@ export const AdminPanel: React.FC = () => {
                             initial={{ opacity: 0, x: -15 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ delay: idx * 0.05 }}
-                            whileHover={{ x: 6, backgroundColor: theme === 'dark' ? '#33415530' : '#f8fafc' }}
+                            whileHover={{ x: 6, backgroundColor: theme === 'dark' ? '#382E5930' : '#f8fafc' }}
                             className="transition-colors cursor-default"
                           >
                             <td className="py-3.5 px-4 font-bold text-gray-900 dark:text-white flex items-center gap-2">
@@ -1732,7 +1732,7 @@ export const AdminPanel: React.FC = () => {
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: idx * 0.03 }}
-                            whileHover={{ backgroundColor: theme === 'dark' ? '#33415535' : '#f8fafc', scale: 1.002 }}
+                            whileHover={{ backgroundColor: theme === 'dark' ? '#382E5935' : '#f8fafc', scale: 1.002 }}
                             className="transition-colors cursor-pointer group"
                             onClick={() => setSelectedOrder(ord)}
                           >
@@ -2733,7 +2733,7 @@ export const AdminPanel: React.FC = () => {
                           initial={{ opacity: 0, x: -10 }}
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ delay: idx * 0.04 }}
-                          whileHover={{ x: 6, backgroundColor: theme === 'dark' ? '#33415530' : '#f8fafc' }}
+                          whileHover={{ x: 6, backgroundColor: theme === 'dark' ? '#382E5930' : '#f8fafc' }}
                           className="py-3.5 px-3 rounded-2xl flex justify-between items-center text-xs cursor-pointer transition-colors"
                           onClick={() => setSelectedOrder(ord)}
                         >

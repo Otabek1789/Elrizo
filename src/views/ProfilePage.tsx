@@ -196,7 +196,7 @@ export const ProfilePage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50/60 dark:bg-[#0B1120] py-6 sm:py-10 pb-24 md:pb-10 transition-colors">
+    <div className="min-h-screen bg-gray-50/60 dark:bg-slate-900 py-6 sm:py-10 pb-24 md:pb-10 transition-colors">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 space-y-6">
         
         {/* Breadcrumb & Orqaga qaytish */}

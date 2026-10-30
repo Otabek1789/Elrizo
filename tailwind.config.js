@@ -40,21 +40,21 @@ export default {
           text: '#8B4513',
           yellow: '#FFDD00',
         },
-        // Standard Clean Slate Dark Theme (comfort dark aesthetic)
+        // Uzum-style Violet-tinted Dark Theme ("sal siyohrang sifat" comfort aesthetic)
         slate: {
-          50: '#f8fafc',
-          100: '#f1f5f9',
-          200: '#e2e8f0',
-          300: '#cbd5e1',
-          400: '#94a3b8',
-          500: '#64748b',
-          600: '#475569',
-          700: '#334155', // Clean standard dark border
-          750: '#283548',
-          800: '#1e293b', // Standard dark card & surface
-          850: '#162235',
-          900: '#0f172a', // Standard dark root background
-          950: '#020617', // Deep contrast
+          50: '#FAF9FD',
+          100: '#F2F0F9',
+          200: '#E6E1F4',
+          300: '#CBC2E5',
+          400: '#A89CC8',
+          500: '#7869A6',
+          600: '#4D3E7B',
+          700: '#382E59', // Clean violet dark border & divider
+          750: '#2A2244', // Input & elevated surfaces
+          800: '#201A35', // Uzum dark card & modal surface
+          850: '#19142A', // Sub-navs & search container
+          900: '#141021', // Uzum violet night root background
+          950: '#0E0B17', // Deep contrast backdrop
         }
       },
       fontFamily: {
