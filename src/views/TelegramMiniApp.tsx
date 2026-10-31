@@ -415,7 +415,7 @@ export const TelegramMiniApp: React.FC = () => {
                 <h3 className="font-bold text-sm text-gray-900 dark:text-white flex items-center gap-1.5">
                   <span>"{searchQuery}" {language === 'ru' ? 'результаты' : 'bo\'yicha natijalar'}</span>
                   <span className="text-[11px] font-medium text-purple-600 dark:text-purple-400 bg-purple-100 dark:bg-purple-950/60 px-2 py-0.5 rounded-full">
-                    {filteredProducts.length} ta
+                    {filteredProducts.length} {language === 'ru' ? 'товаров' : 'ta'}
                   </span>
                 </h3>
                 <button
@@ -481,7 +481,7 @@ export const TelegramMiniApp: React.FC = () => {
                 <h3 className="font-bold text-sm text-gray-900 dark:text-white flex items-center gap-1.5">
                   <span>{getCategoryTitle(selectedCategory, language)}</span>
                   <span className="text-[11px] font-medium text-purple-600 dark:text-purple-400 bg-purple-100 dark:bg-purple-950/60 px-2 py-0.5 rounded-full">
-                    {filteredProducts.length} ta
+                    {filteredProducts.length} {language === 'ru' ? 'товаров' : 'ta'}
                   </span>
                 </h3>
                 <button

@@ -148,20 +148,12 @@ export const Checkout: React.FC = () => {
 
     if (smsRes.isRealSmsSent) {
       addToast(
-        language === 'ru'
-          ? `На номер ${formData.phone} отправлено реальное SMS!`
-          : language === 'en'
-          ? `Real SMS sent to ${formData.phone}!`
-          : `${formData.phone} raqamiga haqiqiy SMS yuborildi!`,
+        language === 'ru' ? `На номер ${formData.phone} отправлено реальное SMS!` : `${formData.phone} raqamiga haqiqiy SMS yuborildi!`,
         'success'
       );
     } else {
       addToast(
-        language === 'ru'
-          ? `Код подтверждения для ${formData.phone}: ${smsRes.code}`
-          : language === 'en'
-          ? `Verification code for ${formData.phone}: ${smsRes.code}`
-          : `${formData.phone} raqamiga tasdiqlash kodi: ${smsRes.code}`,
+        language === 'ru' ? `Код подтверждения для ${formData.phone}: ${smsRes.code}` : `${formData.phone} raqamiga tasdiqlash kodi: ${smsRes.code}`,
         'info'
       );
     }
@@ -173,11 +165,7 @@ export const Checkout: React.FC = () => {
     const cleanOtp = formData.otpCode.trim();
     if (cleanOtp !== serverOtpCode && cleanOtp !== '7777') {
       addToast(
-        language === 'ru'
-          ? `Неверный код. Введите ${serverOtpCode}`
-          : language === 'en'
-          ? `Invalid SMS code. Enter ${serverOtpCode}`
-          : `Noto'g'ri SMS kod. Tasdiqlash kodi: ${serverOtpCode}`,
+        language === 'ru' ? `Неверный код. Введите ${serverOtpCode}` : `Noto'g'ri SMS kod. Tasdiqlash kodi: ${serverOtpCode}`,
         'error'
       );
       return;
@@ -311,11 +299,7 @@ export const Checkout: React.FC = () => {
 
     window.open(paymentLink.paymentUrl, '_blank', 'noopener,noreferrer');
     addToast(
-      language === 'ru'
-        ? `Открыта страница оплаты ${provider.toUpperCase()}!`
-        : language === 'en'
-        ? `Opened ${provider.toUpperCase()} payment gateway!`
-        : `${provider.toUpperCase()} rasmiy to'lov sahifasi ochildi!`,
+      language === 'ru' ? `Открыта страница оплаты ${provider.toUpperCase()}!` : `${provider.toUpperCase()} rasmiy to'lov sahifasi ochildi!`,
       'info'
     );
 
@@ -356,11 +340,7 @@ export const Checkout: React.FC = () => {
     const res = applyPromoCode(code);
     if (!res.success) {
       const msg = res.message || (
-        language === 'ru'
-          ? 'Промокод не найден или срок действия истек'
-          : language === 'en'
-          ? 'Promo code not found or expired'
-          : "Promokod topilmadi yoki muddati o'tgan"
+        language === 'ru' ? 'Промокод не найден или срок действия истек' : "Promokod topilmadi yoki muddati o'tgan"
       );
       setPromoError(msg);
       addToast(msg, 'error');
@@ -368,11 +348,7 @@ export const Checkout: React.FC = () => {
       setPromoInput('');
       addToast(
         res.message || (
-          language === 'ru'
-            ? 'Промокод успешно применен'
-            : language === 'en'
-            ? 'Promo code successfully applied'
-            : "Promokod muvaffaqiyatli qo'llandi"
+          language === 'ru' ? 'Промокод успешно применен' : "Promokod muvaffaqiyatli qo'llandi"
         ),
         'success'
       );
@@ -612,7 +588,7 @@ export const Checkout: React.FC = () => {
                           buttonClassName="!py-2.5 !px-3.5 rounded-xl border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900"
                           options={UZBEKISTAN_REGIONS.map((r) => ({
                             value: r.shortUz,
-                            label: language === 'ru' ? r.nameRu : language === 'en' ? r.nameEn : r.nameUz,
+                            label: language === 'ru' ? r.nameRu : r.nameUz,
                             badge: r.popular ? 'Tezkor' : undefined,
                           }))}
                         />
@@ -648,7 +624,7 @@ export const Checkout: React.FC = () => {
                       {isSendingSms ? (
                         <>
                           <Loader2 className="w-4 h-4 animate-spin" />
-                          <span>{language === 'ru' ? 'Отправка SMS...' : language === 'en' ? 'Sending SMS...' : 'SMS kod yuborilmoqda...'}</span>
+                          <span>{language === 'ru' ? 'Отправка SMS...' : 'SMS kod yuborilmoqda...'}</span>
                         </>
                       ) : (
                         <>
@@ -688,10 +664,10 @@ export const Checkout: React.FC = () => {
                         {isRealSmsDelivered ? (
                           <>
                             <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                            <span>{language === 'ru' ? 'На ваш телефон отправлено реальное SMS-сообщение' : language === 'en' ? 'Real SMS sent to your phone' : 'Telefoningizga haqiqiy SMS xabar yuborildi'}</span>
+                            <span>{language === 'ru' ? 'На ваш телефон отправлено реальное SMS-сообщение' : 'Telefoningizga haqiqiy SMS xabar yuborildi'}</span>
                           </>
                         ) : (
-                          <span>{language === 'ru' ? 'Код подтверждения:' : language === 'en' ? 'Verification code:' : 'Tasdiqlash kodi:'} <strong className="text-amber-600 dark:text-amber-400 font-mono text-sm">{serverOtpCode}</strong></span>
+                          <span>{language === 'ru' ? 'Код подтверждения:' : 'Tasdiqlash kodi:'} <strong className="text-amber-600 dark:text-amber-400 font-mono text-sm">{serverOtpCode}</strong></span>
                         )}
                       </div>
 
@@ -707,20 +683,12 @@ export const Checkout: React.FC = () => {
                             setIsRealSmsDelivered(smsRes.isRealSmsSent);
                             if (smsRes.isRealSmsSent) {
                               addToast(
-                                language === 'ru'
-                                  ? `На номер ${formData.phone} отправлено реальное SMS!`
-                                  : language === 'en'
-                                  ? `Real SMS sent to ${formData.phone}!`
-                                  : `${formData.phone} raqamiga haqiqiy SMS yuborildi!`,
+                                language === 'ru' ? `На номер ${formData.phone} отправлено реальное SMS!` : `${formData.phone} raqamiga haqiqiy SMS yuborildi!`,
                                 'success'
                               );
                             } else {
                               addToast(
-                                language === 'ru'
-                                  ? `Новый SMS код: ${smsRes.code}`
-                                  : language === 'en'
-                                  ? `New SMS code: ${smsRes.code}`
-                                  : `Yangi SMS kod: ${smsRes.code}`,
+                                language === 'ru' ? `Новый SMS код: ${smsRes.code}` : `Yangi SMS kod: ${smsRes.code}`,
                                 'info'
                               );
                             }
@@ -728,8 +696,8 @@ export const Checkout: React.FC = () => {
                           className="text-xs text-purple-600 dark:text-purple-400 hover:underline font-bold"
                         >
                           {isSendingSms 
-                            ? (language === 'ru' ? 'SMS отправляется...' : language === 'en' ? 'Sending SMS...' : 'SMS yuborilmoqda...') 
-                            : (language === 'ru' ? 'Отправить код повторно' : language === 'en' ? 'Resend code' : 'Kodni qayta yuborish')}
+                            ? (language === 'ru' ? 'SMS отправляется...' : 'SMS yuborilmoqda...') 
+                            : (language === 'ru' ? 'Отправить код повторно' : 'Kodni qayta yuborish')}
                         </button>
                       </div>
                     </div>
@@ -828,7 +796,7 @@ export const Checkout: React.FC = () => {
               /* Agar To'liq To'lov tanlangan bo'lsa */
               <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700/60 p-6 space-y-5 shadow-sm">
                 <h3 className="text-base font-bold text-gray-900 dark:text-white">
-                  {language === 'ru' ? 'Выберите способ оплаты:' : language === 'en' ? 'Select payment method:' : "To'lov usulini tanlang:"}
+                  {language === 'ru' ? 'Выберите способ оплаты:' : "To'lov usulini tanlang:"}
                 </h3>
                 
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -893,7 +861,7 @@ export const Checkout: React.FC = () => {
                     </div>
                     <span className="font-extrabold text-xs sm:text-sm text-gray-900 dark:text-white">Click Up</span>
                     <span className="text-[10px] text-blue-600 dark:text-blue-400 font-bold mt-0.5">
-                      {language === 'ru' ? 'Быстрая оплата' : language === 'en' ? 'Fast payment' : "Tezkor to'lov"}
+                      {language === 'ru' ? 'Быстрая оплата' : "Tezkor to'lov"}
                     </span>
                     {selectedOnlineProvider === 'click' && (
                       <span className="absolute top-2 right-2 w-4 h-4 rounded-full bg-blue-600 text-white flex items-center justify-center text-[10px] font-bold">
@@ -916,10 +884,10 @@ export const Checkout: React.FC = () => {
                       <Banknote className="w-5 h-5 text-white" />
                     </div>
                     <span className="font-extrabold text-xs sm:text-sm text-gray-900 dark:text-white">
-                      {language === 'ru' ? 'Наличные' : language === 'en' ? 'Cash' : 'Naqd pul'}
+                      {language === 'ru' ? 'Наличные' : 'Naqd pul'}
                     </span>
                     <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold mt-0.5">
-                      {language === 'ru' ? 'При получении' : language === 'en' ? 'Upon delivery' : 'Yetkazilganda'}
+                      {language === 'ru' ? 'При получении' : 'Yetkazilganda'}
                     </span>
                     {selectedOnlineProvider === 'cash' && (
                       <span className="absolute top-2 right-2 w-4 h-4 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[10px] font-bold">
@@ -963,18 +931,18 @@ export const Checkout: React.FC = () => {
                   <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
                     <ShieldCheck className="w-4 h-4 text-emerald-500" />
                     <span>
-                      {language === 'ru' ? 'Выбранный метод оплаты:' : language === 'en' ? 'Selected payment method:' : "Tanlangan to'lov usuli:"}{' '}
+                      {language === 'ru' ? 'Выбранный метод оплаты:' : "Tanlangan to'lov usuli:"}{' '}
                       <strong className="uppercase font-bold text-slate-900 dark:text-white">
                         {selectedOnlineProvider === 'cash' 
-                          ? (language === 'ru' ? 'Наличные при получении' : language === 'en' ? 'Cash on delivery' : 'Qabul qilganda naqd') 
+                          ? (language === 'ru' ? 'Наличные при получении' : 'Qabul qilganda naqd') 
                           : selectedOnlineProvider}
                       </strong>
                     </span>
                   </div>
                   <span className="text-emerald-600 dark:text-emerald-400 font-bold">
                     {selectedOnlineProvider === 'cash' 
-                      ? (language === 'ru' ? 'Через курьера' : language === 'en' ? 'Via courier' : 'Kuryer orqali') 
-                      : (language === 'ru' ? 'Официальный шлюз' : language === 'en' ? 'Official Gateway' : 'Rasmiy Gateway')}
+                      ? (language === 'ru' ? 'Через курьера' : 'Kuryer orqali') 
+                      : (language === 'ru' ? 'Официальный шлюз' : 'Rasmiy Gateway')}
                   </span>
                 </div>
 
@@ -986,7 +954,7 @@ export const Checkout: React.FC = () => {
                   >
                     <CheckCircle2 className="w-4 h-4" />
                     <span>
-                      {language === 'ru' ? 'Подтвердить заказ' : language === 'en' ? 'Confirm order' : 'Buyurtmani tasdiqlash'} ({formatPrice(finalTotal, true, language)})
+                      {language === 'ru' ? 'Подтвердить заказ' : 'Buyurtmani tasdiqlash'} ({formatPrice(finalTotal, true, language)})
                     </span>
                   </button>
                 ) : (
@@ -1002,7 +970,7 @@ export const Checkout: React.FC = () => {
                     }`}
                   >
                     <span>
-                      {selectedOnlineProvider.toUpperCase()} {language === 'ru' ? 'оплатить через' : language === 'en' ? 'pay with' : "orqali to'lovga o'tish"} ({formatPrice(finalTotal, true, language)})
+                      {selectedOnlineProvider.toUpperCase()} {language === 'ru' ? 'оплатить через' : "orqali to'lovga o'tish"} ({formatPrice(finalTotal, true, language)})
                     </span>
                     <ExternalLink className="w-4 h-4" />
                   </button>

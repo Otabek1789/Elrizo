@@ -27,7 +27,6 @@ export const CitySelectModal: React.FC = () => {
     return UZBEKISTAN_REGIONS.filter((c) =>
       c.nameUz.toLowerCase().includes(q) ||
       c.nameRu.toLowerCase().includes(q) ||
-      c.nameEn.toLowerCase().includes(q) ||
       c.shortUz.toLowerCase().includes(q)
     );
   }, [searchQuery]);

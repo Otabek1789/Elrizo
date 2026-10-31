@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { useStore } from '../store/useStore';
 
-export type Language = 'uz' | 'ru' | 'en';
+export type Language = 'uz' | 'ru';
 export type Theme = 'light' | 'dark';
 
 export const TRANSLATIONS = {

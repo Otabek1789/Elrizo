@@ -2,7 +2,7 @@ export interface CityOption {
   id: string;
   nameUz: string;
   nameRu: string;
-  nameEn: string;
+  nameEn?: string;
   shortUz: string;
   popular?: boolean;
 }

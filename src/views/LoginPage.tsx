@@ -82,8 +82,6 @@ export const LoginPage: React.FC = () => {
         setErrorMessage(
           language === 'ru' 
             ? 'Неверный пароль администратора!' 
-            : language === 'en' 
-            ? 'Incorrect administrator password!' 
             : "Administrator paroli noto'g'ri kiritildi!"
         );
         return;
@@ -107,8 +105,6 @@ export const LoginPage: React.FC = () => {
       addToast(
         language === 'ru' 
           ? 'Добро пожаловать, Главный Администратор!' 
-          : language === 'en' 
-          ? 'Welcome, Head Administrator!' 
           : "Xush kelibsiz, Bosh Administrator!", 
         'success'
       );
@@ -153,8 +149,6 @@ export const LoginPage: React.FC = () => {
         setErrorMessage(
           language === 'ru' 
             ? 'Неверный пароль администратора!' 
-            : language === 'en' 
-            ? 'Incorrect administrator password!' 
             : "Administrator paroli noto'g'ri kiritildi!"
         );
         return;
@@ -177,8 +171,6 @@ export const LoginPage: React.FC = () => {
       addToast(
         language === 'ru' 
           ? 'Добро пожаловать, Главный Администратор!' 
-          : language === 'en' 
-          ? 'Welcome, Head Administrator!' 
           : "Xush kelibsiz, Bosh Administrator!", 
         'success'
       );
@@ -225,8 +217,6 @@ export const LoginPage: React.FC = () => {
         console.error("Google auth error:", error);
         const localizedMsg = language === 'ru'
           ? "Вход через Google еще не включен в консоли Supabase. Пожалуйста, включите провайдер Google."
-          : language === 'en'
-          ? "Google sign-in is not yet enabled in your Supabase dashboard. Please enable Google provider."
           : "Google orqali kirish Supabase panelida hali yoqilmagan. Iltimos, Supabase'da Google providerni faollashtiring.";
 
         setErrorMessage(localizedMsg);
@@ -236,8 +226,6 @@ export const LoginPage: React.FC = () => {
       console.error("Google login catch:", err);
       const errTxt = language === 'ru'
         ? "Произошла ошибка при подключении к Google."
-        : language === 'en'
-        ? "An error occurred while connecting to Google."
         : "Google tizimiga ulanishda xatolik yuz berdi.";
       setErrorMessage(errTxt);
       addToast(errTxt, 'error');
@@ -271,8 +259,6 @@ export const LoginPage: React.FC = () => {
         setTelegramError(
           language === 'ru'
             ? 'Вы еще не вошли в @elrizo_bot. Нажмите кнопку «Перейти в бот» ниже и отправьте /start, затем запросите код.'
-            : language === 'en'
-            ? 'You have not started @elrizo_bot yet. Click the "Open Bot" button below and send /start, then request the code.'
             : "Siz hali @elrizo_bot ga kirmagansiz! Kodni olish uchun pastdagi «Botga o'tish» tugmasini bosib botga /start bosing."
         );
       } else {
@@ -285,8 +271,6 @@ export const LoginPage: React.FC = () => {
           addToast(
             language === 'ru'
               ? `Код отправлен в Telegram бот @${cleanTg}`
-              : language === 'en'
-              ? `Code sent to Telegram bot for @${cleanTg}`
               : `@${cleanTg} hisobingizga @elrizo_bot orqali tasdiqlash kodi yuborildi!`,
             'info'
           );
@@ -321,8 +305,6 @@ export const LoginPage: React.FC = () => {
       setTelegramError(
         language === 'ru'
           ? 'Неверный проверочный код!'
-          : language === 'en'
-          ? 'Incorrect verification code!'
           : "Tasdiqlash kodi noto'g'ri kiritildi!"
       );
       return;
@@ -349,8 +331,6 @@ export const LoginPage: React.FC = () => {
       addToast(
         language === 'ru' 
           ? 'Добро пожаловать через Telegram, Главный Администратор!' 
-          : language === 'en'
-          ? 'Welcome via Telegram, Head Administrator!'
           : "Telegram orqali xush kelibsiz, Bosh Administrator!", 
         'success'
       );
@@ -365,18 +345,16 @@ export const LoginPage: React.FC = () => {
       email: `${cleanTg}@telegram.org`,
       phone: '+998 90 123 45 67',
       isVerified: true,
-      scoringLimit: 15000000,
+      scoringLimit: 0,
       usedLimit: 0,
       isAdmin: false,
       role: 'user',
-      cashbackBalance: 50000,
+      cashbackBalance: 0,
     };
     useStore.setState({ user: tgUser, isAuthOpen: false });
     addToast(
       language === 'ru'
         ? `${tgUser.fullName}! Вы успешно вошли через Telegram`
-        : language === 'en'
-        ? `${tgUser.fullName}! Successfully signed in via Telegram`
         : `${tgUser.fullName}! Telegram orqali muvaffaqiyatli kirdingiz`,
       'success'
     );
@@ -400,7 +378,7 @@ export const LoginPage: React.FC = () => {
           onClick={handleGoogleLogin}
           disabled={isOAuthLoading}
           className="flex-1 h-11 px-3 rounded-2xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-700/80 shadow-xs flex items-center justify-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98] text-xs font-bold text-gray-700 dark:text-slate-200 cursor-pointer disabled:opacity-50"
-          title={language === 'ru' ? 'Войти через аккаунт Google' : language === 'en' ? 'Sign in with Google account' : 'Google hisobi orqali kirish'}
+          title={language === 'ru' ? 'Войти через аккаунт Google' : 'Google hisobi orqali kirish'}
         >
           {isOAuthLoading ? (
             <Loader2 className="w-4 h-4 animate-spin text-uzum-primary" />
@@ -423,7 +401,7 @@ export const LoginPage: React.FC = () => {
             setIsTelegramModalOpen(true);
           }}
           className="flex-1 h-11 px-3 rounded-2xl border border-sky-200 dark:border-sky-900/60 bg-sky-50 dark:bg-sky-950/40 hover:bg-sky-100 dark:hover:bg-sky-900/60 shadow-xs flex items-center justify-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98] text-xs font-bold text-sky-700 dark:text-sky-300 cursor-pointer"
-          title={language === 'ru' ? 'Быстрый вход через Telegram' : language === 'en' ? 'Fast login via Telegram' : 'Telegram orqali tezkor kirish'}
+          title={language === 'ru' ? 'Быстрый вход через Telegram' : 'Telegram orqali tezkor kirish'}
         >
           <svg className="w-4 h-4 text-[#229ED9] fill-current shrink-0" viewBox="0 0 24 24">
             <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.75-.55 2.92-1.27 4.86-2.11 5.83-2.52 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/>
@@ -729,13 +707,11 @@ export const LoginPage: React.FC = () => {
                 <>
                   <div>
                     <h3 className="text-lg font-extrabold text-gray-900 dark:text-white">
-                      {language === 'ru' ? 'Вход через Telegram' : language === 'en' ? 'Log in with Telegram' : 'Telegram orqali kirish'}
+                      {language === 'ru' ? 'Вход через Telegram' : 'Telegram orqali kirish'}
                     </h3>
                     <p className="text-xs text-gray-500 dark:text-slate-400 mt-1 leading-relaxed">
                       {language === 'ru' 
                         ? <>Введите ваш профиль Telegram (<span className="text-sky-600 dark:text-sky-400 font-semibold">@username</span>). Код будет отправлен в Telegram бот.</>
-                        : language === 'en'
-                        ? <>Enter your Telegram handle (<span className="text-sky-600 dark:text-sky-400 font-semibold">@username</span>). Code will be sent to the bot.</>
                         : <>Telegram profilingiz (<span className="text-sky-600 dark:text-sky-400 font-semibold">@username</span>)ni kiriting. Tasdiqlash kodi botingizga yuboriladi.</>}
                     </p>
                   </div>

@@ -235,12 +235,12 @@ export const AdminPanel: React.FC = () => {
     e.preventDefault();
     if (!editingProduct) return;
     if (!editTitle.trim()) {
-      addToast("Mahsulot nomini kiriting!", 'warning');
+      addToast(language === 'ru' ? 'Введите название товара!' : 'Mahsulot nomini kiriting!', 'warning');
       return;
     }
     const priceNum = Number(editPrice.replace(/\D/g, '')) || 0;
     if (priceNum <= 0) {
-      addToast("Mahsulot narxini to'g'ri kiriting!", 'warning');
+      addToast(language === 'ru' ? 'Укажите корректную цену товара!' : "Mahsulot narxini to'g'ri kiriting!", 'warning');
       return;
     }
     const origPriceNum = editOriginalPrice ? Number(editOriginalPrice.replace(/\D/g, '')) : undefined;
@@ -267,9 +267,9 @@ export const AdminPanel: React.FC = () => {
     setIsSyncingProducts(true);
     try {
       await fetchProductsFromCloud();
-      addToast("Mahsulotlar Supabase bilan sinxronlashtirildi!", 'success');
+      addToast(language === 'ru' ? 'Товары синхронизированы с Supabase!' : 'Mahsulotlar Supabase bilan sinxronlashtirildi!', 'success');
     } catch {
-      addToast("Sinxronizatsiyada xatolik", 'error');
+      addToast(language === 'ru' ? 'Ошибка синхронизации' : 'Sinxronizatsiyada xatolik', 'error');
     } finally {
       setIsSyncingProducts(false);
     }
@@ -310,7 +310,7 @@ export const AdminPanel: React.FC = () => {
     setTelegramCustomPrice(p.price.toString());
     setTelegramCustomImage(p.images[0] || '');
     setTelegramCustomNote(p.hasZeroDown ? "0-0-12 Boshlang'ich to'lovsiz Nasiya! Rasmiy kafolat bilan." : "");
-    addToast(`«${p.title}» tanlandi! Ko'rinishini tekshirib Telegramga tashlashingiz mumkin.`, 'info');
+    addToast(language === 'ru' ? `«${p.title}» выбран! Можно опубликовать в Telegram.` : `«${p.title}» tanlandi! Ko'rinishini tekshirib Telegramga tashlashingiz mumkin.`, 'info');
   };
 
   const handleQuickSendToTelegram = async (p: Product) => {
@@ -330,12 +330,12 @@ export const AdminPanel: React.FC = () => {
   const handlePublishToTelegram = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!telegramCustomTitle.trim()) {
-      addToast("Mahsulot nomini kiriting!", 'warning');
+      addToast(language === 'ru' ? 'Введите название товара!' : 'Mahsulot nomini kiriting!', 'warning');
       return;
     }
     const priceNum = Number(telegramCustomPrice.replace(/\D/g, '')) || 0;
     if (priceNum <= 0) {
-      addToast("Mahsulot narxini to'g'ri kiriting!", 'warning');
+      addToast(language === 'ru' ? 'Укажите корректную цену товара!' : "Mahsulot narxini to'g'ri kiriting!", 'warning');
       return;
     }
 
@@ -374,7 +374,7 @@ export const AdminPanel: React.FC = () => {
 
     setIsPostingTelegram(false);
     if (res.success) {
-      addToast(`«${telegramCustomTitle}» Telegramga muvaffaqiyatli joylandi!`, 'success');
+      addToast(language === 'ru' ? `«${telegramCustomTitle}» успешно опубликован в Telegram!` : `«${telegramCustomTitle}» Telegramga muvaffaqiyatli joylandi!`, 'success');
     } else {
       addToast(res.message, 'error');
     }
@@ -514,7 +514,7 @@ export const AdminPanel: React.FC = () => {
     };
 
     addProduct(productObj);
-    addToast(`${newProduct.title} mahsuloti muvaffaqiyatli qo'shildi!`, 'success');
+    addToast(language === 'ru' ? `Товар «${newProduct.title}» успешно добавлен!` : `${newProduct.title} mahsuloti muvaffaqiyatli qo'shildi!`, 'success');
 
     if (newProductPostToTelegram) {
       sendProductToTelegram(productObj, {
@@ -567,12 +567,12 @@ export const AdminPanel: React.FC = () => {
           }
         }
         useStore.setState({ orders: merged });
-        addToast(`${merged.length} ta ariza (LocalStorage + Cloud) muvaffaqiyatli sinxronlashtirildi!`, 'success');
+        addToast(language === 'ru' ? `${merged.length} заявок успешно синхронизировано!` : `${merged.length} ta ariza (LocalStorage + Cloud) muvaffaqiyatli sinxronlashtirildi!`, 'success');
       } else {
-        addToast(`LocalStorage dagi ${localOrders.length} ta ariza saqlandi`, 'info');
+        addToast(language === 'ru' ? `Сохранено ${localOrders.length} локальных заявок` : `LocalStorage dagi ${localOrders.length} ta ariza saqlandi`, 'info');
       }
     } catch {
-      addToast("Sinxronizatsiyada xatolik", 'error');
+      addToast(language === 'ru' ? 'Ошибка синхронизации' : 'Sinxronizatsiyada xatolik', 'error');
     } finally {
       setIsRefreshingCache(false);
     }
@@ -583,7 +583,7 @@ export const AdminPanel: React.FC = () => {
     const cleanCode = newPromo.code.trim().toUpperCase();
     const val = Number(newPromo.discountValue);
     if (!cleanCode || !val || isNaN(val) || val <= 0) {
-      addToast(language === 'ru' ? 'Заполните код и сумму скидки корректно' : language === 'en' ? 'Fill valid code and discount value' : "Promokod kodi va qiymatini to'g'ri kiriting", 'warning');
+      addToast(language === 'ru' ? 'Заполните код и сумму скидки корректно' : "Promokod kodi va qiymatini to'g'ri kiriting", 'warning');
       return;
     }
 
@@ -598,7 +598,7 @@ export const AdminPanel: React.FC = () => {
     };
 
     addPromoCode(promoObj);
-    addToast(`${cleanCode} promokodi muvaffaqiyatli yaratildi!`, 'success');
+    addToast(language === 'ru' ? `Промокод ${cleanCode} успешно создан!` : `${cleanCode} promokodi muvaffaqiyatli yaratildi!`, 'success');
     setNewPromo({
       code: '',
       discountType: 'percentage',
@@ -611,7 +611,7 @@ export const AdminPanel: React.FC = () => {
   const handleCopyGps = (name: string, lat: string, lng: string) => {
     navigator.clipboard?.writeText(`${lat}, ${lng}`);
     setCopiedRegion(name);
-    addToast(`${name} GPS koordinatasi nusxalandi!`, 'info');
+    addToast(language === 'ru' ? `GPS-координаты ${name} скопированы!` : `${name} GPS koordinatasi nusxalandi!`, 'info');
     setTimeout(() => setCopiedRegion(null), 2000);
   };
 
@@ -734,7 +734,7 @@ export const AdminPanel: React.FC = () => {
         {/* Scrollable Navigation & Quick Metrics Snapshot */}
         <div className="flex-1 overflow-y-auto overflow-x-hidden p-3 space-y-4">
           {navSections.map((section, sIdx) => {
-            const sectionTitle = language === 'ru' ? section.titleRu : language === 'en' ? section.titleEn : section.titleUz;
+            const sectionTitle = language === 'ru' ? section.titleRu : section.titleUz;
             return (
               <div key={sIdx} className="space-y-1">
                 {!isSidebarCollapsed && (
@@ -749,7 +749,7 @@ export const AdminPanel: React.FC = () => {
                   {section.items.map((item) => {
                     const Icon = item.icon;
                     const isSelected = activeSection === item.id;
-                    const label = language === 'ru' ? item.labelRu : language === 'en' ? item.labelEn : item.labelUz;
+                    const label = language === 'ru' ? item.labelRu : item.labelUz;
 
                     return (
                       <motion.button
@@ -812,7 +812,7 @@ export const AdminPanel: React.FC = () => {
                 <div className="flex items-center justify-between text-[11px] font-black text-gray-700 dark:text-slate-300">
                   <span className="flex items-center gap-1.5">
                     <Activity className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
-                    {language === 'ru' ? 'Сводка данных' : language === 'en' ? 'Quick Snapshot' : "Tezkor ko'rsatkichlar"}
+                    {language === 'ru' ? 'Сводка данных' : "Tezkor ko'rsatkichlar"}
                   </span>
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                 </div>
@@ -820,7 +820,7 @@ export const AdminPanel: React.FC = () => {
                 <div className="grid grid-cols-2 gap-2 text-center">
                   <div className="p-2 rounded-xl bg-white dark:bg-slate-800/80 border border-gray-100 dark:border-slate-700/60 shadow-xs">
                     <div className="text-[10px] text-gray-500 dark:text-slate-400 font-medium">
-                      {language === 'ru' ? 'Товары' : language === 'en' ? 'Products' : 'Tovarlar'}
+                      {language === 'ru' ? 'Товары' : 'Tovarlar'}
                     </div>
                     <div className="text-sm font-black text-purple-600 dark:text-purple-400">
                       {products.length}
@@ -829,7 +829,7 @@ export const AdminPanel: React.FC = () => {
 
                   <div className="p-2 rounded-xl bg-white dark:bg-slate-800/80 border border-gray-100 dark:border-slate-700/60 shadow-xs">
                     <div className="text-[10px] text-gray-500 dark:text-slate-400 font-medium">
-                      {language === 'ru' ? 'Заявки' : language === 'en' ? 'Orders' : 'Arizalar'}
+                      {language === 'ru' ? 'Заявки' : 'Arizalar'}
                     </div>
                     <div className="text-sm font-black text-amber-600 dark:text-amber-400">
                       {orders.length}
@@ -865,10 +865,10 @@ export const AdminPanel: React.FC = () => {
               navigate('/login', { replace: true });
             }}
             className={`w-full flex items-center ${isSidebarCollapsed ? 'justify-center p-3' : 'gap-3 p-2.5'} text-xs font-bold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-xl transition-colors`}
-            title={isSidebarCollapsed ? (language === 'ru' ? 'Выйти' : language === 'en' ? 'Log out' : 'Tizimdan chiqish') : undefined}
+            title={isSidebarCollapsed ? (language === 'ru' ? 'Выйти' : 'Tizimdan chiqish') : undefined}
           >
             <LogOut className="w-4 h-4 shrink-0" />
-            {!isSidebarCollapsed && <span>{language === 'ru' ? 'Выйти' : language === 'en' ? 'Log out' : 'Tizimdan chiqish'}</span>}
+            {!isSidebarCollapsed && <span>{language === 'ru' ? 'Выйти' : 'Tizimdan chiqish'}</span>}
           </motion.button>
         </div>
       </motion.aside>
@@ -886,7 +886,7 @@ export const AdminPanel: React.FC = () => {
               className="h-9 px-3 rounded-xl bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 text-gray-700 dark:text-slate-300 transition-colors flex items-center gap-2 text-xs font-bold border border-gray-200 dark:border-slate-700 shadow-xs"
             >
               <ArrowLeft className="w-4 h-4" />
-              <span>{language === 'ru' ? 'В магазин' : language === 'en' ? 'Back to Store' : "Do'konga qaytish"}</span>
+              <span>{language === 'ru' ? 'В магазин' : "Do'konga qaytish"}</span>
             </button>
 
             {/* Animated Title */}
@@ -899,15 +899,15 @@ export const AdminPanel: React.FC = () => {
                 transition={{ duration: 0.2 }}
                 className="text-base sm:text-lg font-black text-gray-900 dark:text-white"
               >
-                {activeSection === 'dashboard' && (language === 'ru' ? 'Панель управления' : language === 'en' ? 'Dashboard Overview' : 'Boshqaruv Paneli & Umumiy Holat')}
-                {activeSection === 'applications' && (language === 'ru' ? 'Заявки на рассрочку' : language === 'en' ? 'Installment Applications' : 'Nasiya Savdo Arizalari va Shartnomalar')}
-                {activeSection === 'analytics' && (language === 'ru' ? 'Финансовая аналитика' : language === 'en' ? 'Analytics & Charts' : 'Moliyaviy Statistikalar va Dinamik Grafikalar')}
-                {activeSection === 'promos' && (language === 'ru' ? 'Управление промокодами' : language === 'en' ? 'Promo Codes Management' : 'Promokodlar va Chegirmalar Boshqaruvi')}
-                {activeSection === 'coordinates' && (language === 'ru' ? 'Регионы и GPS координаты' : language === 'en' ? 'Regions & GPS Coordinates' : 'Viloyatlar Geografiyasi va GPS Koordinatalari')}
-                {activeSection === 'products' && (language === 'ru' ? 'Каталог товаров' : language === 'en' ? 'Products & Inventory' : "Mahsulotlar Katalogi va Yangi Tovar Qo'shish")}
-                {activeSection === 'telegram' && (language === 'ru' ? 'Публикация товаров в Telegram' : language === 'en' ? 'Telegram Product Publisher' : "Tovarlarni Telegramga Tashlash & Marketing")}
-                {activeSection === 'customers' && (language === 'ru' ? 'База клиентов (CRM)' : language === 'en' ? 'Customer CRM' : 'Mijozlar Portfeli va Skoring Tahlili')}
-                {activeSection === 'settings' && (language === 'ru' ? 'Настройки системы' : language === 'en' ? 'System Settings' : 'Platforma va Supabase Sozlamalari')}
+                {activeSection === 'dashboard' && (language === 'ru' ? 'Панель управления' : 'Boshqaruv Paneli & Umumiy Holat')}
+                {activeSection === 'applications' && (language === 'ru' ? 'Заявки на рассрочку' : 'Nasiya Savdo Arizalari va Shartnomalar')}
+                {activeSection === 'analytics' && (language === 'ru' ? 'Финансовая аналитика' : 'Moliyaviy Statistikalar va Dinamik Grafikalar')}
+                {activeSection === 'promos' && (language === 'ru' ? 'Управление промокодами' : 'Promokodlar va Chegirmalar Boshqaruvi')}
+                {activeSection === 'coordinates' && (language === 'ru' ? 'Регионы и GPS координаты' : 'Viloyatlar Geografiyasi va GPS Koordinatalari')}
+                {activeSection === 'products' && (language === 'ru' ? 'Каталог товаров' : "Mahsulotlar Katalogi va Yangi Tovar Qo'shish")}
+                {activeSection === 'telegram' && (language === 'ru' ? 'Публикация товаров в Telegram' : "Tovarlarni Telegramga Tashlash & Marketing")}
+                {activeSection === 'customers' && (language === 'ru' ? 'База клиентов (CRM)' : 'Mijozlar Portfeli va Skoring Tahlili')}
+                {activeSection === 'settings' && (language === 'ru' ? 'Настройки системы' : 'Platforma va Supabase Sozlamalari')}
               </motion.h2>
             </AnimatePresence>
           </div>
@@ -930,7 +930,7 @@ export const AdminPanel: React.FC = () => {
               whileTap={{ scale: 0.95 }}
               className="admin-bell-btn relative w-9 h-9 rounded-xl bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 text-gray-700 dark:text-slate-300 border border-gray-200 dark:border-slate-700 flex items-center justify-center cursor-pointer shadow-xs transition-colors shrink-0"
               onClick={() => addToast("Yangi arizalar va tizim xabarnomalari o'z vaqtida yetkazilmoqda", 'info')}
-              title={language === 'ru' ? 'Уведомления' : language === 'en' ? 'Notifications' : 'Bildirishnomalar'}
+              title={language === 'ru' ? 'Уведомления' : 'Bildirishnomalar'}
             >
               <Bell className="w-4 h-4 admin-bell-icon" />
               <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-amber-500 animate-ping" />
@@ -964,7 +964,7 @@ export const AdminPanel: React.FC = () => {
               transition={{ duration: 0.15 }}
               onClick={toggleTheme}
               className="h-9 px-3 rounded-xl bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 text-gray-700 dark:text-slate-300 border border-gray-200 dark:border-slate-700 transition-colors flex items-center gap-1.5 text-xs font-bold shadow-xs select-none"
-              title={theme === 'dark' ? (language === 'ru' ? 'Светлый режим' : language === 'en' ? 'Light mode' : "Yorug' rejim") : (language === 'ru' ? 'Тёмный режим' : language === 'en' ? 'Dark mode' : 'Tungi rejim')}
+              title={theme === 'dark' ? (language === 'ru' ? 'Светлый режим' : "Yorug' rejim") : (language === 'ru' ? 'Тёмный режим' : 'Tungi rejim')}
             >
               <AnimatePresence mode="wait" initial={false}>
                 {theme === 'dark' ? (
@@ -977,7 +977,7 @@ export const AdminPanel: React.FC = () => {
                     className="flex items-center gap-1.5"
                   >
                     <Sun className="w-4 h-4 text-amber-400" />
-                    <span className="hidden md:inline text-[11px]">{language === 'ru' ? 'Светлый' : language === 'en' ? 'Light' : "Yorug'"}</span>
+                    <span className="hidden md:inline text-[11px]">{language === 'ru' ? 'Светлый' : "Yorug'"}</span>
                   </motion.div>
                 ) : (
                   <motion.div
@@ -989,7 +989,7 @@ export const AdminPanel: React.FC = () => {
                     className="flex items-center gap-1.5"
                   >
                     <Moon className="w-4 h-4 text-uzum-primary" />
-                    <span className="hidden md:inline text-[11px]">{language === 'ru' ? 'Тёмный' : language === 'en' ? 'Dark' : 'Tungi'}</span>
+                    <span className="hidden md:inline text-[11px]">{language === 'ru' ? 'Тёмный' : 'Tungi'}</span>
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -1040,7 +1040,7 @@ export const AdminPanel: React.FC = () => {
                   >
                     <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-500 via-indigo-500 to-purple-600 group-hover:h-1.5 transition-all" />
                     <div className="flex justify-between items-center text-gray-500 dark:text-slate-400 text-xs font-bold">
-                      <span>{language === 'ru' ? 'ВСЕГО ЗАЯВОК' : language === 'en' ? 'TOTAL APPLICATIONS' : 'JAMI ARIZALAR'}</span>
+                      <span>{language === 'ru' ? 'ВСЕГО ЗАЯВОК' : 'JAMI ARIZALAR'}</span>
                       <motion.div 
                         whileHover={{ rotate: 360, scale: 1.25 }}
                         transition={{ duration: 0.5 }}
@@ -1052,7 +1052,7 @@ export const AdminPanel: React.FC = () => {
                     <div className="text-2xl font-black text-gray-900 dark:text-white mt-2 flex items-baseline gap-1">
                       <span>{orders.length}</span>
                       <span className="text-xs font-bold text-gray-400">
-                        {language === 'ru' ? 'заявок' : language === 'en' ? 'applications' : 'ta ariza'}
+                        {language === 'ru' ? 'заявок' : 'ta ariza'}
                       </span>
                     </div>
                     <div className="text-[11px] text-emerald-600 dark:text-emerald-400 mt-1 font-semibold flex items-center gap-1">
@@ -1068,7 +1068,7 @@ export const AdminPanel: React.FC = () => {
                   >
                     <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 group-hover:h-1.5 transition-all" />
                     <div className="flex justify-between items-center text-gray-500 dark:text-slate-400 text-xs font-bold">
-                      <span>{language === 'ru' ? 'ПОРТФЕЛЬ РАССРОЧКИ' : language === 'en' ? 'INSTALLMENT PORTFOLIO' : 'NASIYA PORTFELI'}</span>
+                      <span>{language === 'ru' ? 'ПОРТФЕЛЬ РАССРОЧКИ' : 'NASIYA PORTFELI'}</span>
                       <motion.div 
                         whileHover={{ rotate: 360, scale: 1.25 }}
                         transition={{ duration: 0.5 }}
@@ -1080,7 +1080,7 @@ export const AdminPanel: React.FC = () => {
                     <div className="text-xl font-black text-gray-900 dark:text-white mt-2">{formatPrice(totalOrdersAmount, true, language)}</div>
                     <div className="text-[11px] text-emerald-600 dark:text-emerald-400 mt-1 font-semibold flex items-center gap-1">
                       <ShieldCheck className="w-3.5 h-3.5" />
-                      <span>{language === 'ru' ? 'Одобренные договоры' : language === 'en' ? 'Approved contracts' : 'Tasdiqlangan shartnomalar'}</span>
+                      <span>{language === 'ru' ? 'Одобренные договоры' : 'Tasdiqlangan shartnomalar'}</span>
                     </div>
                   </motion.div>
 
@@ -1091,7 +1091,7 @@ export const AdminPanel: React.FC = () => {
                   >
                     <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 group-hover:h-1.5 transition-all" />
                     <div className="flex justify-between items-center text-gray-500 dark:text-slate-400 text-xs font-bold">
-                      <span>{language === 'ru' ? 'ЕЖЕМЕСЯЧНЫЙ ПОТОК' : language === 'en' ? 'MONTHLY CASHFLOW' : 'OYLIK TUSHUM'}</span>
+                      <span>{language === 'ru' ? 'ЕЖЕМЕСЯЧНЫЙ ПОТОК' : 'OYLIK TUSHUM'}</span>
                       <motion.div 
                         whileHover={{ rotate: 360, scale: 1.25 }}
                         transition={{ duration: 0.5 }}
@@ -1100,10 +1100,10 @@ export const AdminPanel: React.FC = () => {
                         <TrendingUp className="w-5 h-5 text-amber-500 dark:text-amber-400" />
                       </motion.div>
                     </div>
-                    <div className="text-xl font-black text-amber-600 dark:text-amber-300 mt-2">{formatPrice(totalMonthlyIncome, true, language)}/{language === 'ru' ? 'мес' : language === 'en' ? 'mo' : 'oy'}</div>
+                    <div className="text-xl font-black text-amber-600 dark:text-amber-300 mt-2">{formatPrice(totalMonthlyIncome, true, language)}/{language === 'ru' ? 'мес' : 'oy'}</div>
                     <div className="text-[11px] text-purple-600 dark:text-purple-400 mt-1 font-semibold flex items-center gap-1">
                       <Zap className="w-3.5 h-3.5" />
-                      <span>{language === 'ru' ? 'График платежей' : language === 'en' ? 'Payment schedule' : 'Rejalashtirilgan oylik grafik'}</span>
+                      <span>{language === 'ru' ? 'График платежей' : 'Rejalashtirilgan oylik grafik'}</span>
                     </div>
                   </motion.div>
 
@@ -1114,7 +1114,7 @@ export const AdminPanel: React.FC = () => {
                   >
                     <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 via-cyan-500 to-blue-600 group-hover:h-1.5 transition-all" />
                     <div className="flex justify-between items-center text-gray-500 dark:text-slate-400 text-xs font-bold">
-                      <span>{language === 'ru' ? 'ТОВАРОВ В КАТАЛОГЕ' : language === 'en' ? 'STORE PRODUCTS' : "DO'KONDA TOVARLAR"}</span>
+                      <span>{language === 'ru' ? 'ТОВАРОВ В КАТАЛОГЕ' : "DO'KONDA TOVARLAR"}</span>
                       <motion.div 
                         whileHover={{ rotate: 360, scale: 1.25 }}
                         transition={{ duration: 0.5 }}
@@ -1124,11 +1124,11 @@ export const AdminPanel: React.FC = () => {
                       </motion.div>
                     </div>
                     <div className="text-2xl font-black text-gray-900 dark:text-white mt-2">
-                      {products.length} {language === 'ru' ? 'шт' : language === 'en' ? 'items' : 'dona'}
+                      {products.length} {language === 'ru' ? 'шт' : 'dona'}
                     </div>
                     <div className="text-[11px] text-blue-600 dark:text-blue-400 mt-1 font-semibold flex items-center gap-1">
                       <Sparkles className="w-3.5 h-3.5" />
-                      <span>{language === 'ru' ? 'С условием 0-0-12' : language === 'en' ? 'With 0-0-12 terms' : '0-0-12 sharti bilan'}</span>
+                      <span>{language === 'ru' ? 'С условием 0-0-12' : '0-0-12 sharti bilan'}</span>
                     </div>
                   </motion.div>
                 </motion.div>
@@ -1146,10 +1146,10 @@ export const AdminPanel: React.FC = () => {
                       <div>
                         <h3 className="text-sm font-black text-gray-900 dark:text-white flex items-center gap-2">
                           <Activity className="w-4 h-4 text-purple-600 dark:text-purple-400 animate-pulse" />
-                          <span>{language === 'ru' ? 'Динамика рассрочки (2026)' : language === 'en' ? 'Installment Growth Dynamics (2026)' : "Nasiya Savdo O'sish Dinamikasi (2026)"}</span>
+                          <span>{language === 'ru' ? 'Динамика рассрочки (2026)' : "Nasiya Savdo O'sish Dinamikasi (2026)"}</span>
                         </h3>
                         <p className="text-xs text-gray-500 dark:text-slate-400">
-                          {currentChartData.subtitle[language as 'uz' | 'ru' | 'en'] || currentChartData.subtitle.uz}
+                          {currentChartData.subtitle[language as 'uz' | 'ru'] || currentChartData.subtitle.uz}
                         </p>
                       </div>
 
@@ -1171,7 +1171,7 @@ export const AdminPanel: React.FC = () => {
                                   : 'text-gray-500 hover:text-gray-900 dark:hover:text-white'
                               }`}
                             >
-                              {TIMEFRAME_LABELS[tf][language as 'uz' | 'ru' | 'en'] || TIMEFRAME_LABELS[tf].uz}
+                              {TIMEFRAME_LABELS[tf][language as 'uz' | 'ru'] || TIMEFRAME_LABELS[tf].uz}
                             </motion.button>
                           ))}
                         </div>
@@ -1183,7 +1183,7 @@ export const AdminPanel: React.FC = () => {
                           transition={{ repeat: Infinity, duration: 2 }}
                           className="text-xs font-bold bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-300 px-3 py-1 rounded-full border border-purple-200 dark:border-purple-500/30 shadow-xs"
                         >
-                          {currentChartData.growth} {language === 'ru' ? 'Рост' : language === 'en' ? 'Growth' : "O'sish"}
+                          {currentChartData.growth} {language === 'ru' ? 'Рост' : "O'sish"}
                         </motion.span>
                       </div>
                     </div>
@@ -1199,10 +1199,10 @@ export const AdminPanel: React.FC = () => {
                         >
                           <div className="font-extrabold text-amber-300 flex items-center gap-1.5">
                             <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                            <span>{language === 'ru' ? `Статистика за ${activeChartPoint.month}:` : language === 'en' ? `Stats for ${activeChartPoint.month}:` : `${activeChartPoint.month} statistikasi:`}</span>
+                            <span>{language === 'ru' ? `Статистика за ${activeChartPoint.month}:` : `${activeChartPoint.month} statistikasi:`}</span>
                           </div>
-                          <div>{language === 'ru' ? 'Общий объем:' : language === 'en' ? 'Total volume:' : 'Umumiy hajm:'} <strong className="text-white">{activeChartPoint.volume}</strong></div>
-                          <div>{language === 'ru' ? 'Темп роста:' : language === 'en' ? 'Growth rate:' : "O'sish sur'ati:"} <strong className="text-emerald-300">{activeChartPoint.growth}</strong></div>
+                          <div>{language === 'ru' ? 'Общий объем:' : 'Umumiy hajm:'} <strong className="text-white">{activeChartPoint.volume}</strong></div>
+                          <div>{language === 'ru' ? 'Темп роста:' : "O'sish sur'ati:"} <strong className="text-emerald-300">{activeChartPoint.growth}</strong></div>
                         </motion.div>
                       )}
                     </AnimatePresence>
@@ -1248,8 +1248,8 @@ export const AdminPanel: React.FC = () => {
 
                         {/* Interactive Data Points */}
                         {currentChartData.points.map((pt, idx) => {
-                          const pLabel = pt.label[language as 'uz' | 'ru' | 'en'] || pt.label.uz;
-                          const pVolume = pt.volume[language as 'uz' | 'ru' | 'en'] || pt.volume.uz;
+                          const pLabel = pt.label[language as 'uz' | 'ru'] || pt.label.uz;
+                          const pVolume = pt.volume[language as 'uz' | 'ru'] || pt.volume.uz;
                           const isHovered = activeChartPoint?.month === pLabel;
                           return (
                             <g key={`${chartTimeframe}-${idx}`}>
@@ -1293,7 +1293,7 @@ export const AdminPanel: React.FC = () => {
                       {/* Bottom Period/Month Labels */}
                       <div className="flex justify-between text-[11px] text-gray-500 dark:text-slate-400 font-bold pt-2 px-2">
                         {currentChartData.points.map((p, idx) => {
-                          const pLabel = p.label[language as 'uz' | 'ru' | 'en'] || p.label.uz;
+                          const pLabel = p.label[language as 'uz' | 'ru'] || p.label.uz;
                           const isSelected = activeChartPoint?.month === pLabel;
                           return (
                             <span 
@@ -1302,7 +1302,7 @@ export const AdminPanel: React.FC = () => {
                                 month: pLabel,
                                 cx: p.cx,
                                 cy: p.cy,
-                                volume: p.volume[language as 'uz' | 'ru' | 'en'] || p.volume.uz,
+                                volume: p.volume[language as 'uz' | 'ru'] || p.volume.uz,
                                 growth: p.growth,
                               })}
                               className={`cursor-pointer transition-colors ${
@@ -1329,10 +1329,10 @@ export const AdminPanel: React.FC = () => {
                     <div>
                       <h3 className="text-sm font-black text-gray-900 dark:text-white flex items-center gap-2">
                         <Award className="w-4 h-4 text-amber-500" />
-                        <span>{language === 'ru' ? 'Распределение сроков' : language === 'en' ? 'Tenure Distribution' : 'Muddatlar Taqsimoti'}</span>
+                        <span>{language === 'ru' ? 'Распределение сроков' : 'Muddatlar Taqsimoti'}</span>
                       </h3>
                       <p className="text-xs text-gray-500 dark:text-slate-400">
-                        {language === 'ru' ? 'Сроки рассрочки, выбранные покупателями' : language === 'en' ? 'Tenures selected by customers' : 'Xaridorlar tanlagan muddatlar'}
+                        {language === 'ru' ? 'Сроки рассрочки, выбранные покупателями' : 'Xaridorlar tanlagan muddatlar'}
                       </p>
                     </div>
 
@@ -1340,7 +1340,7 @@ export const AdminPanel: React.FC = () => {
                       <motion.div whileHover={{ x: 5 }} className="transition-transform cursor-pointer">
                         <div className="flex justify-between font-bold mb-1">
                           <span className="text-gray-700 dark:text-slate-200">
-                            {language === 'ru' ? '12 мес (Популярный)' : language === 'en' ? '12 mo (Most popular)' : '12 oy (Eng ommabop)'}
+                            {language === 'ru' ? '12 мес (Популярный)' : '12 oy (Eng ommabop)'}
                           </span>
                           <span className="text-amber-500 dark:text-amber-400 font-extrabold">{pct12}%</span>
                         </div>
@@ -1357,7 +1357,7 @@ export const AdminPanel: React.FC = () => {
                       <motion.div whileHover={{ x: 5 }} className="transition-transform cursor-pointer">
                         <div className="flex justify-between font-bold mb-1">
                           <span className="text-gray-700 dark:text-slate-200">
-                            {language === 'ru' ? '24 мес (Бытовая техника)' : language === 'en' ? '24 mo (Appliances)' : '24 oy (Katta maishiy texnika)'}
+                            {language === 'ru' ? '24 мес (Бытовая техника)' : '24 oy (Katta maishiy texnika)'}
                           </span>
                           <span className="text-purple-600 dark:text-purple-400 font-extrabold">{pct24}%</span>
                         </div>
@@ -1374,7 +1374,7 @@ export const AdminPanel: React.FC = () => {
                       <motion.div whileHover={{ x: 5 }} className="transition-transform cursor-pointer">
                         <div className="flex justify-between font-bold mb-1">
                           <span className="text-gray-700 dark:text-slate-200">
-                            {language === 'ru' ? '6 мес (Короткий срок)' : language === 'en' ? '6 mo (Short term)' : '6 oy (Qisqa muddat)'}
+                            {language === 'ru' ? '6 мес (Короткий срок)' : '6 oy (Qisqa muddat)'}
                           </span>
                           <span className="text-emerald-600 dark:text-emerald-400 font-extrabold">{pct6}%</span>
                         </div>
@@ -1391,7 +1391,7 @@ export const AdminPanel: React.FC = () => {
                       <motion.div whileHover={{ x: 5 }} className="transition-transform cursor-pointer">
                         <div className="flex justify-between font-bold mb-1">
                           <span className="text-gray-700 dark:text-slate-200">
-                            {language === 'ru' ? '3 мес (0% без переплат)' : language === 'en' ? '3 mo (0% without markup)' : '3 oy (0% Ustamasiz 0-0-12)'}
+                            {language === 'ru' ? '3 мес (0% без переплат)' : '3 oy (0% Ustamasiz 0-0-12)'}
                           </span>
                           <span className="text-blue-600 dark:text-blue-400 font-extrabold">{pct3}%</span>
                         </div>
@@ -1415,13 +1415,9 @@ export const AdminPanel: React.FC = () => {
                         {totalOrdersCount > 0 
                           ? (language === 'ru' 
                               ? `${pct12 + pct24}% покупателей предпочитают рассрочку на 12 и 24 месяца.` 
-                              : language === 'en' 
-                              ? `${pct12 + pct24}% of customers choose 12 and 24 month installment plans.` 
                               : `Xaridorlarning ${pct12 + pct24}% qismi 12 va 24 oylik muddatli to'lovni afzal ko'rmoqda.`)
                           : (language === 'ru'
                               ? 'Пока нет оформленных заказов на рассрочку (0%).'
-                              : language === 'en'
-                              ? 'No installment orders placed yet (0%).'
                               : "Hozircha rasmiylashtirilgan nasiya arizalari mavjud emas (0%).")
                         }
                       </span>
@@ -1440,7 +1436,7 @@ export const AdminPanel: React.FC = () => {
                     <div className="flex items-center gap-2.5">
                       <div className="w-3 h-3 rounded-full bg-emerald-500 animate-ping" />
                       <h3 className="text-sm font-black text-gray-900 dark:text-white">
-                        {language === 'ru' ? 'Лента заявок (Последние заказы)' : language === 'en' ? 'Live Stream (Recent orders)' : 'Jonli Nasiya Oqimi (Oxirgi buyurtmalar)'}
+                        {language === 'ru' ? 'Лента заявок (Последние заказы)' : 'Jonli Nasiya Oqimi (Oxirgi buyurtmalar)'}
                       </h3>
                     </div>
                     <motion.button
@@ -1449,28 +1445,28 @@ export const AdminPanel: React.FC = () => {
                       onClick={() => setActiveSection('applications')}
                       className="text-xs font-bold text-purple-600 dark:text-purple-400 flex items-center gap-1 hover:underline"
                     >
-                      <span>{language === 'ru' ? 'Смотреть все заявки' : language === 'en' ? 'View all applications' : "Barcha arizalarni ko'rish"}</span>
+                      <span>{language === 'ru' ? 'Смотреть все заявки' : "Barcha arizalarni ko'rish"}</span>
                       <ChevronRight className="w-4 h-4" />
                     </motion.button>
                   </div>
 
                   {orders.length === 0 ? (
                     <div className="py-8 text-center text-gray-400 dark:text-slate-500 text-xs">
-                      {language === 'ru' ? 'Заявок пока нет' : language === 'en' ? 'No applications yet' : "Hozircha arizalar mavjud emas"}
+                      {language === 'ru' ? 'Заявок пока нет' : "Hozircha arizalar mavjud emas"}
                     </div>
                   ) : (
                     <div className="overflow-x-auto rounded-2xl border border-gray-100 dark:border-slate-800">
                       <table className="w-full text-left border-collapse">
                         <thead>
                           <tr className="border-b border-gray-100 dark:border-slate-800 bg-gray-50/70 dark:bg-slate-900/40 text-[11px] font-extrabold uppercase text-gray-500 dark:text-slate-400">
-                            <th className="py-3 px-4">{language === 'ru' ? '№ Договора' : language === 'en' ? 'Contract #' : 'Shartnoma #'}</th>
-                            <th className="py-3 px-4">{language === 'ru' ? 'Клиент' : language === 'en' ? 'Customer' : 'Mijoz'}</th>
-                            <th className="py-3 px-4">{language === 'ru' ? 'Срок' : language === 'en' ? 'Term' : 'Muddat'}</th>
-                            <th className="py-3 px-4">{language === 'ru' ? 'Сумма' : language === 'en' ? 'Total' : 'Jami summa'}</th>
-                            <th className="py-3 px-4">{language === 'ru' ? 'В месяц' : language === 'en' ? 'Monthly' : "Oylik to'lov"}</th>
-                            <th className="py-3 px-4">{language === 'ru' ? 'Скоринг' : language === 'en' ? 'Scoring' : 'Skoring'}</th>
-                            <th className="py-3 px-4">{language === 'ru' ? 'Статус' : language === 'en' ? 'Status' : 'Holat'}</th>
-                            <th className="py-3 px-4 text-right">{language === 'ru' ? 'Действие' : language === 'en' ? 'Action' : 'Ko\'rish'}</th>
+                            <th className="py-3 px-4">{language === 'ru' ? '№ Договора' : 'Shartnoma #'}</th>
+                            <th className="py-3 px-4">{language === 'ru' ? 'Клиент' : 'Mijoz'}</th>
+                            <th className="py-3 px-4">{language === 'ru' ? 'Срок' : 'Muddat'}</th>
+                            <th className="py-3 px-4">{language === 'ru' ? 'Сумма' : 'Jami summa'}</th>
+                            <th className="py-3 px-4">{language === 'ru' ? 'В месяц' : "Oylik to'lov"}</th>
+                            <th className="py-3 px-4">{language === 'ru' ? 'Скоринг' : 'Skoring'}</th>
+                            <th className="py-3 px-4">{language === 'ru' ? 'Статус' : 'Holat'}</th>
+                            <th className="py-3 px-4 text-right">{language === 'ru' ? 'Действие' : 'Ko\'rish'}</th>
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100 dark:divide-slate-800 text-xs">
@@ -1488,7 +1484,7 @@ export const AdminPanel: React.FC = () => {
                                 {ord.customerName}
                               </td>
                               <td className="py-3.5 px-4 text-gray-500 dark:text-slate-400 font-medium">
-                                {ord.installmentMonths || 12} {language === 'ru' ? 'мес' : language === 'en' ? 'mo' : 'oy'}
+                                {ord.installmentMonths || 12} {language === 'ru' ? 'мес' : 'oy'}
                               </td>
                               <td className="py-3.5 px-4 font-black text-amber-600 dark:text-amber-400">
                                 {formatPrice(ord.totalPrice, true, language)}
@@ -1498,17 +1494,17 @@ export const AdminPanel: React.FC = () => {
                               </td>
                               <td className="py-3.5 px-4">
                                 <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-50 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/30">
-                                  {ord.scoringScore || 795} {language === 'ru' ? 'баллов' : language === 'en' ? 'pts' : 'ball'}
+                                  {ord.scoringScore || 795} {language === 'ru' ? 'баллов' : 'ball'}
                                 </span>
                               </td>
                               <td className="py-3.5 px-4">
                                 <span className="px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800/50">
-                                  {ord.status === 'scoring_approved' ? (language === 'ru' ? 'Одобрено' : language === 'en' ? 'Approved' : 'Tasdiqlangan') : ord.status}
+                                  {ord.status === 'scoring_approved' ? (language === 'ru' ? 'Одобрено' : 'Tasdiqlangan') : ord.status}
                                 </span>
                               </td>
                               <td className="py-3.5 px-4 text-right">
                                 <button className="text-xs font-bold text-purple-600 dark:text-purple-400 hover:text-purple-700 flex items-center gap-1 justify-end ml-auto">
-                                  <span>{language === 'ru' ? 'Детали' : language === 'en' ? 'Details' : 'Batafsil'}</span>
+                                  <span>{language === 'ru' ? 'Детали' : 'Batafsil'}</span>
                                   <ChevronRight className="w-3.5 h-3.5" />
                                 </button>
                               </td>
@@ -1537,10 +1533,10 @@ export const AdminPanel: React.FC = () => {
                     <div>
                       <h3 className="text-base font-black text-gray-900 dark:text-white flex items-center gap-2">
                         <Globe className="w-5 h-5 text-emerald-500 dark:text-emerald-400 animate-spin" style={{ animationDuration: '10s' }} />
-                        <span>{language === 'ru' ? 'Координаты рассрочки по регионам Узбекистана' : language === 'en' ? 'Installment Coordinates Across Uzbekistan Regions' : "O'zbekiston Viloyatlari bo'yicha Nasiya Koordinatalari"}</span>
+                        <span>{language === 'ru' ? 'Координаты рассрочки по регионам Узбекистана' : "O'zbekiston Viloyatlari bo'yicha Nasiya Koordinatalari"}</span>
                       </h3>
                       <p className="text-xs text-gray-500 dark:text-slate-400">
-                        {language === 'ru' ? 'Плотность и статистика заявок на рассрочку по координатам GPS' : language === 'en' ? 'Density and statistics of installment applications by GPS coordinates' : "GPS kenglik va uzunlik koordinatalari bo'yicha Nasiya arizalari zichligi va statistikasi"}
+                        {language === 'ru' ? 'Плотность и статистика заявок на рассрочку по координатам GPS' : "GPS kenglik va uzunlik koordinatalari bo'yicha Nasiya arizalari zichligi va statistikasi"}
                       </p>
                     </div>
                     <span className="text-xs bg-emerald-50 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 font-bold px-3 py-1.5 rounded-full border border-emerald-200 dark:border-emerald-500/30 flex items-center gap-1.5">
@@ -1549,10 +1545,8 @@ export const AdminPanel: React.FC = () => {
                         {totalOrdersCount > 0 
                           ? (language === 'ru' 
                               ? `${dynamicRegions.filter(r => r.applicationsCount > 0).length} активных региональных кластеров` 
-                              : language === 'en' 
-                              ? `${dynamicRegions.filter(r => r.applicationsCount > 0).length} active regional clusters` 
                               : `${dynamicRegions.filter(r => r.applicationsCount > 0).length} ta faol hududiy klaster`)
-                          : (language === 'ru' ? '0 активных заявок' : language === 'en' ? '0 active orders' : '0 ta faol buyurtma')
+                          : (language === 'ru' ? '0 активных заявок' : '0 ta faol buyurtma')
                         }
                       </span>
                     </span>
@@ -1562,13 +1556,13 @@ export const AdminPanel: React.FC = () => {
                     <table className="w-full text-xs text-left">
                       <thead>
                         <tr className="border-b border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-900/50 text-gray-600 dark:text-slate-400 font-bold uppercase tracking-wider">
-                          <th className="py-3 px-4">{language === 'ru' ? 'Регион' : language === 'en' ? 'Region' : 'Viloyat / Hudud'}</th>
-                          <th className="py-3 px-4">{language === 'ru' ? 'GPS Широта' : language === 'en' ? 'GPS Latitude' : 'GPS Kenglik'}</th>
-                          <th className="py-3 px-4">{language === 'ru' ? 'GPS Долгота' : language === 'en' ? 'GPS Longitude' : 'GPS Uzunlik'}</th>
-                          <th className="py-3 px-4">{language === 'ru' ? 'Заявки' : language === 'en' ? 'Applications' : 'Arizalar soni'}</th>
-                          <th className="py-3 px-4">{language === 'ru' ? 'Общий объем' : language === 'en' ? 'Total volume' : 'Umumiy hajm'}</th>
-                          <th className="py-3 px-4">{language === 'ru' ? 'Копия' : language === 'en' ? 'Copy' : 'Ulashish/Nusxa'}</th>
-                          <th className="py-3 px-4">{language === 'ru' ? 'Дисциплина оплат' : language === 'en' ? 'Payment rate' : "To'lov intizomi"}</th>
+                          <th className="py-3 px-4">{language === 'ru' ? 'Регион' : 'Viloyat / Hudud'}</th>
+                          <th className="py-3 px-4">{language === 'ru' ? 'GPS Широта' : 'GPS Kenglik'}</th>
+                          <th className="py-3 px-4">{language === 'ru' ? 'GPS Долгота' : 'GPS Uzunlik'}</th>
+                          <th className="py-3 px-4">{language === 'ru' ? 'Заявки' : 'Arizalar soni'}</th>
+                          <th className="py-3 px-4">{language === 'ru' ? 'Общий объем' : 'Umumiy hajm'}</th>
+                          <th className="py-3 px-4">{language === 'ru' ? 'Копия' : 'Ulashish/Nusxa'}</th>
+                          <th className="py-3 px-4">{language === 'ru' ? 'Дисциплина оплат' : "To'lov intizomi"}</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-100 dark:divide-slate-700/60 text-gray-700 dark:text-slate-200">
@@ -1591,7 +1585,7 @@ export const AdminPanel: React.FC = () => {
                             <td className="py-3.5 px-4 font-mono text-purple-600 dark:text-purple-300">{reg.lng}</td>
                             <td className="py-3.5 px-4 font-bold text-emerald-600 dark:text-emerald-400">
                               <div className="flex items-center gap-2">
-                                <span>{reg.applicationsCount} {language === 'ru' ? 'шт' : language === 'en' ? 'apps' : 'ta'}</span>
+                                <span>{reg.applicationsCount} {language === 'ru' ? 'шт' : 'ta'}</span>
                                 <div className="w-16 h-1.5 bg-gray-100 dark:bg-slate-700 rounded-full overflow-hidden">
                                   <motion.div 
                                     className="h-full bg-emerald-500" 
@@ -1613,12 +1607,12 @@ export const AdminPanel: React.FC = () => {
                                 {copiedRegion === reg.name ? (
                                   <>
                                     <Check className="w-3.5 h-3.5 text-emerald-500" />
-                                    <span className="text-emerald-600">{language === 'ru' ? 'Скопировано' : language === 'en' ? 'Copied' : 'Nusxalandi'}</span>
+                                    <span className="text-emerald-600">{language === 'ru' ? 'Скопировано' : 'Nusxalandi'}</span>
                                   </>
                                 ) : (
                                   <>
                                     <Copy className="w-3.5 h-3.5" />
-                                    <span>{language === 'ru' ? 'Копировать' : language === 'en' ? 'Copy' : 'Nusxalash'}</span>
+                                    <span>{language === 'ru' ? 'Копировать' : 'Nusxalash'}</span>
                                   </>
                                 )}
                               </motion.button>
@@ -1651,10 +1645,10 @@ export const AdminPanel: React.FC = () => {
                   <div>
                     <h3 className="text-base font-black text-gray-900 dark:text-white flex items-center gap-2">
                       <FileText className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-                      <span>{language === 'ru' ? 'Договоры рассрочки' : language === 'en' ? 'Installment Contracts' : 'Nasiya Savdo Shartnomalari'}</span>
+                      <span>{language === 'ru' ? 'Договоры рассрочки' : 'Nasiya Savdo Shartnomalari'}</span>
                     </h3>
                     <p className="text-xs text-gray-500 dark:text-slate-400">
-                      {language === 'ru' ? 'Нажмите на любую строку для просмотра полного досье' : language === 'en' ? 'Click on any row to view customer dossier' : "Mijoz ma'lumotlarini to'liq ko'rish uchun istalgan qatorni bosing"}
+                      {language === 'ru' ? 'Нажмите на любую строку для просмотра полного досье' : "Mijoz ma'lumotlarini to'liq ko'rish uchun istalgan qatorni bosing"}
                     </p>
                   </div>
 
@@ -1662,7 +1656,7 @@ export const AdminPanel: React.FC = () => {
                     <div className="relative w-full sm:w-64">
                       <input
                         type="text"
-                        placeholder={language === 'ru' ? 'Имя клиента или договор...' : language === 'en' ? 'Customer name or contract...' : 'Mijoz ismi yoki shartnoma...'}
+                        placeholder={language === 'ru' ? 'Имя клиента или договор...' : 'Mijoz ismi yoki shartnoma...'}
                         value={searchFilter}
                         onChange={(e) => setSearchFilter(e.target.value)}
                         className="w-full pl-9 pr-3 py-2 bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-xl text-xs outline-none focus:border-purple-500 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500 transition-all focus:ring-2 focus:ring-purple-200 dark:focus:ring-purple-900"
@@ -1673,10 +1667,10 @@ export const AdminPanel: React.FC = () => {
                     {/* Animated Filter Pills */}
                     <div className="flex items-center bg-gray-100 dark:bg-slate-900 p-1 rounded-xl border border-gray-200 dark:border-slate-700 text-xs font-bold">
                       {[
-                        { id: 'all', label: language === 'ru' ? 'Все' : language === 'en' ? 'All' : 'Barchasi' },
-                        { id: 'scoring_approved', label: language === 'ru' ? 'Одобрено' : language === 'en' ? 'Approved' : 'Tasdiqlangan' },
-                        { id: 'processing', label: language === 'ru' ? 'В обработке' : language === 'en' ? 'Processing' : 'Jarayonda' },
-                        { id: 'delivered', label: language === 'ru' ? 'Доставлено' : language === 'en' ? 'Delivered' : 'Yetkazildi' }
+                        { id: 'all', label: language === 'ru' ? 'Все' : 'Barchasi' },
+                        { id: 'scoring_approved', label: language === 'ru' ? 'Одобрено' : 'Tasdiqlangan' },
+                        { id: 'processing', label: language === 'ru' ? 'В обработке' : 'Jarayonda' },
+                        { id: 'delivered', label: language === 'ru' ? 'Доставлено' : 'Yetkazildi' }
                       ].map((tab) => (
                         <motion.button
                           key={tab.id}
@@ -1707,22 +1701,22 @@ export const AdminPanel: React.FC = () => {
                   <table className="w-full text-xs text-left">
                     <thead>
                       <tr className="border-b border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-900/60 text-gray-600 dark:text-slate-400 font-bold uppercase tracking-wider">
-                        <th className="py-3 px-3">{language === 'ru' ? 'Договор №' : language === 'en' ? 'Contract №' : 'Shartnoma №'}</th>
-                        <th className="py-3 px-3">{language === 'ru' ? 'Клиент и ПИНФЛ' : language === 'en' ? 'Customer & PINFL' : 'Mijoz & PINFL'}</th>
-                        <th className="py-3 px-3">{language === 'ru' ? 'Телефон' : language === 'en' ? 'Phone' : 'Telefon'}</th>
-                        <th className="py-3 px-3">{language === 'ru' ? 'Срок' : language === 'en' ? 'Tenure' : 'Muddat'}</th>
-                        <th className="py-3 px-3">{language === 'ru' ? 'Ежемес. платеж' : language === 'en' ? 'Monthly payment' : "Oylik to'lov"}</th>
-                        <th className="py-3 px-3">{language === 'ru' ? 'Общая сумма' : language === 'en' ? 'Total sum' : 'Jami summa'}</th>
-                        <th className="py-3 px-3">{language === 'ru' ? 'Скоринг' : language === 'en' ? 'Scoring' : 'Skoring'}</th>
-                        <th className="py-3 px-3">{language === 'ru' ? 'Статус' : language === 'en' ? 'Status' : 'Holat'}</th>
-                        <th className="py-3 px-3 text-right">{language === 'ru' ? 'Действия' : language === 'en' ? 'Actions' : 'Amallar'}</th>
+                        <th className="py-3 px-3">{language === 'ru' ? 'Договор №' : 'Shartnoma №'}</th>
+                        <th className="py-3 px-3">{language === 'ru' ? 'Клиент и ПИНФЛ' : 'Mijoz & PINFL'}</th>
+                        <th className="py-3 px-3">{language === 'ru' ? 'Телефон' : 'Telefon'}</th>
+                        <th className="py-3 px-3">{language === 'ru' ? 'Срок' : 'Muddat'}</th>
+                        <th className="py-3 px-3">{language === 'ru' ? 'Ежемес. платеж' : "Oylik to'lov"}</th>
+                        <th className="py-3 px-3">{language === 'ru' ? 'Общая сумма' : 'Jami summa'}</th>
+                        <th className="py-3 px-3">{language === 'ru' ? 'Скоринг' : 'Skoring'}</th>
+                        <th className="py-3 px-3">{language === 'ru' ? 'Статус' : 'Holat'}</th>
+                        <th className="py-3 px-3 text-right">{language === 'ru' ? 'Действия' : 'Amallar'}</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100 dark:divide-slate-700/50 text-gray-700 dark:text-slate-300">
                       {filteredOrders.length === 0 ? (
                         <tr>
                           <td colSpan={9} className="py-8 text-center text-gray-400 dark:text-slate-500">
-                            {language === 'ru' ? 'Заявок не найдено' : language === 'en' ? 'No applications found' : 'Hech qanday ariza topilmadi'}
+                            {language === 'ru' ? 'Заявок не найдено' : 'Hech qanday ariza topilmadi'}
                           </td>
                         </tr>
                       ) : (
@@ -1747,7 +1741,7 @@ export const AdminPanel: React.FC = () => {
                             <td className="py-3 px-3 font-mono">{ord.customerPhone}</td>
                             <td className="py-3 px-3">
                               <span className="bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-300 font-bold px-2 py-0.5 rounded-full text-[10px]">
-                                {ord.installmentMonths ? `${ord.installmentMonths} ${language === 'ru' ? 'мес' : language === 'en' ? 'mo' : 'oy'}` : (language === 'ru' ? 'Наличные' : language === 'en' ? 'Cash' : 'Naqd')}
+                                {ord.installmentMonths ? `${ord.installmentMonths} ${language === 'ru' ? 'мес' : 'oy'}` : (language === 'ru' ? 'Наличные' : 'Naqd')}
                               </span>
                             </td>
                             <td className="py-3 px-3 font-bold text-gray-900 dark:text-white">
@@ -1759,7 +1753,7 @@ export const AdminPanel: React.FC = () => {
                             <td className="py-3 px-3">
                               <span className="text-emerald-700 dark:text-emerald-400 font-bold bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 rounded text-[10px] flex items-center gap-1 w-fit">
                                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                                {ord.scoringScore || 795} {language === 'ru' ? 'баллов' : language === 'en' ? 'pts' : 'ball'}
+                                {ord.scoringScore || 795} {language === 'ru' ? 'баллов' : 'ball'}
                               </span>
                             </td>
                             <td className="py-3 px-3 min-w-[150px]" onClick={(e) => e.stopPropagation()}>
@@ -1770,10 +1764,10 @@ export const AdminPanel: React.FC = () => {
                                 buttonClassName="!py-1 !px-2.5 text-[11px] font-bold rounded-lg border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-xs"
                                 dropdownClassName="w-44 !z-50"
                                 options={[
-                                  { value: 'scoring_approved', label: language === 'ru' ? 'Одобрено' : language === 'en' ? 'Approved' : 'Tasdiqlangan', badge: 'Skoring' },
-                                  { value: 'processing', label: language === 'ru' ? 'В обработке' : language === 'en' ? 'Processing' : 'Jarayonda' },
-                                  { value: 'delivered', label: language === 'ru' ? 'Доставлено' : language === 'en' ? 'Delivered' : 'Yetkazildi' },
-                                  { value: 'pending', label: language === 'ru' ? 'Ожидание' : language === 'en' ? 'Pending' : 'Kutilmoqda' },
+                                  { value: 'scoring_approved', label: language === 'ru' ? 'Одобрено' : 'Tasdiqlangan', badge: 'Skoring' },
+                                  { value: 'processing', label: language === 'ru' ? 'В обработке' : 'Jarayonda' },
+                                  { value: 'delivered', label: language === 'ru' ? 'Доставлено' : 'Yetkazildi' },
+                                  { value: 'pending', label: language === 'ru' ? 'Ожидание' : 'Kutilmoqda' },
                                 ]}
                               />
                             </td>
@@ -1783,7 +1777,7 @@ export const AdminPanel: React.FC = () => {
                                 whileTap={{ scale: 0.9 }}
                                 onClick={() => deleteOrder(ord.id)}
                                 className="p-1.5 text-gray-400 hover:text-rose-600 dark:text-slate-400 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-lg transition-colors"
-                                title={language === 'ru' ? 'Удалить' : language === 'en' ? 'Delete' : "O'chirish"}
+                                title={language === 'ru' ? 'Удалить' : "O'chirish"}
                               >
                                 <Trash2 className="w-4 h-4" />
                               </motion.button>
@@ -1817,14 +1811,14 @@ export const AdminPanel: React.FC = () => {
                       <Plus className="w-5 h-5 text-purple-600 dark:text-purple-400" />
                     </motion.div>
                     <h3 className="text-base font-bold text-gray-900 dark:text-white">
-                      {language === 'ru' ? 'Добавить товар' : language === 'en' ? 'Add Product' : "Yangi Mahsulot Qo'shish"}
+                      {language === 'ru' ? 'Добавить товар' : "Yangi Mahsulot Qo'shish"}
                     </h3>
                   </div>
 
                   <form onSubmit={handleCreateProduct} className="space-y-3 text-xs">
                     <div>
                       <label className="block font-bold text-gray-700 dark:text-slate-300 mb-1">
-                        {language === 'ru' ? 'Название товара *' : language === 'en' ? 'Product Name *' : 'Mahsulot nomi *'}
+                        {language === 'ru' ? 'Название товара *' : 'Mahsulot nomi *'}
                       </label>
                       <input
                         type="text"
@@ -1839,7 +1833,7 @@ export const AdminPanel: React.FC = () => {
                     <div className="grid grid-cols-2 gap-3">
                       <div>
                         <label className="block font-bold text-gray-700 dark:text-slate-300 mb-1">
-                          {language === 'ru' ? 'Цена (сум) *' : language === 'en' ? 'Price (UZS) *' : 'Narxi (so\'m) *'}
+                          {language === 'ru' ? 'Цена (сум) *' : 'Narxi (so\'m) *'}
                         </label>
                         <input
                           type="number"
@@ -1852,7 +1846,7 @@ export const AdminPanel: React.FC = () => {
                       </div>
                       <div>
                         <label className="block font-bold text-gray-700 dark:text-slate-300 mb-1">
-                          {language === 'ru' ? 'Старая цена' : language === 'en' ? 'Original Price' : 'Eski narxi'}
+                          {language === 'ru' ? 'Старая цена' : 'Eski narxi'}
                         </label>
                         <input
                           type="number"
@@ -1866,7 +1860,7 @@ export const AdminPanel: React.FC = () => {
 
                     <div>
                       <label className="block font-bold text-gray-700 dark:text-slate-300 mb-1">
-                        {language === 'ru' ? 'Категория *' : language === 'en' ? 'Category *' : 'Toifasi *'}
+                        {language === 'ru' ? 'Категория *' : 'Toifasi *'}
                       </label>
                       <CustomSelect
                         value={newProduct.categoryId}
@@ -1881,7 +1875,7 @@ export const AdminPanel: React.FC = () => {
 
                     <div>
                       <label className="block font-bold text-gray-700 dark:text-slate-300 mb-1">
-                        {language === 'ru' ? 'Ссылка на фото *' : language === 'en' ? 'Image URL *' : 'Rasm URL *'}
+                        {language === 'ru' ? 'Ссылка на фото *' : 'Rasm URL *'}
                       </label>
                       <input
                         type="url"
@@ -1901,7 +1895,7 @@ export const AdminPanel: React.FC = () => {
                         className="w-4 h-4 text-purple-600 rounded"
                       />
                       <label htmlFor="zeroDownCheckAdmin" className="font-bold text-gray-700 dark:text-slate-300 cursor-pointer">
-                        {language === 'ru' ? 'Рассрочка 0-0-12 без первоначального взноса' : language === 'en' ? '0-0-12 No down payment installment' : "0-0-12 Boshlang'ich to'lovsiz Nasiya"}
+                        {language === 'ru' ? 'Рассрочка 0-0-12 без первоначального взноса' : "0-0-12 Boshlang'ich to'lovsiz Nasiya"}
                       </label>
                     </div>
 
@@ -1925,7 +1919,7 @@ export const AdminPanel: React.FC = () => {
                       type="submit"
                       className="w-full py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-extrabold text-xs rounded-xl transition-all shadow-lg shadow-purple-600/30 hover:brightness-110 mt-2"
                     >
-                      {language === 'ru' ? 'Добавить товар в каталог' : language === 'en' ? 'Add Product to Catalog' : "Tovarni Qo'shish"}
+                      {language === 'ru' ? 'Добавить товар в каталог' : "Tovarni Qo'shish"}
                     </motion.button>
                   </form>
                 </div>
@@ -1934,7 +1928,7 @@ export const AdminPanel: React.FC = () => {
                 <div className="lg:col-span-7 bg-white dark:bg-slate-800/90 p-5 rounded-3xl border border-gray-200 dark:border-slate-700 shadow-sm dark:shadow-xl space-y-4 transition-colors">
                   <h3 className="text-base font-bold text-gray-900 dark:text-white border-b border-gray-200 dark:border-slate-700 pb-3 flex items-center justify-between">
                     <div>
-                      <span>{language === 'ru' ? `Товары в магазине (${products.length})` : language === 'en' ? `Store Products (${products.length})` : `Do'kondagi mahsulotlar (${products.length})`}</span>
+                      <span>{language === 'ru' ? `Товары в магазине (${products.length})` : `Do'kondagi mahsulotlar (${products.length})`}</span>
                       <div className="text-[11px] font-normal text-emerald-600 dark:text-emerald-400">● Supabase Cloud bilan ulangan</div>
                     </div>
                     <div className="flex items-center gap-2">
@@ -1997,7 +1991,7 @@ export const AdminPanel: React.FC = () => {
                               whileTap={{ scale: 0.9 }}
                               onClick={() => handleStartEditProduct(p)}
                               className="p-2 text-gray-500 hover:text-amber-600 dark:text-slate-400 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-500/10 rounded-lg transition-colors shrink-0 cursor-pointer"
-                              title={language === 'ru' ? 'Редактировать' : language === 'en' ? 'Edit' : "Tahrirlash"}
+                              title={language === 'ru' ? 'Редактировать' : "Tahrirlash"}
                             >
                               <Pencil className="w-4 h-4" />
                             </motion.button>
@@ -2011,7 +2005,7 @@ export const AdminPanel: React.FC = () => {
                                 }
                               }}
                               className="p-2 text-gray-400 hover:text-rose-600 dark:text-slate-400 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-lg transition-colors shrink-0 cursor-pointer"
-                              title={language === 'ru' ? 'Удалить' : language === 'en' ? 'Delete' : "O'chirish"}
+                              title={language === 'ru' ? 'Удалить' : "O'chirish"}
                             >
                               <Trash2 className="w-4 h-4" />
                             </motion.button>
@@ -2051,7 +2045,7 @@ export const AdminPanel: React.FC = () => {
 
                   <div className="relative z-10 flex flex-wrap items-center gap-2 shrink-0">
                     <div className="bg-white/15 backdrop-blur-md rounded-2xl px-4 py-2.5 border border-white/20 text-xs">
-                      <div className="text-sky-200 text-[10px] font-bold uppercase">{language === 'ru' ? 'Подключенный бот' : language === 'en' ? 'Connected Bot' : 'Ulangan bot'}</div>
+                      <div className="text-sky-200 text-[10px] font-bold uppercase">{language === 'ru' ? 'Подключенный бот' : 'Ulangan bot'}</div>
                       <div className="font-extrabold text-white flex items-center gap-1.5 mt-0.5">
                         <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
                         @{TELEGRAM_BOT_USERNAME}
@@ -2351,7 +2345,7 @@ export const AdminPanel: React.FC = () => {
                 <div className="p-6 rounded-3xl bg-white dark:bg-slate-800/90 border border-gray-200 dark:border-slate-700 shadow-sm dark:shadow-xl space-y-4 transition-colors">
                   <h3 className="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
                     <ShieldCheck className="w-5 h-5 text-emerald-500" />
-                    <span>{language === 'ru' ? 'Кредитный скоринг (КАТМ)' : language === 'en' ? 'Credit Scoring Distribution (KATM)' : 'Kredit Skoringi Taqsimoti (KATM)'}</span>
+                    <span>{language === 'ru' ? 'Кредитный скоринг (КАТМ)' : 'Kredit Skoringi Taqsimoti (KATM)'}</span>
                   </h3>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
                     <motion.div 
@@ -2359,11 +2353,11 @@ export const AdminPanel: React.FC = () => {
                       className="p-5 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 rounded-2xl space-y-1 shadow-xs"
                     >
                       <span className="text-xs text-emerald-700 dark:text-emerald-400 font-bold block">
-                        {language === 'ru' ? 'Отлично (750 - 1000 баллов)' : language === 'en' ? 'Excellent (750 - 1000 pts)' : "A'lo (750 - 1000 ball)"}
+                        {language === 'ru' ? 'Отлично (750 - 1000 баллов)' : "A'lo (750 - 1000 ball)"}
                       </span>
                       <span className="text-3xl font-black text-gray-900 dark:text-white mt-1 block">{pctHighScoring}%</span>
                       <span className="text-[11px] text-gray-500 dark:text-slate-400">
-                        {language === 'ru' ? 'Автоодобрение' : language === 'en' ? 'Auto approved' : 'Avtomatik tasdiqlash'}
+                        {language === 'ru' ? 'Автоодобрение' : 'Avtomatik tasdiqlash'}
                       </span>
                       <div className="w-full h-2 bg-emerald-200 dark:bg-emerald-900/50 rounded-full mt-3 overflow-hidden">
                         <motion.div className="h-full bg-emerald-500 rounded-full" initial={{ width: 0 }} animate={{ width: `${pctHighScoring}%` }} transition={{ duration: 1.2 }} />
@@ -2375,11 +2369,11 @@ export const AdminPanel: React.FC = () => {
                       className="p-5 bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 rounded-2xl space-y-1 shadow-xs"
                     >
                       <span className="text-xs text-amber-700 dark:text-amber-400 font-bold block">
-                        {language === 'ru' ? 'Средний (600 - 750 баллов)' : language === 'en' ? 'Average (600 - 750 pts)' : "O'rtacha (600 - 750 ball)"}
+                        {language === 'ru' ? 'Средний (600 - 750 баллов)' : "O'rtacha (600 - 750 ball)"}
                       </span>
                       <span className="text-3xl font-black text-gray-900 dark:text-white mt-1 block">{pctMidScoring}%</span>
                       <span className="text-[11px] text-gray-500 dark:text-slate-400">
-                        {language === 'ru' ? 'С первым взносом' : language === 'en' ? 'With down payment' : "Dastlabki to'lov bilan"}
+                        {language === 'ru' ? 'С первым взносом' : "Dastlabki to'lov bilan"}
                       </span>
                       <div className="w-full h-2 bg-amber-200 dark:bg-amber-900/50 rounded-full mt-3 overflow-hidden">
                         <motion.div className="h-full bg-amber-500 rounded-full" initial={{ width: 0 }} animate={{ width: `${pctMidScoring}%` }} transition={{ duration: 1.2 }} />
@@ -2391,11 +2385,11 @@ export const AdminPanel: React.FC = () => {
                       className="p-5 bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/20 rounded-2xl space-y-1 shadow-xs"
                     >
                       <span className="text-xs text-rose-700 dark:text-rose-400 font-bold block">
-                        {language === 'ru' ? 'Низкий (менее 600 баллов)' : language === 'en' ? 'Low (less than 600 pts)' : "Past (600 dan kam)"}
+                        {language === 'ru' ? 'Низкий (менее 600 баллов)' : "Past (600 dan kam)"}
                       </span>
                       <span className="text-3xl font-black text-gray-900 dark:text-white mt-1 block">{pctLowScoring}%</span>
                       <span className="text-[11px] text-gray-500 dark:text-slate-400">
-                        {language === 'ru' ? 'Ручная проверка' : language === 'en' ? 'Manual review' : "Qo'shimcha tekshiruv"}
+                        {language === 'ru' ? 'Ручная проверка' : "Qo'shimcha tekshiruv"}
                       </span>
                       <div className="w-full h-2 bg-rose-200 dark:bg-rose-900/50 rounded-full mt-3 overflow-hidden">
                         <motion.div className="h-full bg-rose-500 rounded-full" initial={{ width: 0 }} animate={{ width: `${pctLowScoring}%` }} transition={{ duration: 1.2 }} />
@@ -2410,32 +2404,30 @@ export const AdminPanel: React.FC = () => {
                     <div>
                       <h3 className="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
                         <BarChart3 className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-                        <span>{language === 'ru' ? 'Сравнение объемов сделок по месяцам' : language === 'en' ? 'Monthly Deal Volume Comparison' : 'Oylik Bitimlar Hajmi Taqqoslami'}</span>
+                        <span>{language === 'ru' ? 'Сравнение объемов сделок по месяцам' : 'Oylik Bitimlar Hajmi Taqqoslami'}</span>
                       </h3>
                       <p className="text-xs text-gray-500 dark:text-slate-400">
-                        {language === 'ru' ? 'Завершенные договоры рассрочки за каждый месяц' : language === 'en' ? 'Completed installment contracts for each month' : 'Har bir oy uchun yakunlangan Nasiya shartnomalari'}
+                        {language === 'ru' ? 'Завершенные договоры рассрочки за каждый месяц' : 'Har bir oy uchun yakunlangan Nasiya shartnomalari'}
                       </p>
                     </div>
                     <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-200 dark:border-emerald-500/20">
                       {totalOrdersCount > 0 
                         ? (language === 'ru' 
                             ? `В среднем в месяц: ${formatPrice(Math.round(totalOrdersAmount / 6), true, language)}` 
-                            : language === 'en' 
-                            ? `Monthly avg: ${formatPrice(Math.round(totalOrdersAmount / 6), true, language)}` 
                             : `O'rtacha oylik: ${formatPrice(Math.round(totalOrdersAmount / 6), true, language)}`)
-                        : (language === 'ru' ? 'В среднем в месяц: 0 сум' : language === 'en' ? 'Monthly avg: 0 UZS' : "O'rtacha oylik: 0 so'm")
+                        : (language === 'ru' ? 'В среднем в месяц: 0 сум' : "O'rtacha oylik: 0 so'm")
                       }
                     </span>
                   </div>
 
                   <div className="h-48 flex items-end justify-between gap-2 sm:gap-4 pt-8 px-2">
                     {[
-                      { month: language === 'ru' ? 'Май' : language === 'en' ? 'May' : 'May', key: 4 },
-                      { month: language === 'ru' ? 'Июн' : language === 'en' ? 'Jun' : 'Iyun', key: 5 },
-                      { month: language === 'ru' ? 'Июл' : language === 'en' ? 'Jul' : 'Iyul', key: 6 },
-                      { month: language === 'ru' ? 'Авг' : language === 'en' ? 'Aug' : 'Avgust', key: 7 },
-                      { month: language === 'ru' ? 'Сен' : language === 'en' ? 'Sep' : 'Sentyabr', key: 8 },
-                      { month: language === 'ru' ? 'Окт' : language === 'en' ? 'Oct' : 'Oktyabr', key: 9 },
+                      { month: language === 'ru' ? 'Май' : 'May', key: 4 },
+                      { month: language === 'ru' ? 'Июн' : 'Iyun', key: 5 },
+                      { month: language === 'ru' ? 'Июл' : 'Iyul', key: 6 },
+                      { month: language === 'ru' ? 'Авг' : 'Avgust', key: 7 },
+                      { month: language === 'ru' ? 'Сен' : 'Sentyabr', key: 8 },
+                      { month: language === 'ru' ? 'Окт' : 'Oktyabr', key: 9 },
                     ].map((col, idx) => {
                       const matchingMonthOrders = orders.filter(o => o.createdAt && new Date(o.createdAt).getMonth() === col.key);
                       const monthSum = matchingMonthOrders.reduce((sum, o) => sum + o.totalPrice, 0);
@@ -2444,7 +2436,7 @@ export const AdminPanel: React.FC = () => {
                         : (totalOrdersCount > 0 ? '6%' : '0%');
                       const valString = totalOrdersAmount > 0 && monthSum > 0 
                         ? formatPrice(monthSum, true, language) 
-                        : (language === 'ru' ? '0 сум' : language === 'en' ? '0 UZS' : "0 so'm");
+                        : (language === 'ru' ? '0 сум' : "0 so'm");
 
                       return (
                         <div key={idx} className="flex-1 flex flex-col items-center gap-2 h-full justify-end group">
@@ -2486,10 +2478,10 @@ export const AdminPanel: React.FC = () => {
                     </div>
                     <div>
                       <h3 className="text-base font-extrabold text-gray-900 dark:text-white">
-                        {language === 'ru' ? 'Активные промокоды и скидки' : language === 'en' ? 'Active Promo Codes & Discounts' : 'Promokodlar va Chegirmalar Tizimi'}
+                        {language === 'ru' ? 'Активные промокоды и скидки' : 'Promokodlar va Chegirmalar Tizimi'}
                       </h3>
                       <p className="text-xs text-gray-500 dark:text-slate-400">
-                        {language === 'ru' ? 'Управление купонами для корзины и оформления рассрочки' : language === 'en' ? 'Manage coupons for cart and checkout' : "Savat va Nasiya buyurtmalari uchun promokodlar boshqaruvi"}
+                        {language === 'ru' ? 'Управление купонами для корзины и оформления рассрочки' : "Savat va Nasiya buyurtmalari uchun promokodlar boshqaruvi"}
                       </p>
                     </div>
                   </div>
@@ -2501,7 +2493,7 @@ export const AdminPanel: React.FC = () => {
                     className="px-4 py-2.5 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-xs font-bold shadow-md shadow-purple-600/25 flex items-center gap-2 transition-all w-fit"
                   >
                     <Plus className="w-4 h-4" />
-                    <span>{language === 'ru' ? 'Создать промокод' : language === 'en' ? 'Create Promo Code' : 'Yangi Promokod Qo\'shish'}</span>
+                    <span>{language === 'ru' ? 'Создать промокод' : 'Yangi Promokod Qo\'shish'}</span>
                   </motion.button>
                 </div>
 
@@ -2518,7 +2510,7 @@ export const AdminPanel: React.FC = () => {
                         <div className="flex items-center justify-between border-b border-gray-100 dark:border-slate-700 pb-3">
                           <h4 className="font-extrabold text-sm text-gray-900 dark:text-white flex items-center gap-2">
                             <Sparkles className="w-4 h-4 text-amber-500" />
-                            <span>{language === 'ru' ? 'Новый промокод' : language === 'en' ? 'New Promo Code' : 'Yangi Promokod Yaratish'}</span>
+                            <span>{language === 'ru' ? 'Новый промокод' : 'Yangi Promokod Yaratish'}</span>
                           </h4>
                           <button
                             type="button"
@@ -2532,7 +2524,7 @@ export const AdminPanel: React.FC = () => {
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                           <div>
                             <label className="block text-xs font-bold text-gray-700 dark:text-slate-300 mb-1">
-                              {language === 'ru' ? 'Код (например, WELCOME10):' : language === 'en' ? 'Code (e.g., WELCOME10):' : 'Kodi (masalan: WELCOME10):'}
+                              {language === 'ru' ? 'Код (например, WELCOME10):' : 'Kodi (masalan: WELCOME10):'}
                             </label>
                             <input
                               type="text"
@@ -2546,7 +2538,7 @@ export const AdminPanel: React.FC = () => {
 
                           <div>
                             <label className="block text-xs font-bold text-gray-700 dark:text-slate-300 mb-1">
-                              {language === 'ru' ? 'Тип скидки:' : language === 'en' ? 'Discount Type:' : 'Chegirma turi:'}
+                              {language === 'ru' ? 'Тип скидки:' : 'Chegirma turi:'}
                             </label>
                             <CustomSelect
                               size="sm"
@@ -2554,8 +2546,8 @@ export const AdminPanel: React.FC = () => {
                               onChange={(val) => setNewPromo({ ...newPromo, discountType: val as any })}
                               buttonClassName="bg-gray-50 dark:bg-slate-900 border-gray-200 dark:border-slate-700"
                               options={[
-                                { value: 'percentage', label: language === 'ru' ? 'Процент (%)' : language === 'en' ? 'Percentage (%)' : 'Foiz (%)' },
-                                { value: 'fixed', label: language === 'ru' ? 'Фиксированная сумма (сум)' : language === 'en' ? 'Fixed sum (UZS)' : 'Aniq summa (so\'m)' },
+                                { value: 'percentage', label: language === 'ru' ? 'Процент (%)' : 'Foiz (%)' },
+                                { value: 'fixed', label: language === 'ru' ? 'Фиксированная сумма (сум)' : 'Aniq summa (so\'m)' },
                               ]}
                             />
                           </div>
@@ -2563,8 +2555,8 @@ export const AdminPanel: React.FC = () => {
                           <div>
                             <label className="block text-xs font-bold text-gray-700 dark:text-slate-300 mb-1">
                               {newPromo.discountType === 'percentage' 
-                                ? (language === 'ru' ? 'Скидка в процентах (%):' : language === 'en' ? 'Discount percentage (%):' : 'Chegirma foizi (%):') 
-                                : (language === 'ru' ? 'Сумма скидки (сум):' : language === 'en' ? 'Discount amount (UZS):' : 'Chegirma summasi (so\'m):')}
+                                ? (language === 'ru' ? 'Скидка в процентах (%):' : 'Chegirma foizi (%):') 
+                                : (language === 'ru' ? 'Сумма скидки (сум):' : 'Chegirma summasi (so\'m):')}
                             </label>
                             <input
                               type="number"
@@ -2580,7 +2572,7 @@ export const AdminPanel: React.FC = () => {
 
                         <div>
                           <label className="block text-xs font-bold text-gray-700 dark:text-slate-300 mb-1">
-                            {language === 'ru' ? 'Описание для клиентов:' : language === 'en' ? 'Customer Description:' : 'Mijozlar uchun tavsif:'}
+                            {language === 'ru' ? 'Описание для клиентов:' : 'Mijozlar uchun tavsif:'}
                           </label>
                           <input
                             type="text"
@@ -2597,13 +2589,13 @@ export const AdminPanel: React.FC = () => {
                             onClick={() => setIsAddPromoModalOpen(false)}
                             className="px-4 py-2 rounded-xl bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-300 text-xs font-bold hover:bg-gray-200 transition-colors"
                           >
-                            {language === 'ru' ? 'Отмена' : language === 'en' ? 'Cancel' : 'Bekor qilish'}
+                            {language === 'ru' ? 'Отмена' : 'Bekor qilish'}
                           </button>
                           <button
                             type="submit"
                             className="px-5 py-2 rounded-xl bg-uzum-primary hover:bg-uzum-hover text-white text-xs font-bold transition-all shadow-md"
                           >
-                            {language === 'ru' ? 'Сохранить промокод' : language === 'en' ? 'Save Promo Code' : 'Promokodni Saqlash'}
+                            {language === 'ru' ? 'Сохранить промокод' : 'Promokodni Saqlash'}
                           </button>
                         </div>
                       </form>
@@ -2643,7 +2635,7 @@ export const AdminPanel: React.FC = () => {
                           </p>
 
                           <div className="text-[11px] text-gray-400 dark:text-slate-400 font-medium">
-                            {language === 'ru' ? 'Использовано:' : language === 'en' ? 'Used:' : 'Qo\'llanilgan:'} <strong className="text-gray-900 dark:text-white">{promo.usageCount || 0} {language === 'ru' ? 'раз' : language === 'en' ? 'times' : 'marta'}</strong>
+                            {language === 'ru' ? 'Использовано:' : 'Qo\'llanilgan:'} <strong className="text-gray-900 dark:text-white">{promo.usageCount || 0} {language === 'ru' ? 'раз' : 'marta'}</strong>
                           </div>
                         </div>
 
@@ -2660,10 +2652,10 @@ export const AdminPanel: React.FC = () => {
                             {promo.isActive ? (
                               <span className="inline-flex items-center gap-1">
                                 <Check className="w-3 h-3 text-emerald-600 dark:text-emerald-300" />
-                                <span>{language === 'ru' ? 'Активен' : language === 'en' ? 'Active' : 'Faol'}</span>
+                                <span>{language === 'ru' ? 'Активен' : 'Faol'}</span>
                               </span>
                             ) : (
-                              <span>{language === 'ru' ? 'Отключен' : language === 'en' ? 'Inactive' : 'Nofaol'}</span>
+                              <span>{language === 'ru' ? 'Отключен' : 'Nofaol'}</span>
                             )}
                           </button>
 
@@ -2672,7 +2664,7 @@ export const AdminPanel: React.FC = () => {
                             onClick={() => {
                               if (window.confirm(`${promo.code} promokodini o'chirishni xohlaysizmi?`)) {
                                 deletePromoCode(promo.id);
-                                addToast(`${promo.code} o'chirildi!`, 'info');
+                                addToast(language === 'ru' ? `Промокод ${promo.code} удален!` : `${promo.code} o'chirildi!`, 'info');
                               }
                             }}
                             className="p-1.5 text-gray-400 hover:text-rose-500 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors"
@@ -2702,14 +2694,14 @@ export const AdminPanel: React.FC = () => {
                   <div>
                     <h3 className="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
                       <Users className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-                      <span>{language === 'ru' ? 'База клиентов (CRM)' : language === 'en' ? 'Customer Base (CRM)' : 'Mijozlar Bazasi (CRM)'}</span>
+                      <span>{language === 'ru' ? 'База клиентов (CRM)' : 'Mijozlar Bazasi (CRM)'}</span>
                     </h3>
                     <p className="text-xs text-gray-500 dark:text-slate-400">
-                      {language === 'ru' ? 'Платежная дисциплина и персональный лимит' : language === 'en' ? 'Payment discipline and credit limits' : 'Mijozlarning to\'lov intizomi va shaxsiy limiti'}
+                      {language === 'ru' ? 'Платежная дисциплина и персональный лимит' : 'Mijozlarning to\'lov intizomi va shaxsiy limiti'}
                     </p>
                   </div>
                   <span className="text-xs font-bold px-3 py-1 rounded-full bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-300">
-                    {orders.length} {language === 'ru' ? 'активных клиентов' : language === 'en' ? 'active customers' : 'ta faol mijoz'}
+                    {orders.length} {language === 'ru' ? 'активных клиентов' : 'ta faol mijoz'}
                   </span>
                 </div>
 
@@ -2717,10 +2709,10 @@ export const AdminPanel: React.FC = () => {
                   <div className="py-12 text-center text-gray-400 dark:text-slate-500 space-y-2">
                     <Users className="w-10 h-10 mx-auto opacity-30" />
                     <p className="text-sm font-semibold">
-                      {language === 'ru' ? 'База клиентов пуста (0 покупок)' : language === 'en' ? 'Customer base is empty (0 purchases)' : "Mijozlar bazasi bo'sh (0 ta xarid)"}
+                      {language === 'ru' ? 'База клиентов пуста (0 покупок)' : "Mijozlar bazasi bo'sh (0 ta xarid)"}
                     </p>
                     <p className="text-xs">
-                      {language === 'ru' ? 'Когда кто-то оформит заказ, данные автоматически появятся здесь' : language === 'en' ? 'When someone places an order, their data will automatically appear here' : "Biror kishi xarid qilganda mijoz ma'lumotlari avtomatik shu yerda aks etadi"}
+                      {language === 'ru' ? 'Когда кто-то оформит заказ, данные автоматически появятся здесь' : "Biror kishi xarid qilganda mijoz ma'lumotlari avtomatik shu yerda aks etadi"}
                     </p>
                   </div>
                 ) : (
@@ -2751,7 +2743,7 @@ export const AdminPanel: React.FC = () => {
                             <span className="text-amber-600 dark:text-amber-400 font-extrabold block">{formatPrice(ord.totalPrice, true, language)}</span>
                             <span className="text-emerald-600 dark:text-emerald-400 text-[10px] font-bold flex items-center justify-end gap-1">
                               <CheckCircle className="w-3 h-3" />
-                              <span>{language === 'ru' ? 'Платежи: Отлично' : language === 'en' ? 'Payment status: Excellent' : "To'lov holati: A'lo"}</span>
+                              <span>{language === 'ru' ? 'Платежи: Отлично' : "To'lov holati: A'lo"}</span>
                             </span>
                           </div>
                         </motion.div>
@@ -2774,7 +2766,7 @@ export const AdminPanel: React.FC = () => {
               >
                 <h3 className="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
                   <Settings className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-                  <span>{language === 'ru' ? 'Настройки системы и безопасности' : language === 'en' ? 'System & Security Settings' : 'Tizim va Xavfsizlik Sozlamalari'}</span>
+                  <span>{language === 'ru' ? 'Настройки системы и безопасности' : 'Tizim va Xavfsizlik Sozlamalari'}</span>
                 </h3>
                 <div className="space-y-3 text-xs">
                   <motion.div 
@@ -2787,7 +2779,7 @@ export const AdminPanel: React.FC = () => {
                     </div>
                     <span className="text-emerald-700 dark:text-emerald-400 font-bold bg-emerald-50 dark:bg-emerald-500/10 px-2.5 py-1 rounded-xl border border-emerald-200 dark:border-emerald-500/20 flex items-center gap-1.5 shadow-xs">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
-                      <span>{language === 'ru' ? 'Подключено' : language === 'en' ? 'Connected' : 'Ulangan'}</span>
+                      <span>{language === 'ru' ? 'Подключено' : 'Ulangan'}</span>
                     </span>
                   </motion.div>
 
@@ -2913,7 +2905,7 @@ export const AdminPanel: React.FC = () => {
                       className="px-3.5 py-1.5 bg-uzum-primary hover:bg-[#520080] text-white rounded-xl font-bold transition-all flex items-center gap-1.5 shadow-sm text-xs cursor-pointer"
                     >
                       <RefreshCw className={`w-3.5 h-3.5 ${isRefreshingCache ? 'animate-spin' : ''}`} />
-                      <span>{language === 'ru' ? 'Синхронизировать' : language === 'en' ? 'Synchronize' : 'Sinxronlash'}</span>
+                      <span>{language === 'ru' ? 'Синхронизировать' : 'Sinxronlash'}</span>
                     </motion.button>
                   </motion.div>
                 </div>
@@ -2942,10 +2934,10 @@ export const AdminPanel: React.FC = () => {
                   </div>
                   <div>
                     <h3 className="text-base font-extrabold text-gray-900 dark:text-white">
-                      {language === 'ru' ? 'Договор №' : language === 'en' ? 'Contract №' : 'Shartnoma №'} {selectedOrder.contractNumber || selectedOrder.id}
+                      {language === 'ru' ? 'Договор №' : 'Shartnoma №'} {selectedOrder.contractNumber || selectedOrder.id}
                     </h3>
                     <span className="text-xs text-gray-400">
-                      {language === 'ru' ? 'Дата оформления:' : language === 'en' ? 'Date registered:' : 'Rasmiylashtirilgan sana:'} {new Date(selectedOrder.createdAt).toLocaleString(language === 'ru' ? 'ru-RU' : language === 'en' ? 'en-US' : 'uz-UZ')}
+                      {language === 'ru' ? 'Дата оформления:' : 'Rasmiylashtirilgan sana:'} {new Date(selectedOrder.createdAt).toLocaleString(language === 'ru' ? 'ru-RU' : 'uz-UZ')}
                     </span>
                   </div>
                 </div>
@@ -2964,20 +2956,20 @@ export const AdminPanel: React.FC = () => {
                 {/* Customer Info Card */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 rounded-2xl bg-gray-50 dark:bg-slate-900/60 border border-gray-200 dark:border-slate-700">
                   <div>
-                    <span className="text-gray-400 block text-[11px]">{language === 'ru' ? 'Ф.И.О клиента:' : language === 'en' ? 'Customer Full Name:' : 'Mijoz F.I.Sh:'}</span>
+                    <span className="text-gray-400 block text-[11px]">{language === 'ru' ? 'Ф.И.О клиента:' : 'Mijoz F.I.Sh:'}</span>
                     <strong className="text-sm text-gray-900 dark:text-white">{selectedOrder.customerName}</strong>
                   </div>
                   <div>
-                    <span className="text-gray-400 block text-[11px]">{language === 'ru' ? 'Номер телефона:' : language === 'en' ? 'Phone Number:' : 'Telefon raqami:'}</span>
+                    <span className="text-gray-400 block text-[11px]">{language === 'ru' ? 'Номер телефона:' : 'Telefon raqami:'}</span>
                     <strong className="text-sm font-mono text-gray-900 dark:text-white">{selectedOrder.customerPhone}</strong>
                   </div>
                   <div>
-                    <span className="text-gray-400 block text-[11px]">{language === 'ru' ? 'ПИНФЛ:' : language === 'en' ? 'PINFL:' : 'JShShIR (PINFL):'}</span>
+                    <span className="text-gray-400 block text-[11px]">{language === 'ru' ? 'ПИНФЛ:' : 'JShShIR (PINFL):'}</span>
                     <strong className="text-xs font-mono text-purple-600 dark:text-purple-300">{selectedOrder.pinfl || '31204956780012'}</strong>
                   </div>
                   <div>
-                    <span className="text-gray-400 block text-[11px]">{language === 'ru' ? 'Адрес доставки:' : language === 'en' ? 'Delivery Address:' : 'Yetkazish manzili:'}</span>
-                    <strong className="text-xs text-gray-900 dark:text-white">{selectedOrder.deliveryAddress || (language === 'ru' ? 'г. Ташкент, Чиланзар' : language === 'en' ? 'Tashkent city, Chilanzar' : 'Toshkent shahri, Chilonzor')}</strong>
+                    <span className="text-gray-400 block text-[11px]">{language === 'ru' ? 'Адрес доставки:' : 'Yetkazish manzili:'}</span>
+                    <strong className="text-xs text-gray-900 dark:text-white">{selectedOrder.deliveryAddress || (language === 'ru' ? 'г. Ташкент, Чиланзар' : 'Toshkent shahri, Chilonzor')}</strong>
                   </div>
                 </div>
 
@@ -2986,24 +2978,24 @@ export const AdminPanel: React.FC = () => {
                   <div className="flex justify-between items-center border-b border-white/10 pb-2">
                     <span className="text-purple-200 font-bold flex items-center gap-1.5">
                       <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                      <span>{language === 'ru' ? 'Кредитный скоринг:' : language === 'en' ? 'Credit Scoring:' : 'Kredit Skoringi:'}</span>
+                      <span>{language === 'ru' ? 'Кредитный скоринг:' : 'Kredit Skoringi:'}</span>
                     </span>
                     <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-extrabold border border-emerald-400/30">
-                      {selectedOrder.scoringScore || 795} {language === 'ru' ? 'баллов (Отлично)' : language === 'en' ? 'pts (Excellent)' : "ball (A'lo)"}
+                      {selectedOrder.scoringScore || 795} {language === 'ru' ? 'баллов (Отлично)' : "ball (A'lo)"}
                     </span>
                   </div>
                   <div className="grid grid-cols-3 gap-2 text-center pt-1">
                     <div>
-                      <span className="text-[10px] text-purple-300 block">{language === 'ru' ? 'Общая сумма:' : language === 'en' ? 'Total amount:' : 'Jami summa:'}</span>
+                      <span className="text-[10px] text-purple-300 block">{language === 'ru' ? 'Общая сумма:' : 'Jami summa:'}</span>
                       <strong className="text-sm text-amber-300">{formatPrice(selectedOrder.totalPrice, true, language)}</strong>
                     </div>
                     <div>
-                      <span className="text-[10px] text-purple-300 block">{language === 'ru' ? 'Срок:' : language === 'en' ? 'Term:' : 'Muddat:'}</span>
-                      <strong className="text-sm text-white">{selectedOrder.installmentMonths || 12} {language === 'ru' ? 'мес' : language === 'en' ? 'mo' : 'oy'}</strong>
+                      <span className="text-[10px] text-purple-300 block">{language === 'ru' ? 'Срок:' : 'Muddat:'}</span>
+                      <strong className="text-sm text-white">{selectedOrder.installmentMonths || 12} {language === 'ru' ? 'мес' : 'oy'}</strong>
                     </div>
                     <div>
-                      <span className="text-[10px] text-purple-300 block">{language === 'ru' ? 'Ежемесячный платёж:' : language === 'en' ? 'Monthly payment:' : "Oylik to'lov:"}</span>
-                      <strong className="text-sm text-amber-300">{formatPrice(selectedOrder.monthlyPayment || 0, true, language)}/{language === 'ru' ? 'мес' : language === 'en' ? 'mo' : 'oy'}</strong>
+                      <span className="text-[10px] text-purple-300 block">{language === 'ru' ? 'Ежемесячный платёж:' : "Oylik to'lov:"}</span>
+                      <strong className="text-sm text-amber-300">{formatPrice(selectedOrder.monthlyPayment || 0, true, language)}/{language === 'ru' ? 'мес' : 'oy'}</strong>
                     </div>
                   </div>
                 </div>
@@ -3011,20 +3003,20 @@ export const AdminPanel: React.FC = () => {
                 {/* Items in Contract */}
                 <div className="space-y-2">
                   <span className="font-bold text-gray-700 dark:text-slate-300 block uppercase tracking-wider text-[11px]">
-                    {language === 'ru' ? 'Товары в договоре' : language === 'en' ? 'Contract items' : 'Shartnomadagi tovarlar'} ({selectedOrder.items?.length || 1}):
+                    {language === 'ru' ? 'Товары в договоре' : 'Shartnomadagi tovarlar'} ({selectedOrder.items?.length || 1}):
                   </span>
                   <div className="divide-y divide-gray-100 dark:divide-slate-800 border border-gray-200 dark:border-slate-800 rounded-xl overflow-hidden">
                     {selectedOrder.items?.map((item, i) => (
                       <div key={i} className="p-3 bg-white dark:bg-slate-900/50 flex justify-between items-center">
                         <div>
                           <span className="font-bold text-gray-900 dark:text-white block">{item.title}</span>
-                          <span className="text-gray-400 text-[11px]">{item.quantity} {language === 'ru' ? 'шт' : language === 'en' ? 'items' : 'dona'} • {formatPrice(item.price, true, language)}</span>
+                          <span className="text-gray-400 text-[11px]">{item.quantity} {language === 'ru' ? 'шт' : 'dona'} • {formatPrice(item.price, true, language)}</span>
                         </div>
                         <div className="text-right">
                           <span className="font-extrabold text-gray-900 dark:text-white block">{formatPrice(item.price * item.quantity, true, language)}</span>
                           {item.monthlyPayment && (
                             <span className="text-[10px] text-purple-600 dark:text-purple-300 font-bold">
-                              {formatPrice(item.monthlyPayment, true, language)}/{language === 'ru' ? 'мес' : language === 'en' ? 'mo' : 'oy'}
+                              {formatPrice(item.monthlyPayment, true, language)}/{language === 'ru' ? 'мес' : 'oy'}
                             </span>
                           )}
                         </div>
@@ -3041,12 +3033,12 @@ export const AdminPanel: React.FC = () => {
                     onClick={() => {
                       updateOrderStatus(selectedOrder.id, 'scoring_approved');
                       setSelectedOrder({ ...selectedOrder, status: 'scoring_approved' });
-                      addToast(language === 'ru' ? 'Договор успешно подтвержден!' : language === 'en' ? 'Contract approved successfully!' : 'Shartnoma tasdiqlandi!', 'success');
+                      addToast(language === 'ru' ? 'Договор успешно подтвержден!' : 'Shartnoma tasdiqlandi!', 'success');
                     }}
                     className="flex-1 py-2.5 px-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl flex items-center justify-center gap-1.5 shadow-sm"
                   >
                     <Check className="w-4 h-4" />
-                    <span>{language === 'ru' ? 'Одобрить' : language === 'en' ? 'Approve' : 'Tasdiqlash'}</span>
+                    <span>{language === 'ru' ? 'Одобрить' : 'Tasdiqlash'}</span>
                   </motion.button>
 
                   <motion.button
@@ -3055,12 +3047,12 @@ export const AdminPanel: React.FC = () => {
                     onClick={() => {
                       updateOrderStatus(selectedOrder.id, 'delivered');
                       setSelectedOrder({ ...selectedOrder, status: 'delivered' });
-                      addToast(language === 'ru' ? "Статус заказа обновлен на 'Доставлено'!" : language === 'en' ? "Status updated to 'Delivered'!" : "Shartnoma 'Yetkazildi' holatiga o'tkazildi!", 'info');
+                      addToast(language === 'ru' ? "Статус заказа обновлен на 'Доставлено'!" : "Shartnoma 'Yetkazildi' holatiga o'tkazildi!", 'info');
                     }}
                     className="flex-1 py-2.5 px-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl flex items-center justify-center gap-1.5 shadow-sm"
                   >
                     <Package className="w-4 h-4" />
-                    <span>{language === 'ru' ? 'Доставлено' : language === 'en' ? 'Delivered' : 'Yetkazildi'}</span>
+                    <span>{language === 'ru' ? 'Доставлено' : 'Yetkazildi'}</span>
                   </motion.button>
 
                   <motion.button
@@ -3069,12 +3061,12 @@ export const AdminPanel: React.FC = () => {
                     onClick={() => {
                       deleteOrder(selectedOrder.id);
                       setSelectedOrder(null);
-                      addToast(language === 'ru' ? 'Договор удален' : language === 'en' ? 'Contract deleted' : "Shartnoma o'chirildi", 'warning');
+                      addToast(language === 'ru' ? 'Договор удален' : "Shartnoma o'chirildi", 'warning');
                     }}
                     className="py-2.5 px-4 bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 hover:bg-rose-100 rounded-xl font-bold flex items-center justify-center gap-1.5"
                   >
                     <Trash2 className="w-4 h-4" />
-                    <span>{language === 'ru' ? 'Удалить' : language === 'en' ? 'Delete' : "O'chirish"}</span>
+                    <span>{language === 'ru' ? 'Удалить' : "O'chirish"}</span>
                   </motion.button>
                 </div>
               </div>
