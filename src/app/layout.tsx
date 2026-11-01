@@ -40,6 +40,10 @@ const themeInitScript = `
       } else {
         document.documentElement.classList.remove('dark');
       }
+      if (parsed?.state && parsed?.state?.language === 'en') {
+        parsed.state.language = 'uz';
+        localStorage.setItem('elrizo_store_v3', JSON.stringify(parsed));
+      }
     }
   } catch (e) {}
 `;

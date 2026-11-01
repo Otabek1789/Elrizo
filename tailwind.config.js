@@ -40,21 +40,21 @@ export default {
           text: '#8B4513',
           yellow: '#FFDD00',
         },
-        // Uzum-style Violet-tinted Dark Theme ("sal siyohrang sifat" comfort aesthetic)
+        // Uzum.uz uslubidagi yoqimli yumshoq siyohrang tungi rejim (QORA EMAS, ko'zni charchatmaydigan binafsharang)
         slate: {
-          50: '#FAF9FD',
-          100: '#F2F0F9',
-          200: '#E6E1F4',
-          300: '#CBC2E5',
-          400: '#A89CC8',
-          500: '#7869A6',
-          600: '#4D3E7B',
-          700: '#382E59', // Clean violet dark border & divider
-          750: '#2A2244', // Input & elevated surfaces
-          800: '#201A35', // Uzum dark card & modal surface
-          850: '#19142A', // Sub-navs & search container
-          900: '#141021', // Uzum violet night root background
-          950: '#0E0B17', // Deep contrast backdrop
+          50: '#FAF8FD',
+          100: '#F2EEFA',
+          200: '#E5DEF7',
+          300: '#C8BDE8',
+          400: '#A898D7',
+          500: '#7E69BD',
+          600: '#614F9D',
+          700: '#4B3D7D', // Yumshoq binafsha hoshiya va ajratgich
+          750: '#372D5E', // Input va ko'tarilgan elementlar
+          800: '#2B234B', // Karta va modal fonlari (qora emas, to'q siyohrang)
+          850: '#251F41', // Qidiruv va sub-header fonlari
+          900: '#1F1A36', // Asosiy sayt foni (qora emas, yoqimli uzum siyohrang)
+          950: '#171329', // Chuqur orqa fon
         }
       },
       fontFamily: {

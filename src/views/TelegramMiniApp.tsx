@@ -570,32 +570,32 @@ export const TelegramMiniApp: React.FC = () => {
                     icon: Zap,
                     title: t('trust1Title'),
                     desc: t('trust1Desc'),
-                    bg: "bg-purple-50/80 dark:bg-slate-800 text-purple-700 dark:text-purple-300 border-purple-200/50 dark:border-gray-800",
+                    bg: "bg-purple-50/80 dark:bg-slate-800 text-purple-700 dark:text-purple-300 border-purple-200/50 dark:border-slate-700",
                   },
                   {
                     icon: Percent,
                     title: t('trust2Title'),
                     desc: t('trust2Desc'),
-                    bg: "bg-emerald-50/80 dark:bg-slate-800 text-emerald-700 dark:text-emerald-300 border-emerald-200/50 dark:border-gray-800",
+                    bg: "bg-emerald-50/80 dark:bg-slate-800 text-emerald-700 dark:text-emerald-300 border-emerald-200/50 dark:border-slate-700",
                   },
                   {
                     icon: Truck,
                     title: t('trust3Title'),
                     desc: t('trust3Desc'),
-                    bg: "bg-blue-50/80 dark:bg-slate-800 text-blue-700 dark:text-blue-300 border-blue-200/50 dark:border-gray-800",
+                    bg: "bg-blue-50/80 dark:bg-slate-800 text-blue-700 dark:text-blue-300 border-blue-200/50 dark:border-slate-700",
                   },
                   {
                     icon: ShieldCheck,
                     title: t('trust4Title'),
                     desc: t('trust4Desc'),
-                    bg: "bg-amber-50/80 dark:bg-slate-800 text-amber-800 dark:text-amber-300 border-amber-200/50 dark:border-gray-800",
+                    bg: "bg-amber-50/80 dark:bg-slate-800 text-amber-800 dark:text-amber-300 border-amber-200/50 dark:border-slate-700",
                   },
                 ].map((item, idx) => (
                   <div
                     key={idx}
                     className={`p-2.5 rounded-2xl border ${item.bg} flex items-start gap-2 shadow-xs`}
                   >
-                    <div className="p-2 rounded-xl bg-white/80 dark:bg-gray-800/80 shadow-xs shrink-0">
+                    <div className="p-2 rounded-xl bg-white/80 dark:bg-slate-800/80 shadow-xs shrink-0">
                       <item.icon className="w-4 h-4" />
                     </div>
                     <div className="space-y-0.5 min-w-0">
@@ -719,7 +719,7 @@ export const TelegramMiniApp: React.FC = () => {
                       tgHaptic('light');
                       setActiveTab('catalog');
                     }}
-                    className="flex items-center gap-1 text-xs font-bold text-uzum-primary dark:text-purple-300 bg-purple-50 dark:bg-gray-800 px-2.5 py-1 rounded-lg border border-purple-200/50 dark:border-gray-700"
+                    className="flex items-center gap-1 text-xs font-bold text-uzum-primary dark:text-purple-300 bg-purple-50 dark:bg-slate-800 px-2.5 py-1 rounded-lg border border-purple-200/50 dark:border-slate-700"
                   >
                     <SlidersHorizontal className="w-3 h-3" />
                     <span>{t('filtersAndAll')}</span>
@@ -741,7 +741,7 @@ export const TelegramMiniApp: React.FC = () => {
                         className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all shrink-0 ${
                           isActive
                             ? 'bg-gradient-to-r from-[#640199] to-[#7B0FB5] text-white shadow-md shadow-purple-500/25 scale-105'
-                            : 'bg-white dark:bg-slate-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-800'
+                            : 'bg-white dark:bg-slate-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-slate-700'
                         }`}
                       >
                         <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-amber-300' : 'text-purple-600 dark:text-purple-400'}`} />
@@ -820,7 +820,7 @@ export const TelegramMiniApp: React.FC = () => {
                     setSelectedCategory(cat.slug);
                     setActiveTab('home');
                   }}
-                  className="bg-white dark:bg-slate-800 rounded-2xl p-3 border border-gray-100 dark:border-gray-800 flex flex-col gap-2.5 shadow-sm active:scale-[0.99] cursor-pointer hover:border-purple-300 dark:hover:border-purple-800 transition-all"
+                  className="bg-white dark:bg-slate-800 rounded-2xl p-3 border border-gray-100 dark:border-slate-700 flex flex-col gap-2.5 shadow-sm active:scale-[0.99] cursor-pointer hover:border-purple-300 dark:hover:border-purple-800 transition-all"
                 >
                   <div className="flex items-center justify-between gap-3">
                     <div className="flex items-center gap-3 min-w-0">
@@ -841,7 +841,7 @@ export const TelegramMiniApp: React.FC = () => {
 
                   {/* Subcategories pill tags */}
                   {cat.subcategories && cat.subcategories.length > 0 && (
-                    <div className="flex flex-wrap gap-1.5 pt-1 border-t border-gray-100 dark:border-gray-800/60">
+                    <div className="flex flex-wrap gap-1.5 pt-1 border-t border-gray-100 dark:border-slate-700/60">
                       {cat.subcategories.slice(0, 4).map(sub => (
                         <span
                           key={sub.id}
@@ -851,7 +851,7 @@ export const TelegramMiniApp: React.FC = () => {
                             setSearchQuery(sub.name);
                             setActiveTab('home');
                           }}
-                          className="text-[10px] bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-300 px-2 py-0.5 rounded-md hover:bg-purple-50 dark:hover:bg-purple-950/60 hover:text-purple-700 dark:hover:text-purple-300 transition-colors"
+                          className="text-[10px] bg-gray-50 dark:bg-slate-750 text-gray-600 dark:text-gray-300 px-2 py-0.5 rounded-md hover:bg-purple-50 dark:hover:bg-purple-950/60 hover:text-purple-700 dark:hover:text-purple-300 transition-colors"
                         >
                           {sub.name}
                         </span>
@@ -959,12 +959,12 @@ export const TelegramMiniApp: React.FC = () => {
                 {cart.map(item => (
                   <div
                     key={item.product.id}
-                    className="bg-white dark:bg-slate-800 rounded-2xl p-3 border border-gray-100 dark:border-gray-800 flex items-center justify-between gap-3 shadow-sm"
+                    className="bg-white dark:bg-slate-800 rounded-2xl p-3 border border-gray-100 dark:border-slate-700 flex items-center justify-between gap-3 shadow-sm"
                   >
                     <img
                       src={item.product.images[0]}
                       alt={item.product.title}
-                      className="w-14 h-14 object-contain rounded-xl bg-gray-50 dark:bg-gray-800 p-1 shrink-0"
+                      className="w-14 h-14 object-contain rounded-xl bg-gray-50 dark:bg-slate-750 p-1 shrink-0"
                     />
                     <div className="flex-1 min-w-0">
                       <h4 className="text-xs font-semibold text-gray-900 dark:text-white truncate">
@@ -978,10 +978,10 @@ export const TelegramMiniApp: React.FC = () => {
                       </div>
                     </div>
                     {/* Stepper */}
-                    <div className="flex items-center gap-1.5 bg-gray-50 dark:bg-gray-800/80 p-1 rounded-xl shrink-0">
+                    <div className="flex items-center gap-1.5 bg-gray-50 dark:bg-slate-750/80 p-1 rounded-xl shrink-0">
                       <button
                         onClick={(e) => handleDecrement(e, item.product.id)}
-                        className="w-6 h-6 rounded-lg bg-white dark:bg-gray-700 flex items-center justify-center text-gray-700 dark:text-gray-200 shadow-sm"
+                        className="w-6 h-6 rounded-lg bg-white dark:bg-slate-700 flex items-center justify-center text-gray-700 dark:text-gray-200 shadow-sm"
                       >
                         <Minus className="w-3 h-3" />
                       </button>
@@ -998,7 +998,7 @@ export const TelegramMiniApp: React.FC = () => {
               </div>
 
               {/* Cart Summary Card */}
-              <div className="bg-white dark:bg-slate-800 rounded-2xl p-3.5 border border-gray-100 dark:border-gray-800 space-y-2 text-xs">
+              <div className="bg-white dark:bg-slate-800 rounded-2xl p-3.5 border border-gray-100 dark:border-slate-700 space-y-2 text-xs">
                 <div className="flex items-center justify-between text-gray-500 dark:text-gray-400">
                   <span>Mahsulotlar jami:</span>
                   <span className="font-semibold text-gray-900 dark:text-white">
@@ -1015,7 +1015,7 @@ export const TelegramMiniApp: React.FC = () => {
                     ⚡ {cartMonthly.toLocaleString('uz-UZ')} so'm/oy
                   </span>
                 </div>
-                <div className="border-t border-gray-100 dark:border-gray-800 pt-2 flex items-center justify-between font-extrabold text-sm">
+                <div className="border-t border-gray-100 dark:border-slate-700 pt-2 flex items-center justify-between font-extrabold text-sm">
                   <span>Jami to'lov:</span>
                   <span className="text-gray-950 dark:text-white">
                     {cartTotal.toLocaleString('uz-UZ')} so'm
@@ -1216,7 +1216,7 @@ export const TelegramMiniApp: React.FC = () => {
                       className={`py-1.5 rounded-xl font-bold text-xs transition-all ${
                         selectedMonths === m
                           ? 'bg-[#640199] text-white shadow'
-                          : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-purple-200/60 dark:border-gray-700'
+                          : 'bg-white dark:bg-slate-800 text-gray-700 dark:text-gray-300 border border-purple-200/60 dark:border-slate-700'
                       }`}
                     >
                       {m} oy
@@ -1247,7 +1247,7 @@ export const TelegramMiniApp: React.FC = () => {
               {selectedProduct.specs && Object.keys(selectedProduct.specs).length > 0 && (
                 <div className="space-y-1.5 pt-1">
                   <h4 className="font-bold text-xs text-gray-900 dark:text-white">Texnik xususiyatlari:</h4>
-                  <div className="bg-gray-50 dark:bg-gray-800/40 rounded-xl p-2.5 space-y-1 text-xs">
+                  <div className="bg-gray-50 dark:bg-slate-750/50 rounded-xl p-2.5 space-y-1 text-xs">
                     {Object.entries(selectedProduct.specs).slice(0, 6).map(([k, v]) => (
                       <div key={k} className="flex justify-between text-gray-600 dark:text-gray-300 text-[11px]">
                         <span className="text-gray-400">{k}:</span>
@@ -1270,13 +1270,13 @@ export const TelegramMiniApp: React.FC = () => {
             </div>
 
             {/* Sticky Sheet Action Bar */}
-            <div className="p-3 bg-white dark:bg-slate-800 border-t border-gray-100 dark:border-gray-800 grid grid-cols-2 gap-2">
+            <div className="p-3 bg-white dark:bg-slate-800 border-t border-gray-100 dark:border-slate-700 grid grid-cols-2 gap-2">
               <button
                 onClick={(e) => {
                   handleAdd(e, selectedProduct);
                   setIsDetailOpen(false);
                 }}
-                className="py-2.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white font-bold text-xs flex items-center justify-center gap-1.5 active:scale-95"
+                className="py-2.5 rounded-xl bg-gray-100 dark:bg-slate-750 text-gray-900 dark:text-white font-bold text-xs flex items-center justify-center gap-1.5 active:scale-95"
               >
                 <ShoppingCart className="w-3.5 h-3.5" />
                 <span>Savatga</span>
@@ -1347,7 +1347,7 @@ export const TelegramMiniApp: React.FC = () => {
                     className={`py-2 px-2.5 rounded-xl font-bold text-xs transition-all ${
                       checkoutPaymentMode === 'installment'
                         ? 'bg-[#640199] text-white shadow'
-                        : 'bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700'
+                        : 'bg-gray-50 dark:bg-slate-750 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-slate-700'
                     }`}
                   >
                     ⚡ 0-0-12 Halol Nasiya
@@ -1361,7 +1361,7 @@ export const TelegramMiniApp: React.FC = () => {
                     className={`py-2 px-2.5 rounded-xl font-bold text-xs transition-all ${
                       checkoutPaymentMode === 'full'
                         ? 'bg-[#640199] text-white shadow'
-                        : 'bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700'
+                        : 'bg-gray-50 dark:bg-slate-750 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-slate-700'
                     }`}
                   >
                     💳 Naqd / Karta
@@ -1385,7 +1385,7 @@ export const TelegramMiniApp: React.FC = () => {
                         className={`py-1.5 rounded-xl font-bold text-xs transition-all ${
                           checkoutMonths === m
                             ? 'bg-[#640199] text-white shadow'
-                            : 'bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700'
+                            : 'bg-gray-50 dark:bg-slate-750 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-slate-700'
                         }`}
                       >
                         {m} oy
@@ -1404,7 +1404,7 @@ export const TelegramMiniApp: React.FC = () => {
                   value={checkoutName}
                   onChange={(e) => setCheckoutName(e.target.value)}
                   placeholder="Masalan: Sardor Aliyev"
-                  className="w-full px-3 py-2 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 focus:outline-none focus:border-purple-600 text-xs"
+                  className="w-full px-3 py-2 rounded-xl bg-gray-50 dark:bg-slate-750 border border-gray-200 dark:border-slate-700 focus:outline-none focus:border-purple-600 text-xs text-gray-900 dark:text-white"
                 />
               </div>
 
@@ -1417,7 +1417,7 @@ export const TelegramMiniApp: React.FC = () => {
                   value={checkoutPhone}
                   onChange={(e) => setCheckoutPhone(e.target.value)}
                   placeholder="+998 90 123 45 67"
-                  className="w-full px-3 py-2 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 focus:outline-none focus:border-purple-600 text-xs font-mono"
+                  className="w-full px-3 py-2 rounded-xl bg-gray-50 dark:bg-slate-750 border border-gray-200 dark:border-slate-700 focus:outline-none focus:border-purple-600 text-xs font-mono text-gray-900 dark:text-white"
                 />
               </div>
 
@@ -1427,7 +1427,7 @@ export const TelegramMiniApp: React.FC = () => {
                 <select
                   value={checkoutRegion}
                   onChange={(e) => setCheckoutRegion(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 focus:outline-none focus:border-purple-600 text-xs"
+                  className="w-full px-3 py-2 rounded-xl bg-gray-50 dark:bg-slate-750 border border-gray-200 dark:border-slate-700 focus:outline-none focus:border-purple-600 text-xs text-gray-900 dark:text-white"
                 >
                   {REGIONS.map(r => (
                     <option key={r} value={r}>{r}</option>
@@ -1444,7 +1444,7 @@ export const TelegramMiniApp: React.FC = () => {
                   value={checkoutAddress}
                   onChange={(e) => setCheckoutAddress(e.target.value)}
                   placeholder="Masalan: Chilonzor tumani, 9-mavze, 12-uy"
-                  className="w-full px-3 py-2 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 focus:outline-none focus:border-purple-600 text-xs"
+                  className="w-full px-3 py-2 rounded-xl bg-gray-50 dark:bg-slate-750 border border-gray-200 dark:border-slate-700 focus:outline-none focus:border-purple-600 text-xs text-gray-900 dark:text-white"
                 />
               </div>
 
@@ -1487,7 +1487,7 @@ export const TelegramMiniApp: React.FC = () => {
               </p>
             </div>
 
-            <div className="bg-gray-50 dark:bg-gray-800/60 rounded-2xl p-3 text-left space-y-1.5 text-xs">
+            <div className="bg-gray-50 dark:bg-slate-750/60 rounded-2xl p-3 text-left space-y-1.5 text-xs">
               <div className="flex justify-between text-gray-600 dark:text-gray-300">
                 <span>Xaridor:</span>
                 <span className="font-bold">{orderSuccessData.customerName}</span>
@@ -1527,7 +1527,7 @@ export const TelegramMiniApp: React.FC = () => {
       )}
 
       {/* 10. FIXED NATIVE BOTTOM NAVIGATION BAR */}
-      <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-slate-800/95 backdrop-blur-md border-t border-gray-200/80 dark:border-gray-800/80 py-2 px-3 shadow-2xl">
+      <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-slate-800/95 backdrop-blur-md border-t border-gray-200/80 dark:border-slate-700/80 py-2 px-3 shadow-2xl">
         <div className="max-w-md mx-auto grid grid-cols-5 gap-1">
           {[
             { id: 'home', label: 'Asosiy', icon: Home },

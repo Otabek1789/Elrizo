@@ -108,7 +108,7 @@ interface StoreState {
   openCityModal: () => void;
   closeCityModal: () => void;
 
-  // Theme & Language (Light/Dark mode & UZ/RU/EN)
+  // Theme & Language (Light/Dark mode & UZ/RU)
   theme: Theme;
   setTheme: (theme: Theme) => void;
   toggleTheme: () => void;
@@ -899,12 +899,13 @@ export const useStore = create<StoreState>()(
         get().setTheme(next);
       },
 
-      // Language (UZ/RU/EN)
+      // Language (UZ/RU faqat O'zbek va Rus tillari, EN butunlay olib tashlangan)
       language: 'uz' as Language,
       setLanguage: (lang: Language) => {
-        set({ language: lang });
+        const safeLang: Language = lang === 'ru' ? 'ru' : 'uz';
+        set({ language: safeLang });
         if (typeof document !== 'undefined') {
-          document.documentElement.lang = lang;
+          document.documentElement.lang = safeLang;
         }
       },
       t: (key: TranslationKey) => getTranslation(get().language, key),
@@ -929,6 +930,10 @@ export const useStore = create<StoreState>()(
           } catch (e) {}
         }
         if (state) {
+          // Ingliz tilini butunlay yo'q qilish: foydalanuvchi brauzerida eski "en" qolgan bo'lsa darhol "uz"ga majburlash
+          if ((state as any).language !== 'ru' && (state as any).language !== 'uz') {
+            state.language = 'uz';
+          }
           if (!state.products || state.products.length === 0) {
             state.products = PRODUCTS;
           } else {
