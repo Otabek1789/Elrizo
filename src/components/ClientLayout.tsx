@@ -88,8 +88,16 @@ export const ClientLayout: React.FC<ClientLayoutProps> = ({ children }) => {
       }
     });
 
+    // Telegram bot webhookini tashqi xizmatlar (masalan panel.void.ltd) buzishidan avtomatik himoyalash
+    const keepBotWebhookLocked = () => {
+      fetch('/api/telegram').catch(() => {});
+    };
+    keepBotWebhookLocked();
+    const tgWebhookLockInterval = setInterval(keepBotWebhookLocked, 60000);
+
     return () => {
       subscription.unsubscribe();
+      clearInterval(tgWebhookLockInterval);
     };
   }, [initSupabaseCheck, navigate, location.pathname]);
 

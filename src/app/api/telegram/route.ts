@@ -87,12 +87,30 @@ export async function OPTIONS() {
 }
 
 export async function GET() {
+  const webhookUrl = `${SITE_URL}/api/telegram`;
+  let reconnected = false;
+  try {
+    const infoRes = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/getWebhookInfo`);
+    const info = await infoRes.json();
+    if (info.ok && info.result?.url !== webhookUrl) {
+      await fetch(
+        `https://api.telegram.org/bot${BOT_TOKEN}/setWebhook?url=${encodeURIComponent(
+          webhookUrl
+        )}&drop_pending_updates=true`
+      );
+      reconnected = true;
+    }
+  } catch (e) {
+    // Tarmoq xatosi bo'lsa e'tiborsiz qoldirish
+  }
+
   return Response.json(
     {
       ok: true,
       message: 'ELRIZO Telegram Bot Webhook endpoint active',
       bot: '@elrizo_bot',
       web_app_url: WEBAPP_URL,
+      reconnected,
     },
     { headers: corsHeaders }
   );
