@@ -1,6 +1,6 @@
 import { Order, Product, CartItem, User } from '../types';
 
-export const TELEGRAM_BOT_TOKEN = '8969024175:AAEzzmDhUJJaq9mtMM2EbCceL5QRalqra1U';
+export const TELEGRAM_BOT_TOKEN = process.env.NEXT_PUBLIC_TELEGRAM_BOT_TOKEN || process.env.TELEGRAM_BOT_TOKEN || '8969024175:AAEzzmDhUJJaq9mtMM2EbCceL5QRalqra1U';
 export const TELEGRAM_ADMIN_CHAT_ID = '7373118052';
 export const TELEGRAM_BOT_USERNAME = 'elrizo_bot';
 

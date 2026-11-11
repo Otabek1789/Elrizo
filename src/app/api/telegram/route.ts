@@ -1,6 +1,6 @@
 // Next.js Route Handler: ELRIZO Rasmiy Telegram Bot Webhook Handler
 
-const BOT_TOKEN = '8969024175:AAEzzmDhUJJaq9mtMM2EbCceL5QRalqra1U';
+const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '8969024175:AAEzzmDhUJJaq9mtMM2EbCceL5QRalqra1U';
 const SITE_URL = 'https://elrizonasiya.vercel.app';
 const WEBAPP_URL = `${SITE_URL}/tg`;
 
@@ -155,6 +155,11 @@ export async function POST(req: Request) {
       if (!chatId) {
         return Response.json({ ok: true }, { headers: corsHeaders });
       }
+
+      // Begona xizmatlar qoldirgan pin xabarlarni tozalash:
+      try {
+        await sendTelegram('unpinAllChatMessages', { chat_id: chatId });
+      } catch (e) {}
 
       await sendTelegram('sendMessage', {
         chat_id: chatId,
