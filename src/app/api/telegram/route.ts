@@ -224,23 +224,10 @@ export async function GET() {
   );
 }
 
-export async function POST(req: Request) {
-  // Webhookni tashqi xizmatlar buzib qo'yishidan doimiy himoya qilish:
-  try {
-    const webhookUrl = `${SITE_URL}/api/telegram`;
-    const infoRes = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/getWebhookInfo`);
-    const info = await infoRes.json();
-    if (info.ok && info.result?.url !== webhookUrl) {
-      await fetch(
-        `https://api.telegram.org/bot${BOT_TOKEN}/setWebhook?url=${encodeURIComponent(
-          webhookUrl
-        )}&drop_pending_updates=true`
-      );
-    }
-  } catch (e) {
-    // Tarmoq xatosi bo'lsa davom etish
-  }
+export const dynamic = 'force-dynamic';
+export const maxDuration = 15;
 
+export async function POST(req: Request) {
   let update: any;
   try {
     update = await req.json();
@@ -254,8 +241,8 @@ export async function POST(req: Request) {
   }
 
   try {
-    // 1. Foydalanuvchi xabar yozganda (har qanday xabar: /start, matn yoki savol)
-    // Bot ochilganda yoki xabar kelganda birinchi bo'lib tilni so'raymiz!
+    // 1. Foydalanuvchi xabar yozganda (/start yoki ixtiyoriy matn)
+    // Eng tez javob qaytarish: ortiqcha kutishlarsiz zudlik bilan yuboriladi
     if (update.message) {
       const msg = update.message;
       const chatId = msg.chat?.id;
@@ -264,12 +251,7 @@ export async function POST(req: Request) {
         return Response.json({ ok: true }, { headers: corsHeaders });
       }
 
-      // Begona xizmatlar qoldirgan pin xabarlarni tozalash:
-      try {
-        await sendTelegram('unpinAllChatMessages', { chat_id: chatId });
-      } catch (e) {}
-
-      // Oldin tilni tanlash kartochkasi yuboriladi (aynan foydalanuvchi xohlagandek)
+      // Zudlik bilan til tanlash kartochkasi yuboriladi (kechikishlarsiz)
       await sendTelegram('sendMessage', {
         chat_id: chatId,
         text: getLanguagePromptText(),
@@ -293,226 +275,238 @@ export async function POST(req: Request) {
         // A) Til tanlashda o'zgarish (radio button kabi nuqta o'zgaradi va toast chiqadi)
         if (data === 'lang_uz_uz' || data === 'set_lang_uz') {
           // O'zbek tili allaqachon tanlangan edi yoki bosildi -> Menyu ochiladi
-          let res: any = null;
-          if (messageId) {
-            res = await sendTelegram('editMessageText', {
-              chat_id: chatId,
-              message_id: messageId,
-              text: getWelcomeCardUz(safeFirstName),
-              parse_mode: 'HTML',
-              reply_markup: { inline_keyboard: keyboardUz },
-            });
-          }
-          if (!res?.ok) {
-            await sendTelegram('sendMessage', {
-              chat_id: chatId,
-              text: getWelcomeCardUz(safeFirstName),
-              parse_mode: 'HTML',
-              reply_markup: { inline_keyboard: keyboardUz },
-            });
-          }
-          await sendTelegram('answerCallbackQuery', {
-            callback_query_id: cb.id,
-            text: "🇺🇿 O'zbek tili tanlandi",
-          });
+          const editTask = messageId
+            ? sendTelegram('editMessageText', {
+                chat_id: chatId,
+                message_id: messageId,
+                text: getWelcomeCardUz(safeFirstName),
+                parse_mode: 'HTML',
+                reply_markup: { inline_keyboard: keyboardUz },
+              })
+            : sendTelegram('sendMessage', {
+                chat_id: chatId,
+                text: getWelcomeCardUz(safeFirstName),
+                parse_mode: 'HTML',
+                reply_markup: { inline_keyboard: keyboardUz },
+              });
+
+          await Promise.all([
+            sendTelegram('answerCallbackQuery', {
+              callback_query_id: cb.id,
+              text: "🇺🇿 O'zbek tili tanlandi",
+            }),
+            editTask,
+          ]);
           return Response.json({ ok: true }, { headers: corsHeaders });
         }
 
         if (data === 'lang_uz_ru' || data === 'lang_uz_en') {
           // Ruscha yoki inglizchadan o'zbekchaga o'tkazish
-          if (messageId) {
-            await sendTelegram('editMessageText', {
-              chat_id: chatId,
-              message_id: messageId,
-              text: getLanguagePromptText(),
-              reply_markup: { inline_keyboard: getLanguageKeyboard('uz') },
-            });
-          }
-          await sendTelegram('answerCallbackQuery', {
-            callback_query_id: cb.id,
-            text: "🇺🇿 O'zbek tili tanlandi. ⬅️ Menyu tugmasini bosing",
-          });
+          const editTask = messageId
+            ? sendTelegram('editMessageText', {
+                chat_id: chatId,
+                message_id: messageId,
+                text: getLanguagePromptText(),
+                reply_markup: { inline_keyboard: getLanguageKeyboard('uz') },
+              })
+            : Promise.resolve();
+
+          await Promise.all([
+            sendTelegram('answerCallbackQuery', {
+              callback_query_id: cb.id,
+              text: "🇺🇿 O'zbek tili tanlandi. ⬅️ Menyu tugmasini bosing",
+            }),
+            editTask,
+          ]);
           return Response.json({ ok: true }, { headers: corsHeaders });
         }
 
         if (data === 'lang_ru_ru' || data === 'set_lang_ru') {
           // Rus tili allaqachon tanlangan edi yoki bosildi -> Menyu ochiladi
-          let res: any = null;
-          if (messageId) {
-            res = await sendTelegram('editMessageText', {
-              chat_id: chatId,
-              message_id: messageId,
-              text: getWelcomeCardRu(safeFirstName),
-              parse_mode: 'HTML',
-              reply_markup: { inline_keyboard: keyboardRu },
-            });
-          }
-          if (!res?.ok) {
-            await sendTelegram('sendMessage', {
-              chat_id: chatId,
-              text: getWelcomeCardRu(safeFirstName),
-              parse_mode: 'HTML',
-              reply_markup: { inline_keyboard: keyboardRu },
-            });
-          }
-          await sendTelegram('answerCallbackQuery', {
-            callback_query_id: cb.id,
-            text: "🇷🇺 Выбран русский язык",
-          });
+          const editTask = messageId
+            ? sendTelegram('editMessageText', {
+                chat_id: chatId,
+                message_id: messageId,
+                text: getWelcomeCardRu(safeFirstName),
+                parse_mode: 'HTML',
+                reply_markup: { inline_keyboard: keyboardRu },
+              })
+            : sendTelegram('sendMessage', {
+                chat_id: chatId,
+                text: getWelcomeCardRu(safeFirstName),
+                parse_mode: 'HTML',
+                reply_markup: { inline_keyboard: keyboardRu },
+              });
+
+          await Promise.all([
+            sendTelegram('answerCallbackQuery', {
+              callback_query_id: cb.id,
+              text: "🇷🇺 Выбран русский язык",
+            }),
+            editTask,
+          ]);
           return Response.json({ ok: true }, { headers: corsHeaders });
         }
 
         if (data === 'lang_ru_uz' || data === 'lang_ru_en') {
           // O'zbekcha yoki inglizchadan ruschaga o'tkazish
-          if (messageId) {
-            await sendTelegram('editMessageText', {
-              chat_id: chatId,
-              message_id: messageId,
-              text: getLanguagePromptText(),
-              reply_markup: { inline_keyboard: getLanguageKeyboard('ru') },
-            });
-          }
-          await sendTelegram('answerCallbackQuery', {
-            callback_query_id: cb.id,
-            text: "🇷🇺 Выбран русский язык. Нажмите «⬅️ Menyu»",
-          });
+          const editTask = messageId
+            ? sendTelegram('editMessageText', {
+                chat_id: chatId,
+                message_id: messageId,
+                text: getLanguagePromptText(),
+                reply_markup: { inline_keyboard: getLanguageKeyboard('ru') },
+              })
+            : Promise.resolve();
+
+          await Promise.all([
+            sendTelegram('answerCallbackQuery', {
+              callback_query_id: cb.id,
+              text: "🇷🇺 Выбран русский язык. Нажмите «⬅️ Menyu»",
+            }),
+            editTask,
+          ]);
           return Response.json({ ok: true }, { headers: corsHeaders });
         }
 
         if (data === 'lang_en_en' || data === 'set_lang_en') {
           // Ingliz tili allaqachon tanlangan edi yoki bosildi -> Menyu ochiladi
-          let res: any = null;
-          if (messageId) {
-            res = await sendTelegram('editMessageText', {
-              chat_id: chatId,
-              message_id: messageId,
-              text: getWelcomeCardEn(safeFirstName),
-              parse_mode: 'HTML',
-              reply_markup: { inline_keyboard: keyboardEn },
-            });
-          }
-          if (!res?.ok) {
-            await sendTelegram('sendMessage', {
-              chat_id: chatId,
-              text: getWelcomeCardEn(safeFirstName),
-              parse_mode: 'HTML',
-              reply_markup: { inline_keyboard: keyboardEn },
-            });
-          }
-          await sendTelegram('answerCallbackQuery', {
-            callback_query_id: cb.id,
-            text: "🇬🇧 English selected",
-          });
+          const editTask = messageId
+            ? sendTelegram('editMessageText', {
+                chat_id: chatId,
+                message_id: messageId,
+                text: getWelcomeCardEn(safeFirstName),
+                parse_mode: 'HTML',
+                reply_markup: { inline_keyboard: keyboardEn },
+              })
+            : sendTelegram('sendMessage', {
+                chat_id: chatId,
+                text: getWelcomeCardEn(safeFirstName),
+                parse_mode: 'HTML',
+                reply_markup: { inline_keyboard: keyboardEn },
+              });
+
+          await Promise.all([
+            sendTelegram('answerCallbackQuery', {
+              callback_query_id: cb.id,
+              text: "🇬🇧 English selected",
+            }),
+            editTask,
+          ]);
           return Response.json({ ok: true }, { headers: corsHeaders });
         }
 
         if (data === 'lang_en_uz' || data === 'lang_en_ru') {
           // O'zbekcha yoki ruschadan inglizchaga o'tkazish
-          if (messageId) {
-            await sendTelegram('editMessageText', {
-              chat_id: chatId,
-              message_id: messageId,
-              text: getLanguagePromptText(),
-              reply_markup: { inline_keyboard: getLanguageKeyboard('en') },
-            });
-          }
-          await sendTelegram('answerCallbackQuery', {
-            callback_query_id: cb.id,
-            text: "🇬🇧 English selected. Press «⬅️ Menyu»",
-          });
+          const editTask = messageId
+            ? sendTelegram('editMessageText', {
+                chat_id: chatId,
+                message_id: messageId,
+                text: getLanguagePromptText(),
+                reply_markup: { inline_keyboard: getLanguageKeyboard('en') },
+              })
+            : Promise.resolve();
+
+          await Promise.all([
+            sendTelegram('answerCallbackQuery', {
+              callback_query_id: cb.id,
+              text: "🇬🇧 English selected. Press «⬅️ Menyu»",
+            }),
+            editTask,
+          ]);
           return Response.json({ ok: true }, { headers: corsHeaders });
         }
 
         // B) Menyu tugmasi bosilganda (⬅️ Menyu)
         if (data === 'menu_uz' || data === 'open_menu') {
-          let res: any = null;
-          if (messageId) {
-            res = await sendTelegram('editMessageText', {
-              chat_id: chatId,
-              message_id: messageId,
-              text: getWelcomeCardUz(safeFirstName),
-              parse_mode: 'HTML',
-              reply_markup: { inline_keyboard: keyboardUz },
-            });
-          }
-          if (!res?.ok) {
-            await sendTelegram('sendMessage', {
-              chat_id: chatId,
-              text: getWelcomeCardUz(safeFirstName),
-              parse_mode: 'HTML',
-              reply_markup: { inline_keyboard: keyboardUz },
-            });
-          }
-          await sendTelegram('answerCallbackQuery', { callback_query_id: cb.id });
+          const editTask = messageId
+            ? sendTelegram('editMessageText', {
+                chat_id: chatId,
+                message_id: messageId,
+                text: getWelcomeCardUz(safeFirstName),
+                parse_mode: 'HTML',
+                reply_markup: { inline_keyboard: keyboardUz },
+              })
+            : sendTelegram('sendMessage', {
+                chat_id: chatId,
+                text: getWelcomeCardUz(safeFirstName),
+                parse_mode: 'HTML',
+                reply_markup: { inline_keyboard: keyboardUz },
+              });
+
+          await Promise.all([
+            sendTelegram('answerCallbackQuery', { callback_query_id: cb.id }),
+            editTask,
+          ]);
           return Response.json({ ok: true }, { headers: corsHeaders });
         }
 
         if (data === 'menu_ru') {
-          let res: any = null;
-          if (messageId) {
-            res = await sendTelegram('editMessageText', {
-              chat_id: chatId,
-              message_id: messageId,
-              text: getWelcomeCardRu(safeFirstName),
-              parse_mode: 'HTML',
-              reply_markup: { inline_keyboard: keyboardRu },
-            });
-          }
-          if (!res?.ok) {
-            await sendTelegram('sendMessage', {
-              chat_id: chatId,
-              text: getWelcomeCardRu(safeFirstName),
-              parse_mode: 'HTML',
-              reply_markup: { inline_keyboard: keyboardRu },
-            });
-          }
-          await sendTelegram('answerCallbackQuery', { callback_query_id: cb.id });
+          const editTask = messageId
+            ? sendTelegram('editMessageText', {
+                chat_id: chatId,
+                message_id: messageId,
+                text: getWelcomeCardRu(safeFirstName),
+                parse_mode: 'HTML',
+                reply_markup: { inline_keyboard: keyboardRu },
+              })
+            : sendTelegram('sendMessage', {
+                chat_id: chatId,
+                text: getWelcomeCardRu(safeFirstName),
+                parse_mode: 'HTML',
+                reply_markup: { inline_keyboard: keyboardRu },
+              });
+
+          await Promise.all([
+            sendTelegram('answerCallbackQuery', { callback_query_id: cb.id }),
+            editTask,
+          ]);
           return Response.json({ ok: true }, { headers: corsHeaders });
         }
 
         if (data === 'menu_en') {
-          let res: any = null;
-          if (messageId) {
-            res = await sendTelegram('editMessageText', {
-              chat_id: chatId,
-              message_id: messageId,
-              text: getWelcomeCardEn(safeFirstName),
-              parse_mode: 'HTML',
-              reply_markup: { inline_keyboard: keyboardEn },
-            });
-          }
-          if (!res?.ok) {
-            await sendTelegram('sendMessage', {
-              chat_id: chatId,
-              text: getWelcomeCardEn(safeFirstName),
-              parse_mode: 'HTML',
-              reply_markup: { inline_keyboard: keyboardEn },
-            });
-          }
-          await sendTelegram('answerCallbackQuery', { callback_query_id: cb.id });
+          const editTask = messageId
+            ? sendTelegram('editMessageText', {
+                chat_id: chatId,
+                message_id: messageId,
+                text: getWelcomeCardEn(safeFirstName),
+                parse_mode: 'HTML',
+                reply_markup: { inline_keyboard: keyboardEn },
+              })
+            : sendTelegram('sendMessage', {
+                chat_id: chatId,
+                text: getWelcomeCardEn(safeFirstName),
+                parse_mode: 'HTML',
+                reply_markup: { inline_keyboard: keyboardEn },
+              });
+
+          await Promise.all([
+            sendTelegram('answerCallbackQuery', { callback_query_id: cb.id }),
+            editTask,
+          ]);
           return Response.json({ ok: true }, { headers: corsHeaders });
         }
 
         // C) Tilni o'zgartirish tugmasi bosilganda (Main menudan qaytish)
         if (data.startsWith('choose_lang') || data === 'choose_language') {
           const lang = data.includes('_ru') ? 'ru' : data.includes('_en') ? 'en' : 'uz';
-          let res: any = null;
-          if (messageId) {
-            res = await sendTelegram('editMessageText', {
-              chat_id: chatId,
-              message_id: messageId,
-              text: getLanguagePromptText(),
-              reply_markup: { inline_keyboard: getLanguageKeyboard(lang) },
-            });
-          }
-          if (!res?.ok) {
-            await sendTelegram('sendMessage', {
-              chat_id: chatId,
-              text: getLanguagePromptText(),
-              reply_markup: { inline_keyboard: getLanguageKeyboard(lang) },
-            });
-          }
-          await sendTelegram('answerCallbackQuery', { callback_query_id: cb.id });
+          const editTask = messageId
+            ? sendTelegram('editMessageText', {
+                chat_id: chatId,
+                message_id: messageId,
+                text: getLanguagePromptText(),
+                reply_markup: { inline_keyboard: getLanguageKeyboard(lang) },
+              })
+            : sendTelegram('sendMessage', {
+                chat_id: chatId,
+                text: getLanguagePromptText(),
+                reply_markup: { inline_keyboard: getLanguageKeyboard(lang) },
+              });
+
+          await Promise.all([
+            sendTelegram('answerCallbackQuery', { callback_query_id: cb.id }),
+            editTask,
+          ]);
           return Response.json({ ok: true }, { headers: corsHeaders });
         }
       }
