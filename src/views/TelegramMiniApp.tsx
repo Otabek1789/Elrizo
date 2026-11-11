@@ -127,7 +127,18 @@ export const TelegramMiniApp: React.FC = () => {
         );
       }
     }
-  }, []);
+
+    // Query parametrdan tilni o'qib olish (masalan ?lang=uz yoki ?lang=ru)
+    if (typeof window !== 'undefined') {
+      try {
+        const params = new URLSearchParams(window.location.search);
+        const urlLang = params.get('lang');
+        if (urlLang === 'uz' || urlLang === 'ru') {
+          setLanguage(urlLang);
+        }
+      } catch (e) {}
+    }
+  }, [setLanguage]);
 
   // Filter Products
   const filteredProducts = useMemo(() => {

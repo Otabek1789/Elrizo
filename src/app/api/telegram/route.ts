@@ -42,7 +42,26 @@ async function sendTelegram(method: string, body: Record<string, any>) {
   }
 }
 
-function getOfficialWelcomeCard(firstName: string = 'Hurmatli mijoz'): string {
+// Language selection prompt (Bot ochilganda birinchi bo'lib tilni so'rash)
+function getLanguagePromptCard(): string {
+  return `Assalomu alaykum! / Здравствуйте! 👋
+
+🌟 <b>ELRIZO NASIYA SAVDO</b> rasmiy Telegram do'koniga xush kelibsiz!
+🌟 Добро пожаловать в официальный Telegram-магазин <b>ELRIZO НАРИЯ САВДО</b>!
+
+👇 <b>Iltimos, muloqot tilini tanlang:</b>
+👇 <b>Пожалуйста, выберите язык обслуживания:</b>`;
+}
+
+const languageSelectKeyboard = [
+  [
+    { text: "🇺🇿 O'zbekcha", callback_data: "set_lang_uz" },
+    { text: "🇷🇺 Русский", callback_data: "set_lang_ru" }
+  ]
+];
+
+// O'zbekcha rasmiy kartochka
+function getWelcomeCardUz(firstName: string = 'Hurmatli mijoz'): string {
   return `Assalomu alaykum, <b>${escapeHtml(firstName)}</b>! 👋
 
 🌟 <b>ELRIZO NASIYA SAVDO</b> — 0-0-12 Halol Nasiya Savdo rasmiy Telegram do'koniga xush kelibsiz!
@@ -63,13 +82,51 @@ Biz bilan qulay va xavfsiz xarid qiling:
 👇 <b>Do'konni ochish uchun quyidagi tugmani bosing:</b>`;
 }
 
-const officialInlineKeyboard = [
+const keyboardUz = [
   [
-    { text: "🛍️ ELRIZO Mini App (Do'konni ochish)", web_app: { url: WEBAPP_URL } }
+    { text: "🛍️ ELRIZO Mini App (Do'konni ochish)", web_app: { url: `${WEBAPP_URL}?lang=uz` } }
   ],
   [
     { text: "💬 Telegram Admin (@yahyo0526)", url: "https://t.me/yahyo0526" },
     { text: "🌐 Rasmiy saytga o'tish", url: SITE_URL }
+  ],
+  [
+    { text: "🔄 Tilni o'zgartirish / Сменить язык", callback_data: "choose_language" }
+  ]
+];
+
+// Ruscha rasmiy kartochka
+function getWelcomeCardRu(firstName: string = 'Уважаемый клиент'): string {
+  return `Здравствуйте, <b>${escapeHtml(firstName)}</b>! 👋
+
+🌟 Добро пожаловать в официальный Telegram-магазин <b>ELRIZO НАРИЯ САВДО</b> — рассрочка 0-0-12!
+
+Покупайте удобно и безопасно:
+⚡ <b>0% Первый взнос</b> — ничего не платите заранее
+⚡ <b>0% Переплата (без наценок)</b> — удобный срок до 12 месяцев
+🚚 <b>Бесплатная доставка за 24 часа</b> по всему Узбекистану
+🛡️ <b>1 год официальной гарантии</b> на все товары
+
+🏢 <b>Информация о магазине:</b>
+☎️ <b>Телефон:</b> +998 94 333 55 22
+💬 <b>Telegram админ:</b> @yahyo0526
+⏰ <b>Время работы:</b> Ежедневно с 09:00 до 21:00 (без выходных)
+📍 <b>Адрес:</b> г. Наманган, Янгикурганский район
+🌐 <b>Официальный сайт:</b> https://elrizonasiya.vercel.app
+
+👇 <b>Нажмите кнопку ниже, чтобы открыть магазин:</b>`;
+}
+
+const keyboardRu = [
+  [
+    { text: "🛍️ Открыть магазин (Mini App)", web_app: { url: `${WEBAPP_URL}?lang=ru` } }
+  ],
+  [
+    { text: "💬 Telegram Админ (@yahyo0526)", url: "https://t.me/yahyo0526" },
+    { text: "🌐 Перейти на сайт", url: SITE_URL }
+  ],
+  [
+    { text: "🔄 Сменить язык / Tilni o'zgartirish", callback_data: "choose_language" }
   ]
 ];
 
@@ -147,10 +204,10 @@ export async function POST(req: Request) {
 
   try {
     // 1. Foydalanuvchi xabar yozganda (har qanday xabar: /start, matn yoki savol)
+    // Bot ochilganda yoki xabar kelganda birinchi bo'lib tilni so'raymiz!
     if (update.message) {
       const msg = update.message;
       const chatId = msg.chat?.id;
-      const safeFirstName = msg.from?.first_name || 'Hurmatli mijoz';
 
       if (!chatId) {
         return Response.json({ ok: true }, { headers: corsHeaders });
@@ -161,33 +218,111 @@ export async function POST(req: Request) {
         await sendTelegram('unpinAllChatMessages', { chat_id: chatId });
       } catch (e) {}
 
+      // Oldin tilni tanlash kartochkasi yuboriladi
       await sendTelegram('sendMessage', {
         chat_id: chatId,
-        text: getOfficialWelcomeCard(safeFirstName),
+        text: getLanguagePromptCard(),
         parse_mode: 'HTML',
         reply_markup: {
-          inline_keyboard: officialInlineKeyboard,
+          inline_keyboard: languageSelectKeyboard,
         },
       });
 
       return Response.json({ ok: true }, { headers: corsHeaders });
     }
 
-    // 2. Callback query (tugma bosilganda)
+    // 2. Callback query (til tanlanganda yoki tugma bosilganda)
     if (update.callback_query) {
       const cb = update.callback_query;
       const chatId = cb.message?.chat?.id;
+      const messageId = cb.message?.message_id;
+      const data = cb.data;
       const safeFirstName = cb.from?.first_name || 'Hurmatli mijoz';
 
       if (chatId) {
-        await sendTelegram('sendMessage', {
-          chat_id: chatId,
-          text: getOfficialWelcomeCard(safeFirstName),
-          parse_mode: 'HTML',
-          reply_markup: {
-            inline_keyboard: officialInlineKeyboard,
-          },
-        });
+        if (data === 'set_lang_uz') {
+          // Foydalanuvchi O'zbek tilini tanladi
+          let res: any = null;
+          if (messageId) {
+            res = await sendTelegram('editMessageText', {
+              chat_id: chatId,
+              message_id: messageId,
+              text: getWelcomeCardUz(safeFirstName),
+              parse_mode: 'HTML',
+              reply_markup: {
+                inline_keyboard: keyboardUz,
+              },
+            });
+          }
+          if (!res?.ok) {
+            await sendTelegram('sendMessage', {
+              chat_id: chatId,
+              text: getWelcomeCardUz(safeFirstName),
+              parse_mode: 'HTML',
+              reply_markup: {
+                inline_keyboard: keyboardUz,
+              },
+            });
+          }
+        } else if (data === 'set_lang_ru') {
+          // Foydalanuvchi Rus tilini tanladi
+          let res: any = null;
+          if (messageId) {
+            res = await sendTelegram('editMessageText', {
+              chat_id: chatId,
+              message_id: messageId,
+              text: getWelcomeCardRu(safeFirstName),
+              parse_mode: 'HTML',
+              reply_markup: {
+                inline_keyboard: keyboardRu,
+              },
+            });
+          }
+          if (!res?.ok) {
+            await sendTelegram('sendMessage', {
+              chat_id: chatId,
+              text: getWelcomeCardRu(safeFirstName),
+              parse_mode: 'HTML',
+              reply_markup: {
+                inline_keyboard: keyboardRu,
+              },
+            });
+          }
+        } else if (data === 'choose_language') {
+          // Foydalanuvchi tilni o'zgartirishni xohladi
+          let res: any = null;
+          if (messageId) {
+            res = await sendTelegram('editMessageText', {
+              chat_id: chatId,
+              message_id: messageId,
+              text: getLanguagePromptCard(),
+              parse_mode: 'HTML',
+              reply_markup: {
+                inline_keyboard: languageSelectKeyboard,
+              },
+            });
+          }
+          if (!res?.ok) {
+            await sendTelegram('sendMessage', {
+              chat_id: chatId,
+              text: getLanguagePromptCard(),
+              parse_mode: 'HTML',
+              reply_markup: {
+                inline_keyboard: languageSelectKeyboard,
+              },
+            });
+          }
+        } else {
+          // Boshqa har qanday noma'lum callback bo'lsa til tanlashga qaytarish
+          await sendTelegram('sendMessage', {
+            chat_id: chatId,
+            text: getLanguagePromptCard(),
+            parse_mode: 'HTML',
+            reply_markup: {
+              inline_keyboard: languageSelectKeyboard,
+            },
+          });
+        }
       }
 
       await sendTelegram('answerCallbackQuery', {
