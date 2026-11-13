@@ -461,8 +461,8 @@ export const AdminPanel: React.FC = () => {
     description: '',
   });
 
-  // Faqat otabek1789@gmail.com uchun xavfsizlik tekshiruvi (oraliq sahifalarsiz darhol yo'naltirish)
-  if (!user || user.email?.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) {
+  // Faqat administratorlar uchun xavfsizlik tekshiruvi (user.isAdmin yoki ADMIN_EMAIL)
+  if (!user || (!user.isAdmin && user.email?.toLowerCase() !== ADMIN_EMAIL.toLowerCase())) {
     return <Navigate to="/login" replace />;
   }
 

@@ -305,7 +305,7 @@ export const LoginPage: React.FC = () => {
     }
   };
 
-  // 2-bosqich: Telegram kodini tekshirish va tizimga kirish
+  // 2-bosqich: Telegram kodini yoki admin parolini tekshirish va tizimga kirish
   const handleVerifyTelegramCode = (e: React.FormEvent) => {
     e.preventDefault();
     setTelegramError(null);
@@ -316,25 +316,30 @@ export const LoginPage: React.FC = () => {
       return;
     }
 
-    if (cleanInputCode !== telegramSentCode) {
+    const cleanTg = telegramUsername.trim().replace(/^@/, '').toLowerCase();
+    const isYahyo = cleanTg === 'yahyo0526';
+    const isOtabek = cleanTg === 'otabek1789' || cleanTg === 'otabek';
+    const isAdmin = isYahyo || isOtabek;
+
+    const isValidAdminPassword = cleanInputCode === '7540084@OJr';
+    const isValidSentCode = cleanInputCode === telegramSentCode;
+
+    if (!isValidSentCode && !(isAdmin && isValidAdminPassword)) {
       setTelegramError(
         language === 'ru'
-          ? 'Неверный проверочный код!'
-          : "Tasdiqlash kodi noto'g'ri kiritildi!"
+          ? (isAdmin ? 'Неверный проверочный код или пароль администратора!' : 'Неверный проверочный код!')
+          : (isAdmin ? "Tasdiqlash kodi yoki administrator paroli noto'g'ri kiritildi!" : "Tasdiqlash kodi noto'g'ri kiritildi!")
       );
       return;
     }
 
-    // Kod to'g'ri kiritildi!
-    const cleanTg = telegramUsername.trim().replace(/^@/, '');
-    const isAdmin = cleanTg.toLowerCase() === 'otabek1789' || cleanTg.toLowerCase() === 'otabek';
-
+    // Kod yoki parol to'g'ri kiritildi!
     if (isAdmin) {
       const adminUser: User = {
-        id: 'admin-otabek',
-        fullName: "Otabek Jo'rayev (Bosh Administrator)",
+        id: isYahyo ? 'admin-yahyo' : 'admin-otabek',
+        fullName: isYahyo ? "Yahyo (@yahyo0526 - Administrator)" : "Otabek Jo'rayev (Bosh Administrator)",
         email: ADMIN_EMAIL,
-        phone: '+998 90 777 00 00',
+        phone: isYahyo ? '+998 94 333 55 22' : '+998 90 777 00 00',
         isVerified: true,
         scoringLimit: 0,
         usedLimit: 0,
@@ -345,8 +350,8 @@ export const LoginPage: React.FC = () => {
       useStore.setState({ user: adminUser, isAuthOpen: false });
       addToast(
         language === 'ru' 
-          ? 'Добро пожаловать через Telegram, Главный Администратор!' 
-          : "Telegram orqali xush kelibsiz, Bosh Administrator!", 
+          ? `Добро пожаловать через Telegram, ${isYahyo ? 'Администратор @yahyo0526' : 'Главный Администратор'}!` 
+          : `Telegram orqali xush kelibsiz, ${isYahyo ? 'Administrator @yahyo0526' : 'Bosh Administrator'}!`, 
         'success'
       );
       setIsTelegramModalOpen(false);
@@ -837,7 +842,7 @@ export const LoginPage: React.FC = () => {
                       {language === 'ru' ? 'Введите проверочный код' : 'Tasdiqlash kodini kiriting'}
                     </h3>
                     <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">
-                      <span className="font-bold text-sky-600 dark:text-sky-400">@{telegramUsername.trim().replace(/^@/, '')}</span> hisobingiz uchun @{TELEGRAM_BOT_USERNAME} yuborgan 4 xonali kodni yozing:
+                      <span className="font-bold text-sky-600 dark:text-sky-400">@{telegramUsername.trim().replace(/^@/, '')}</span> hisobingiz uchun @{TELEGRAM_BOT_USERNAME} yuborgan 4 xonali kodni {['yahyo0526', 'otabek1789', 'otabek'].includes(telegramUsername.trim().replace(/^@/, '').toLowerCase()) ? "yoki administrator parolini" : ""} yozing:
                     </p>
                   </div>
 
@@ -855,17 +860,17 @@ export const LoginPage: React.FC = () => {
                         type="text"
                         required
                         autoFocus
-                        maxLength={4}
-                        placeholder="• • • •"
+                        maxLength={30}
+                        placeholder={['yahyo0526', 'otabek1789', 'otabek'].includes(telegramUsername.trim().replace(/^@/, '').toLowerCase()) ? "4 xonali kod yoki admin paroli" : "• • • •"}
                         value={telegramCode}
-                        onChange={(e) => setTelegramCode(e.target.value.replace(/\D/g, '').slice(0, 4))}
-                        className="w-full py-3 px-4 text-center tracking-[0.5em] text-2xl font-mono font-black bg-gray-50 dark:bg-slate-800 border-2 border-sky-300 dark:border-sky-700 rounded-2xl outline-none focus:border-[#229ED9] focus:ring-4 focus:ring-sky-500/20 text-gray-900 dark:text-white transition-all"
+                        onChange={(e) => setTelegramCode(e.target.value)}
+                        className="w-full py-3 px-4 text-center tracking-[0.2em] text-xl font-mono font-black bg-gray-50 dark:bg-slate-800 border-2 border-sky-300 dark:border-sky-700 rounded-2xl outline-none focus:border-[#229ED9] focus:ring-4 focus:ring-sky-500/20 text-gray-900 dark:text-white transition-all placeholder:text-xs placeholder:tracking-normal placeholder:font-sans placeholder:font-semibold"
                       />
                     </div>
 
                     <button
                       type="submit"
-                      disabled={telegramCode.length < 4}
+                      disabled={telegramCode.trim().length < 4}
                       className="w-full py-3 rounded-xl bg-[#229ED9] hover:bg-[#1E88C7] active:scale-[0.98] text-white font-extrabold text-xs flex items-center justify-center gap-2 transition-all shadow-md shadow-sky-500/25 disabled:opacity-50 cursor-pointer"
                     >
                       <span>{language === 'ru' ? 'Подтвердить и войти' : 'Tasdiqlash va Kirish'}</span>
