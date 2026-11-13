@@ -1542,9 +1542,9 @@ export const TelegramMiniApp: React.FC = () => {
                       });
                       openPaymentCheckout(url);
                     }}
-                    className="py-2.5 px-3 rounded-xl bg-teal-500 hover:bg-teal-600 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow active:scale-95 transition-transform"
+                    className="py-2.5 px-3 rounded-xl bg-white hover:bg-gray-50 border border-teal-300 dark:border-teal-700 text-teal-800 font-bold text-xs flex items-center justify-center gap-1.5 shadow active:scale-95 transition-transform"
                   >
-                    <span>payme</span>
+                    <img src="/payments/payme.png" alt="Payme" className="h-4 w-auto object-contain" />
                   </button>
                   <button
                     type="button"
@@ -1557,9 +1557,9 @@ export const TelegramMiniApp: React.FC = () => {
                       });
                       openPaymentCheckout(url);
                     }}
-                    className="py-2.5 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow active:scale-95 transition-transform"
+                    className="py-2.5 px-3 rounded-xl bg-white hover:bg-gray-50 border border-blue-300 dark:border-blue-700 text-blue-800 font-bold text-xs flex items-center justify-center gap-1.5 shadow active:scale-95 transition-transform"
                   >
-                    <span>CLICK UP</span>
+                    <img src="/payments/click.png" alt="Click" className="h-4 w-auto object-contain" />
                   </button>
                 </div>
               </div>

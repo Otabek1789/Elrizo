@@ -107,8 +107,8 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
                     : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 bg-white dark:bg-slate-800'
                 }`}
               >
-                <div className="w-10 h-10 rounded-xl bg-blue-600 text-white font-black text-xs flex items-center justify-center shadow">
-                  CLICK
+                <div className="w-14 h-10 px-1.5 rounded-xl bg-white dark:bg-white flex items-center justify-center shadow-xs border border-gray-100 dark:border-slate-200">
+                  <img src="/payments/click.png" alt="Click" className="h-5 w-auto object-contain max-w-full" />
                 </div>
                 <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
                   Click
@@ -126,8 +126,8 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
                     : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 bg-white dark:bg-slate-800'
                 }`}
               >
-                <div className="w-10 h-10 rounded-xl bg-teal-500 text-white font-black text-xs flex items-center justify-center shadow">
-                  payme
+                <div className="w-14 h-10 px-1.5 rounded-xl bg-white dark:bg-white flex items-center justify-center shadow-xs border border-gray-100 dark:border-slate-200">
+                  <img src="/payments/payme.png" alt="Payme" className="h-5 w-auto object-contain max-w-full" />
                 </div>
                 <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
                   Payme
@@ -145,8 +145,8 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
                     : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 bg-white dark:bg-slate-800'
                 }`}
               >
-                <div className="w-10 h-10 rounded-xl bg-purple-600 text-white font-black text-xs flex items-center justify-center shadow">
-                  uzum
+                <div className="w-14 h-10 px-1.5 rounded-xl bg-white dark:bg-white flex items-center justify-center shadow-xs border border-gray-100 dark:border-slate-200">
+                  <img src="/payments/uzumpay.png" alt="Uzum Pay" className="h-5 w-auto object-contain max-w-full" />
                 </div>
                 <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
                   Uzum Pay
