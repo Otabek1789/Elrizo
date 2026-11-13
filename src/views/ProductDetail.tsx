@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useParams, useNavigate, Link } from '@/lib/navigation';
 import { 
   Star, 
@@ -58,17 +58,90 @@ export const ProductDetail: React.FC = () => {
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState<'specs' | 'description' | 'reviews'>('specs');
 
-  // Colors & Storage Variants State
-  const availableColors = product.colors && product.colors.length > 0 ? product.colors : DEFAULT_PRODUCT_COLORS;
-  const availableStorage = product.storageOptions && product.storageOptions.length > 0 ? product.storageOptions : DEFAULT_STORAGE_OPTIONS;
+  // Ushbu tovar smartfon/telefon ekanligini aniqlash (Faqat telefonlarda rang va xotira varianti bo'ladi)
+  // Noutbuklar va boshqa tovarlar (Tefal, maishiy texnika va h.k.) uchun rang/xotira bloklari umuman chiqmaydi!
+  const isPhoneProduct = useMemo(() => {
+    if (product.colors && product.colors.length > 0) return true;
+    if (product.categoryId === 'cat-smartphones') {
+      const titleLower = (product.title || '').toLowerCase();
+      // Soat, naushnik, konsollarni chiqarib tashlaymiz
+      if (
+        titleLower.includes('watch') ||
+        titleLower.includes('soat') ||
+        titleLower.includes('airpods') ||
+        titleLower.includes('quloqchin') ||
+        titleLower.includes('naushnik') ||
+        titleLower.includes('playstation') ||
+        titleLower.includes('ps5')
+      ) {
+        return false;
+      }
+      return true;
+    }
+    return false;
+  }, [product]);
 
-  const [selectedColor, setSelectedColor] = useState(availableColors[0]);
-  const [selectedStorage, setSelectedStorage] = useState(availableStorage[0]);
+  // Telefon brendiga mos keladigan haqiqiy ranglar
+  const availableColors = useMemo(() => {
+    if (!isPhoneProduct) return [];
+    if (product.colors && product.colors.length > 0) return product.colors;
+    const titleLower = (product.title || '').toLowerCase();
+    if (titleLower.includes('iphone') || titleLower.includes('apple')) {
+      return [
+        { name: 'Natural Titanium', hex: '#9A9590' },
+        { name: 'Black Titanium', hex: '#2B2B2B' },
+        { name: 'White Titanium', hex: '#F2F1ED' },
+        { name: 'Desert Titanium', hex: '#C5B5A5' },
+      ];
+    }
+    if (titleLower.includes('samsung') || titleLower.includes('galaxy')) {
+      return [
+        { name: 'Titanium Gray', hex: '#878681' },
+        { name: 'Titanium Black', hex: '#282828' },
+        { name: 'Titanium Violet', hex: '#59536B' },
+        { name: 'Titanium Yellow', hex: '#E8DFB8' },
+      ];
+    }
+    if (titleLower.includes('xiaomi') || titleLower.includes('redmi')) {
+      return [
+        { name: 'Midnight Black', hex: '#1C1C1E' },
+        { name: 'Aurora Purple', hex: '#6D5BA3' },
+        { name: 'Moonlight White', hex: '#F5F5F7' },
+        { name: 'Ocean Blue', hex: '#3A6B88' },
+      ];
+    }
+    return [
+      { name: 'Qora (Black)', hex: '#1C1C1E' },
+      { name: 'Oq (White)', hex: '#F5F5F7' },
+      { name: "Ko'k (Blue)", hex: '#3A6B88' },
+      { name: 'Kulrang (Gray)', hex: '#8E8E93' },
+    ];
+  }, [isPhoneProduct, product.colors, product.title]);
 
-  // Dynamic price based on selected storage
-  const effectivePrice = product.price + (selectedStorage?.priceOffset || 0);
-  const effectiveOriginalPrice = product.originalPrice ? product.originalPrice + (selectedStorage?.priceOffset || 0) : undefined;
-  const monthlyPayment = calculateMonthlyPaymentQuick(effectivePrice, 12);
+  const availableStorage = useMemo(() => {
+    if (!isPhoneProduct) return [];
+    if (product.storageOptions && product.storageOptions.length > 0) return product.storageOptions;
+    return DEFAULT_STORAGE_OPTIONS;
+  }, [isPhoneProduct, product.storageOptions]);
+
+  const [selectedColor, setSelectedColor] = useState(availableColors[0] || null);
+  const [selectedStorage, setSelectedStorage] = useState(availableStorage[0] || null);
+
+  useEffect(() => {
+    setSelectedColor(availableColors[0] || null);
+    setSelectedStorage(availableStorage[0] || null);
+  }, [availableColors, availableStorage]);
+
+  // Dynamic price based on selected storage (faqat telefonlar uchun)
+  const effectivePrice = isPhoneProduct && selectedStorage?.priceOffset
+    ? product.price + selectedStorage.priceOffset
+    : product.price;
+
+  const effectiveOriginalPrice = product.originalPrice
+    ? (isPhoneProduct && selectedStorage?.priceOffset ? product.originalPrice + selectedStorage.priceOffset : product.originalPrice)
+    : undefined;
+
+  const monthlyPayment = calculateMonthlyPaymentQuick(effectivePrice, 12, product.hasZeroDown !== false);
 
   const favorite = isFavorite(product.id);
   const isCompared = comparisonList.includes(product.id);
@@ -91,11 +164,14 @@ export const ProductDetail: React.FC = () => {
       openLoginRequiredModal();
       return;
     }
+    const itemTitle = isPhoneProduct && selectedStorage && selectedColor
+      ? `${product.title} (${selectedStorage.size}, ${selectedColor.name})`
+      : product.title;
     const configuredProduct = {
       ...product,
       price: effectivePrice,
       originalPrice: effectiveOriginalPrice,
-      title: `${product.title} (${selectedStorage.size}, ${selectedColor.name})`,
+      title: itemTitle,
     };
     for (let i = 0; i < quantity; i++) {
       addToCart(configuredProduct, 12, 'full');
@@ -107,11 +183,14 @@ export const ProductDetail: React.FC = () => {
       openLoginRequiredModal();
       return;
     }
+    const itemTitle = isPhoneProduct && selectedStorage && selectedColor
+      ? `${product.title} (${selectedStorage.size}, ${selectedColor.name})`
+      : product.title;
     const configuredProduct = {
       ...product,
       price: effectivePrice,
       originalPrice: effectiveOriginalPrice,
-      title: `${product.title} (${selectedStorage.size}, ${selectedColor.name})`,
+      title: itemTitle,
     };
     addToCart(configuredProduct, 12, 'installment');
     navigate('/checkout');
@@ -144,15 +223,18 @@ export const ProductDetail: React.FC = () => {
 
   const handleSendToTelegram = async () => {
     setIsSendingToTelegram(true);
+    const itemTitle = isPhoneProduct && selectedStorage && selectedColor
+      ? `${product.title} (${selectedStorage.size}, ${selectedColor.name})`
+      : product.title;
     const configuredProduct = {
       ...product,
       price: effectivePrice,
       originalPrice: effectiveOriginalPrice,
-      title: `${product.title} (${selectedStorage.size}, ${selectedColor.name})`,
+      title: itemTitle,
     };
     const res = await sendProductToTelegram(configuredProduct, {
-      color: selectedColor.name,
-      storage: selectedStorage.size,
+      color: isPhoneProduct && selectedColor ? selectedColor.name : undefined,
+      storage: isPhoneProduct && selectedStorage ? selectedStorage.size : undefined,
       price: effectivePrice,
       monthlyPayment: monthlyPayment,
       user: user,
@@ -337,83 +419,87 @@ export const ProductDetail: React.FC = () => {
             </h1>
           </div>
 
-          {/* Color Selection Swatches */}
-          <div className="space-y-2.5 p-4 rounded-2xl bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-800">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 text-xs font-bold text-slate-700 dark:text-slate-300">
-                <Palette className="w-4 h-4 text-primary-500" />
-                <span>{t('productSelectColor')}</span>
+          {/* Color Selection Swatches (Faqat telefon/smartfonlar uchun) */}
+          {isPhoneProduct && availableColors.length > 0 && selectedColor && (
+            <div className="space-y-2.5 p-4 rounded-2xl bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-800">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-xs font-bold text-slate-700 dark:text-slate-300">
+                  <Palette className="w-4 h-4 text-primary-500" />
+                  <span>{t('productSelectColor')}</span>
+                </div>
+                <span className="text-xs font-semibold text-primary-600 dark:text-primary-400">
+                  {selectedColor.name}
+                </span>
               </div>
-              <span className="text-xs font-semibold text-primary-600 dark:text-primary-400">
-                {selectedColor.name}
-              </span>
-            </div>
 
-            <div className="flex items-center gap-3">
-              {availableColors.map((color, idx) => {
-                const isSelected = selectedColor.name === color.name;
-                return (
-                  <button
-                    key={idx}
-                    type="button"
-                    onClick={() => setSelectedColor(color)}
-                    className={`group relative flex items-center gap-2 p-1.5 rounded-xl border-2 transition-all ${
-                      isSelected
-                        ? 'border-primary-600 bg-primary-50/50 dark:bg-primary-950/30 ring-2 ring-primary-500/20'
-                        : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 bg-white dark:bg-slate-900'
-                    }`}
-                  >
-                    <span
-                      className="w-6 h-6 rounded-lg shadow-inner border border-black/10 shrink-0"
-                      style={{ backgroundColor: color.hex }}
-                    />
-                    <span className="text-xs font-medium text-slate-700 dark:text-slate-300 pr-1.5">
-                      {color.name}
-                    </span>
-                    {isSelected && (
-                      <Check className="w-3.5 h-3.5 text-primary-600 dark:text-primary-400" />
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Storage / Memory Selection Chips */}
-          <div className="space-y-2.5 p-4 rounded-2xl bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-800">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 text-xs font-bold text-slate-700 dark:text-slate-300">
-                <HardDrive className="w-4 h-4 text-indigo-500" />
-                <span>{t('productStorageSize')}</span>
+              <div className="flex items-center gap-3 flex-wrap">
+                {availableColors.map((color, idx) => {
+                  const isSelected = selectedColor.name === color.name;
+                  return (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => setSelectedColor(color)}
+                      className={`group relative flex items-center gap-2 p-1.5 rounded-xl border-2 transition-all cursor-pointer ${
+                        isSelected
+                          ? 'border-primary-600 bg-primary-50/50 dark:bg-primary-950/30 ring-2 ring-primary-500/20'
+                          : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 bg-white dark:bg-slate-900'
+                      }`}
+                    >
+                      <span
+                        className="w-6 h-6 rounded-lg shadow-inner border border-black/10 shrink-0"
+                        style={{ backgroundColor: color.hex }}
+                      />
+                      <span className="text-xs font-medium text-slate-700 dark:text-slate-300 pr-1.5">
+                        {color.name}
+                      </span>
+                      {isSelected && (
+                        <Check className="w-3.5 h-3.5 text-primary-600 dark:text-primary-400" />
+                      )}
+                    </button>
+                  );
+                })}
               </div>
-              <span className="text-xs font-semibold text-indigo-600 dark:text-indigo-400">
-                {selectedStorage.size}
-              </span>
             </div>
+          )}
 
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-              {availableStorage.map((opt, idx) => {
-                const isSelected = selectedStorage.size === opt.size;
-                return (
-                  <button
-                    key={idx}
-                    type="button"
-                    onClick={() => setSelectedStorage(opt)}
-                    className={`py-2 px-3 rounded-xl border-2 text-center transition-all ${
-                      isSelected
-                        ? 'border-indigo-600 bg-indigo-50/50 dark:bg-indigo-950/40 text-indigo-900 dark:text-indigo-200 font-bold ring-2 ring-indigo-500/20 shadow-sm'
-                        : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 text-slate-700 dark:text-slate-300 font-medium bg-white dark:bg-slate-900'
-                    }`}
-                  >
-                    <div className="text-sm font-bold">{opt.size}</div>
-                    <div className="text-[10px] text-slate-400 mt-0.5">
-                      {(opt.priceOffset || 0) === 0 ? t('productBaselineStorage') : `+${((opt.priceOffset || 0) / 1000000).toFixed(1)} ${t('mln')}`}
-                    </div>
-                  </button>
-                );
-              })}
+          {/* Storage / Memory Selection Chips (Faqat telefon/smartfonlar uchun) */}
+          {isPhoneProduct && availableStorage.length > 0 && selectedStorage && (
+            <div className="space-y-2.5 p-4 rounded-2xl bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-800">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-xs font-bold text-slate-700 dark:text-slate-300">
+                  <HardDrive className="w-4 h-4 text-indigo-500" />
+                  <span>{t('productStorageSize')}</span>
+                </div>
+                <span className="text-xs font-semibold text-indigo-600 dark:text-indigo-400">
+                  {selectedStorage.size}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                {availableStorage.map((opt, idx) => {
+                  const isSelected = selectedStorage.size === opt.size;
+                  return (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => setSelectedStorage(opt)}
+                      className={`py-2 px-3 rounded-xl border-2 text-center transition-all cursor-pointer ${
+                        isSelected
+                          ? 'border-indigo-600 bg-indigo-50/50 dark:bg-indigo-950/40 text-indigo-900 dark:text-indigo-200 font-bold ring-2 ring-indigo-500/20 shadow-sm'
+                          : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 text-slate-700 dark:text-slate-300 font-medium bg-white dark:bg-slate-900'
+                      }`}
+                    >
+                      <div className="text-sm font-bold">{opt.size}</div>
+                      <div className="text-[10px] text-slate-400 mt-0.5">
+                        {(opt.priceOffset || 0) === 0 ? t('productBaselineStorage') : `+${((opt.priceOffset || 0) / 1000000).toFixed(1)} ${t('mln')}`}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Special Nasiya Highlight Card */}
           <div className="bg-gradient-to-r from-purple-900 to-indigo-900 text-white rounded-2xl p-4 sm:p-5 shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-4">

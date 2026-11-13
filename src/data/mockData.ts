@@ -505,6 +505,7 @@ export const PRODUCTS: Product[] = [
     tags: ['M3 Chip', '18 soat avtonomiya', 'Apple'],
     specs: {
       'Brend': 'Apple',
+      'Rangi': "Midnight (To'q ko'k-qora)",
       'Protsessor': 'Apple M3 chip (8 yadroli CPU, 10 yadroli GPU)',
       'Operativ xotira': '16 GB birlashtirilgan xotira',
       'Doimiy xotira': '512 GB SSD',
@@ -536,6 +537,7 @@ export const PRODUCTS: Product[] = [
     tags: ['Geymer noutbuk', 'RTX 4060', 'Lenovo'],
     specs: {
       'Brend': 'Lenovo',
+      'Rangi': 'Onyx Grey (Kulrang)',
       'Ekran': '16" WQXGA 240Hz IPS 500 nits',
       'Videokarta': 'NVIDIA GeForce RTX 4060 8GB (140W TGP)',
       'Protsessor': 'AMD Ryzen 7 7745HX (16 potok)',
@@ -567,6 +569,7 @@ export const PRODUCTS: Product[] = [
     tags: ['0-0-12', 'OLED ekran', 'Asus'],
     specs: {
       'Brend': 'Asus',
+      'Rangi': 'Indie Black (Klassik qora)',
       'Ekran': '15.6" Full HD OLED 600 nits',
       'Protsessor': 'Intel Core i5 13-avlod',
       'Xotira': '16GB DDR4 / 512GB NVMe SSD',
@@ -598,6 +601,7 @@ export const PRODUCTS: Product[] = [
     tags: ['0-0-12', 'Hamyonbop', 'HP'],
     specs: {
       'Brend': 'HP',
+      'Rangi': 'Natural Silver (Kumushrang)',
       'Ekran': '15.6" Full HD Antiglare',
       'Protsessor': 'Intel Core i3 12-avlod',
       'Xotira': '8GB RAM / 256GB SSD',
