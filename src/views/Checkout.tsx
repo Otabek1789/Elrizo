@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate, Link } from '@/lib/navigation';
 import { 
   CreditCard, 
@@ -63,20 +63,34 @@ export const Checkout: React.FC = () => {
   }, [user, navigate, openLoginRequiredModal]);
 
   const totalAmount = getCartTotal();
-  const monthlyTotal = getCartMonthlyTotal();
   const discountAmount = getDiscountAmount();
   const priceAfterPromo = Math.max(0, totalAmount - discountAmount);
   const finalTotal = priceAfterPromo;
 
-  const monthlyRatio = totalAmount > 0 ? finalTotal / totalAmount : 1;
-  const finalMonthlyTotal = Math.round(monthlyTotal * monthlyRatio);
+  // Savatdagi tanlangan muddat bo'yicha boshlang'ich qiymat
+  const initialMonths = (cart[0]?.selectedInstallmentMonths as 3 | 6 | 12 | 24) || 12;
+  const [selectedMonths, setSelectedMonths] = useState<3 | 6 | 12 | 24>(initialMonths);
+
+  // Tanlangan muddat (selectedMonths) bo'yicha joriy oylik to'lovni 0-0-12 Halol shartida aniq hisoblash
+  const currentTenureMonthly = useMemo(() => {
+    return cart.reduce((sum, item) => {
+      const isZero = item.product?.hasZeroDown !== false;
+      const singleMonthly = calculateMonthlyPaymentQuick(item.product.price, selectedMonths, isZero);
+      return sum + singleMonthly * item.quantity;
+    }, 0);
+  }, [cart, selectedMonths]);
+
+  const finalMonthlyTotal = useMemo(() => {
+    if (totalAmount <= 0) return 0;
+    const ratio = finalTotal / totalAmount;
+    return Math.round(currentTenureMonthly * ratio);
+  }, [currentTenureMonthly, finalTotal, totalAmount]);
 
   const [promoInput, setPromoInput] = useState('');
   const [promoError, setPromoError] = useState('');
 
   // Rejim: to'liq to'lash yoki nasiyaga rasmiylashtirish
   const [paymentMode, setPaymentMode] = useState<PaymentMode>('installment');
-  const [selectedMonths, setSelectedMonths] = useState<3 | 6 | 12 | 24>(12);
 
   // Nasiya bosqichlari: 1: Shaxsiy ma'lumotlar, 2: SMS OTP, 3: Skoring va Karta, 4: Muvaffaqiyat
   const [currentStep, setCurrentStep] = useState<number>(1);
@@ -583,9 +597,52 @@ export const Checkout: React.FC = () => {
                   </span>
                 </div>
 
-                {/* BOSQICH 1: Shaxsiy ma'lumotlar */}
+                {/* BOSQICH 1: Shaxsiy ma'lumotlar va Nasiya muddati */}
                 {currentStep === 1 && (
                   <form onSubmit={handleProceedToOtp} className="space-y-4">
+                    {/* Nasiya muddatini tanlash (3, 6, 12, 24 oy) */}
+                    <div className="bg-purple-50/70 dark:bg-purple-950/40 p-3.5 sm:p-4 rounded-2xl border border-purple-200/60 dark:border-purple-800/50 space-y-2">
+                      <div className="flex items-center justify-between text-xs font-bold text-gray-800 dark:text-purple-200">
+                        <span className="flex items-center gap-1.5">
+                          <CreditCard className="w-4 h-4 text-uzum-primary dark:text-purple-400" />
+                          <span>{language === 'ru' ? 'Срок рассрочки (0-0-12):' : 'Nasiya muddati (0-0-12 Halol):'}</span>
+                        </span>
+                        <span className="text-uzum-primary dark:text-purple-300 font-extrabold">
+                          {selectedMonths} {language === 'ru' ? 'мес' : 'oy'} • {formatPrice(finalMonthlyTotal, true, language)}{t('perMonth')}
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                        {([3, 6, 12, 24] as const).map((m) => {
+                          const isSelected = selectedMonths === m;
+                          const mPay = cart.reduce((sum, item) => {
+                            const isZero = item.product?.hasZeroDown !== false;
+                            return sum + calculateMonthlyPaymentQuick(item.product.price, m, isZero) * item.quantity;
+                          }, 0);
+                          const mPayDiscounted = totalAmount > 0 ? Math.round(mPay * (finalTotal / totalAmount)) : 0;
+
+                          return (
+                            <button
+                              key={m}
+                              type="button"
+                              onClick={() => setSelectedMonths(m)}
+                              className={`py-2 px-2 rounded-xl text-center transition-all border cursor-pointer ${
+                                isSelected
+                                  ? 'bg-uzum-primary text-white border-uzum-primary shadow-sm ring-2 ring-purple-200 dark:ring-purple-900'
+                                  : 'bg-white dark:bg-slate-800 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-slate-700 hover:border-purple-300'
+                              }`}
+                            >
+                              <div className="text-xs font-black">{m} {language === 'ru' ? 'мес' : 'oy'}</div>
+                              <div className={`text-[10px] mt-0.5 font-bold ${isSelected ? 'text-purple-100' : 'text-uzum-primary dark:text-purple-400'}`}>
+                                {formatPrice(mPayDiscounted, false, language)} {language === 'ru' ? 'сум/мес' : "so'm/oy"}
+                              </div>
+                              <div className={`text-[9px] mt-0.5 ${isSelected ? 'text-emerald-200' : 'text-emerald-600 dark:text-emerald-400'}`}>
+                                0% {language === 'ru' ? 'переплат' : 'ustama'}
+                              </div>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-xs font-bold text-gray-700 dark:text-slate-300 mb-1">
@@ -1184,7 +1241,7 @@ export const Checkout: React.FC = () => {
                 <div className="text-right">
                   {discountAmount > 0 && (
                     <div className="text-[11px] text-gray-400 line-through">
-                      {paymentMode === 'installment' ? formatPrice(monthlyTotal, true, language) + t('perMonth') : formatPrice(totalAmount, true, language)}
+                      {paymentMode === 'installment' ? formatPrice(currentTenureMonthly, true, language) + t('perMonth') : formatPrice(totalAmount, true, language)}
                     </div>
                   )}
                   <span className="text-xl font-black text-gray-900 dark:text-white">

@@ -384,7 +384,8 @@ export const useStore = create<StoreState>()(
         const { cart } = get();
         return cart.reduce((total, item) => {
           const months = item.selectedInstallmentMonths || 12;
-          const markupPercent = months === 3 ? 0 : months === 6 ? 12 : months === 12 ? 24 : 38;
+          const isZeroDown = item.product?.hasZeroDown !== false;
+          const markupPercent = isZeroDown ? 0 : (months === 3 ? 0 : months === 6 ? 8 : months === 12 ? 16 : 24);
           const itemTotal = item.product.price * item.quantity * (1 + markupPercent / 100);
           return total + Math.round(itemTotal / months);
         }, 0);

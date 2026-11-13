@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from '@/lib/navigation';
 import { 
   Calculator, 
@@ -12,7 +12,7 @@ import {
   ArrowRight
 } from 'lucide-react';
 import { Product } from '../types';
-import { calculateInstallment, formatPrice, INSTALLMENT_PLANS } from '../utils/calculator';
+import { calculateInstallment, formatPrice, getInstallmentPlans } from '../utils/calculator';
 import { useStore } from '../store/useStore';
 import { useTranslation } from '../utils/translations';
 
@@ -33,19 +33,35 @@ export const InstallmentCalculator: React.FC<InstallmentCalculatorProps> = ({
   const { addToCart, user, openLoginRequiredModal } = useStore();
   const { t, language } = useTranslation();
 
+  const isZeroDownProduct = product.hasZeroDown !== false;
+
+  // Mavjud muddatlarni mahsulotning maxMonths chekloviga ko'ra saralash
+  const availablePlans = useMemo(() => {
+    const plans = getInstallmentPlans(language, isZeroDownProduct);
+    const max = product.maxMonths || 24;
+    return plans.filter((p) => p.months <= max);
+  }, [language, isZeroDownProduct, product.maxMonths]);
+
   const [selectedMonths, setSelectedMonths] = useState<3 | 6 | 12 | 24>(12);
   const [downPaymentPercent, setDownPaymentPercent] = useState<number>(0); // 0%, 10%, 20%, 30%
   const [showFullSchedule, setShowFullSchedule] = useState<boolean>(false);
 
+  // Agar tanlangan muddat mavjud bo'lmasa, eng katta ruxsat etilganiga o'tkazamiz
+  useEffect(() => {
+    if (availablePlans.length > 0 && !availablePlans.some((p) => p.months === selectedMonths)) {
+      setSelectedMonths(availablePlans[availablePlans.length - 1].months);
+    }
+  }, [availablePlans, selectedMonths]);
+
   // Dastlabki to'lov summasi
   const downPaymentAmount = useMemo(() => {
-    return Math.round((product.price * downPaymentPercent) / 100);
+    return Math.round(((product.price || 0) * downPaymentPercent) / 100);
   }, [product.price, downPaymentPercent]);
 
-  // Hisob-kitob natijasi
+  // Hisob-kitob natijasi (0-0-12 Halol Nasiya parametrida xatosiz)
   const calculation = useMemo(() => {
-    return calculateInstallment(product.price, selectedMonths, downPaymentAmount);
-  }, [product.price, selectedMonths, downPaymentAmount]);
+    return calculateInstallment(product.price, selectedMonths, downPaymentAmount, new Date(), isZeroDownProduct);
+  }, [product.price, selectedMonths, downPaymentAmount, isZeroDownProduct]);
 
   const handleApplyOrder = () => {
     if (!user) {
@@ -68,20 +84,20 @@ export const InstallmentCalculator: React.FC<InstallmentCalculatorProps> = ({
   // Kalkulyatorning asosiy formasi (Har ikkala holat uchun bir xil toza dizayn)
   const renderCalculatorForm = () => (
     <>
-      {/* 1-QADAM: Muddat tanlash (Badge overlap xatosi to'liq tuzatildi) */}
+      {/* 1-QADAM: Muddat tanlash */}
       <div>
         <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-3">
           {t('stepTenure')}
         </label>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-          {INSTALLMENT_PLANS.map((plan) => {
+          {availablePlans.map((plan) => {
             const isSelected = selectedMonths === plan.months;
             return (
               <button
                 key={plan.months}
                 type="button"
                 onClick={() => setSelectedMonths(plan.months)}
-                className={`relative pt-4 pb-2.5 px-2 rounded-xl border text-center transition-all ${
+                className={`relative pt-4 pb-2.5 px-2 rounded-xl border text-center transition-all cursor-pointer ${
                   isSelected
                     ? 'border-uzum-primary bg-purple-50/80 dark:bg-purple-950/60 ring-2 ring-purple-200 dark:ring-purple-900 text-uzum-primary dark:text-purple-300 shadow-sm'
                     : 'border-gray-200/80 dark:border-slate-800 bg-white dark:bg-slate-800/80 hover:border-purple-300 dark:hover:border-purple-600/40 text-gray-700 dark:text-gray-300'
@@ -89,11 +105,11 @@ export const InstallmentCalculator: React.FC<InstallmentCalculatorProps> = ({
               >
                 {plan.isZeroPercent && (
                   <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-emerald-600 text-white text-[8px] sm:text-[9px] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider shadow z-10 whitespace-nowrap">
-                    0% {t('markupLabel')}
+                    {plan.months === 12 && isZeroDownProduct ? '0-0-12 Halol' : `0% ${t('markupLabel')}`}
                   </span>
                 )}
                 <div className="text-xs sm:text-sm font-bold">{plan.months} {t('monthsUnit')}</div>
-                <div className="text-[10px] sm:text-[11px] text-gray-500 dark:text-gray-400 font-medium mt-0.5">
+                <div className="text-[10px] sm:text-[11px] font-medium mt-0.5 text-emerald-600 dark:text-emerald-400">
                   {plan.markupPercent === 0 ? t('zeroMarkup') : `+${plan.markupPercent}% ${t('markupLabel')}`}
                 </div>
               </button>
@@ -148,8 +164,10 @@ export const InstallmentCalculator: React.FC<InstallmentCalculatorProps> = ({
             </div>
             <div className="flex justify-between gap-4 text-purple-200 text-[11px]">
               <span>{t('markupRate')}</span>
-              <strong className="text-emerald-300">
-                {calculation.markupPercent === 0 ? t('freeMarkup') : `${calculation.markupPercent}%`}
+              <strong className="text-emerald-300 font-extrabold">
+                {calculation.markupPercent === 0 
+                  ? (language === 'ru' ? '0% (0-0-12 Халяль)' : "0% (0-0-12 Halol)") 
+                  : `+${calculation.markupPercent}%`}
               </strong>
             </div>
           </div>
@@ -167,7 +185,11 @@ export const InstallmentCalculator: React.FC<InstallmentCalculatorProps> = ({
           </div>
           <div>
             <span className="text-purple-300 block text-[10px]">{t('totalMarkupLabel')}</span>
-            <span className="font-semibold text-amber-300">+{formatPrice(calculation.markupAmount, true, language)}</span>
+            <span className={`font-semibold ${calculation.markupAmount === 0 ? 'text-emerald-400' : 'text-amber-300'}`}>
+              {calculation.markupAmount === 0 
+                ? (language === 'ru' ? '0 сум (0%)' : "0 so'm (0%)") 
+                : `+${formatPrice(calculation.markupAmount, true, language)}`}
+            </span>
           </div>
           <div>
             <span className="text-purple-300 block text-[10px]">{t('totalPaymentLabel')}</span>
