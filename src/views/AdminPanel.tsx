@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { useNavigate, Navigate } from '@/lib/navigation';
+import { useNavigate, Navigate, Link } from '@/lib/navigation';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
 import { 
   Crown, 
@@ -462,8 +462,57 @@ export const AdminPanel: React.FC = () => {
   });
 
   // Faqat administratorlar uchun xavfsizlik tekshiruvi (user.isAdmin yoki ADMIN_EMAIL)
-  if (!user || (!user.isAdmin && user.email?.toLowerCase() !== ADMIN_EMAIL.toLowerCase())) {
-    return <Navigate to="/login" replace />;
+  const isAuthorizedAdmin = !!user && (!!user.isAdmin || user.email?.toLowerCase() === ADMIN_EMAIL.toLowerCase());
+
+  useEffect(() => {
+    if (!isAuthorizedAdmin) {
+      navigate('/login', { replace: true });
+    }
+  }, [isAuthorizedAdmin, navigate]);
+
+  useEffect(() => {
+    if (!isAuthorizedAdmin) return;
+    let isMounted = true;
+    fetchOrdersFromSupabase().then((remoteOrders) => {
+      if (isMounted && remoteOrders && remoteOrders.length > 0) {
+        const localOrders = useStore.getState().orders;
+        const merged = [...remoteOrders];
+        for (const local of localOrders) {
+          if (!merged.some(m => (m.contractNumber && m.contractNumber === local.contractNumber) || m.id === local.id)) {
+            merged.push(local);
+          }
+        }
+        useStore.setState({ orders: merged });
+      }
+    }).catch(err => {
+      console.warn("Auto-syncing orders from Supabase:", err);
+    });
+    return () => { isMounted = false; };
+  }, [isAuthorizedAdmin]);
+
+  // Barcha hooklar chaqirilgandan keyin xavfsizlik ekrani (Rules of Hooks ga 100% mos)
+  if (!isAuthorizedAdmin) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-[#F8F9FA] dark:bg-slate-900 text-center">
+        <div className="w-16 h-16 rounded-3xl bg-purple-100 dark:bg-purple-950/60 text-uzum-primary dark:text-purple-300 flex items-center justify-center mb-4">
+          <ShieldCheck className="w-8 h-8" />
+        </div>
+        <h2 className="text-xl font-black text-gray-900 dark:text-white mb-2">
+          {language === 'ru' ? 'Требуется вход администратора' : 'Administrator sifatida kirish talab qilinadi'}
+        </h2>
+        <p className="text-sm text-gray-500 dark:text-slate-400 max-w-sm mb-6">
+          {language === 'ru' 
+            ? 'Вы вышли из системы. Пожалуйста, войдите снова.' 
+            : "Siz tizimdan chiqqansiz. Qayta kirish uchun Login sahifasiga o'ting."}
+        </p>
+        <Link
+          to="/login"
+          className="px-6 py-3 rounded-2xl bg-uzum-primary hover:bg-[#520080] text-white font-extrabold text-sm shadow-lg shadow-purple-500/25 transition-all no-underline inline-block"
+        >
+          {language === 'ru' ? 'Перейти на страницу входа' : "Kirish sahifasiga o'tish"}
+        </Link>
+      </div>
+    );
   }
 
   // Hisob-kitoblar (Real buyurtmalar va Supabase arizalariga asoslangan)
@@ -580,25 +629,6 @@ export const AdminPanel: React.FC = () => {
       description: '',
     });
   };
-
-  useEffect(() => {
-    let isMounted = true;
-    fetchOrdersFromSupabase().then((remoteOrders) => {
-      if (isMounted && remoteOrders && remoteOrders.length > 0) {
-        const localOrders = useStore.getState().orders;
-        const merged = [...remoteOrders];
-        for (const local of localOrders) {
-          if (!merged.some(m => (m.contractNumber && m.contractNumber === local.contractNumber) || m.id === local.id)) {
-            merged.push(local);
-          }
-        }
-        useStore.setState({ orders: merged });
-      }
-    }).catch(err => {
-      console.warn("Auto-syncing orders from Supabase:", err);
-    });
-    return () => { isMounted = false; };
-  }, []);
 
   const handleRefreshCache = async () => {
     setIsRefreshingCache(true);
@@ -908,8 +938,8 @@ export const AdminPanel: React.FC = () => {
             whileHover={{ scale: 1.05, x: isSidebarCollapsed ? 0 : 3 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => {
-              logoutUser();
               navigate('/login', { replace: true });
+              logoutUser();
             }}
             className={`w-full flex items-center ${isSidebarCollapsed ? 'justify-center p-3' : 'gap-3 p-2.5'} text-xs font-bold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-xl transition-colors`}
             title={isSidebarCollapsed ? (language === 'ru' ? 'Выйти' : 'Tizimdan chiqish') : undefined}
@@ -1044,8 +1074,12 @@ export const AdminPanel: React.FC = () => {
             </motion.button>
 
             <div className="text-right hidden sm:block">
-              <div className="text-xs font-bold text-gray-900 dark:text-white">Otabek Jo'rayev</div>
-              <div className="text-[10px] text-amber-600 dark:text-amber-400 font-mono">otabek1789@gmail.com</div>
+              <div className="text-xs font-bold text-gray-900 dark:text-white">
+                {user?.fullName || "Otabek Jo'rayev"}
+              </div>
+              <div className="text-[10px] text-amber-600 dark:text-amber-400 font-mono">
+                {user?.email || 'otabek1789@gmail.com'}
+              </div>
             </div>
             
             <motion.div 
