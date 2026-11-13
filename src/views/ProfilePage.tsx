@@ -20,7 +20,8 @@ import {
   Calendar,
   FileText,
   Upload,
-  Image as ImageIcon
+  Image as ImageIcon,
+  Trash2
 } from 'lucide-react';
 import { useStore } from '../store/useStore';
 import { formatPrice } from '../utils/calculator';
@@ -96,7 +97,7 @@ const compressImage = (file: File): Promise<string> => {
 
 export const ProfilePage: React.FC = () => {
   const navigate = useNavigate();
-  const { user, updateUserProfile, logoutUser, orders, favorites, language } = useStore();
+  const { user, updateUserProfile, logoutUser, orders, favorites, language, addToast } = useStore();
   const { t } = useTranslation();
 
   const [activeTab, setActiveTab] = useState<'info' | 'orders' | 'security'>('info');
@@ -195,6 +196,18 @@ export const ProfilePage: React.FC = () => {
     }
   };
 
+  const handleRemoveAvatar = () => {
+    setAvatarUrl('');
+    updateUserProfile({ avatarUrl: '' });
+    setShowAvatarModal(false);
+    addToast(
+      language === 'ru' 
+        ? 'Фото профиля успешно удалено' 
+        : "Profil rasmi muvaffaqiyatli o'chirildi", 
+      'info'
+    );
+  };
+
   return (
     <div className="min-h-screen bg-gray-50/60 dark:bg-slate-900 py-6 sm:py-10 pb-24 md:pb-10 transition-colors">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 space-y-6">
@@ -233,6 +246,19 @@ export const ProfilePage: React.FC = () => {
                   <Crown className="w-4 h-4" />
                 </div>
               )}
+              {/* Rasm mavjud bo'lganda o'chirish tugmasi */}
+              {avatarUrl && (
+                <button
+                  type="button"
+                  onClick={handleRemoveAvatar}
+                  className="absolute -bottom-2 -left-2 p-2.5 rounded-2xl bg-rose-500 hover:bg-rose-600 text-white shadow-lg transition-transform hover:scale-110 flex items-center justify-center cursor-pointer border-2 border-white dark:border-slate-800"
+                  title={language === 'ru' ? 'Удалить фото профиля' : "Profil rasmini o'chirish"}
+                  aria-label="Profil rasmini o'chirish"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              )}
+
               <button
                 type="button"
                 onClick={() => setShowAvatarModal(true)}
@@ -727,6 +753,20 @@ export const ProfilePage: React.FC = () => {
                     OK
                   </button>
                 </div>
+
+                {/* Profil rasmini o'chirish tugmasi */}
+                {avatarUrl && (
+                  <div className="pt-2 border-t border-gray-100 dark:border-slate-700">
+                    <button
+                      type="button"
+                      onClick={handleRemoveAvatar}
+                      className="w-full py-2.5 px-4 rounded-xl bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/60 border border-rose-200 dark:border-rose-900/60 text-rose-600 dark:text-rose-400 font-bold text-xs flex items-center justify-center gap-2 transition-colors cursor-pointer"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                      <span>{language === 'ru' ? 'Удалить текущее фото профиля' : "Profil rasmini o'chirish"}</span>
+                    </button>
+                  </div>
+                )}
               </div>
             </motion.div>
           </div>
