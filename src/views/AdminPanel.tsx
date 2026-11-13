@@ -188,6 +188,7 @@ export const AdminPanel: React.FC = () => {
     orders, 
     updateOrderStatus, 
     deleteOrder, 
+    clearAllOrders,
     products, 
     addProduct, 
     updateProduct,
@@ -1776,6 +1777,23 @@ export const AdminPanel: React.FC = () => {
                         </motion.button>
                       ))}
                     </div>
+
+                    {orders.length > 0 && (
+                      <motion.button
+                        whileHover={{ scale: 1.04 }}
+                        whileTap={{ scale: 0.96 }}
+                        onClick={() => {
+                          if (window.confirm(language === 'ru' ? 'Вы уверены, что хотите очистить все тестовые заявки?' : "Haqiqatan ham barcha test arizalarni tozalab, 0 ta qilmoqchimisiz?")) {
+                            clearAllOrders();
+                          }
+                        }}
+                        className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/40 text-rose-600 dark:text-rose-400 text-xs font-bold transition-colors cursor-pointer border border-rose-200/60 dark:border-rose-900/40"
+                        title={language === 'ru' ? 'Очистить все тестовые заявки' : "Barcha test arizalarni tozalash (0 qilish)"}
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        <span>{language === 'ru' ? 'Очистить тесты (0)' : "Testlarni tozalash (0 qilish)"}</span>
+                      </motion.button>
+                    )}
                   </div>
                 </div>
 

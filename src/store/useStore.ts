@@ -78,6 +78,7 @@ interface StoreState {
   addOrder: (order: Order) => Promise<void>;
   updateOrderStatus: (orderId: string, status: Order['status']) => void;
   deleteOrder: (orderId: string) => void;
+  clearAllOrders: () => void;
 
   // User & Auth State (Persisted in localStorage)
   user: User | null;
@@ -597,6 +598,11 @@ export const useStore = create<StoreState>()(
         get().addToast("Ariza o'chirildi", 'info');
       },
 
+      clearAllOrders: () => {
+        set({ orders: [] });
+        get().addToast("Barcha test buyurtmalar tozalandi (0 ta)", 'info');
+      },
+
       // User & Auth (Email & Parol)
       user: null,
       isAuthOpen: false,
@@ -956,8 +962,14 @@ export const useStore = create<StoreState>()(
               return p;
             });
           }
-          // Saytdan hali hech kim sotib olmagan: buyurtmalarni tozalaymiz
-          if (state.orders && state.orders.some((o: any) => o.contractNumber === 'ELR-592970' || o.contractNumber === 'ELR-PAY-345805' || o.id === 'ord-initial-01')) {
+          // Admin tekshiruv uchun ochgan barcha sinov buyurtmalarini tozalash (nol qilish)
+          if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
+            const hasReset = localStorage.getItem('elrizo_admin_test_orders_cleared_v3');
+            if (!hasReset) {
+              state.orders = [];
+              localStorage.setItem('elrizo_admin_test_orders_cleared_v3', 'true');
+            }
+          } else {
             state.orders = [];
           }
           if (state.cashbackTransactions) {

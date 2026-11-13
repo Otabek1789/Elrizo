@@ -97,7 +97,7 @@ const compressImage = (file: File): Promise<string> => {
 
 export const ProfilePage: React.FC = () => {
   const navigate = useNavigate();
-  const { user, updateUserProfile, logoutUser, orders, favorites, language, addToast } = useStore();
+  const { user, updateUserProfile, logoutUser, orders, deleteOrder, clearAllOrders, favorites, language, addToast } = useStore();
   const { t } = useTranslation();
 
   const [activeTab, setActiveTab] = useState<'info' | 'orders' | 'security'>('info');
@@ -629,33 +629,61 @@ export const ProfilePage: React.FC = () => {
                   </button>
                 </div>
               ) : (
-                <div className="divide-y divide-gray-100 dark:divide-slate-700/60">
-                  {orders.map((ord) => (
-                    <div key={ord.id} className="py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-2">
-                          <span className="font-mono font-bold text-purple-600 dark:text-purple-400">
-                            {ord.contractNumber || ord.id}
-                          </span>
-                          <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-50 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400">
-                            {ord.status}
-                          </span>
-                        </div>
-                        <div className="text-gray-500 dark:text-slate-400">
-                          {new Date(ord.createdAt).toLocaleDateString()} • {ord.installmentMonths || 12} {t('monthsUnit')}
-                        </div>
-                      </div>
+                <div className="space-y-3">
+                  {/* Test buyurtmalarni tozalash tugmasi (Admin yoki foydalanuvchi uchun) */}
+                  <div className="flex items-center justify-between pb-2 border-b border-gray-100 dark:border-slate-800">
+                    <span className="text-xs text-gray-500 dark:text-slate-400">
+                      {language === 'ru' ? 'Всего заказов:' : 'Jami buyurtmalar:'} <strong className="text-gray-900 dark:text-white">{orders.length} ta</strong>
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => clearAllOrders()}
+                      className="px-2.5 py-1 rounded-xl bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/40 text-rose-600 dark:text-rose-400 text-[11px] font-bold transition-colors flex items-center gap-1.5 cursor-pointer border border-rose-200/50 dark:border-rose-900/30"
+                      title={language === 'ru' ? 'Очистить историю заказов' : 'Barcha test buyurtmalarni o\'chirish'}
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>{language === 'ru' ? 'Очистить историю' : "Tarixni tozalash (0 qilish)"}</span>
+                    </button>
+                  </div>
 
-                      <div className="text-right">
-                        <span className="text-sm font-black text-amber-600 dark:text-amber-400 block">
-                          {formatPrice(ord.totalPrice, true, language)}
-                        </span>
-                        <span className="text-[11px] text-gray-500 dark:text-slate-400">
-                          {formatPrice(ord.monthlyPayment || Math.round(ord.totalPrice / 12), true, language)} {t('profilePerMonth')}
-                        </span>
+                  <div className="divide-y divide-gray-100 dark:divide-slate-700/60">
+                    {orders.map((ord) => (
+                      <div key={ord.id} className="py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            <span className="font-mono font-bold text-purple-600 dark:text-purple-400">
+                              {ord.contractNumber || ord.id}
+                            </span>
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-50 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400">
+                              {ord.status}
+                            </span>
+                          </div>
+                          <div className="text-gray-500 dark:text-slate-400">
+                            {new Date(ord.createdAt).toLocaleDateString()} • {ord.installmentMonths || 12} {t('monthsUnit')}
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-3 self-end sm:self-center">
+                          <div className="text-right">
+                            <span className="text-sm font-black text-amber-600 dark:text-amber-400 block">
+                              {formatPrice(ord.totalPrice, true, language)}
+                            </span>
+                            <span className="text-[11px] text-gray-500 dark:text-slate-400">
+                              {formatPrice(ord.monthlyPayment || Math.round(ord.totalPrice / 12), true, language)} {t('profilePerMonth')}
+                            </span>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => deleteOrder(ord.id)}
+                            className="p-1.5 text-gray-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-lg transition-colors cursor-pointer"
+                            title={language === 'ru' ? 'Удалить заказ' : "Buyurtmani o'chirish"}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
               )}
             </motion.div>
