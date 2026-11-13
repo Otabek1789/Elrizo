@@ -1,4 +1,5 @@
 import { Order, Product, CartItem, User } from '../types';
+import { supabase } from '../lib/supabase';
 
 export const TELEGRAM_BOT_TOKEN = process.env.NEXT_PUBLIC_TELEGRAM_BOT_TOKEN || process.env.TELEGRAM_BOT_TOKEN || '8969024175:AAEzzmDhUJJaq9mtMM2EbCceL5QRalqra1U';
 export const TELEGRAM_ADMIN_CHAT_ID = '7373118052';
@@ -355,7 +356,33 @@ export async function findTelegramChatIdByUsername(usernameInput: string): Promi
     // ignore
   }
 
-  // 4. Telegram Bot API getUpdates orqali bot bilan muloqot qilganlarni qidirish
+  // 4. Supabase orqali tekshirish (Botga start bosgan foydalanuvchilar bazasi)
+  try {
+    const { data, error } = await supabase
+      .from('nasiya_orders')
+      .select('phone, items')
+      .eq('payment_mode', 'telegram_bot_user')
+      .eq('customer_name', clean)
+      .limit(1);
+
+    if (!error && data && data.length > 0 && data[0]?.phone) {
+      const foundChatId = String(data[0].phone);
+      const firstName = data[0].items?.[0]?.first_name || clean;
+
+      try {
+        const cached = localStorage.getItem('elrizo_known_tg_users');
+        const parsed = cached ? JSON.parse(cached) : {};
+        parsed[clean] = { id: foundChatId, name: firstName };
+        localStorage.setItem('elrizo_known_tg_users', JSON.stringify(parsed));
+      } catch {}
+
+      return { chatId: foundChatId, firstName, inBot: true };
+    }
+  } catch (err) {
+    console.warn("Supabase telegram user lookup error:", err);
+  }
+
+  // 5. Telegram Bot API getUpdates orqali tekshirish (fallback)
   try {
     const res = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getUpdates`);
     const data = await res.json();

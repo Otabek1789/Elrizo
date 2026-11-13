@@ -216,6 +216,7 @@ export async function fetchOrdersFromSupabase(): Promise<Order[]> {
     const { data, error } = await supabase
       .from('nasiya_orders')
       .select('*')
+      .neq('payment_mode', 'telegram_bot_user')
       .order('created_at', { ascending: false });
 
     if (error || !data) return [];

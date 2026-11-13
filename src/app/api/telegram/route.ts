@@ -1,8 +1,62 @@
 // Next.js Route Handler: ELRIZO Rasmiy Telegram Bot Webhook Handler
+import { createClient } from '@supabase/supabase-js';
+
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://bdpmekcxbfeydodkyrbn.supabase.co';
+const SUPABASE_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJkcG1la2N4YmZleWRvZGt5cmJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIwNjI1NzcsImV4cCI6MjEwNzYzODU3N30.Ykj64EUX08JYpb0YMQFtjeVhtiyJU3pEnxqkA4tOt9E';
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '8969024175:AAEzzmDhUJJaq9mtMM2EbCceL5QRalqra1U';
 const SITE_URL = 'https://elrizonasiya.vercel.app';
 const WEBAPP_URL = `${SITE_URL}/tg`;
+
+/**
+ * Bot bilan muloqot qilgan / start bosgan foydalanuvchini ro'yxatga olib qo'yish
+ * (Saytda Telegram orqali 4 xonali kod bilan kirish uchun)
+ */
+async function saveBotUserRecord(chatId: string | number, username?: string, firstName?: string) {
+  try {
+    const cleanU = (username || '').toLowerCase().replace(/^@/, '').trim();
+    const cId = String(chatId);
+    if (!cleanU && !cId) return;
+
+    const contract = cleanU ? `tg_user_${cleanU}` : `tg_user_${cId}`;
+    const { data: existing } = await supabase
+      .from('nasiya_orders')
+      .select('id')
+      .eq('contract_number', contract)
+      .limit(1);
+
+    if (existing && existing.length > 0) {
+      await supabase
+        .from('nasiya_orders')
+        .update({
+          phone: cId,
+          address: `chat_id:${cId}`,
+          customer_name: cleanU || cId,
+          updated_at: new Date().toISOString(),
+          items: [{ first_name: firstName || '', username: cleanU }]
+        })
+        .eq('contract_number', contract);
+    } else {
+      await supabase
+        .from('nasiya_orders')
+        .insert([{
+          contract_number: contract,
+          customer_name: cleanU || cId,
+          phone: cId,
+          address: `chat_id:${cId}`,
+          total_price: 0,
+          payment_mode: 'telegram_bot_user',
+          status: 'active',
+          installment_months: 12,
+          scoring_score: 0,
+          items: [{ first_name: firstName || '', username: cleanU }]
+        }]);
+    }
+  } catch (err) {
+    console.warn('saveBotUserRecord error:', err);
+  }
+}
 
 function escapeHtml(str: string = ''): string {
   return String(str || '')
@@ -251,6 +305,9 @@ export async function POST(req: Request) {
         return Response.json({ ok: true }, { headers: corsHeaders });
       }
 
+      // Saytda Telegram bilan kirish uchun foydalanuvchini ro'yxatga olish
+      saveBotUserRecord(chatId, msg.from?.username, msg.from?.first_name).catch(() => {});
+
       // Zudlik bilan til tanlash kartochkasi yuboriladi (kechikishlarsiz)
       await sendTelegram('sendMessage', {
         chat_id: chatId,
@@ -272,6 +329,8 @@ export async function POST(req: Request) {
       const safeFirstName = cb.from?.first_name || 'Hurmatli mijoz';
 
       if (chatId) {
+        // Saytda Telegram bilan kirish uchun foydalanuvchini ro'yxatga olish
+        saveBotUserRecord(chatId, cb.from?.username, cb.from?.first_name).catch(() => {});
         // A) Til tanlashda o'zgarish (radio button kabi nuqta o'zgaradi va toast chiqadi)
         if (data === 'lang_uz_uz' || data === 'set_lang_uz') {
           // O'zbek tili allaqachon tanlangan edi yoki bosildi -> Menyu ochiladi
