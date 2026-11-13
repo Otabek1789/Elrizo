@@ -727,7 +727,7 @@ export const LoginPage: React.FC = () => {
               initial={{ opacity: 0, scale: 0.95, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
-              className="w-full max-w-sm sm:max-w-md bg-white dark:bg-slate-900 rounded-3xl p-5 sm:p-6 border border-sky-100 dark:border-slate-800 shadow-2xl text-center space-y-4 relative overflow-hidden"
+              className="w-full max-w-sm sm:max-w-md bg-white dark:bg-slate-900 rounded-3xl pt-10 pb-5 px-5 sm:pt-11 sm:pb-6 sm:px-6 border border-sky-100 dark:border-slate-800 shadow-2xl text-center space-y-4 relative overflow-hidden"
             >
               <button
                 type="button"
@@ -738,17 +738,19 @@ export const LoginPage: React.FC = () => {
                   setTelegramError(null);
                   setIsNotInBot(false);
                 }}
-                className="absolute top-4 right-4 p-1.5 text-gray-400 hover:text-gray-700 dark:hover:text-white rounded-full hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors cursor-pointer z-10"
+                className="absolute top-2.5 right-2.5 sm:top-3 sm:right-3 w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-700 dark:hover:text-white rounded-full hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors cursor-pointer z-20"
                 aria-label="Yopish"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
 
               {/* Telegram Badge & Sarlavha */}
-              <div className="w-13 h-13 rounded-2xl bg-[#229ED9]/10 dark:bg-[#229ED9]/20 flex items-center justify-center mx-auto text-[#229ED9] shadow-inner border border-sky-200/50 dark:border-sky-800/50">
-                <svg className="w-7 h-7 fill-current" viewBox="0 0 24 24">
-                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.75-.55 2.92-1.27 4.86-2.11 5.83-2.52 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/>
-                </svg>
+              <div className="w-full py-2 px-4 rounded-2xl bg-sky-50/80 dark:bg-sky-950/40 flex items-center justify-center text-[#229ED9] shadow-inner border border-sky-200/50 dark:border-sky-800/50">
+                <div className="w-8 h-8 rounded-full bg-[#229ED9] text-white flex items-center justify-center shadow-sm">
+                  <svg className="w-4.5 h-4.5 fill-current" viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.75-.55 2.92-1.27 4.86-2.11 5.83-2.52 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/>
+                  </svg>
+                </div>
               </div>
 
               <div>
