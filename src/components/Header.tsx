@@ -234,35 +234,40 @@ export const Header: React.FC = () => {
               }
             }}
             placeholder={t('searchPlaceholder')}
-            className={`w-full ${isMobile ? 'pl-8 pr-16 py-2 text-xs' : 'pl-11 pr-24 py-2.5 text-sm'} bg-transparent text-gray-900 dark:text-white rounded-2xl outline-none placeholder:text-gray-400 dark:placeholder:text-gray-400 font-medium`}
+            className={`w-full ${isMobile ? 'pl-8 pr-20 py-2 text-xs' : 'pl-11 pr-32 py-2.5 text-sm'} bg-transparent text-gray-900 dark:text-white rounded-2xl outline-none placeholder:text-gray-400 dark:placeholder:text-gray-400 font-medium`}
           />
           <Search className={`${isMobile ? 'w-4 h-4 left-2.5' : 'w-5 h-5 left-3.5'} text-gray-400 absolute pointer-events-none`} />
 
-          {/* Clear search button */}
-          {localSearch && (
-            <motion.button
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              onClick={() => {
-                setLocalSearch('');
-                setSearchQuery('');
-              }}
-              className={`absolute ${isMobile ? 'right-10' : 'right-16'} p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 rounded-full hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors`}
-              title={t('clearAll')}
-            >
-              <X className="w-3.5 h-3.5" />
-            </motion.button>
-          )}
+          {/* O'ng tomondagi tugmalar: X (tozalash) va Qidirish tugmasi */}
+          <div className="absolute right-1 sm:right-1.5 flex items-center gap-1 sm:gap-1.5">
+            {localSearch && (
+              <motion.button
+                type="button"
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0, opacity: 0 }}
+                onClick={() => {
+                  setLocalSearch('');
+                  setSearchQuery('');
+                }}
+                className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 rounded-full hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors flex items-center justify-center cursor-pointer"
+                title={t('clearAll')}
+              >
+                <X className="w-4 h-4" />
+              </motion.button>
+            )}
 
-          <motion.button
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => handleExecuteSearch()}
-            className={`absolute right-1 sm:right-1.5 bg-uzum-primary hover:bg-uzum-hover text-white ${isMobile ? 'text-[11px] px-2.5 py-1' : 'text-xs px-3 sm:px-3.5 py-1 sm:py-1.5'} font-bold rounded-xl transition-colors shadow-sm flex items-center justify-center gap-1`}
-          >
-            <Search className="w-3.5 h-3.5 sm:hidden" />
-            <span className="hidden sm:inline">{t('headerSearchBtn')}</span>
-          </motion.button>
+            <motion.button
+              type="button"
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => handleExecuteSearch()}
+              className={`bg-uzum-primary hover:bg-uzum-hover text-white ${isMobile ? 'text-[11px] px-2.5 py-1' : 'text-xs px-3 sm:px-3.5 py-1 sm:py-1.5'} font-bold rounded-xl transition-colors shadow-sm flex items-center justify-center gap-1 cursor-pointer`}
+            >
+              <Search className="w-3.5 h-3.5 sm:hidden" />
+              <span className="hidden sm:inline">{t('headerSearchBtn')}</span>
+            </motion.button>
+          </div>
         </motion.div>
 
         {/* Jonli Qidiruv Natijalari (Live Search Dropdown) */}
