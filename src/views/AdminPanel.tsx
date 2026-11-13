@@ -856,7 +856,7 @@ export const AdminPanel: React.FC = () => {
                             animate={isSelected ? { scale: [1, 1.2, 1] } : {}}
                             transition={{ duration: 0.3 }}
                           >
-                            <Icon className={`w-4.5 h-4.5 shrink-0 ${'iconColor' in item && item.iconColor ? item.iconColor : ''}`} />
+                            <Icon className={`w-5 h-5 shrink-0 ${'iconColor' in item && item.iconColor ? item.iconColor : ''}`} />
                           </motion.div>
                           {!isSidebarCollapsed && <span className="text-xs font-bold">{label}</span>}
                         </div>
