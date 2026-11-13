@@ -1,13 +1,20 @@
-'use client';
-
 import React, { Suspense } from 'react';
+import type { Metadata } from 'next';
 import { CatalogPage } from '@/views/CatalogPage';
 
-export default function Catalog() {
+export const metadata: Metadata = {
+  title: "Mahsulotlar katalogi — 0-0-12 Halol Nasiya | ELRIZO",
+  description: "ELRIZO do'konining to'liq mahsulotlar katalogi: smartfonlar, maishiy texnika, noutbuklar, televizorlar va barcha tovarlar 0-0-12 halol nasiyaga.",
+  openGraph: {
+    title: "Mahsulotlar katalogi | ELRIZO Nasiya Savdo",
+    description: "Barcha tovarlar 0% boshlang'ich to'lov va 0% ustama bilan 12 oygacha.",
+  },
+};
+
+export default function Page() {
   return (
-    <Suspense fallback={<div className="min-h-screen py-10 text-center text-sm text-gray-500">Yuklanmoqda...</div>}>
+    <Suspense fallback={<div className="min-h-screen py-20 text-center text-sm text-gray-500 font-bold">Katalog yuklanmoqda...</div>}>
       <CatalogPage />
     </Suspense>
   );
 }
-

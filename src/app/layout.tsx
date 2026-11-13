@@ -12,13 +12,25 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: 'ELRIZO - Siz rozi — biz rozi! | Nasiya Savdo Bozori',
+  metadataBase: new URL('https://elrizonasiya.vercel.app'),
+  title: {
+    default: 'ELRIZO - Siz rozi — biz rozi! | 0-0-12 Halol Nasiya Savdo',
+    template: '%s | ELRIZO',
+  },
   description: "ELRIZO NASIYA SAVDO — 0-0-12 Halol va qulay nasiya savdo do'koni. O'zbekiston bo'ylab 24 soatda bepul yetkazib berish va 1 yillik rasmiy kafolat.",
   icons: {
     icon: [
       { url: '/favicon.svg', type: 'image/svg+xml' },
       { url: '/favicon.png', type: 'image/png' },
     ],
+  },
+  openGraph: {
+    title: 'ELRIZO - Siz rozi — biz rozi! | 0-0-12 Halol Nasiya Savdo',
+    description: "0% Boshlang'ich to'lov, 0% ustama bilan 12 oygacha halol nasiya savdo.",
+    url: 'https://elrizonasiya.vercel.app',
+    siteName: 'ELRIZO Nasiya Savdo',
+    locale: 'uz_UZ',
+    type: 'website',
   },
 };
 
