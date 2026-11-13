@@ -248,7 +248,104 @@ export async function OPTIONS() {
   });
 }
 
-export async function GET() {
+export async function GET(req: Request) {
+  const { searchParams } = new URL(req.url);
+
+  // 1. Saytdan botga start berilganini real vaqtda tekshirish (Deep Link sessiyasi bo'yicha)
+  const checkAuth = searchParams.get('check_auth');
+  if (checkAuth) {
+    const cleanToken = checkAuth.trim();
+    const sessionContract = cleanToken.startsWith('tg_session_') ? cleanToken : `tg_session_${cleanToken}`;
+    try {
+      const { data, error } = await supabase
+        .from('nasiya_orders')
+        .select('phone, customer_name, promo_code, items, status')
+        .eq('contract_number', sessionContract)
+        .limit(1);
+
+      if (!error && data && data.length > 0 && data[0]?.status === 'started') {
+        const item = data[0];
+        const itemDetails = (item.items && item.items[0]) || {};
+        return Response.json(
+          {
+            ok: true,
+            started: true,
+            chatId: String(item.phone),
+            username: itemDetails.username || (item.customer_name && !item.customer_name.startsWith('tg_') ? item.customer_name : ''),
+            firstName: itemDetails.first_name || '',
+            code: item.promo_code || itemDetails.code || '',
+          },
+          { headers: corsHeaders }
+        );
+      }
+    } catch (e) {
+      console.warn('check_auth lookup error:', e);
+    }
+
+    return Response.json(
+      {
+        ok: true,
+        started: false,
+        message: 'Foydalanuvchi hali botga start bosmagan',
+      },
+      { headers: corsHeaders }
+    );
+  }
+
+  // 2. Foydalanuvchi username bo'yicha botga start berganmi yoki yo'qligini tekshirish
+  const checkUsername = searchParams.get('check_username');
+  if (checkUsername) {
+    const cleanU = checkUsername.trim().replace(/^@/, '').toLowerCase();
+
+    // Taniqli administratorlar uchun darhol ruxsat
+    if (cleanU === 'otabek1789' || cleanU === 'otabek' || cleanU === 'yahyo0526') {
+      return Response.json(
+        {
+          ok: true,
+          inBot: true,
+          chatId: '7373118052',
+          username: cleanU,
+          firstName: cleanU,
+        },
+        { headers: corsHeaders }
+      );
+    }
+
+    try {
+      const contract = `tg_user_${cleanU}`;
+      const { data } = await supabase
+        .from('nasiya_orders')
+        .select('phone, customer_name, items')
+        .eq('contract_number', contract)
+        .limit(1);
+
+      if (data && data.length > 0 && data[0]?.phone) {
+        const itemDetails = (data[0].items && data[0].items[0]) || {};
+        return Response.json(
+          {
+            ok: true,
+            inBot: true,
+            chatId: String(data[0].phone),
+            username: cleanU,
+            firstName: itemDetails.first_name || cleanU,
+          },
+          { headers: corsHeaders }
+        );
+      }
+    } catch (e) {
+      console.warn('check_username lookup error:', e);
+    }
+
+    return Response.json(
+      {
+        ok: true,
+        inBot: false,
+        message: `Ushbu @${cleanU} Telegram hisobi hali botimizga start bermagan`,
+      },
+      { headers: corsHeaders }
+    );
+  }
+
   const webhookUrl = `${SITE_URL}/api/telegram`;
   let reconnected = false;
   try {
@@ -296,19 +393,73 @@ export async function POST(req: Request) {
 
   try {
     // 1. Foydalanuvchi xabar yozganda (/start yoki ixtiyoriy matn)
-    // Eng tez javob qaytarish: ortiqcha kutishlarsiz zudlik bilan yuboriladi
     if (update.message) {
       const msg = update.message;
       const chatId = msg.chat?.id;
+      const text = (msg.text || '').trim();
+      const username = msg.from?.username || '';
+      const firstName = msg.from?.first_name || '';
 
       if (!chatId) {
         return Response.json({ ok: true }, { headers: corsHeaders });
       }
 
       // Saytda Telegram bilan kirish uchun foydalanuvchini ro'yxatga olish
-      saveBotUserRecord(chatId, msg.from?.username, msg.from?.first_name).catch(() => {});
+      saveBotUserRecord(chatId, username, firstName).catch(() => {});
 
-      // Zudlik bilan til tanlash kartochkasi yuboriladi (kechikishlarsiz)
+      // Maxsus sessiya tokeni bilan start berilganmi? (masalan /start auth_abc123)
+      const startAuthMatch = text.match(/^\/start\s+(auth_[a-zA-Z0-9_-]+)/i);
+      if (startAuthMatch || text.startsWith('/start auth_')) {
+        const authToken = startAuthMatch ? startAuthMatch[1] : text.replace('/start ', '').trim();
+        const generatedCode = Math.floor(1000 + Math.random() * 9000).toString();
+        const sessionContract = `tg_session_${authToken}`;
+
+        // Supabase bazasida ushbu sessiyaga start berilganini qayd etamiz
+        try {
+          await supabase.from('nasiya_orders').upsert([{
+            contract_number: sessionContract,
+            customer_name: username || String(chatId),
+            phone: String(chatId),
+            address: `chat_id:${chatId}`,
+            total_price: 0,
+            payment_mode: 'telegram_auth_session',
+            status: 'started',
+            promo_code: generatedCode,
+            installment_months: 12,
+            scoring_score: 0,
+            items: [{
+              first_name: firstName,
+              username: username,
+              chat_id: String(chatId),
+              code: generatedCode,
+              started_at: new Date().toISOString(),
+            }]
+          }], { onConflict: 'contract_number' });
+        } catch (sessErr) {
+          console.warn('save auth session error:', sessErr);
+        }
+
+        // Foydalanuvchiga Telegramda tezkor 4 xonali kirish kodini yuboramiz
+        await sendTelegram('sendMessage', {
+          chat_id: chatId,
+          text: `🔐 <b>ELRIZO ONLINE MARKET — KIRISH KODI</b>\n━━━━━━━━━━━━━━━━━━━━\nAssalomu alaykum${firstName ? ', <b>' + escapeHtml(firstName) + '</b>' : ''}!\n\nSaytga kirish uchun 4 xonali tasdiqlash kodingiz:\n\n👉 <code><b>${generatedCode}</b></code> 👈\n\n⚠️ <i>Ushbu bir martalik kodni saytdagi oynaga kiriting. Kod 5 daqiqa davomida amal qiladi.</i>\n━━━━━━━━━━━━━━━━━━━━\n⏰ <b>Vaqt:</b> ${new Date().toLocaleString('uz-UZ')}\n🌐 https://elrizonasiya.vercel.app`,
+          parse_mode: 'HTML',
+          reply_markup: {
+            inline_keyboard: [
+              [
+                { text: "🛍️ ELRIZO Mini App (Do'kon)", web_app: { url: `${WEBAPP_URL}?lang=uz` } }
+              ],
+              [
+                { text: "🌐 Rasmiy saytga qaytish", url: SITE_URL }
+              ]
+            ]
+          }
+        });
+
+        return Response.json({ ok: true }, { headers: corsHeaders });
+      }
+
+      // Standart /start yoki boshqa xabarlar uchun til tanlash menyusi
       await sendTelegram('sendMessage', {
         chat_id: chatId,
         text: getLanguagePromptText(),

@@ -333,17 +333,38 @@ export async function findTelegramChatIdByUsername(usernameInput: string): Promi
   const clean = usernameInput.trim().replace(/^@/, '').toLowerCase();
   if (!clean) return { chatId: null, inBot: false };
 
-  // 1. Agar raqamli chat_id kiritilgan bo'lsa
-  if (/^\d{6,14}$/.test(clean)) {
-    return { chatId: clean, inBot: true };
-  }
-
-  // 2. Taniqli foydalanuvchilar (masalan otabek / yahyo0526 / admin)
+  // 1. Taniqli administratorlar (masalan otabek / yahyo0526 / admin)
   if (clean === 'yahyo0526' || clean === 'otabek1789' || clean === 'otabek') {
     return { chatId: TELEGRAM_ADMIN_CHAT_ID, firstName: clean, inBot: true };
   }
 
-  // 3. LocalStorage keshidan tekshirish
+  // 2. Agar to'g'ridan-to'g'ri raqamli chat_id kiritilgan bo'lsa
+  if (/^\d{6,14}$/.test(clean)) {
+    return { chatId: clean, inBot: true };
+  }
+
+  // 3. Backend API orqali tekshirish (GET /api/telegram?check_username=...)
+  try {
+    const apiRes = await fetch(`/api/telegram?check_username=${encodeURIComponent(clean)}`);
+    if (apiRes.ok) {
+      const apiData = await apiRes.json();
+      if (apiData.ok && apiData.inBot && apiData.chatId) {
+        return {
+          chatId: String(apiData.chatId),
+          firstName: apiData.firstName || clean,
+          inBot: true,
+        };
+      }
+      if (apiData.ok && apiData.inBot === false) {
+        // Backend tasdiqladi: foydalanuvchi hali botga start bosmagan!
+        return { chatId: null, inBot: false };
+      }
+    }
+  } catch (apiErr) {
+    console.warn("Backend check_username fetch exception:", apiErr);
+  }
+
+  // 4. LocalStorage keshidan tekshirish
   try {
     const cached = localStorage.getItem('elrizo_known_tg_users');
     if (cached) {

@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link, Navigate } from '@/lib/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -58,6 +58,65 @@ export const LoginPage: React.FC = () => {
   const [isNotInBot, setIsNotInBot] = useState(false);
   const [telegramChatId, setTelegramChatId] = useState<string | null>(null);
   const [telegramError, setTelegramError] = useState<string | null>(null);
+  const [telegramSessionToken, setTelegramSessionToken] = useState<string>(() =>
+    'auth_' + Math.random().toString(36).substring(2, 10)
+  );
+
+  const openTelegramModal = () => {
+    const token = 'auth_' + Math.random().toString(36).substring(2, 10);
+    setTelegramSessionToken(token);
+    setTelegramStep('start');
+    setTelegramCode('');
+    setTelegramError(null);
+    setIsNotInBot(false);
+    setIsTelegramModalOpen(true);
+  };
+
+  // Telegram botga start bosilganini backend orqali real vaqtda tekshirish (faqat start bosilgandagina keyingi oynaga o'tadi)
+  useEffect(() => {
+    if (!isTelegramModalOpen || telegramStep !== 'start' || !telegramSessionToken) {
+      return;
+    }
+
+    let isMounted = true;
+    const pollInterval = setInterval(async () => {
+      try {
+        const res = await fetch(`/api/telegram?check_auth=${encodeURIComponent(telegramSessionToken)}`);
+        if (!res.ok) return;
+        const data = await res.json();
+        if (!isMounted) return;
+
+        if (data?.started && data.ok) {
+          if (data.username) {
+            setTelegramUsername(data.username);
+          } else if (data.firstName) {
+            setTelegramUsername(data.firstName);
+          }
+          if (data.code) {
+            setTelegramSentCode(data.code);
+          }
+          if (data.chatId) {
+            setTelegramChatId(data.chatId);
+          }
+          setTelegramError(null);
+          setTelegramStep('code');
+          addToast(
+            language === 'ru'
+              ? 'Бот успешно запущен! Проверочный код отправлен вам в Telegram.'
+              : "Telegram botga start berildi! 4 xonali tasdiqlash kodi Telegramingizga yuborildi.",
+            'success'
+          );
+        }
+      } catch (err) {
+        // silent polling catch
+      }
+    }, 1200);
+
+    return () => {
+      isMounted = false;
+      clearInterval(pollInterval);
+    };
+  }, [isTelegramModalOpen, telegramStep, telegramSessionToken, language, addToast]);
 
   // Agar allaqachon kirgan bo'lsa darhol tegishli sahifaga yo'naltirish (tizimdan chiqish holatida bo'lmasa)
   if (user && typeof window !== 'undefined' && localStorage.getItem('elrizo_user_logged_out') !== 'true') {
@@ -281,37 +340,37 @@ export const LoginPage: React.FC = () => {
       const found = await findTelegramChatIdByUsername(cleanTg);
 
       if (!found.inBot || !found.chatId) {
-        // Foydalanuvchi botga hali start bermagan!
+        // Foydalanuvchi botga hali start bermagan! Qat'iy to'xtatamiz!
         setIsNotInBot(true);
-        // Stepni username da ushlab turamiz, botga start berishni so'raymiz
         setTelegramError(
           language === 'ru'
-            ? 'Вы еще не запустили наш бот! Нажмите синюю кнопку «Telegram botga o\'tish» выше и отправьте /start, затем запросите код повторно.'
-            : "Siz hali Telegram botimizga start bermagansiz! Kodni qabul qilish uchun yuqoridagi ko'k «Telegram botga o'tish» tugmasini bosib botga /start bosing, so'ngra kodni oling."
+            ? `Пользователь @${cleanTg} еще не запустил бот! Перейдите в бот @${TELEGRAM_BOT_USERNAME} и нажмите «Start». Только после этого откроется окно пароля.`
+            : `Ushbu @${cleanTg} Telegram hisobi hali @${TELEGRAM_BOT_USERNAME} botimizga start bermagan! Qachonki botga kirib «Start» bossangizgina keyingi oynaga o'ta olasiz.`
+        );
+        return;
+      }
+
+      // Foydalanuvchi botda bor, kod yuboramiz!
+      setTelegramChatId(found.chatId);
+      const res = await sendTelegramLoginCode(found.chatId, cleanTg, generatedCode);
+      if (res.success) {
+        setIsNotInBot(false);
+        setTelegramStep('code');
+        addToast(
+          language === 'ru'
+            ? `4-значный код подтверждения отправлен в Telegram бот @${cleanTg}`
+            : `@${cleanTg} hisobingizga @${TELEGRAM_BOT_USERNAME} orqali 4 xonali tasdiqlash kodi yuborildi!`,
+          'info'
         );
       } else {
-        // Foydalanuvchi botda bor, kod yuboramiz!
-        setTelegramChatId(found.chatId);
-        const res = await sendTelegramLoginCode(found.chatId, cleanTg, generatedCode);
-        if (res.success) {
-          setIsNotInBot(false);
-          setTelegramStep('code');
-          addToast(
+        setIsNotInBot(true);
+        setTelegramError(
+          res.error || (
             language === 'ru'
-              ? `4-значный код подтверждения отправлен в Telegram бот @${cleanTg}`
-              : `@${cleanTg} hisobingizga @${TELEGRAM_BOT_USERNAME} orqali 4 xonali tasdiqlash kodi yuborildi!`,
-            'info'
-          );
-        } else {
-          setIsNotInBot(true);
-          setTelegramError(
-            res.error || (
-              language === 'ru'
-                ? "Ошибка отправки кода в бот. Убедитесь, что вы нажали /start в боте."
-                : "Kod yuborishda xatolik yuz berdi. Iltimos botga o'tib /start bosganingizga ishonch hosil qiling."
-            )
-          );
-        }
+              ? "Ошибка отправки кода в бот. Убедитесь, что вы нажали /start в боте."
+              : "Kod yuborishda xatolik yuz berdi. Iltimos botga o'tib /start bosganingizga ishonch hosil qiling."
+          )
+        );
       }
     } catch (err: any) {
       console.error("Telegram code request error:", err);
@@ -384,10 +443,11 @@ export const LoginPage: React.FC = () => {
       return;
     }
 
+    const userIdentifier = cleanTg || telegramChatId || 'user';
     const tgUser: User = {
-      id: `tg-${cleanTg}-${Date.now()}`,
-      fullName: `@${cleanTg}`,
-      email: `${cleanTg}@telegram.org`,
+      id: `tg-${userIdentifier}-${Date.now()}`,
+      fullName: cleanTg ? `@${cleanTg}` : (telegramUsername || 'Telegram Foydalanuvchisi'),
+      email: `${userIdentifier}@telegram.org`,
       phone: '+998 90 123 45 67',
       isVerified: true,
       scoringLimit: 0,
@@ -441,12 +501,7 @@ export const LoginPage: React.FC = () => {
         {/* Telegram orqali kirish tugmasi */}
         <button 
           type="button" 
-          onClick={() => {
-            setErrorMessage(null);
-            setTelegramError(null);
-            setTelegramStep('start');
-            setIsTelegramModalOpen(true);
-          }}
+          onClick={openTelegramModal}
           className="flex-1 h-11 px-3 rounded-2xl border border-sky-200 dark:border-sky-900/60 bg-sky-50 dark:bg-sky-950/40 hover:bg-sky-100 dark:hover:bg-sky-900/60 shadow-xs flex items-center justify-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98] text-xs font-bold text-sky-700 dark:text-sky-300 cursor-pointer"
           title={language === 'ru' ? 'Быстрый вход через Telegram' : 'Telegram orqali tezkor kirish'}
         >
@@ -738,19 +793,17 @@ export const LoginPage: React.FC = () => {
                   setTelegramError(null);
                   setIsNotInBot(false);
                 }}
-                className="absolute top-2.5 right-2.5 sm:top-3 sm:right-3 w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-700 dark:hover:text-white rounded-full hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors cursor-pointer z-20"
+                className="absolute top-3.5 right-3.5 sm:top-4 sm:right-4 w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-700 dark:hover:text-white rounded-full hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors cursor-pointer z-20"
                 aria-label="Yopish"
               >
                 <X className="w-4 h-4" />
               </button>
 
-              {/* Telegram Badge & Sarlavha */}
-              <div className="w-full py-2 px-4 rounded-2xl bg-sky-50/80 dark:bg-sky-950/40 flex items-center justify-center text-[#229ED9] shadow-inner border border-sky-200/50 dark:border-sky-800/50">
-                <div className="w-8 h-8 rounded-full bg-[#229ED9] text-white flex items-center justify-center shadow-sm">
-                  <svg className="w-4.5 h-4.5 fill-current" viewBox="0 0 24 24">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.75-.55 2.92-1.27 4.86-2.11 5.83-2.52 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/>
-                  </svg>
-                </div>
+              {/* Telegram Icon (Centered, no wide background bar to collide with X button) */}
+              <div className="w-12 h-12 rounded-2xl bg-[#229ED9] text-white flex items-center justify-center mx-auto shadow-md shadow-sky-500/25">
+                <svg className="w-6 h-6 fill-current" viewBox="0 0 24 24">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.75-.55 2.92-1.27 4.86-2.11 5.83-2.52 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/>
+                </svg>
               </div>
 
               <div>
@@ -795,7 +848,7 @@ export const LoginPage: React.FC = () => {
               {/* 1-BOSQICH: FAQAT BOTGA START BERISH OYNASI */}
               {telegramStep === 'start' && (
                 <div className="space-y-4 pt-1">
-                  <div className="bg-gradient-to-br from-sky-50 via-sky-50/70 to-blue-50/50 dark:from-sky-950/40 dark:via-sky-900/20 dark:to-slate-800/60 border-2 border-sky-200 dark:border-sky-800/80 rounded-2xl p-4 sm:p-5 text-left space-y-3 shadow-sm">
+                  <div className="bg-gradient-to-br from-sky-50 via-sky-50/70 to-blue-50/50 dark:from-sky-950/40 dark:via-sky-900/20 dark:to-slate-800/60 border-2 border-sky-200 dark:border-sky-800/80 rounded-2xl p-4 sm:p-5 text-left space-y-3.5 shadow-sm">
                     <div className="flex items-center justify-between">
                       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-[#229ED9] text-white tracking-wide shadow-xs">
                         1-qadam
@@ -813,40 +866,61 @@ export const LoginPage: React.FC = () => {
                       </h4>
                       <p className="text-xs leading-relaxed text-gray-600 dark:text-slate-300 mt-1.5">
                         {language === 'ru'
-                          ? 'Код подтверждения из 4 цифр отправляется в наш официальный бот. Поэтому сначала перейдите в бот и нажмите «Start»:'
-                          : "Usernameni yozganingizda 4 xonali kod Telegram botingizga yuboriladi. Kodni qabul qilish uchun birinchi bo'lib botimizga kiring va «Start» bosing:"}
+                          ? 'Нажмите синюю кнопку ниже, перейдите в бот и нажмите «Start». Как только вы нажмете «Start», бот отправит вам 4-значный проверочный код, а сайт автоматически перейдет к вводу кода:'
+                          : "Quyidagi ko'k tugmani bosib botimizga kiring va «Start» bosing. Start bosishingiz bilan bot sizga 4 xonali kod yuboradi, sayt esa buni backend orqali bilib avtomatik keyingi oynaga o'tadi:"}
                       </p>
                     </div>
 
-                    {/* TELEGRAM BOTGA O'TISH TUGMASI */}
+                    {/* TELEGRAM BOTGA O'TISH TUGMASI (Deep link orqali) */}
                     <a
                       id="btn-goto-telegram-bot-step1"
-                      href={`https://t.me/${TELEGRAM_BOT_USERNAME}`}
+                      href={`https://t.me/${TELEGRAM_BOT_USERNAME}?start=${telegramSessionToken}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      onClick={() => {
-                        // Botga o'tish bilan birga saytda 2-qadamga (username oynasiga) o'tkazamiz
-                        setTelegramStep('username');
-                      }}
-                      className="w-full py-3 px-4 rounded-xl bg-[#229ED9] hover:bg-[#1C8EC7] active:scale-[0.98] text-white font-extrabold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all shadow-md shadow-sky-500/25 cursor-pointer"
+                      className="w-full py-3.5 px-4 rounded-xl bg-[#229ED9] hover:bg-[#1C8EC7] active:scale-[0.98] text-white font-extrabold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all shadow-md shadow-sky-500/25 cursor-pointer"
                     >
-                      <svg className="w-4 h-4 fill-current shrink-0" viewBox="0 0 24 24">
+                      <svg className="w-4.5 h-4.5 fill-current shrink-0" viewBox="0 0 24 24">
                         <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.75-.55 2.92-1.27 4.86-2.11 5.83-2.52 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/>
                       </svg>
-                      <span>{language === 'ru' ? "Telegram botga o'tish" : "Telegram botga o'tish"}</span>
+                      <span>{language === 'ru' ? "Открыть Telegram бот (@elrizo_bot)" : "Telegram botga o'tish (@elrizo_bot)"}</span>
                       <ExternalLink className="w-3.5 h-3.5 opacity-80 shrink-0" />
                     </a>
                   </div>
 
-                  {/* START BERIB SAYTGA QAYTGANDAN SO'NG DAVOM ETISH TUGMASI */}
-                  <button
-                    type="button"
-                    onClick={() => setTelegramStep('username')}
-                    className="w-full py-2.5 px-4 rounded-xl border-2 border-gray-200 dark:border-slate-700 hover:border-[#229ED9] text-gray-700 dark:text-slate-200 font-extrabold text-xs flex items-center justify-center gap-2 transition-all hover:bg-sky-50 dark:hover:bg-slate-800 cursor-pointer"
-                  >
-                    <span>{language === 'ru' ? "Я запустил(а) бот, продолжить" : "Botga start berdim, davom etish"}</span>
-                    <ArrowRight className="w-3.5 h-3.5 text-[#229ED9]" />
-                  </button>
+                  {/* REAL-TIME BACKEND TEKSHIRUV INDIKATORI (AVTOMATIK O'TISH) */}
+                  <div className="p-3.5 rounded-2xl bg-sky-50/90 dark:bg-sky-950/50 border border-sky-200 dark:border-sky-800/80 flex items-center gap-3 text-left">
+                    <div className="relative flex h-3.5 w-3.5 shrink-0">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-[#229ED9]"></span>
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-xs font-bold text-sky-950 dark:text-sky-200 leading-tight">
+                        {language === 'ru' 
+                          ? 'Ожидание нажатия «Start» в боте...' 
+                          : 'Botga «Start» berilishi kutilmoqda...'}
+                      </p>
+                      <p className="text-[11px] text-sky-700/85 dark:text-sky-300/85 mt-0.5 leading-snug">
+                        {language === 'ru'
+                          ? 'Как только вы нажмете «Start» в боте, система автоматически проверит это и откроет окно кода.'
+                          : 'Bot ochilganda «Start» bosing. Backend botga start berilganini bilishi bilan sayt avtomatik keyingi oynaga o\'tadi.'}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* USERNAME BILAN TEKSHIRISH (ALTERNATIVE) */}
+                  <div className="pt-0.5 text-center">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setTelegramError(null);
+                        setTelegramStep('username');
+                      }}
+                      className="text-xs font-bold text-gray-500 dark:text-slate-400 hover:text-[#229ED9] transition-colors inline-flex items-center gap-1 cursor-pointer"
+                    >
+                      <span>{language === 'ru' ? 'Уже запускали бот ранее? Ввести @username' : 'Avval botga start berganmisiz? Username bilan tekshirish'}</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </div>
               )}
 
@@ -881,18 +955,30 @@ export const LoginPage: React.FC = () => {
                   </div>
 
                   {telegramError && (
-                    <div className="p-3 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-300 text-xs font-medium text-left flex items-start gap-2 shadow-xs">
-                      <AlertCircle className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
-                      <div className="flex-1 space-y-1.5">
-                        <span className="leading-tight block">{telegramError}</span>
+                    <div className="p-3.5 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border-2 border-rose-200 dark:border-rose-900/60 text-rose-800 dark:text-rose-300 text-xs font-medium text-left flex items-start gap-2.5 shadow-sm">
+                      <AlertCircle className="w-4 h-4 text-rose-500 shrink-0 mt-0.5" />
+                      <div className="flex-1 space-y-2">
+                        <span className="leading-snug block font-semibold">{telegramError}</span>
                         {isNotInBot && (
-                          <button
-                            type="button"
-                            onClick={() => setTelegramStep('start')}
-                            className="text-[11px] font-bold text-sky-600 dark:text-sky-400 underline block cursor-pointer"
-                          >
-                            {language === 'ru' ? 'Вернуться к 1-шагу и запустить бот' : "1-qadamga qaytib botga start berish"}
-                          </button>
+                          <div className="flex items-center gap-2 pt-1">
+                            <a
+                              href={`https://t.me/${TELEGRAM_BOT_USERNAME}?start=${telegramSessionToken}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={() => setTelegramStep('start')}
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#229ED9] text-white text-[11px] font-bold shadow-xs hover:bg-[#1C8EC7] transition-all cursor-pointer"
+                            >
+                              <span>{language === 'ru' ? 'Запустить бот сейчас' : "Hozir botga kirib «Start» bosish"}</span>
+                              <ExternalLink className="w-3 h-3" />
+                            </a>
+                            <button
+                              type="button"
+                              onClick={() => setTelegramStep('start')}
+                              className="text-[11px] font-bold text-sky-600 dark:text-sky-400 hover:underline cursor-pointer"
+                            >
+                              {language === 'ru' ? '1-шаг' : "1-qadamga qaytish"}
+                            </button>
+                          </div>
                         )}
                       </div>
                     </div>
@@ -942,7 +1028,7 @@ export const LoginPage: React.FC = () => {
                       {language === 'ru' ? 'Введите проверочный код' : 'Tasdiqlash kodini kiriting'}
                     </h3>
                     <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">
-                      <span className="font-bold text-sky-600 dark:text-sky-400">@{telegramUsername.trim().replace(/^@/, '')}</span> hisobingiz uchun @{TELEGRAM_BOT_USERNAME} yuborgan 4 xonali kodni {['yahyo0526', 'otabek1789', 'otabek'].includes(telegramUsername.trim().replace(/^@/, '').toLowerCase()) ? "yoki administrator parolini" : ""} yozing:
+                      <span className="font-bold text-sky-600 dark:text-sky-400">{telegramUsername ? `@${telegramUsername.trim().replace(/^@/, '')}` : "Telegram"}</span> hisobingiz uchun @{TELEGRAM_BOT_USERNAME} yuborgan 4 xonali kodni {['yahyo0526', 'otabek1789', 'otabek'].includes((telegramUsername || '').trim().replace(/^@/, '').toLowerCase()) ? "yoki administrator parolini" : ""} yozing:
                     </p>
                   </div>
 
@@ -961,7 +1047,7 @@ export const LoginPage: React.FC = () => {
                         required
                         autoFocus
                         maxLength={30}
-                        placeholder={['yahyo0526', 'otabek1789', 'otabek'].includes(telegramUsername.trim().replace(/^@/, '').toLowerCase()) ? "4 xonali kod yoki admin paroli" : "• • • •"}
+                        placeholder={['yahyo0526', 'otabek1789', 'otabek'].includes((telegramUsername || '').trim().replace(/^@/, '').toLowerCase()) ? "4 xonali kod yoki admin paroli" : "• • • •"}
                         value={telegramCode}
                         onChange={(e) => setTelegramCode(e.target.value)}
                         className="w-full py-3 px-4 text-center tracking-[0.2em] text-xl font-mono font-black bg-gray-50 dark:bg-slate-800 border-2 border-sky-300 dark:border-sky-700 rounded-2xl outline-none focus:border-[#229ED9] focus:ring-4 focus:ring-sky-500/20 text-gray-900 dark:text-white transition-all placeholder:text-xs placeholder:tracking-normal placeholder:font-sans placeholder:font-semibold"
