@@ -2734,8 +2734,13 @@ export const AdminPanel: React.FC = () => {
                             {promo.description}
                           </p>
 
-                          <div className="text-[11px] text-gray-400 dark:text-slate-400 font-medium">
-                            {language === 'ru' ? 'Использовано:' : 'Qo\'llanilgan:'} <strong className="text-gray-900 dark:text-white">{promo.usageCount || 0} {language === 'ru' ? 'раз' : 'marta'}</strong>
+                          <div className="flex items-center justify-between text-[11px] text-gray-400 dark:text-slate-400 font-medium">
+                            <span>
+                              {language === 'ru' ? 'Использовано:' : 'Qo\'llanilgan:'} <strong className="text-gray-900 dark:text-white">{promo.usageCount || 0} {language === 'ru' ? 'раз' : 'marta'}</strong>
+                            </span>
+                            <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
+                              {language === 'ru' ? '1 клиент = 1 раз' : '1 kishi = 1 marta'}
+                            </span>
                           </div>
                         </div>
 

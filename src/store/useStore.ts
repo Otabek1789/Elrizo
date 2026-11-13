@@ -125,7 +125,10 @@ interface StoreState {
   // Promo codes (WELCOME10, ELRIZO15, etc.)
   promoCodes: PromoCode[];
   appliedPromoCode: PromoCode | null;
-  applyPromoCode: (code: string) => { success: boolean; message?: string };
+  usedPromoCodes: string[]; // Brauzer / qurilma bo'yicha ishlatilgan promokodlar
+  promoUsageByUser: Record<string, string[]>; // Telefon raqami yoki User ID bo'yicha ishlatilgan promokodlar
+  applyPromoCode: (code: string, phoneOrId?: string) => { success: boolean; message?: string };
+  isPromoCodeUsedByUser: (code: string, phoneOrId?: string) => boolean;
   removePromoCode: () => void;
   addPromoCode: (promo: PromoCode) => void;
   togglePromoCode: (id: string) => void;
@@ -403,12 +406,84 @@ export const useStore = create<StoreState>()(
       // Promo codes implementation
       promoCodes: INITIAL_PROMO_CODES,
       appliedPromoCode: null,
+      usedPromoCodes: [],
+      promoUsageByUser: {},
 
-      applyPromoCode: (codeStr: string) => {
+      isPromoCodeUsedByUser: (code: string, phoneOrId?: string) => {
+        const cleanCode = (code || '').trim().toUpperCase();
+        if (!cleanCode) return false;
+
+        // 1. Ushbu qurilma/brauzerda biror buyurtmada ishlatilganmi?
+        const usedDevice = get().usedPromoCodes || [];
+        if (usedDevice.some((c) => c.toUpperCase() === cleanCode)) {
+          return true;
+        }
+
+        // 2. Joriy tizimga kirgan foydalanuvchining shaxsiy hisobida ishlatilganmi?
+        const currentUser = get().user;
+        if (currentUser?.usedPromoCodes && currentUser.usedPromoCodes.some((c) => c.toUpperCase() === cleanCode)) {
+          return true;
+        }
+
+        // 3. Telefon raqami yoki User ID bo'yicha xaritada bormi?
+        const usageMap = get().promoUsageByUser || {};
+        const checkKeys: string[] = [];
+        if (currentUser?.id) checkKeys.push(currentUser.id);
+        if (currentUser?.phone) {
+          checkKeys.push(currentUser.phone);
+          const digits = currentUser.phone.replace(/\D/g, '');
+          if (digits) checkKeys.push(digits);
+        }
+        if (phoneOrId) {
+          checkKeys.push(phoneOrId);
+          const digits = phoneOrId.replace(/\D/g, '');
+          if (digits) checkKeys.push(digits);
+        }
+
+        for (const k of checkKeys) {
+          if (k && usageMap[k] && usageMap[k].some((c) => c.toUpperCase() === cleanCode)) {
+            return true;
+          }
+        }
+
+        // 4. Avvalgi rasmiylashtirilgan buyurtmalar tarixida ushbu shaxs/telefon bilan ishlatilganmi?
+        const orders = get().orders || [];
+        const targetDigits = (phoneOrId || currentUser?.phone || '').replace(/\D/g, '');
+        const hasOrderWithPromo = orders.some((ord) => {
+          if (!ord.appliedPromoCode) return false;
+          if (ord.appliedPromoCode.trim().toUpperCase() !== cleanCode) return false;
+
+          // Agar telefon raqami mos kelsa
+          if (targetDigits) {
+            const ordDigits = (ord.customerPhone || '').replace(/\D/g, '');
+            if (ordDigits && (ordDigits === targetDigits || ordDigits.endsWith(targetDigits) || targetDigits.endsWith(ordDigits))) {
+              return true;
+            }
+          }
+          // Agar foydalanuvchi ismi mos kelsa
+          if (currentUser?.fullName && ord.customerName && ord.customerName.trim().toLowerCase() === currentUser.fullName.trim().toLowerCase()) {
+            return true;
+          }
+          return false;
+        });
+
+        if (hasOrderWithPromo) return true;
+
+        return false;
+      },
+
+      applyPromoCode: (codeStr: string, phoneOrId?: string) => {
         const cleanCode = codeStr.trim().toUpperCase();
         if (!cleanCode) {
           const msg = get().t('promoNotFoundToast');
           get().addToast(msg, 'error');
+          return { success: false, message: msg };
+        }
+
+        // 1. Shaxs tomonidan avval ishlatilganmi tekshirish (1 kishi faqat 1 marta ishlata oladi)
+        if (get().isPromoCodeUsedByUser(cleanCode, phoneOrId)) {
+          const msg = get().t('promoAlreadyUsedToast');
+          get().addToast(msg, 'warning');
           return { success: false, message: msg };
         }
 
@@ -437,14 +512,6 @@ export const useStore = create<StoreState>()(
         }
 
         set({ appliedPromoCode: promo });
-
-        // Increment usage count
-        set((state) => ({
-          promoCodes: state.promoCodes.map((p) =>
-            p.id === promo.id ? { ...p, usageCount: (p.usageCount || 0) + 1 } : p
-          ),
-        }));
-
         get().addToast(`${get().t('promoAppliedToast')} (${promo.code})`, 'success');
         return { success: true };
       },
@@ -536,9 +603,69 @@ export const useStore = create<StoreState>()(
       // Orders (Local Storage + Supabase sync)
       orders: [],
       addOrder: async (order: Order) => {
-        set((state) => ({
-          orders: [order, ...state.orders],
-        }));
+        const promoCodeUsed = order.appliedPromoCode?.trim().toUpperCase();
+
+        set((state) => {
+          let updatedDevice = state.usedPromoCodes || [];
+          let updatedMap = { ...(state.promoUsageByUser || {}) };
+          let updatedUser = state.user;
+          let updatedPromos = state.promoCodes;
+
+          if (promoCodeUsed) {
+            // 1. Qurilma bo'yicha belgilash
+            if (!updatedDevice.map((c) => c.toUpperCase()).includes(promoCodeUsed)) {
+              updatedDevice = [...updatedDevice, promoCodeUsed];
+            }
+
+            // 2. Telefon raqami va foydalanuvchi ID bo'yicha belgilash
+            const phoneDigits = (order.customerPhone || '').replace(/\D/g, '');
+            if (phoneDigits) {
+              const currentList = updatedMap[phoneDigits] || [];
+              if (!currentList.map((c) => c.toUpperCase()).includes(promoCodeUsed)) {
+                updatedMap[phoneDigits] = [...currentList, promoCodeUsed];
+              }
+            }
+            if (order.customerPhone) {
+              const currentList = updatedMap[order.customerPhone] || [];
+              if (!currentList.map((c) => c.toUpperCase()).includes(promoCodeUsed)) {
+                updatedMap[order.customerPhone] = [...currentList, promoCodeUsed];
+              }
+            }
+            if (state.user?.id) {
+              const currentList = updatedMap[state.user.id] || [];
+              if (!currentList.map((c) => c.toUpperCase()).includes(promoCodeUsed)) {
+                updatedMap[state.user.id] = [...currentList, promoCodeUsed];
+              }
+            }
+
+            // 3. User profilidagi usedPromoCodes ro'yxatini yangilash
+            if (state.user) {
+              const existingCodes = state.user.usedPromoCodes || [];
+              if (!existingCodes.map((c) => c.toUpperCase()).includes(promoCodeUsed)) {
+                updatedUser = {
+                  ...state.user,
+                  usedPromoCodes: [...existingCodes, promoCodeUsed],
+                };
+              }
+            }
+
+            // 4. Promokodning umumiy qo'llanilish sonini oshirish
+            updatedPromos = state.promoCodes.map((p) =>
+              p.code.toUpperCase() === promoCodeUsed
+                ? { ...p, usageCount: (p.usageCount || 0) + 1 }
+                : p
+            );
+          }
+
+          return {
+            orders: [order, ...state.orders],
+            usedPromoCodes: updatedDevice,
+            promoUsageByUser: updatedMap,
+            user: updatedUser,
+            promoCodes: updatedPromos,
+            appliedPromoCode: null, // Buyurtma rasmiylashtirilgach, promokod yechiladi
+          };
+        });
 
         // Telegram Bot orqali administratorga tezkor va to'liq hisobot yuborish
         try {
@@ -976,7 +1103,7 @@ export const useStore = create<StoreState>()(
             state.cashbackTransactions = [];
           }
           if (state.promoCodes) {
-            state.promoCodes = state.promoCodes.map((p: any) => ({ ...p, usageCount: 0 }));
+            state.promoCodes = state.promoCodes.map((p: any) => ({ ...p, usageCount: p.usageCount || 0 }));
           }
         }
         if (state?.user) {
@@ -1026,6 +1153,8 @@ export const useStore = create<StoreState>()(
         language: state.language,
         promoCodes: state.promoCodes,
         appliedPromoCode: state.appliedPromoCode,
+        usedPromoCodes: state.usedPromoCodes,
+        promoUsageByUser: state.promoUsageByUser,
         selectedCity: state.selectedCity,
         comparisonList: state.comparisonList,
         reviews: state.reviews,

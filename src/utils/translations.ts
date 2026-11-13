@@ -428,6 +428,9 @@ export const TRANSLATIONS = {
     promoMinOrderToast: "Ushbu promokod faqat minimal buyurtma uchun amal qiladi:",
     availablePromosHint: "Mavjud promokodlar:",
     promoAppliedBadge: "chegirma taqdim etildi",
+    promoAlreadyUsedToast: "Siz bu promokoddan avval foydalangansiz! Har bir promokodni faqat bir marta ishlatish mumkin. Keyingi xarid uchun boshqa promokod kiriting.",
+    promoAlreadyUsedBadge: "Avval ishlatilgan",
+    promoOneTimeRuleNotice: "Bitta promokoddan 1 kishi faqat 1 marta foydalanishi mumkin",
 
     // Login Required Modal
     loginRequiredTitle: "Akkauntga kirish talab etiladi",
@@ -1064,6 +1067,9 @@ export const TRANSLATIONS = {
     promoMinOrderToast: "Этот промокод действует при минимальной сумме заказа:",
     availablePromosHint: "Доступные промокоды:",
     promoAppliedBadge: "скидка предоставлена",
+    promoAlreadyUsedToast: "Вы уже использовали этот промокод! Каждый промокод можно использовать только один раз. Для следующей покупки укажите другой промокод.",
+    promoAlreadyUsedBadge: "Ранее использован",
+    promoOneTimeRuleNotice: "Каждый промокод действует только 1 раз для одного человека",
 
     // Login Required Modal
     loginRequiredTitle: "Требуется вход в аккаунт",

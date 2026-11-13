@@ -47,6 +47,7 @@ export const Checkout: React.FC = () => {
     appliedPromoCode,
     applyPromoCode,
     removePromoCode,
+    isPromoCodeUsedByUser,
     getDiscountAmount,
     openLoginRequiredModal,
     selectedCity,
@@ -367,11 +368,32 @@ export const Checkout: React.FC = () => {
     });
   };
 
+  // Agar kiritilgan telefon raqam avval ushbu promokoddan foydalangan bo'lsa, uni avtomatik bekor qilish
+  useEffect(() => {
+    if (appliedPromoCode && formData.phone) {
+      if (isPromoCodeUsedByUser(appliedPromoCode.code, formData.phone)) {
+        removePromoCode();
+        const msg = t('promoAlreadyUsedToast');
+        setPromoError(msg);
+        addToast(msg, 'warning');
+      }
+    }
+  }, [formData.phone, appliedPromoCode, isPromoCodeUsedByUser, removePromoCode, t, addToast]);
+
   const handleApplyPromo = (codeToApply?: string) => {
     const code = (codeToApply || promoInput).trim();
     if (!code) return;
     setPromoError('');
-    const res = applyPromoCode(code);
+
+    // Shaxsiy tekshiruv: 1 kishi bitta promokoddan faqat bir marta foydalana oladi
+    if (isPromoCodeUsedByUser(code, formData.phone)) {
+      const msg = t('promoAlreadyUsedToast');
+      setPromoError(msg);
+      addToast(msg, 'warning');
+      return;
+    }
+
+    const res = applyPromoCode(code, formData.phone);
     if (!res.success) {
       const msg = res.message || (
         language === 'ru' ? 'Промокод не найден или срок действия истек' : "Promokod topilmadi yoki muddati o'tgan"
@@ -380,12 +402,6 @@ export const Checkout: React.FC = () => {
       addToast(msg, 'error');
     } else {
       setPromoInput('');
-      addToast(
-        res.message || (
-          language === 'ru' ? 'Промокод успешно применен' : "Promokod muvaffaqiyatli qo'llandi"
-        ),
-        'success'
-      );
     }
   };
 
@@ -1191,21 +1207,37 @@ export const Checkout: React.FC = () => {
                   )}
                   {/* Tavsiya qilinadigan promokod chiplari */}
                   <div className="flex flex-wrap gap-1.5 pt-1">
-                    <button
-                      type="button"
-                      onClick={() => handleApplyPromo('WELCOME10')}
-                      className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-md bg-purple-100/70 dark:bg-purple-950/60 text-uzum-primary dark:text-purple-300 hover:bg-purple-200 dark:hover:bg-purple-900/60 transition-colors"
-                    >
-                      WELCOME10 (-10%)
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleApplyPromo('ELRIZO15')}
-                      className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-md bg-purple-100/70 dark:bg-purple-950/60 text-uzum-primary dark:text-purple-300 hover:bg-purple-200 dark:hover:bg-purple-900/60 transition-colors"
-                    >
-                      ELRIZO15 (-15%)
-                    </button>
+                    {[
+                      { code: 'WELCOME10', label: 'WELCOME10 (-10%)' },
+                      { code: 'ELRIZO15', label: 'ELRIZO15 (-15%)' },
+                    ].map((chip) => {
+                      const isUsed = isPromoCodeUsedByUser(chip.code, formData.phone);
+                      return (
+                        <button
+                          key={chip.code}
+                          type="button"
+                          onClick={() => handleApplyPromo(chip.code)}
+                          disabled={isUsed}
+                          className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-md transition-colors flex items-center gap-1 ${
+                            isUsed
+                              ? 'bg-gray-100 dark:bg-slate-800 text-gray-400 dark:text-slate-500 line-through cursor-not-allowed opacity-60 border border-gray-200 dark:border-slate-700'
+                              : 'bg-purple-100/70 dark:bg-purple-950/60 text-uzum-primary dark:text-purple-300 hover:bg-purple-200 dark:hover:bg-purple-900/60 border border-purple-200/60 dark:border-purple-800/60 cursor-pointer'
+                          }`}
+                          title={isUsed ? t('promoAlreadyUsedToast') : undefined}
+                        >
+                          <span>{chip.label}</span>
+                          {isUsed && (
+                            <span className="text-[9px] font-sans no-underline font-normal text-rose-500">
+                              ({t('promoAlreadyUsedBadge')})
+                            </span>
+                          )}
+                        </button>
+                      );
+                    })}
                   </div>
+                  <p className="text-[10px] text-gray-400 dark:text-slate-500 pt-0.5">
+                    ℹ️ {t('promoOneTimeRuleNotice')}
+                  </p>
                 </div>
               )}
             </div>

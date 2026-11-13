@@ -21,6 +21,7 @@ export const CartDrawer: React.FC = () => {
     appliedPromoCode,
     applyPromoCode,
     removePromoCode,
+    isPromoCodeUsedByUser,
     getDiscountAmount,
     getFinalTotal,
     getFinalMonthlyTotal,
@@ -52,8 +53,15 @@ export const CartDrawer: React.FC = () => {
 
   const handleApplyPromo = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!promoInput.trim()) return;
-    const res = applyPromoCode(promoInput);
+    const clean = promoInput.trim().toUpperCase();
+    if (!clean) return;
+
+    if (isPromoCodeUsedByUser(clean, user?.phone)) {
+      addToast(t('promoAlreadyUsedToast'), 'warning');
+      return;
+    }
+
+    const res = applyPromoCode(clean, user?.phone);
     if (res.success) {
       setPromoInput('');
     }
@@ -251,21 +259,37 @@ export const CartDrawer: React.FC = () => {
                     {/* Quick clickable chips */}
                     <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
                       <span className="text-[10px] text-gray-400 dark:text-slate-500">{t('availablePromosHint')}</span>
-                      <button
-                        type="button"
-                        onClick={() => applyPromoCode('WELCOME10')}
-                        className="px-2 py-0.5 rounded-md bg-purple-50 dark:bg-purple-950/60 text-uzum-primary dark:text-purple-300 font-mono text-[10px] font-bold border border-purple-200 dark:border-purple-800 hover:bg-purple-100 transition-colors"
-                      >
-                        WELCOME10 (-10%)
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => applyPromoCode('ELRIZO15')}
-                        className="px-2 py-0.5 rounded-md bg-purple-50 dark:bg-purple-950/60 text-uzum-primary dark:text-purple-300 font-mono text-[10px] font-bold border border-purple-200 dark:border-purple-800 hover:bg-purple-100 transition-colors"
-                      >
-                        ELRIZO15 (-15%)
-                      </button>
+                      {[
+                        { code: 'WELCOME10', label: 'WELCOME10 (-10%)' },
+                        { code: 'ELRIZO15', label: 'ELRIZO15 (-15%)' },
+                      ].map((chip) => {
+                        const isUsed = isPromoCodeUsedByUser(chip.code, user?.phone);
+                        return (
+                          <button
+                            key={chip.code}
+                            type="button"
+                            onClick={() => applyPromoCode(chip.code, user?.phone)}
+                            disabled={isUsed}
+                            className={`px-2 py-0.5 rounded-md font-mono text-[10px] font-bold border transition-colors flex items-center gap-1 ${
+                              isUsed
+                                ? 'bg-gray-100 dark:bg-slate-800 text-gray-400 dark:text-slate-500 line-through opacity-60 border-gray-200 dark:border-slate-700 cursor-not-allowed'
+                                : 'bg-purple-50 dark:bg-purple-950/60 text-uzum-primary dark:text-purple-300 border-purple-200 dark:border-purple-800 hover:bg-purple-100 dark:hover:bg-purple-900/60 cursor-pointer'
+                            }`}
+                            title={isUsed ? t('promoAlreadyUsedToast') : undefined}
+                          >
+                            <span>{chip.label}</span>
+                            {isUsed && (
+                              <span className="text-[9px] font-sans no-underline font-normal text-rose-500">
+                                ({t('promoAlreadyUsedBadge')})
+                              </span>
+                            )}
+                          </button>
+                        );
+                      })}
                     </div>
+                    <p className="text-[10px] text-gray-400 dark:text-slate-500 pt-0.5">
+                      ℹ️ {t('promoOneTimeRuleNotice')}
+                    </p>
                   </form>
                 )}
               </div>

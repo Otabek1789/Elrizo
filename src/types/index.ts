@@ -113,6 +113,7 @@ export interface User {
   loyaltyCardNumber?: string;
   address?: string;
   city?: string;
+  usedPromoCodes?: string[]; // Ushbu foydalanuvchi buyurtmalarida ishlatgan promokodlar
 }
 
 export type PaymentMode = 'full' | 'installment';
