@@ -60,7 +60,7 @@ interface StoreState {
   isCartOpen: boolean;
   openCart: () => void;
   closeCart: () => void;
-  addToCart: (product: Product, months?: 3 | 6 | 12 | 24, purchaseType?: 'full' | 'installment') => void;
+  addToCart: (product: Product, months?: 3 | 6 | 12 | 24, purchaseType?: 'full' | 'installment', quantity?: number) => void;
   removeFromCart: (productId: string) => void;
   updateQuantity: (productId: string, quantity: number) => void;
   clearCart: () => void;
@@ -323,7 +323,7 @@ export const useStore = create<StoreState>()(
       openCart: () => set({ isCartOpen: true }),
       closeCart: () => set({ isCartOpen: false }),
 
-      addToCart: (product, months = 12, purchaseType = 'installment') => {
+      addToCart: (product, months = 12, purchaseType = 'installment', quantity = 1) => {
         if (!get().user) {
           set({ isLoginRequiredModalOpen: true });
           return;
@@ -332,10 +332,11 @@ export const useStore = create<StoreState>()(
         set((state) => {
           const existingIndex = state.cart.findIndex((item) => item.product.id === product.id);
           let updatedCart: CartItem[];
+          const addQty = typeof quantity === 'number' && quantity > 0 ? quantity : 1;
 
           if (existingIndex > -1) {
             updatedCart = [...state.cart];
-            updatedCart[existingIndex].quantity += 1;
+            updatedCart[existingIndex].quantity += addQty;
             updatedCart[existingIndex].selectedInstallmentMonths = months;
             updatedCart[existingIndex].purchaseType = purchaseType;
           } else {
@@ -343,15 +344,17 @@ export const useStore = create<StoreState>()(
               ...state.cart,
               {
                 product,
-                quantity: 1,
+                quantity: addQty,
                 selectedInstallmentMonths: months,
                 purchaseType,
               },
             ];
           }
 
-          get().addToast(`"${product.title.slice(0, 30)}..." savatga qo'shildi`, 'success');
-          return { cart: updatedCart, isCartOpen: true };
+          const cleanTitle = product.title?.trim() || "Tovar";
+          const displayTitle = cleanTitle.length > 32 ? `${cleanTitle.slice(0, 32)}...` : cleanTitle;
+          get().addToast(`«${displayTitle}» savatchaga qo'shildi!`, 'success');
+          return { cart: updatedCart, isCartOpen: false };
         });
       },
 

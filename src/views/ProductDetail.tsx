@@ -173,9 +173,7 @@ export const ProductDetail: React.FC = () => {
       originalPrice: effectiveOriginalPrice,
       title: itemTitle,
     };
-    for (let i = 0; i < quantity; i++) {
-      addToCart(configuredProduct, 12, 'full');
-    }
+    addToCart(configuredProduct, 12, 'full', quantity);
   };
 
   const handleBuyInstallment = () => {

@@ -1286,7 +1286,6 @@ export const CatalogPage: React.FC = () => {
                           type="button"
                           onClick={() => {
                             addToCart(p, 12, 'installment');
-                            addToast(`«${p.title}» ${t('cartTitle')}ga qo'shildi`, 'success');
                           }}
                           className="flex-1 py-2.5 px-3 bg-uzum-primary hover:bg-uzum-hover text-white text-xs font-bold rounded-2xl shadow-md shadow-purple-500/20 flex items-center justify-center gap-1.5 transition-all cursor-pointer"
                         >
