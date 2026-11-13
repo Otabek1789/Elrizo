@@ -937,7 +937,7 @@ export const Checkout: React.FC = () => {
                         : 'border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900/60 hover:border-gray-300 dark:hover:border-slate-600'
                     }`}
                   >
-                    <div className="w-14 h-10 px-1.5 rounded-xl bg-white dark:bg-white flex items-center justify-center shadow-xs border border-gray-100 dark:border-slate-200 mb-1.5">
+                    <div className="w-16 h-10 px-2 rounded-xl bg-white dark:bg-white flex items-center justify-center shadow-xs border border-gray-200 dark:border-slate-300 mb-1.5">
                       <img src="/payments/uzumpay.png" alt="Uzum Pay" className="h-5 w-auto object-contain max-w-full" />
                     </div>
                     <span className="font-extrabold text-xs sm:text-sm text-gray-900 dark:text-white">Uzum Pay</span>
@@ -961,7 +961,7 @@ export const Checkout: React.FC = () => {
                         : 'border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900/60 hover:border-gray-300 dark:hover:border-slate-600'
                     }`}
                   >
-                    <div className="w-14 h-10 px-1.5 rounded-xl bg-white dark:bg-white flex items-center justify-center shadow-xs border border-gray-100 dark:border-slate-200 mb-1.5">
+                    <div className="w-16 h-10 px-2 rounded-xl bg-white dark:bg-white flex items-center justify-center shadow-xs border border-gray-200 dark:border-slate-300 mb-1.5">
                       <img src="/payments/payme.png" alt="Payme" className="h-5 w-auto object-contain max-w-full" />
                     </div>
                     <span className="font-extrabold text-xs sm:text-sm text-gray-900 dark:text-white">Payme</span>
@@ -983,7 +983,7 @@ export const Checkout: React.FC = () => {
                         : 'border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900/60 hover:border-gray-300 dark:hover:border-slate-600'
                     }`}
                   >
-                    <div className="w-14 h-10 px-1.5 rounded-xl bg-white dark:bg-white flex items-center justify-center shadow-xs border border-gray-100 dark:border-slate-200 mb-1.5">
+                    <div className="w-16 h-10 px-2 rounded-xl bg-white dark:bg-white flex items-center justify-center shadow-xs border border-gray-200 dark:border-slate-300 mb-1.5">
                       <img src="/payments/click.png" alt="Click" className="h-5 w-auto object-contain max-w-full" />
                     </div>
                     <span className="font-extrabold text-xs sm:text-sm text-gray-900 dark:text-white">Click</span>
@@ -1007,7 +1007,7 @@ export const Checkout: React.FC = () => {
                         : 'border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900/60 hover:border-gray-300 dark:hover:border-slate-600'
                     }`}
                   >
-                    <div className="w-14 h-10 px-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 flex items-center justify-center shadow-xs border border-emerald-200 dark:border-emerald-800/60 mb-1.5">
+                    <div className="w-16 h-10 px-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 flex items-center justify-center shadow-xs border border-emerald-200 dark:border-emerald-800/60 mb-1.5">
                       <Banknote className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
                     </div>
                     <span className="font-extrabold text-xs sm:text-sm text-gray-900 dark:text-white">
