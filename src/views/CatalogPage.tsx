@@ -818,7 +818,11 @@ export const CatalogPage: React.FC = () => {
             <span className="text-xs font-bold text-gray-700 dark:text-slate-300 uppercase tracking-wider block">
               {t('specialPrivilege')}
             </span>
-            <label className="flex items-center justify-between p-3 rounded-2xl bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-950/40 dark:to-indigo-950/40 border border-purple-200/60 dark:border-purple-800/50 cursor-pointer hover:bg-purple-100/70 transition-all select-none">
+            <label className={`flex items-center justify-between p-3 rounded-2xl border transition-all cursor-pointer select-none ${
+              onlyZeroDown
+                ? 'bg-purple-100/90 dark:bg-purple-900/50 border-uzum-primary ring-2 ring-purple-500/20 shadow-sm'
+                : 'bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-950/40 dark:to-indigo-950/40 border-purple-200/60 dark:border-purple-800/50 hover:bg-purple-100/60 dark:hover:bg-purple-900/30 hover:border-purple-300 dark:hover:border-purple-700/60'
+            }`}>
               <div className="flex items-center gap-2">
                 <Zap className="w-4 h-4 text-uzum-primary dark:text-purple-300 shrink-0" />
                 <div>
@@ -1393,7 +1397,11 @@ export const CatalogPage: React.FC = () => {
               </div>
 
               {/* 0-0-12 */}
-              <label className="flex items-center justify-between p-3.5 rounded-2xl bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-950/40 dark:to-indigo-950/40 border border-purple-200/60 dark:border-purple-800/50 cursor-pointer">
+              <label className={`flex items-center justify-between p-3.5 rounded-2xl border transition-all cursor-pointer select-none ${
+                onlyZeroDown
+                  ? 'bg-purple-100/90 dark:bg-purple-900/50 border-uzum-primary ring-2 ring-purple-500/20 shadow-sm'
+                  : 'bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-950/40 dark:to-indigo-950/40 border-purple-200/60 dark:border-purple-800/50 hover:bg-purple-100/60 dark:hover:bg-purple-900/30 hover:border-purple-300 dark:hover:border-purple-700/60'
+              }`}>
                 <div className="flex items-center gap-2">
                   <Zap className="w-4 h-4 text-uzum-primary dark:text-purple-300" />
                   <div>
