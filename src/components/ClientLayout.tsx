@@ -48,6 +48,15 @@ export const ClientLayout: React.FC<ClientLayoutProps> = ({ children }) => {
 
     // Supabase OAuth (Google) orqali kirganda sessiyani avtomatik qabul qilish
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_OUT' || !session?.user) {
+        return;
+      }
+
+      // Agar foydalanuvchi tizimdan chiqqan bo'lsa, uni avtomatik qayta kirgizib yubormaslik
+      if (typeof window !== 'undefined' && localStorage.getItem('elrizo_user_logged_out') === 'true') {
+        return;
+      }
+
       if (session?.user) {
         const email = session.user.email || '';
         const isAdmin = isAdminUser(email);
@@ -70,6 +79,10 @@ export const ClientLayout: React.FC<ClientLayoutProps> = ({ children }) => {
           };
 
           useStore.setState({ user: userObj });
+          if (typeof window !== 'undefined') {
+            localStorage.removeItem('elrizo_user_logged_out');
+          }
+
           const currentLang = useStore.getState().language;
           useStore.getState().addToast(
             isAdmin
@@ -81,9 +94,6 @@ export const ClientLayout: React.FC<ClientLayoutProps> = ({ children }) => {
                   : `Xush kelibsiz, ${userObj.fullName}! (Google orqali kirdingiz)`),
             'success'
           );
-          if (isAdmin && (location.pathname === '/login' || location.pathname === '/auth')) {
-            navigate('/admin', { replace: true });
-          }
         }
       }
     });
@@ -99,7 +109,7 @@ export const ClientLayout: React.FC<ClientLayoutProps> = ({ children }) => {
       subscription.unsubscribe();
       clearInterval(tgWebhookLockInterval);
     };
-  }, [initSupabaseCheck, navigate, location.pathname]);
+  }, [initSupabaseCheck, navigate]);
 
   // Dark/Light theme class synchronization
   useEffect(() => {

@@ -59,8 +59,8 @@ export const LoginPage: React.FC = () => {
   const [telegramChatId, setTelegramChatId] = useState<string | null>(null);
   const [telegramError, setTelegramError] = useState<string | null>(null);
 
-  // Agar allaqachon kirgan bo'lsa darhol tegishli sahifaga yo'naltirish (oraliq sahifa ko'rinmaydi)
-  if (user) {
+  // Agar allaqachon kirgan bo'lsa darhol tegishli sahifaga yo'naltirish (tizimdan chiqish holatida bo'lmasa)
+  if (user && typeof window !== 'undefined' && localStorage.getItem('elrizo_user_logged_out') !== 'true') {
     return <Navigate to={user.isAdmin ? '/admin' : '/'} replace />;
   }
 
@@ -78,6 +78,10 @@ export const LoginPage: React.FC = () => {
     const isAdmin = cleanEmail === ADMIN_EMAIL.toLowerCase();
 
     // Administrator tekshiruvi: faqat belgilangan parol bilan
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('elrizo_user_logged_out');
+    }
+
     if (isAdmin) {
       if (signInPassword !== '7540084@OJr') {
         setErrorMessage(
@@ -102,6 +106,9 @@ export const LoginPage: React.FC = () => {
         cashbackBalance: 0,
       };
 
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('elrizo_user_logged_out');
+      }
       useStore.setState({ user: adminUser, isAuthOpen: false });
       addToast(
         language === 'ru' 
@@ -127,6 +134,9 @@ export const LoginPage: React.FC = () => {
       cashbackBalance: 0,
     };
 
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('elrizo_user_logged_out');
+    }
     useStore.setState({ user: regularUser, isAuthOpen: false });
     addToast(`${regularUser.fullName}! ${t('checkoutSmsVerified')}`, 'success');
     navigate('/');
@@ -144,6 +154,10 @@ export const LoginPage: React.FC = () => {
     }
 
     const isAdmin = cleanEmail === ADMIN_EMAIL.toLowerCase();
+
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('elrizo_user_logged_out');
+    }
 
     if (isAdmin) {
       if (signUpPassword !== '7540084@OJr') {
@@ -168,6 +182,9 @@ export const LoginPage: React.FC = () => {
         cashbackBalance: 0,
       };
 
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('elrizo_user_logged_out');
+      }
       useStore.setState({ user: adminUser, isAuthOpen: false });
       addToast(
         language === 'ru' 
@@ -192,6 +209,9 @@ export const LoginPage: React.FC = () => {
       cashbackBalance: 0,
     };
 
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('elrizo_user_logged_out');
+    }
     useStore.setState({ user: newUser, isAuthOpen: false });
     addToast(`${newUser.fullName}! ${t('checkoutSmsVerified')}`, 'success');
     navigate('/');
@@ -335,6 +355,10 @@ export const LoginPage: React.FC = () => {
     }
 
     // Kod yoki parol to'g'ri kiritildi!
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('elrizo_user_logged_out');
+    }
+
     if (isAdmin) {
       const adminUser: User = {
         id: isYahyo ? 'admin-yahyo' : 'admin-otabek',

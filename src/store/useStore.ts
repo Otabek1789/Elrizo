@@ -794,8 +794,22 @@ export const useStore = create<StoreState>()(
       },
 
       logoutUser: () => {
+        if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
+          try {
+            localStorage.setItem('elrizo_user_logged_out', 'true');
+            // Supabase auth kalitlarini tozalash
+            const keysToRemove: string[] = [];
+            for (let i = 0; i < localStorage.length; i++) {
+              const k = localStorage.key(i);
+              if (k && (k.startsWith('sb-') || k.includes('supabase.auth.token'))) {
+                keysToRemove.push(k);
+              }
+            }
+            keysToRemove.forEach((k) => localStorage.removeItem(k));
+          } catch (e) {}
+        }
         signOutFromSupabase();
-        set({ user: null, activePage: 'home' });
+        set({ user: null, activePage: 'home', appliedPromoCode: null });
         get().addToast('Tizimdan chiqildi', 'info');
       },
 
