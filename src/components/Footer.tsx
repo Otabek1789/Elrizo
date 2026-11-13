@@ -116,7 +116,7 @@ export const Footer: React.FC = () => {
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-gray-400 dark:text-gray-500">
           <div className="flex flex-wrap items-center gap-2">
             <LogoIcon size={22} />
-            <span className="font-black text-[#640199] dark:text-purple-400">ELRIZO</span>
+            <span className="font-bold text-[#640199] dark:text-purple-400">ELRIZO</span>
             <span className="text-xs font-semibold text-gray-700 dark:text-gray-300 italic">«{t('slogan')}»</span>
             <span className="text-gray-400 dark:text-gray-500 hidden sm:inline">• {t('footerCopyright')}</span>
           </div>
