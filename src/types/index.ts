@@ -157,7 +157,7 @@ export interface Order {
   pinfl?: string;
   contractNumber?: string;
   scoringScore?: number;
-  status: 'pending' | 'scoring_approved' | 'processing' | 'delivered';
+  status: 'pending' | 'scoring_approved' | 'processing' | 'delivered' | 'paid' | 'cancelled';
   appliedPromoCode?: string;
   discountAmount?: number;
   cashbackEarned?: number; // Xariddan yig'ilgan 1% keshbek

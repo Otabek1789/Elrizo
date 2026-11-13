@@ -9,6 +9,7 @@ import {
   isInsideTelegram
 } from '../utils/telegramWebApp';
 import { sendOrderNotificationToTelegram } from '../utils/telegramBot';
+import { createPaymeInvoiceUrl, createClickInvoiceUrl, openPaymentCheckout } from '../lib/paymentService';
 import {
   Search,
   ShoppingCart,
@@ -1522,6 +1523,47 @@ export const TelegramMiniApp: React.FC = () => {
             <p className="text-[11px] text-gray-500 leading-relaxed">
               Operatorimiz 10 daqiqa ichida siz bilan bog'lanib, bepul yetkazib berish vaqtini tasdiqlaydi.
             </p>
+
+            {/* Agar Naqd/Karta to'lovi tanlangan bo'lsa: Payme va Click to'lov tugmalari */}
+            {orderSuccessData.paymentMode === 'full' && (
+              <div className="space-y-2 pt-1">
+                <div className="text-[11px] font-bold text-gray-700 dark:text-gray-300 text-left">
+                  To'lovni hoziroq amalga oshirish:
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      tgHaptic('medium');
+                      const url = createPaymeInvoiceUrl({
+                        orderId: orderSuccessData.id,
+                        contractNumber: orderSuccessData.contractNumber || orderSuccessData.id,
+                        amount: orderSuccessData.totalPrice,
+                      });
+                      openPaymentCheckout(url);
+                    }}
+                    className="py-2.5 px-3 rounded-xl bg-teal-500 hover:bg-teal-600 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow active:scale-95 transition-transform"
+                  >
+                    <span>payme</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      tgHaptic('medium');
+                      const url = createClickInvoiceUrl({
+                        orderId: orderSuccessData.id,
+                        contractNumber: orderSuccessData.contractNumber || orderSuccessData.id,
+                        amount: orderSuccessData.totalPrice,
+                      });
+                      openPaymentCheckout(url);
+                    }}
+                    className="py-2.5 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow active:scale-95 transition-transform"
+                  >
+                    <span>CLICK UP</span>
+                  </button>
+                </div>
+              </div>
+            )}
 
             <button
               onClick={() => {

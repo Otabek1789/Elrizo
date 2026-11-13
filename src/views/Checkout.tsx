@@ -32,7 +32,7 @@ import { sendVerificationSms } from '../lib/smsService';
 import { CustomSelect } from '../components/CustomSelect';
 import { UZBEKISTAN_REGIONS } from '../data/regions';
 import { generateAndPrintContract } from '../lib/pdfContractGenerator';
-import { generatePaymentLink } from '../lib/paymentService';
+import { generatePaymentLink, openPaymentCheckout } from '../lib/paymentService';
 
 export const Checkout: React.FC = () => {
   const navigate = useNavigate();
@@ -106,8 +106,20 @@ export const Checkout: React.FC = () => {
   const [isRealSmsDelivered, setIsRealSmsDelivered] = useState<boolean>(false);
 
   // Online to'lov tizimi (Uzum Pay, Payme, Click, Naqd)
-  const [selectedOnlineProvider, setSelectedOnlineProvider] = useState<'uzumpay' | 'payme' | 'click' | 'cash'>('uzumpay');
+  const [selectedOnlineProvider, setSelectedOnlineProvider] = useState<'uzumpay' | 'payme' | 'click' | 'cash'>('payme');
   const [completedOrder, setCompletedOrder] = useState<Order | null>(null);
+  const [lastPaymentUrl, setLastPaymentUrl] = useState<string>('');
+  const [isPaymentSuccessUrl, setIsPaymentSuccessUrl] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('payment') === 'success') {
+        setIsPaymentSuccessUrl(true);
+        setCurrentStep(4);
+      }
+    }
+  }, []);
 
   // Agar savat bo'sh bo'lsa
   if (cart.length === 0 && currentStep !== 4) {
@@ -297,11 +309,19 @@ export const Checkout: React.FC = () => {
       customerPhone: formData.phone,
     });
 
-    window.open(paymentLink.paymentUrl, '_blank', 'noopener,noreferrer');
+    setLastPaymentUrl(paymentLink.paymentUrl);
+
     addToast(
-      language === 'ru' ? `Открыта страница оплаты ${provider.toUpperCase()}!` : `${provider.toUpperCase()} rasmiy to'lov sahifasi ochildi!`,
+      language === 'ru'
+        ? `Переход на официальную оплату ${provider.toUpperCase()}...`
+        : `${provider.toUpperCase()} rasmiy to'lov sahifasiga yo'naltirilmoqda...`,
       'info'
     );
+
+    // Xavfsiz to'lov shlyuziga yo'naltirish
+    setTimeout(() => {
+      openPaymentCheckout(paymentLink.paymentUrl);
+    }, 700);
 
     setCurrentStep(4);
     clearCart();
@@ -404,6 +424,56 @@ export const Checkout: React.FC = () => {
                 <span>{t('checkoutDeliveryAddressLabel')}</span>
                 <strong className="text-gray-900 dark:text-white">{formData.city}, {formData.address}</strong>
               </div>
+            </div>
+          )}
+
+          {/* Agar online to'lov (Payme yoki Click) bo'lsa */}
+          {paymentMode === 'full' && selectedOnlineProvider !== 'cash' && (
+            <div className="bg-slate-50 dark:bg-slate-900/60 rounded-2xl p-5 text-left border border-slate-200 dark:border-slate-700/60 space-y-3.5 text-xs">
+              <div className="flex items-center justify-between border-b border-gray-200 dark:border-slate-700/60 pb-3">
+                <div className="flex items-center gap-2.5">
+                  <div className={`w-9 h-9 rounded-xl text-white font-black text-xs flex items-center justify-center shadow ${
+                    selectedOnlineProvider === 'click' ? 'bg-blue-600' : 'bg-teal-500'
+                  }`}>
+                    {selectedOnlineProvider === 'click' ? 'CLICK' : 'payme'}
+                  </div>
+                  <div>
+                    <div className="font-bold text-gray-900 dark:text-white capitalize text-sm">
+                      {selectedOnlineProvider === 'click' ? 'Click Up' : 'Payme'} to'lovi
+                    </div>
+                    <div className="text-[11px] text-gray-500 dark:text-slate-400">
+                      {isPaymentSuccessUrl ? "Muvaffaqiyatli to'landi" : "Rasmiy to'lov shlyuzi orqali to'lov"}
+                    </div>
+                  </div>
+                </div>
+                <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${
+                  isPaymentSuccessUrl
+                    ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-300'
+                    : 'bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-300'
+                }`}>
+                  {isPaymentSuccessUrl ? '✓ TO\'LANGAN' : 'KUTILMOQDA'}
+                </span>
+              </div>
+
+              {!isPaymentSuccessUrl && lastPaymentUrl && (
+                <div className="pt-1 space-y-2">
+                  <button
+                    type="button"
+                    onClick={() => openPaymentCheckout(lastPaymentUrl)}
+                    className={`w-full py-3.5 px-4 rounded-xl text-white font-extrabold text-sm flex items-center justify-center gap-2 shadow-lg transition-transform active:scale-98 ${
+                      selectedOnlineProvider === 'click'
+                        ? 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 shadow-blue-500/25'
+                        : 'bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-600 shadow-teal-500/25'
+                    }`}
+                  >
+                    <span>{selectedOnlineProvider.toUpperCase()} ilovasida to'lash ({formatPrice(finalTotal, true, language)})</span>
+                    <ExternalLink className="w-4 h-4" />
+                  </button>
+                  <p className="text-[11px] text-gray-500 dark:text-slate-400 text-center">
+                    Agar to'lov sahifasi avtomatik ochilmagan bo'lsa, yuqoridagi tugmani bosing
+                  </p>
+                </div>
+              )}
             </div>
           )}
 

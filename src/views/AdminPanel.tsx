@@ -52,7 +52,10 @@ import {
   CheckCircle2,
   Send,
   Pencil,
-  Save
+  Save,
+  CreditCard,
+  Key,
+  Link2
 } from 'lucide-react';
 import { useStore } from '../store/useStore';
 import { formatPrice } from '../utils/calculator';
@@ -61,6 +64,12 @@ import { CATEGORIES } from '../data/mockData';
 import { Order, Product, PromoCode } from '../types';
 import { CustomSelect } from '../components/CustomSelect';
 import { testTelegramBotConnection, sendProductToTelegram, TELEGRAM_BOT_USERNAME, TELEGRAM_ADMIN_CHAT_ID } from '../utils/telegramBot';
+import { 
+  getPaymentMerchantConfig, 
+  savePaymentMerchantConfig, 
+  createPaymeInvoiceUrl, 
+  createClickInvoiceUrl 
+} from '../lib/paymentService';
 
 interface RegionCoordinate {
   name: string;
@@ -196,7 +205,7 @@ export const AdminPanel: React.FC = () => {
     deletePromoCode
   } = useStore();
 
-  const [activeSection, setActiveSection] = useState<'dashboard' | 'applications' | 'analytics' | 'products' | 'telegram' | 'promos' | 'coordinates' | 'customers' | 'settings'>('dashboard');
+  const [activeSection, setActiveSection] = useState<'dashboard' | 'applications' | 'analytics' | 'products' | 'telegram' | 'promos' | 'coordinates' | 'customers' | 'payments' | 'settings'>('dashboard');
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [searchFilter, setSearchFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'scoring_approved' | 'processing' | 'delivered'>('all');
@@ -205,6 +214,43 @@ export const AdminPanel: React.FC = () => {
   const [copiedRegion, setCopiedRegion] = useState<string | null>(null);
   const [activeChartPoint, setActiveChartPoint] = useState<ChartPoint | null>(null);
   const [chartTimeframe, setChartTimeframe] = useState<'1m' | '6m' | '1y'>('1y');
+
+  // To'lov tizimlari sozlamalari (Payme & Click)
+  const [paymeMerchantId, setPaymeMerchantId] = useState('');
+  const [paymeKey, setPaymeKey] = useState('');
+  const [clickServiceId, setClickServiceId] = useState('');
+  const [clickMerchantId, setClickMerchantId] = useState('');
+  const [clickSecretKey, setClickSecretKey] = useState('');
+  const [copiedWebhook, setCopiedWebhook] = useState<string | null>(null);
+
+  useEffect(() => {
+    const config = getPaymentMerchantConfig();
+    setPaymeMerchantId(config.paymeMerchantId || '');
+    setPaymeKey(config.paymeKey || '');
+    setClickServiceId(config.clickServiceId || '');
+    setClickMerchantId(config.clickMerchantId || '');
+    setClickSecretKey(config.clickSecretKey || '');
+  }, []);
+
+  const handleSavePaymentConfig = () => {
+    savePaymentMerchantConfig({
+      paymeMerchantId: paymeMerchantId.trim(),
+      paymeKey: paymeKey.trim(),
+      clickServiceId: clickServiceId.trim(),
+      clickMerchantId: clickMerchantId.trim(),
+      clickSecretKey: clickSecretKey.trim(),
+    });
+    addToast(language === 'ru' ? 'Настройки Payme и Click сохранены!' : "Payme va Click to'lov sozlamalari saqlandi!", 'success');
+  };
+
+  const handleCopyWebhook = (url: string, key: string) => {
+    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      navigator.clipboard.writeText(url);
+      setCopiedWebhook(key);
+      addToast(language === 'ru' ? 'Webhook URL скопирован!' : 'Webhook manzili nusxalandi!', 'info');
+      setTimeout(() => setCopiedWebhook(null), 2500);
+    }
+  };
 
   // Mahsulotni tahrirlash (Edit Product) holati (Supabase integratsiyasi)
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
@@ -616,7 +662,7 @@ export const AdminPanel: React.FC = () => {
   };
 
   interface NavItem {
-    id: 'dashboard' | 'applications' | 'analytics' | 'products' | 'telegram' | 'promos' | 'coordinates' | 'customers' | 'settings';
+    id: 'dashboard' | 'applications' | 'analytics' | 'products' | 'telegram' | 'promos' | 'coordinates' | 'customers' | 'payments' | 'settings';
     labelUz: string;
     labelRu: string;
     labelEn: string;
@@ -660,6 +706,7 @@ export const AdminPanel: React.FC = () => {
       titleEn: 'Customers & System',
       items: [
         { id: 'customers', labelUz: 'Mijozlar CRM', labelRu: 'Клиенты CRM', labelEn: 'Customers CRM', icon: Users },
+        { id: 'payments', labelUz: "To'lovlar (Payme & Click)", labelRu: "Оплата (Payme & Click)", labelEn: "Payments", icon: CreditCard, iconColor: 'text-teal-500' },
         { id: 'settings', labelUz: 'Tizim Sozlamalari', labelRu: 'Настройки', labelEn: 'Settings', icon: Settings },
       ],
     },
@@ -907,6 +954,7 @@ export const AdminPanel: React.FC = () => {
                 {activeSection === 'products' && (language === 'ru' ? 'Каталог товаров' : "Mahsulotlar Katalogi va Yangi Tovar Qo'shish")}
                 {activeSection === 'telegram' && (language === 'ru' ? 'Публикация товаров в Telegram' : "Tovarlarni Telegramga Tashlash & Marketing")}
                 {activeSection === 'customers' && (language === 'ru' ? 'База клиентов (CRM)' : 'Mijozlar Portfeli va Skoring Tahlili')}
+                {activeSection === 'payments' && (language === 'ru' ? 'Платежные системы (Payme & Click)' : "To'lov Tizimlari Sozlamalari (Payme & Click)")}
                 {activeSection === 'settings' && (language === 'ru' ? 'Настройки системы' : 'Platforma va Supabase Sozlamalari')}
               </motion.h2>
             </AnimatePresence>
@@ -2751,6 +2799,276 @@ export const AdminPanel: React.FC = () => {
                     })}
                   </div>
                 )}
+              </motion.div>
+            )}
+
+            {/* SECTION: PAYMENTS (PAYME & CLICK) */}
+            {activeSection === 'payments' && (
+              <motion.div
+                key="payments"
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -15 }}
+                transition={{ duration: 0.25 }}
+                className="space-y-6 max-w-4xl"
+              >
+                {/* Header Banner */}
+                <div className="p-6 rounded-3xl bg-gradient-to-r from-purple-900/90 via-indigo-900/80 to-slate-900 text-white border border-purple-700/50 shadow-xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <CreditCard className="w-6 h-6 text-teal-400" />
+                      <h3 className="text-lg font-black tracking-tight">
+                        {language === 'ru' ? 'Интеграция Payme и Click' : "Payme va Click Rasmiy To'lov Tizimlari"}
+                      </h3>
+                      <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-extrabold border border-emerald-500/30">
+                        Webhook Active
+                      </span>
+                    </div>
+                    <p className="text-xs text-purple-200/80 max-w-xl">
+                      {language === 'ru'
+                        ? 'Настройте учетные данные мерчанта для приема реальных оплат через карты Uzcard и Humo на расчетный счет ELRIZO.'
+                        : "Sayt va botda mijozlar Uzcard va Humo kartalari orqali to'lov qilganda pullar to'g'ridan-to'g'ri korxona hisob raqamiga tushishi uchun kassa kalitlarini ulang."}
+                    </p>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={handleSavePaymentConfig}
+                    className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-600 hover:to-emerald-700 text-white font-extrabold text-xs shadow-lg shadow-teal-500/25 flex items-center gap-2 shrink-0 transition-transform active:scale-95 cursor-pointer"
+                  >
+                    <Save className="w-4 h-4" />
+                    <span>{language === 'ru' ? 'Сохранить настройки' : 'Sozlamalarni saqlash'}</span>
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* 1. PAYME BUSINESS */}
+                  <div className="p-6 rounded-3xl bg-white dark:bg-slate-800/90 border border-gray-200 dark:border-slate-700 shadow-sm space-y-4">
+                    <div className="flex items-center justify-between border-b border-gray-100 dark:border-slate-700/60 pb-3.5">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-2xl bg-teal-500 text-white font-black text-xs flex items-center justify-center shadow-md shadow-teal-500/20">
+                          payme
+                        </div>
+                        <div>
+                          <h4 className="font-extrabold text-sm text-gray-900 dark:text-white">Payme Business</h4>
+                          <span className="text-[10px] text-teal-600 dark:text-teal-400 font-bold">
+                            {paymeMerchantId ? '🟢 ' + (language === 'ru' ? 'Боевой режим (Live)' : 'Ishchi rejim (Live)') : '🟡 ' + (language === 'ru' ? 'Тестовый режим' : 'Sinov rejimi')}
+                          </span>
+                        </div>
+                      </div>
+                      <a
+                        href="https://business.payme.uz"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-xs text-purple-600 dark:text-purple-400 hover:underline flex items-center gap-1 font-bold"
+                      >
+                        <span>business.payme.uz</span>
+                        <ExternalLink className="w-3 h-3" />
+                      </a>
+                    </div>
+
+                    <div className="space-y-3.5 text-xs">
+                      <div>
+                        <div className="flex justify-between items-center mb-1">
+                          <label className="font-bold text-gray-700 dark:text-slate-300">
+                            Payme Webhook URL ({language === 'ru' ? 'для кабинета Payme' : 'Payme kabineti uchun'}):
+                          </label>
+                          <button
+                            type="button"
+                            onClick={() => handleCopyWebhook('https://elrizonasiya.vercel.app/api/payment/payme', 'payme')}
+                            className="text-[11px] text-purple-600 dark:text-purple-400 hover:underline flex items-center gap-1 font-bold cursor-pointer"
+                          >
+                            <Copy className="w-3 h-3" />
+                            <span>{copiedWebhook === 'payme' ? (language === 'ru' ? 'Скопировано!' : 'Nusxalandi!') : (language === 'ru' ? 'Копировать' : 'Nusxalash')}</span>
+                          </button>
+                        </div>
+                        <input
+                          type="text"
+                          readOnly
+                          value="https://elrizonasiya.vercel.app/api/payment/payme"
+                          className="w-full px-3.5 py-2 rounded-xl bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-800 text-[11px] font-mono text-gray-700 dark:text-slate-300 outline-none"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block font-bold text-gray-700 dark:text-slate-300 mb-1">
+                          Payme Merchant ID:
+                        </label>
+                        <input
+                          type="text"
+                          value={paymeMerchantId}
+                          onChange={(e) => setPaymeMerchantId(e.target.value)}
+                          placeholder="Masalan: 65b0c78a..."
+                          className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-gray-900 dark:text-white text-xs outline-none focus:border-teal-500 font-mono"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block font-bold text-gray-700 dark:text-slate-300 mb-1">
+                          Payme Secret Key (Kassa kaliti):
+                        </label>
+                        <input
+                          type="password"
+                          value={paymeKey}
+                          onChange={(e) => setPaymeKey(e.target.value)}
+                          placeholder="Payme shaxsiy kabinetidagi kassa kaliti"
+                          className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-gray-900 dark:text-white text-xs outline-none focus:border-teal-500 font-mono"
+                        />
+                      </div>
+
+                      <div className="pt-2 flex justify-between items-center border-t border-gray-100 dark:border-slate-800">
+                        <span className="text-[11px] text-gray-400">
+                          Format: JSON-RPC 2.0 (Uzcard / Humo)
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const url = createPaymeInvoiceUrl({
+                              orderId: 'test_order_1',
+                              contractNumber: 'ELR-TEST-001',
+                              amount: 50000,
+                            });
+                            window.open(url, '_blank');
+                          }}
+                          className="px-3 py-1.5 rounded-xl bg-teal-50 dark:bg-teal-950/50 hover:bg-teal-100 dark:hover:bg-teal-900/50 text-teal-700 dark:text-teal-300 font-bold text-[11px] transition-colors flex items-center gap-1.5"
+                        >
+                          <ExternalLink className="w-3.5 h-3.5" />
+                          <span>{language === 'ru' ? 'Тестовая ссылка' : 'Sinov havolasi'}</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 2. CLICK MERCHANT */}
+                  <div className="p-6 rounded-3xl bg-white dark:bg-slate-800/90 border border-gray-200 dark:border-slate-700 shadow-sm space-y-4">
+                    <div className="flex items-center justify-between border-b border-gray-100 dark:border-slate-700/60 pb-3.5">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-2xl bg-blue-600 text-white font-black text-xs flex items-center justify-center shadow-md shadow-blue-600/20">
+                          CLICK
+                        </div>
+                        <div>
+                          <h4 className="font-extrabold text-sm text-gray-900 dark:text-white">Click Up Merchant</h4>
+                          <span className="text-[10px] text-blue-600 dark:text-blue-400 font-bold">
+                            {clickServiceId ? '🟢 ' + (language === 'ru' ? 'Боевой режим (Live)' : 'Ishchi rejim (Live)') : '🟡 ' + (language === 'ru' ? 'Тестовый режим' : 'Sinov rejimi')}
+                          </span>
+                        </div>
+                      </div>
+                      <a
+                        href="https://merchant.click.uz"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-xs text-purple-600 dark:text-purple-400 hover:underline flex items-center gap-1 font-bold"
+                      >
+                        <span>merchant.click.uz</span>
+                        <ExternalLink className="w-3 h-3" />
+                      </a>
+                    </div>
+
+                    <div className="space-y-3.5 text-xs">
+                      <div>
+                        <div className="flex justify-between items-center mb-1">
+                          <label className="font-bold text-gray-700 dark:text-slate-300">
+                            Click Webhook URL ({language === 'ru' ? 'для кабинета Click' : 'Click kabineti uchun'}):
+                          </label>
+                          <button
+                            type="button"
+                            onClick={() => handleCopyWebhook('https://elrizonasiya.vercel.app/api/payment/click', 'click')}
+                            className="text-[11px] text-purple-600 dark:text-purple-400 hover:underline flex items-center gap-1 font-bold cursor-pointer"
+                          >
+                            <Copy className="w-3 h-3" />
+                            <span>{copiedWebhook === 'click' ? (language === 'ru' ? 'Скопировано!' : 'Nusxalandi!') : (language === 'ru' ? 'Копировать' : 'Nusxalash')}</span>
+                          </button>
+                        </div>
+                        <input
+                          type="text"
+                          readOnly
+                          value="https://elrizonasiya.vercel.app/api/payment/click"
+                          className="w-full px-3.5 py-2 rounded-xl bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-800 text-[11px] font-mono text-gray-700 dark:text-slate-300 outline-none"
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block font-bold text-gray-700 dark:text-slate-300 mb-1">
+                            Click Service ID:
+                          </label>
+                          <input
+                            type="text"
+                            value={clickServiceId}
+                            onChange={(e) => setClickServiceId(e.target.value)}
+                            placeholder="Masalan: 31289"
+                            className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-gray-900 dark:text-white text-xs outline-none focus:border-blue-500 font-mono"
+                          />
+                        </div>
+                        <div>
+                          <label className="block font-bold text-gray-700 dark:text-slate-300 mb-1">
+                            Click Merchant ID:
+                          </label>
+                          <input
+                            type="text"
+                            value={clickMerchantId}
+                            onChange={(e) => setClickMerchantId(e.target.value)}
+                            placeholder="Masalan: 24560"
+                            className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-gray-900 dark:text-white text-xs outline-none focus:border-blue-500 font-mono"
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block font-bold text-gray-700 dark:text-slate-300 mb-1">
+                          Click Secret Key (Maxfiy kalit):
+                        </label>
+                        <input
+                          type="password"
+                          value={clickSecretKey}
+                          onChange={(e) => setClickSecretKey(e.target.value)}
+                          placeholder="Click kabinetidagi maxfiy kalit (Secret Key)"
+                          className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-gray-900 dark:text-white text-xs outline-none focus:border-blue-500 font-mono"
+                        />
+                      </div>
+
+                      <div className="pt-2 flex justify-between items-center border-t border-gray-100 dark:border-slate-800">
+                        <span className="text-[11px] text-gray-400">
+                          Format: Prepare & Complete (Click Up)
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const url = createClickInvoiceUrl({
+                              orderId: 'test_order_1',
+                              contractNumber: 'ELR-TEST-001',
+                              amount: 50000,
+                            });
+                            window.open(url, '_blank');
+                          }}
+                          className="px-3 py-1.5 rounded-xl bg-blue-50 dark:bg-blue-950/50 hover:bg-blue-100 dark:hover:bg-blue-900/50 text-blue-700 dark:text-blue-300 font-bold text-[11px] transition-colors flex items-center gap-1.5"
+                        >
+                          <ExternalLink className="w-3.5 h-3.5" />
+                          <span>{language === 'ru' ? 'Тестовая ссылка' : 'Sinov havolasi'}</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Integration Guide Box */}
+                <div className="p-5 rounded-2xl bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/40 text-xs text-amber-900 dark:text-amber-200 space-y-2">
+                  <div className="font-extrabold flex items-center gap-2 text-sm text-amber-800 dark:text-amber-300">
+                    <ShieldCheck className="w-4 h-4" />
+                    <span>Haqiqiy to'lovlarni qabul qilish bo'yicha 3 qadamli qo'llanma:</span>
+                  </div>
+                  <ol className="list-decimal pl-5 space-y-1.5 text-[11px] text-amber-800/90 dark:text-amber-300/80 leading-relaxed">
+                    <li>
+                      <strong>Payme Business (business.payme.uz)</strong> yoki <strong>Click Merchant (merchant.click.uz)</strong> da korxonangiz (YaTT yoki MCHJ) nomidan shartnoma tuzing.
+                    </li>
+                    <li>
+                      Shaxsiy kabinetingizdagi <em>Sozlamalar (URL bildirishnomalar)</em> bo'limiga yuqoridagi <strong>Webhook URL</strong> manzillarini nusxalab qo'ying.
+                    </li>
+                    <li>
+                      Sizga berilgan <strong>Merchant ID</strong> va <strong>Secret Key</strong> kalitlarini yuqoridagi kataklarga yozib, <strong>«Sozlamalarni saqlash»</strong> tugmasini bosing. Shundan so'ng mijozlar to'lagan barcha pullar to'g'ridan-to'g'ri bank hisob raqamingizga tushadi!
+                    </li>
+                  </ol>
+                </div>
               </motion.div>
             )}
 
