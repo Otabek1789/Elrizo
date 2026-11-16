@@ -20,7 +20,7 @@ export const CATEGORIES: Category[] = [
     name: 'Smartfonlar va gadjetlar',
     slug: 'smartphones',
     iconName: 'Smartphone',
-    image: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=300&auto=format&fit=crop&q=80',
+    image: '/categories/cat-smartphones.webp',
     itemCount: 420,
     subcategories: [
       { id: 'sub-apple', name: 'Apple iPhone', slug: 'apple' },
@@ -35,7 +35,7 @@ export const CATEGORIES: Category[] = [
     name: 'Maishiy texnika',
     slug: 'appliances',
     iconName: 'Tv',
-    image: 'https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?w=300&auto=format&fit=crop&q=80',
+    image: '/categories/cat-appliances.webp',
     itemCount: 310,
     subcategories: [
       { id: 'sub-tv', name: 'Smart Televizorlar', slug: 'smart-tv' },
@@ -50,7 +50,7 @@ export const CATEGORIES: Category[] = [
     name: 'Noutbuk va kompyuterlar',
     slug: 'computers',
     iconName: 'Laptop',
-    image: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=300&auto=format&fit=crop&q=80',
+    image: '/categories/cat-computers.webp',
     itemCount: 215,
     subcategories: [
       { id: 'sub-macbook', name: 'Apple MacBook', slug: 'macbook' },
@@ -64,7 +64,7 @@ export const CATEGORIES: Category[] = [
     name: 'Goʻzallik va parvarish',
     slug: 'beauty',
     iconName: 'Sparkles',
-    image: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=300&auto=format&fit=crop&q=80',
+    image: '/categories/cat-beauty.webp',
     itemCount: 180,
     subcategories: [
       { id: 'sub-hair', name: 'Dyson & soch feni', slug: 'hair-dryers' },
@@ -77,7 +77,7 @@ export const CATEGORIES: Category[] = [
     name: 'Avtomobil jihozlari',
     slug: 'auto',
     iconName: 'Car',
-    image: 'https://images.unsplash.com/photo-1558981806-ec527fa84c39?w=300&auto=format&fit=crop&q=80',
+    image: '/categories/cat-auto.webp',
     itemCount: 95,
     subcategories: [
       { id: 'sub-dashcam', name: 'Videoregistratorlar', slug: 'dashcams' },
@@ -89,7 +89,7 @@ export const CATEGORIES: Category[] = [
     name: 'Uy-roʻzgʻor buyumlari',
     slug: 'home-goods',
     iconName: 'Armchair',
-    image: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=300&auto=format&fit=crop&q=80',
+    image: '/categories/cat-home.webp',
     itemCount: 350,
     subcategories: [
       { id: 'sub-kitchen', name: 'Oshxona idishlari', slug: 'kitchen' },
@@ -1018,7 +1018,7 @@ export const PROMO_BANNERS = [
     gradient: 'from-[#640199] via-[#8B5CF6] to-[#EC4899]',
     ctaText: 'Xarid qilish',
     targetCategory: 'smartphones',
-    image: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=600&auto=format&fit=crop&q=80',
+    image: '/categories/cat-smartphones.webp',
   },
   {
     id: 'b-2',
@@ -1028,7 +1028,7 @@ export const PROMO_BANNERS = [
     gradient: 'from-[#1E1B4B] via-[#312E81] to-[#7000FF]',
     ctaText: 'Katalogga o\'tish',
     targetCategory: 'appliances',
-    image: 'https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?w=600&auto=format&fit=crop&q=80',
+    image: '/categories/cat-appliances.webp',
   },
   {
     id: 'b-3',
@@ -1038,6 +1038,6 @@ export const PROMO_BANNERS = [
     gradient: 'from-[#0F172A] via-[#1E293B] to-[#6366F1]',
     ctaText: 'Tanlash',
     targetCategory: 'computers',
-    image: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=600&auto=format&fit=crop&q=80',
+    image: '/categories/cat-computers.webp',
   },
 ];

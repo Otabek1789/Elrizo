@@ -31,11 +31,11 @@ export const CategoryList: React.FC<CategoryListProps> = ({ onSelectCategory }) 
                     : 'border-gray-200/70 dark:border-gray-800/80 hover:border-purple-300 dark:hover:border-purple-500/40 hover:shadow-card-hover'
                 }`}
               >
-                <div className="w-14 h-14 sm:w-20 sm:h-20 rounded-full overflow-hidden bg-gray-50 dark:bg-gray-800/60 mb-2 p-1 border border-gray-200/60 dark:border-gray-800/80 group-hover:scale-105 transition-transform">
+                <div className="w-14 h-14 sm:w-20 sm:h-20 rounded-full overflow-hidden bg-gray-50 dark:bg-slate-900/60 mb-2 p-1.5 border border-gray-200/60 dark:border-gray-800/80 group-hover:scale-105 transition-transform flex items-center justify-center">
                   <img
                     src={cat.image}
                     alt={translatedName}
-                    className="w-full h-full object-cover rounded-full"
+                    className="w-full h-full object-contain rounded-full"
                   />
                 </div>
                 <span className={`text-[11px] sm:text-sm font-semibold line-clamp-2 leading-tight transition-colors ${
@@ -61,11 +61,11 @@ export const CategoryList: React.FC<CategoryListProps> = ({ onSelectCategory }) 
                   : 'border-gray-200/70 dark:border-slate-800/80 hover:border-purple-300 dark:hover:border-purple-500/40 hover:shadow-card-hover'
               }`}
             >
-              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full overflow-hidden bg-gray-50 dark:bg-slate-900/60 mb-2.5 p-1 border border-gray-200/60 dark:border-slate-800/80 group-hover:scale-105 transition-transform">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full overflow-hidden bg-gray-50 dark:bg-slate-900/60 mb-2.5 p-1.5 border border-gray-200/60 dark:border-slate-800/80 group-hover:scale-105 transition-transform flex items-center justify-center">
                 <img
                   src={cat.image}
                   alt={translatedName}
-                  className="w-full h-full object-cover rounded-full"
+                  className="w-full h-full object-contain rounded-full"
                 />
               </div>
               <span className={`text-xs sm:text-sm font-semibold line-clamp-2 leading-tight transition-colors ${
