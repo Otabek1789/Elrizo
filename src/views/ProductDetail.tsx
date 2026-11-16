@@ -54,7 +54,7 @@ export const ProductDetail: React.FC = () => {
   const product = products.find((p) => p.id === id || p.id === selectedProductId) || products[0];
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [imageError, setImageError] = useState(false);
-  const fallbackDetailImg = 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=800&auto=format&fit=crop&q=80';
+  const fallbackDetailImg = '/products/prod-001.webp';
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState<'specs' | 'description' | 'reviews'>('specs');
 

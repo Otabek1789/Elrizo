@@ -98,7 +98,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   };
 
   const [imageError, setImageError] = useState(false);
-  const fallbackImg = 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=800&auto=format&fit=crop&q=80';
+  const fallbackImg = '/products/prod-001.webp';
   const currentImg = !imageError && product.images && product.images.length > 0
     ? (product.images[activeImageIndex] || product.images[0] || fallbackImg)
     : fallbackImg;

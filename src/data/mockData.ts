@@ -111,8 +111,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.95,
     reviewsCount: 342,
     images: [
-      'https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=800&auto=format&fit=crop&q=80',
-      'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=800&auto=format&fit=crop&q=80',
+      '/products/prod-001.webp',
     ],
     categoryId: 'cat-smartphones',
     categoryName: 'Smartfonlar va gadjetlar',
@@ -145,8 +144,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.9,
     reviewsCount: 215,
     images: [
-      'https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?w=800&auto=format&fit=crop&q=80',
-      'https://images.unsplash.com/photo-1580910051074-3eb694886505?w=800&auto=format&fit=crop&q=80',
+      '/products/prod-002.webp',
     ],
     categoryId: 'cat-smartphones',
     categoryName: 'Smartfonlar va gadjetlar',
@@ -178,8 +176,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.75,
     reviewsCount: 198,
     images: [
-      'https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=800&auto=format&fit=crop&q=80',
-      'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=800&auto=format&fit=crop&q=80',
+      '/products/prod-003.webp',
     ],
     categoryId: 'cat-smartphones',
     categoryName: 'Smartfonlar va gadjetlar',
@@ -211,7 +208,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.7,
     reviewsCount: 145,
     images: [
-      'https://images.unsplash.com/photo-1580910051074-3eb694886505?w=800&auto=format&fit=crop&q=80',
+      '/products/prod-004.png',
     ],
     categoryId: 'cat-smartphones',
     categoryName: 'Smartfonlar va gadjetlar',
@@ -242,7 +239,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.9,
     reviewsCount: 88,
     images: [
-      'https://images.unsplash.com/photo-1508685096489-7aacd43bd3b1?w=800&auto=format&fit=crop&q=80',
+      '/products/prod-005.webp',
     ],
     categoryId: 'cat-smartphones',
     categoryName: 'Smartfonlar va gadjetlar',
@@ -273,7 +270,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.9,
     reviewsCount: 310,
     images: [
-      'https://images.unsplash.com/photo-1600294037681-c80b4cb5b434?w=800&auto=format&fit=crop&q=80',
+      '/products/prod-006.webp',
     ],
     categoryId: 'cat-smartphones',
     categoryName: 'Smartfonlar va gadjetlar',
@@ -304,7 +301,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.95,
     reviewsCount: 420,
     images: [
-      'https://images.unsplash.com/photo-1606813907291-d86efa9b94db?w=800&auto=format&fit=crop&q=80',
+      '/products/prod-007.webp',
     ],
     categoryId: 'cat-smartphones',
     categoryName: 'Smartfonlar va gadjetlar',
@@ -336,7 +333,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.7,
     reviewsCount: 98,
     images: [
-      'https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?w=800&auto=format&fit=crop&q=80',
+      '/products/prod-008.webp',
     ],
     categoryId: 'cat-appliances',
     categoryName: 'Maishiy texnika',
@@ -367,7 +364,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.8,
     reviewsCount: 84,
     images: [
-      'https://images.unsplash.com/photo-1571175443880-49e1d25b2bc5?w=800&auto=format&fit=crop&q=80',
+      '/products/prod-009.webp',
     ],
     categoryId: 'cat-appliances',
     categoryName: 'Maishiy texnika',
@@ -398,7 +395,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.85,
     reviewsCount: 112,
     images: [
-      'https://images.unsplash.com/photo-1626806787461-102c1bfaaea1?w=800&auto=format&fit=crop&q=80',
+      '/products/prod-010.webp',
     ],
     categoryId: 'cat-appliances',
     categoryName: 'Maishiy texnika',
@@ -429,7 +426,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.85,
     reviewsCount: 76,
     images: [
-      'https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&auto=format&fit=crop&q=80',
+      '/products/prod-011.webp',
     ],
     categoryId: 'cat-appliances',
     categoryName: 'Maishiy texnika',
@@ -459,7 +456,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.8,
     reviewsCount: 65,
     images: [
-      'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=800&auto=format&fit=crop&q=80',
+      '/products/prod-012.webp',
     ],
     categoryId: 'cat-appliances',
     categoryName: 'Maishiy texnika',
@@ -492,7 +489,7 @@ export const PRODUCTS: Product[] = [
     rating: 5.0,
     reviewsCount: 164,
     images: [
-      'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=800&auto=format&fit=crop&q=80',
+      '/products/prod-013.webp',
     ],
     categoryId: 'cat-computers',
     categoryName: 'Noutbuk va kompyuterlar',
@@ -524,7 +521,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.9,
     reviewsCount: 92,
     images: [
-      'https://images.unsplash.com/photo-1603302576837-37561b2e2302?w=800&auto=format&fit=crop&q=80',
+      '/products/prod-014.webp',
     ],
     categoryId: 'cat-computers',
     categoryName: 'Noutbuk va kompyuterlar',
@@ -556,7 +553,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.8,
     reviewsCount: 110,
     images: [
-      'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=800&auto=format&fit=crop&q=80',
+      '/products/prod-015.png',
     ],
     categoryId: 'cat-computers',
     categoryName: 'Noutbuk va kompyuterlar',
@@ -588,7 +585,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.65,
     reviewsCount: 78,
     images: [
-      'https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=800&auto=format&fit=crop&q=80',
+      '/products/prod-016.webp',
     ],
     categoryId: 'cat-computers',
     categoryName: 'Noutbuk va kompyuterlar',
@@ -622,7 +619,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.95,
     reviewsCount: 189,
     images: [
-      'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=800&auto=format&fit=crop&q=80',
+      '/products/prod-017.png',
     ],
     categoryId: 'cat-beauty',
     categoryName: 'Goʻzallik va parvarish',
@@ -653,7 +650,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.9,
     reviewsCount: 74,
     images: [
-      'https://images.unsplash.com/photo-1527799820374-dcf8d9d4a388?w=800&auto=format&fit=crop&q=80',
+      '/products/prod-018.webp',
     ],
     categoryId: 'cat-beauty',
     categoryName: 'Goʻzallik va parvarish',
@@ -683,7 +680,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.85,
     reviewsCount: 135,
     images: [
-      'https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?w=800&auto=format&fit=crop&q=80',
+      '/products/prod-019.webp',
     ],
     categoryId: 'cat-beauty',
     categoryName: 'Goʻzallik va parvarish',
@@ -713,7 +710,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.8,
     reviewsCount: 91,
     images: [
-      'https://images.unsplash.com/photo-1621607512214-68297480165e?w=800&auto=format&fit=crop&q=80',
+      '/products/prod-020.webp',
     ],
     categoryId: 'cat-beauty',
     categoryName: 'Goʻzallik va parvarish',
@@ -745,7 +742,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.85,
     reviewsCount: 142,
     images: [
-      'https://images.unsplash.com/photo-1558981806-ec527fa84c39?w=800&auto=format&fit=crop&q=80',
+      '/products/prod-021.webp',
     ],
     categoryId: 'cat-auto',
     categoryName: 'Avtomobil jihozlari',
@@ -776,7 +773,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.8,
     reviewsCount: 114,
     images: [
-      'https://images.unsplash.com/photo-1542282088-72c9c27ed0cd?w=800&auto=format&fit=crop&q=80',
+      '/products/prod-022.webp',
     ],
     categoryId: 'cat-auto',
     categoryName: 'Avtomobil jihozlari',
@@ -807,7 +804,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.75,
     reviewsCount: 89,
     images: [
-      'https://images.unsplash.com/photo-1545454675-3531b543be5d?w=800&auto=format&fit=crop&q=80',
+      '/products/prod-023.webp',
     ],
     categoryId: 'cat-auto',
     categoryName: 'Avtomobil jihozlari',
@@ -838,7 +835,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.8,
     reviewsCount: 167,
     images: [
-      'https://images.unsplash.com/photo-1584438784894-089d6a62b8fa?w=800&auto=format&fit=crop&q=80',
+      '/products/prod-024.webp',
     ],
     categoryId: 'cat-auto',
     categoryName: 'Avtomobil jihozlari',
@@ -870,7 +867,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.9,
     reviewsCount: 124,
     images: [
-      'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?w=800&auto=format&fit=crop&q=80',
+      '/products/prod-025.webp',
     ],
     categoryId: 'cat-home',
     categoryName: 'Uy-roʻzgʻor buyumlari',
@@ -901,7 +898,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.8,
     reviewsCount: 88,
     images: [
-      'https://images.unsplash.com/photo-1585771724684-38269d6639fd?w=800&auto=format&fit=crop&q=80',
+      '/products/prod-026.webp',
     ],
     categoryId: 'cat-home',
     categoryName: 'Uy-roʻzgʻor buyumlari',
@@ -931,7 +928,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.85,
     reviewsCount: 165,
     images: [
-      'https://images.unsplash.com/photo-1517668808822-9ebb02f2a0e6?w=800&auto=format&fit=crop&q=80',
+      '/products/prod-027.webp',
     ],
     categoryId: 'cat-home',
     categoryName: 'Uy-roʻzgʻor buyumlari',
@@ -961,7 +958,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.8,
     reviewsCount: 230,
     images: [
-      'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&auto=format&fit=crop&q=80',
+      '/products/prod-028.webp',
     ],
     categoryId: 'cat-home',
     categoryName: 'Uy-roʻzgʻor buyumlari',
@@ -991,7 +988,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.9,
     reviewsCount: 140,
     images: [
-      'https://images.unsplash.com/photo-1584269600464-37b1b58a9fe7?w=800&auto=format&fit=crop&q=80',
+      '/products/prod-029.webp',
     ],
     categoryId: 'cat-home',
     categoryName: 'Uy-roʻzgʻor buyumlari',

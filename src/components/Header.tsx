@@ -36,6 +36,7 @@ import {
   Package
 } from 'lucide-react';
 import { Logo } from './Logo';
+import { LanguageSelectModal } from './LanguageSelectModal';
 import { useStore } from '../store/useStore';
 import { CATEGORIES } from '../data/mockData';
 import { formatPrice } from '../utils/calculator';
@@ -109,6 +110,7 @@ export const Header: React.FC = () => {
   const { t, language, setLanguage } = useTranslation();
 
   const [isCatalogOpen, setIsCatalogOpen] = useState(false);
+  const [isLangModalOpen, setIsLangModalOpen] = useState(false);
   const [activeCategoryId, setActiveCategoryId] = useState(CATEGORIES[0].id);
   const [localSearch, setLocalSearch] = useState(searchQuery);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
@@ -434,22 +436,25 @@ export const Header: React.FC = () => {
               <span className="whitespace-nowrap font-semibold">+998 94 333 55 22</span>
             </a>
 
-            {/* Language Selector in Top Bar */}
-            <div className="flex items-center bg-gray-200/70 dark:bg-slate-800 p-0.5 rounded-lg text-[11px] font-bold shrink-0 whitespace-nowrap">
-              {(['uz', 'ru'] as const).map((lang) => (
-                <button
-                  key={lang}
-                  onClick={() => setLanguage(lang)}
-                  className={`px-2 py-0.5 rounded-md uppercase transition-all whitespace-nowrap ${
-                    language === lang
-                      ? 'bg-white dark:bg-slate-700 text-uzum-primary dark:text-purple-300 shadow-xs font-black'
-                      : 'text-gray-500 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white'
-                  }`}
-                >
-                  {lang}
-                </button>
-              ))}
-            </div>
+            {/* Language Selector in Top Bar (Uzum style with Flag Modal) */}
+            <button
+              type="button"
+              onClick={() => setIsLangModalOpen(true)}
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-gray-700 dark:text-gray-200 text-xs font-bold transition-all border border-gray-200/60 dark:border-slate-700 cursor-pointer shadow-2xs group"
+              title={language === 'ru' ? "Сменить язык" : "Tilni tanlash"}
+            >
+              <div className="w-4 h-3 rounded-2xs overflow-hidden shrink-0 border border-black/10 shadow-xs">
+                <img
+                  src={language === 'ru' ? '/flags/ru.svg' : '/flags/uz.svg'}
+                  alt=""
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <span className="text-[11px] group-hover:text-uzum-primary dark:group-hover:text-purple-300 transition-colors">
+                {language === 'ru' ? 'Русский' : "O'zbekcha"}
+              </span>
+              <ChevronDown className="w-3 h-3 text-gray-400 group-hover:text-uzum-primary transition-colors" />
+            </button>
 
             {/* Theme Toggle Button */}
             <button
@@ -623,18 +628,22 @@ export const Header: React.FC = () => {
             )}
           </motion.button>
 
-          {/* Language Selector in Main Header (Mobile only: Compact cycling badge) */}
+          {/* Language Selector in Main Header (Mobile only: Modal trigger with Flag) */}
           <button
             type="button"
-            onClick={() => {
-              const nextLang = language === 'uz' ? 'ru' : 'uz';
-              setLanguage(nextLang);
-            }}
+            onClick={() => setIsLangModalOpen(true)}
             className="flex md:hidden items-center gap-1 px-2 py-1 rounded-xl bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 text-gray-700 dark:text-gray-200 text-[10px] font-black uppercase transition-all shrink-0 border border-gray-200/60 dark:border-slate-700/60 cursor-pointer"
-            title={language === 'ru' ? "Сменить язык (UZ / RU)" : "Tilni o'zgartirish (UZ / RU)"}
+            title={language === 'ru' ? "Сменить язык" : "Tilni tanlash"}
           >
-            <Globe className="w-3 h-3 text-uzum-primary dark:text-purple-400" />
+            <div className="w-3.5 h-2.5 rounded-2xs overflow-hidden shrink-0 border border-black/10">
+              <img
+                src={language === 'ru' ? '/flags/ru.svg' : '/flags/uz.svg'}
+                alt=""
+                className="w-full h-full object-cover"
+              />
+            </div>
             <span>{language}</span>
+            <ChevronDown className="w-2.5 h-2.5 text-gray-400" />
           </button>
 
           {/* Favorites Heart Icon in Mobile Header */}
@@ -974,6 +983,11 @@ export const Header: React.FC = () => {
           </div>
         </div>
       </div>
+      {/* Language Select Modal with Flags */}
+      <LanguageSelectModal
+        isOpen={isLangModalOpen}
+        onClose={() => setIsLangModalOpen(false)}
+      />
     </header>
   );
 };

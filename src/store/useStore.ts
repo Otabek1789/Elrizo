@@ -1088,17 +1088,11 @@ export const useStore = create<StoreState>()(
           if (!state.products || state.products.length === 0) {
             state.products = PRODUCTS;
           } else {
+            // Yangilangan original mahsulot rasmlarini xotiradagi tovarlarga zudlik bilan sinxronizatsiya qilish:
             state.products = state.products.map((p) => {
-              if (p.images && p.images.length > 0) {
-                p.images = p.images.map((img) => {
-                  if (img.includes('photo-1512290900672-1f41334c26a5')) {
-                    return 'https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?w=800&auto=format&fit=crop&q=80';
-                  }
-                  if (img.includes('photo-1584990347449-3996d92984b9')) {
-                    return 'https://images.unsplash.com/photo-1584269600464-37b1b58a9fe7?w=800&auto=format&fit=crop&q=80';
-                  }
-                  return img;
-                });
+              const fresh = PRODUCTS.find((fp) => fp.id === p.id);
+              if (fresh && fresh.images && fresh.images.length > 0) {
+                p.images = fresh.images;
               }
               return p;
             });
