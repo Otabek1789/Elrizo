@@ -320,7 +320,7 @@ export const ProductDetail: React.FC = () => {
                   src={img} 
                   alt="" 
                   onError={(e) => { (e.currentTarget as HTMLImageElement).src = fallbackDetailImg; }}
-                  className="w-full h-full object-cover rounded-lg" 
+                  className="w-full h-full object-contain p-1 rounded-lg" 
                 />
               </button>
             ))}

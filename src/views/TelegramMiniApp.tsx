@@ -837,7 +837,7 @@ export const TelegramMiniApp: React.FC = () => {
                   <div className="flex items-center justify-between gap-3">
                     <div className="flex items-center gap-3 min-w-0">
                       <div className="w-12 h-12 rounded-xl bg-purple-50 dark:bg-purple-950/50 p-1 shrink-0 overflow-hidden border border-purple-200/50 dark:border-purple-800/50 flex items-center justify-center">
-                        <img src={cat.image} alt={catTitle} className="w-full h-full object-cover rounded-lg" />
+                        <img src={cat.image} alt={catTitle} className="w-full h-full object-contain p-0.5 rounded-lg" />
                       </div>
                       <div className="min-w-0">
                         <h4 className="font-bold text-xs text-gray-900 dark:text-white truncate">

@@ -182,12 +182,14 @@ export const BannerSlider: React.FC<BannerSliderProps> = ({ onBannerAction }) =>
           </div>
 
           {/* O'ng rasm qismi */}
-          <div className="hidden sm:block sm:w-1/3 md:w-5/12 h-full z-10 relative flex items-center justify-center">
-            <img
-              src={banner.image}
-              alt={localizedBanner.title}
-              className="w-full h-44 sm:h-56 md:h-64 lg:h-72 object-cover rounded-2xl shadow-2xl border-4 border-white/20 transform group-hover:scale-105 transition-transform duration-500 pointer-events-none select-none"
-            />
+          <div className="hidden sm:flex sm:w-1/3 md:w-5/12 h-full z-10 relative items-center justify-center p-2">
+            <div className="w-full max-w-[280px] sm:max-w-[320px] md:max-w-[360px] h-44 sm:h-56 md:h-64 lg:h-72 rounded-2xl shadow-2xl border-4 border-white/25 bg-white/10 backdrop-blur-md p-3 sm:p-5 flex items-center justify-center transform group-hover:scale-105 transition-transform duration-500 overflow-hidden">
+              <img
+                src={banner.image}
+                alt={localizedBanner.title}
+                className="w-full h-full object-contain filter drop-shadow-xl pointer-events-none select-none"
+              />
+            </div>
           </div>
         </motion.div>
       </AnimatePresence>

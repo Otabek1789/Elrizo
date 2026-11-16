@@ -1136,7 +1136,7 @@ export const Checkout: React.FC = () => {
                   <img
                     src={item.product.images[0]}
                     alt={item.product.title}
-                    className="w-12 h-12 rounded-lg object-cover border border-gray-200 dark:border-slate-700 shrink-0 bg-white dark:bg-slate-800"
+                    className="w-12 h-12 rounded-lg object-contain p-1 border border-gray-200 dark:border-slate-700 shrink-0 bg-white dark:bg-slate-800"
                   />
                   <div className="flex-1 min-w-0">
                     <h4 className="font-medium text-gray-800 dark:text-slate-200 truncate">{item.product.title}</h4>
