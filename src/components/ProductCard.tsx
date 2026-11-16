@@ -110,7 +110,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     >
       {/* Top Image Section */}
       <div 
-        className="relative w-full aspect-[4/4.2] overflow-hidden bg-gray-50 dark:bg-slate-900/60 flex items-center justify-center"
+        className="relative w-full aspect-[4/4.2] overflow-hidden bg-gray-50 dark:bg-slate-900/60 flex items-center justify-center p-2.5 sm:p-3"
         onMouseEnter={() => {
           if (product.images && product.images.length > 1) setActiveImageIndex(1);
         }}
@@ -122,7 +122,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           src={currentImg}
           alt={product.title}
           onError={() => setImageError(true)}
-          className="w-full h-full object-cover object-center group-hover:scale-108 transition-transform duration-500"
+          className="w-full h-full object-contain object-center group-hover:scale-108 transition-transform duration-500"
           loading="lazy"
         />
 
