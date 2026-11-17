@@ -332,11 +332,11 @@ export const ProductDetail: React.FC = () => {
               src={!imageError && product.images && product.images.length > 0 ? (product.images[selectedImageIndex] || product.images[0] || fallbackDetailImg) : fallbackDetailImg}
               alt={product.title}
               onError={() => setImageError(true)}
-              className="w-full h-full object-contain p-4 transition-all duration-300"
+              className="w-full h-full object-contain pt-10 pb-4 px-6 transition-all duration-300"
             />
 
-            {/* Badges */}
-            <div className="absolute top-3 left-3 flex flex-col items-start gap-1.5 z-10 pointer-events-none">
+            {/* Badges - Gorizontal qatorda, mahsulotni to'smaydi */}
+            <div className="absolute top-3 left-3 flex items-center gap-2 z-10 pointer-events-none">
               {product.hasZeroDown && (
                 <span className="inline-flex items-center gap-1 bg-emerald-600 text-white text-xs font-bold px-2.5 py-1 rounded-lg shadow-sm w-fit">
                   0-0-12 {t('zeroDownBadge')}

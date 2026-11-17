@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { ActivePage, CartItem, Order, Product, PromoCode, User, Review, CashbackTransaction } from '../types';
+import { ActivePage, CartItem, Order, Product, PromoCode, User, Review, CashbackTransaction, InfoModalTopic } from '../types';
 import { PRODUCTS } from '../data/mockData';
 import { INITIAL_REVIEWS } from '../data/mockReviews';
 import { searchProducts } from '../utils/searchHelper';
@@ -149,6 +149,11 @@ interface StoreState {
   // Real Customer Reviews (Sharhlar)
   reviews: Record<string, Review[]>;
   addReview: (productId: string, review: { userName: string; rating: number; comment: string }) => void;
+
+  // Info & Trust Modals (Oferta, Rekvizitlar, Nasiya qoidalari, FAQ va h.k.)
+  infoModalTopic: InfoModalTopic | null;
+  openInfoModal: (topic: InfoModalTopic) => void;
+  closeInfoModal: () => void;
 
   // Order Tracking (Buyurtmani kuzatish)
   isOrderTrackingOpen: boolean;
@@ -993,6 +998,11 @@ export const useStore = create<StoreState>()(
       isCashbackCardModalOpen: false,
       openCashbackCardModal: () => {},
       closeCashbackCardModal: () => {},
+
+      // Info & Trust Modals
+      infoModalTopic: null,
+      openInfoModal: (topic: InfoModalTopic) => set({ infoModalTopic: topic }),
+      closeInfoModal: () => set({ infoModalTopic: null }),
 
       // Toasts
       toasts: [],

@@ -48,7 +48,7 @@ export const generateAndPrintContract = (order: Order) => {
 
   const printWindow = window.open('', '_blank', 'width=900,height=800');
   if (!printWindow) {
-    alert("Brauzeringizda pop-up (yangi oyna) ochishga ruxsat bering");
+    console.warn("Pop-up blocked. Please allow pop-ups for contract printing.");
     return;
   }
 

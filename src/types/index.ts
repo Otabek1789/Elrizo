@@ -38,6 +38,16 @@ export interface Review {
 
 export type OnlinePaymentProvider = 'click' | 'payme' | 'uzumpay';
 
+export type InfoModalTopic =
+  | 'offer'
+  | 'details'
+  | 'installment'
+  | 'scoring'
+  | 'pickup'
+  | 'faq'
+  | 'vacancies'
+  | 'app';
+
 export interface SubCategory {
   id: string;
   name: string;

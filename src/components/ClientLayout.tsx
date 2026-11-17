@@ -10,6 +10,7 @@ import { CartDrawer } from './CartDrawer';
 import { AuthModal } from './AuthModal';
 import { LoginRequiredModal } from './LoginRequiredModal';
 import { CitySelectModal } from './CitySelectModal';
+import { InfoModal } from './InfoModal';
 import { InstallmentCalculator } from './InstallmentCalculator';
 import { ProductComparisonModal } from './ProductComparisonModal';
 import { ComparisonBar } from './ComparisonBar';
@@ -173,6 +174,7 @@ export const ClientLayout: React.FC<ClientLayoutProps> = ({ children }) => {
           <ProductComparisonModal />
           <ComparisonBar />
           <OrderTrackingModal />
+          <InfoModal />
 
           {/* Global Tezkor Nasiya Kalkulyatori Modali */}
           {isCalculatorOpen && calculatorProduct && (

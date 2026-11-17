@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from '@/lib/navigation';
 import { motion } from 'framer-motion';
-import { Heart, Star, ShoppingBag, Calculator, Zap, Scale, Send } from 'lucide-react';
+import { Heart, Star, ShoppingBag, Calculator, Zap, Scale, Send, Sparkles } from 'lucide-react';
 import { Product } from '../types';
 import { useStore } from '../store/useStore';
 import { calculateMonthlyPaymentQuick, formatPrice } from '../utils/calculator';
@@ -108,9 +108,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({
       onClick={handleCardClick}
       className="group bg-white dark:bg-slate-800 rounded-2xl sm:rounded-3xl border border-gray-200/70 dark:border-slate-800/80 hover:border-purple-300 dark:hover:border-purple-500/40 shadow-sm hover:shadow-card-hover hover:-translate-y-1 transition-all duration-150 flex flex-col justify-between overflow-hidden cursor-pointer relative"
     >
-      {/* Top Image Section */}
+      {/* Top Image Section - Tovar yozuvlar ostida qolib ketmasligi uchun yuqoridan qulay joy qoldirilgan */}
       <div 
-        className="relative w-full aspect-[4/4.2] overflow-hidden bg-gray-50 dark:bg-slate-900/60 flex items-center justify-center p-2.5 sm:p-3"
+        className="relative w-full aspect-[4/4.2] overflow-hidden bg-gray-50 dark:bg-slate-900/60 flex items-center justify-center pt-8 pb-3 px-4 sm:px-5"
         onMouseEnter={() => {
           if (product.images && product.images.length > 1) setActiveImageIndex(1);
         }}
@@ -122,17 +122,17 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           src={currentImg}
           alt={product.title}
           onError={() => setImageError(true)}
-          className="w-full h-full object-contain object-center group-hover:scale-108 transition-transform duration-500"
+          className="w-full h-full object-contain object-center group-hover:scale-105 transition-transform duration-500"
           loading="lazy"
         />
 
         {/* Action Buttons: Favorite, Compare & Telegram */}
-        <div className="absolute top-3 right-3 flex flex-col gap-1.5 z-10">
+        <div className="absolute top-2.5 right-2.5 flex flex-col gap-1.5 z-10">
           <motion.button
             whileHover={{ scale: 1.2 }}
             whileTap={{ scale: 0.85 }}
             onClick={handleToggleFavorite}
-            className="p-2 rounded-full bg-white/85 hover:bg-white dark:bg-slate-800/80 dark:hover:bg-slate-700 backdrop-blur-md text-gray-400 dark:text-gray-300 hover:text-rose-500 transition-colors shadow-sm"
+            className="p-1.5 sm:p-2 rounded-full bg-white/85 hover:bg-white dark:bg-slate-800/80 dark:hover:bg-slate-700 backdrop-blur-md text-gray-400 dark:text-gray-300 hover:text-rose-500 transition-colors shadow-sm"
             title={t('addToFavoritesTitle')}
           >
             <Heart
@@ -146,7 +146,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             whileHover={{ scale: 1.2 }}
             whileTap={{ scale: 0.85 }}
             onClick={handleToggleComparison}
-            className={`p-2 rounded-full backdrop-blur-md transition-colors shadow-sm ${
+            className={`p-1.5 sm:p-2 rounded-full backdrop-blur-md transition-colors shadow-sm ${
               isCompared
                 ? 'bg-primary-600 text-white shadow-md shadow-primary-500/30'
                 : 'bg-white/85 hover:bg-white dark:bg-slate-800/80 dark:hover:bg-slate-700 text-gray-400 dark:text-gray-300 hover:text-primary-600'
@@ -161,33 +161,28 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             whileTap={{ scale: 0.85 }}
             onClick={handleSendProductToTelegram}
             disabled={isSendingTg}
-            className="p-2 rounded-full bg-white/85 hover:bg-sky-50 dark:bg-slate-800/80 dark:hover:bg-sky-950/40 backdrop-blur-md text-sky-500 hover:text-sky-600 transition-colors shadow-sm cursor-pointer"
+            className="p-1.5 sm:p-2 rounded-full bg-white/85 hover:bg-sky-50 dark:bg-slate-800/80 dark:hover:bg-sky-950/40 backdrop-blur-md text-sky-500 hover:text-sky-600 transition-colors shadow-sm cursor-pointer"
             title={`${t('telegramSendProduct')} (@elrizo_bot)`}
           >
             <Send className={`w-4 h-4 -rotate-12 ${isSendingTg ? 'animate-spin' : ''}`} />
           </motion.button>
         </div>
 
-        {/* Badges */}
-        <div className="absolute top-2.5 left-2.5 flex flex-col items-start gap-1 z-10 pointer-events-none">
+        {/* Badges - Gorizontal qatorda, mahsulotni to'smaydigan qilib yuqori qismga ixcham joylashtirilgan */}
+        <div className="absolute top-2.5 left-2.5 flex items-center gap-1.5 z-10 pointer-events-none">
           {product.hasZeroDown && (
             <motion.span 
               initial={{ scale: 0.8 }}
               animate={{ scale: 1 }}
-              className="inline-flex items-center gap-1 bg-emerald-600 text-white text-[10px] font-extrabold px-2 py-0.5 rounded-md shadow-sm w-fit tracking-wide"
+              className="inline-flex items-center gap-1 bg-emerald-600 text-white text-[10px] font-extrabold px-2 py-0.5 rounded-md shadow-sm tracking-wide"
             >
               <Zap className="w-2.5 h-2.5 fill-white" />
               <span>0-0-12</span>
             </motion.span>
           )}
           {product.discountPercentage && (
-            <span className="inline-flex items-center justify-center bg-rose-500 text-white text-[10px] font-extrabold px-2 py-0.5 rounded-md shadow-sm w-fit">
+            <span className="inline-flex items-center justify-center bg-rose-500 text-white text-[10px] font-extrabold px-1.5 py-0.5 rounded-md shadow-sm">
               -{product.discountPercentage}%
-            </span>
-          )}
-          {product.isWeeklyOffer && (
-            <span className="inline-flex items-center justify-center bg-amber-500 text-white text-[10px] font-extrabold px-2 py-0.5 rounded-md shadow-sm w-fit">
-              {t('weeklyOfferBadge')}
             </span>
           )}
         </div>
@@ -209,6 +204,15 @@ export const ProductCard: React.FC<ProductCardProps> = ({
       {/* Content Section */}
       <div className="p-3 sm:p-4 flex flex-col flex-1 justify-between gap-2.5 sm:gap-3">
         <div>
+          {/* Hafta taklifi nishoni - tovarni to'smaydigan qilib sarlavha tepasiga joylashtirildi */}
+          {product.isWeeklyOffer && (
+            <div className="mb-1.5">
+              <span className="inline-flex items-center gap-1 bg-amber-500 text-white text-[10px] font-extrabold px-2 py-0.5 rounded-md shadow-sm w-fit">
+                <Sparkles className="w-2.5 h-2.5 fill-white" />
+                <span>{t('weeklyOfferBadge')}</span>
+              </span>
+            </div>
+          )}
           {/* Title */}
           {onClick ? (
             <div

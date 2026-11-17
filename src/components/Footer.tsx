@@ -1,12 +1,14 @@
 'use client';
 import React from 'react';
 import { Link } from '@/lib/navigation';
-import { ShieldCheck, Truck, Headphones, RotateCcw, CreditCard } from 'lucide-react';
+import { ShieldCheck, Truck, Headphones, RotateCcw, CreditCard, Smartphone, Play } from 'lucide-react';
 import { LogoIcon } from './Logo';
 import { useTranslation } from '../utils/translations';
+import { useStore } from '../store/useStore';
 
 export const Footer: React.FC = () => {
   const { t } = useTranslation();
+  const { openInfoModal } = useStore();
 
   return (
     <footer className="bg-white dark:bg-slate-900 border-t border-gray-200 dark:border-slate-800 mt-16 text-xs text-gray-600 dark:text-gray-400 transition-colors">
@@ -68,10 +70,10 @@ export const Footer: React.FC = () => {
         <div>
           <h4 className="font-bold text-gray-900 dark:text-white mb-3 text-sm">{t('footerAboutTitle')}</h4>
           <ul className="space-y-2">
-            <li><Link to="/catalog" className="hover:text-uzum-primary dark:hover:text-purple-300 transition-colors no-underline">{t('footerPickupPoints')}</Link></li>
-            <li><Link to="/catalog" className="hover:text-uzum-primary dark:hover:text-purple-300 transition-colors no-underline">{t('footerVacancies')}</Link></li>
-            <li><Link to="/catalog" className="hover:text-uzum-primary dark:hover:text-purple-300 transition-colors no-underline">{t('footerCompanyDetails')}</Link></li>
-            <li><Link to="/catalog" className="hover:text-uzum-primary dark:hover:text-purple-300 transition-colors no-underline">{t('footerPublicOffer')}</Link></li>
+            <li><button type="button" onClick={() => openInfoModal('pickup')} className="hover:text-uzum-primary dark:hover:text-purple-300 transition-colors text-left cursor-pointer">{t('footerPickupPoints')}</button></li>
+            <li><button type="button" onClick={() => openInfoModal('vacancies')} className="hover:text-uzum-primary dark:hover:text-purple-300 transition-colors text-left cursor-pointer">{t('footerVacancies')}</button></li>
+            <li><button type="button" onClick={() => openInfoModal('details')} className="hover:text-uzum-primary dark:hover:text-purple-300 transition-colors text-left cursor-pointer">{t('footerCompanyDetails')}</button></li>
+            <li><button type="button" onClick={() => openInfoModal('offer')} className="hover:text-uzum-primary dark:hover:text-purple-300 transition-colors text-left cursor-pointer">{t('footerPublicOffer')}</button></li>
           </ul>
         </div>
 
@@ -79,19 +81,19 @@ export const Footer: React.FC = () => {
           <h4 className="font-bold text-gray-900 dark:text-white mb-3 text-sm">{t('footerForUsers')}</h4>
           <ul className="space-y-2">
             <li><a href="https://t.me/elrizo_bot" target="_blank" rel="noopener noreferrer" className="hover:text-uzum-primary dark:hover:text-purple-300 transition-colors">{t('footerContactUs')}</a></li>
-            <li><Link to="/catalog" className="hover:text-uzum-primary dark:hover:text-purple-300 transition-colors no-underline">{t('footerFaq')}</Link></li>
-            <li><Link to="/catalog" className="hover:text-uzum-primary dark:hover:text-purple-300 transition-colors no-underline">{t('footerInstallmentRules')}</Link></li>
-            <li><Link to="/catalog" className="hover:text-uzum-primary dark:hover:text-purple-300 transition-colors no-underline">{t('footerScoringRequirements')}</Link></li>
+            <li><button type="button" onClick={() => openInfoModal('faq')} className="hover:text-uzum-primary dark:hover:text-purple-300 transition-colors text-left cursor-pointer">{t('footerFaq')}</button></li>
+            <li><button type="button" onClick={() => openInfoModal('installment')} className="hover:text-uzum-primary dark:hover:text-purple-300 transition-colors text-left cursor-pointer">{t('footerInstallmentRules')}</button></li>
+            <li><button type="button" onClick={() => openInfoModal('scoring')} className="hover:text-uzum-primary dark:hover:text-purple-300 transition-colors text-left cursor-pointer">{t('footerScoringRequirements')}</button></li>
           </ul>
         </div>
 
         <div>
           <h4 className="font-bold text-gray-900 dark:text-white mb-3 text-sm">{t('footerForBusiness')}</h4>
           <ul className="space-y-2">
-            <li><a href="https://t.me/elrizo_bot" target="_blank" rel="noopener noreferrer" className="hover:text-uzum-primary dark:hover:text-purple-300 transition-colors">{t('footerSellOnElrizo')}</a></li>
+            <li><a href="https://t.me/yahyo0526" target="_blank" rel="noopener noreferrer" className="hover:text-uzum-primary dark:hover:text-purple-300 transition-colors">{t('footerSellOnElrizo')}</a></li>
             <li><Link to="/login" className="hover:text-uzum-primary dark:hover:text-purple-300 transition-colors no-underline">{t('footerSellerCabinet')}</Link></li>
-            <li><Link to="/catalog" className="hover:text-uzum-primary dark:hover:text-purple-300 transition-colors no-underline">{t('footerOpenPickup')}</Link></li>
-            <li><a href="https://t.me/elrizo_bot" target="_blank" rel="noopener noreferrer" className="hover:text-uzum-primary dark:hover:text-purple-300 transition-colors">{t('footerPartnership')}</a></li>
+            <li><button type="button" onClick={() => openInfoModal('pickup')} className="hover:text-uzum-primary dark:hover:text-purple-300 transition-colors text-left cursor-pointer">{t('footerOpenPickup')}</button></li>
+            <li><a href="https://t.me/yahyo0526" target="_blank" rel="noopener noreferrer" className="hover:text-uzum-primary dark:hover:text-purple-300 transition-colors">{t('footerPartnership')}</a></li>
           </ul>
         </div>
 
@@ -101,11 +103,27 @@ export const Footer: React.FC = () => {
             {t('footerAppDesc')}
           </p>
           <div className="flex flex-col gap-2">
-            <button className="px-3 py-2 bg-gray-900 dark:bg-slate-800 text-white rounded-xl flex items-center justify-center gap-2 hover:bg-black dark:hover:bg-slate-700 transition-colors border border-transparent dark:border-slate-700">
-              <span className="text-xs font-bold">App Store</span>
+            <button 
+              type="button"
+              onClick={() => openInfoModal('app')}
+              className="px-3.5 py-2.5 bg-gray-900 dark:bg-slate-800 text-white rounded-xl flex items-center justify-start gap-3 hover:bg-black dark:hover:bg-slate-700 transition-all border border-transparent dark:border-slate-700 shadow-sm active:scale-95 cursor-pointer"
+            >
+              <Smartphone className="w-5 h-5 text-gray-300" />
+              <div className="text-left leading-tight">
+                <div className="text-[9px] text-gray-400 uppercase tracking-wider font-medium">Download on</div>
+                <div className="text-xs font-bold">App Store</div>
+              </div>
             </button>
-            <button className="px-3 py-2 bg-gray-900 dark:bg-slate-800 text-white rounded-xl flex items-center justify-center gap-2 hover:bg-black dark:hover:bg-slate-700 transition-colors border border-transparent dark:border-slate-700">
-              <span className="text-xs font-bold">Google Play</span>
+            <button 
+              type="button"
+              onClick={() => openInfoModal('app')}
+              className="px-3.5 py-2.5 bg-gray-900 dark:bg-slate-800 text-white rounded-xl flex items-center justify-start gap-3 hover:bg-black dark:hover:bg-slate-700 transition-all border border-transparent dark:border-slate-700 shadow-sm active:scale-95 cursor-pointer"
+            >
+              <Play className="w-4 h-4 fill-current text-gray-300 ml-0.5" />
+              <div className="text-left leading-tight">
+                <div className="text-[9px] text-gray-400 uppercase tracking-wider font-medium">Get it on</div>
+                <div className="text-xs font-bold">Google Play</div>
+              </div>
             </button>
           </div>
         </div>

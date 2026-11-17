@@ -38,7 +38,10 @@ import {
   SlidersHorizontal,
   Flame,
   Zap,
-  ArrowRight
+  ArrowRight,
+  MapPin,
+  CreditCard,
+  MessageCircle
 } from 'lucide-react';
 import { BannerSlider } from '../components/BannerSlider';
 import { CategoryList } from '../components/CategoryList';
@@ -88,9 +91,18 @@ export const TelegramMiniApp: React.FC = () => {
     theme,
     toggleTheme,
     language,
-    setLanguage
+    setLanguage,
+    addToast
   } = useStore();
   const { t } = useTranslation();
+
+  const showTgAlert = (msg: string) => {
+    if (typeof window !== 'undefined' && (window as any).Telegram?.WebApp?.showAlert) {
+      (window as any).Telegram.WebApp.showAlert(msg);
+    } else {
+      addToast(msg, 'warning');
+    }
+  };
 
   // Telegram User & Context
   const [tgUser, setTgUser] = useState<any>(null);
@@ -268,7 +280,7 @@ export const TelegramMiniApp: React.FC = () => {
     if (isSubmitting) return;
 
     if (!checkoutPhone.trim() || checkoutPhone.trim().length < 9) {
-      alert("Iltimos, to'liq telefon raqamingizni kiriting!");
+      showTgAlert("Iltimos, to'liq telefon raqamingizni kiriting!");
       return;
     }
 
@@ -337,7 +349,7 @@ export const TelegramMiniApp: React.FC = () => {
     } catch (err: any) {
       console.error("Order submission error:", err);
       tgHaptic('error');
-      alert("Buyurtma yuborishda xatolik yuz berdi. Iltimos qaytadan urinib ko'ring.");
+      showTgAlert("Buyurtma yuborishda xatolik yuz berdi. Iltimos qaytadan urinib ko'ring.");
     } finally {
       setIsSubmitting(false);
     }
@@ -1127,12 +1139,12 @@ export const TelegramMiniApp: React.FC = () => {
               <Phone className="w-3.5 h-3.5 text-[#640199] dark:text-purple-400" />
               <span>ELRIZO NASIYA SAVDO — Rasmiy ma'lumotlar</span>
             </h4>
-            <div className="text-[11px] text-gray-600 dark:text-gray-300 space-y-1 leading-relaxed">
-              <p>☎️ <b>Telefon:</b> <a href="tel:+998943335522" className="text-purple-600 dark:text-purple-400 font-bold">+998 94 333 55 22</a></p>
-              <p>💬 <b>Telegram admin:</b> <a href="https://t.me/yahyo0526" target="_blank" rel="noreferrer" className="text-purple-600 dark:text-purple-400 font-bold">@yahyo0526</a></p>
-              <p>⏰ <b>Ish vaqti:</b> Har kuni 09:00 dan 21:00 gacha (dam olishsiz)</p>
-              <p>📍 <b>Manzil:</b> Namangan shahri, Yangiqo'rg'on tumani</p>
-              <p>🌐 <b>Rasmiy sayt:</b> <a href="https://elrizonasiya.vercel.app" target="_blank" rel="noreferrer" className="text-purple-600 dark:text-purple-400 font-bold underline">elrizonasiya.vercel.app</a></p>
+            <div className="text-[11px] text-gray-600 dark:text-gray-300 space-y-1.5 leading-relaxed">
+              <p className="flex items-center gap-1.5"><Phone className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400 shrink-0" /> <b>Telefon:</b> <a href="tel:+998943335522" className="text-purple-600 dark:text-purple-400 font-bold">+998 94 333 55 22</a></p>
+              <p className="flex items-center gap-1.5"><MessageCircle className="w-3.5 h-3.5 text-sky-500 shrink-0" /> <b>Telegram admin:</b> <a href="https://t.me/yahyo0526" target="_blank" rel="noreferrer" className="text-purple-600 dark:text-purple-400 font-bold">@yahyo0526</a></p>
+              <p className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5 text-amber-500 shrink-0" /> <b>Ish vaqti:</b> Har kuni 09:00 dan 21:00 gacha</p>
+              <p className="flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5 text-rose-500 shrink-0" /> <b>Manzil:</b> Namangan shahri, Yangiqo'rg'on tumani</p>
+              <p className="flex items-center gap-1.5"><Globe className="w-3.5 h-3.5 text-emerald-500 shrink-0" /> <b>Rasmiy sayt:</b> <a href="https://elrizonasiya.vercel.app" target="_blank" rel="noreferrer" className="text-purple-600 dark:text-purple-400 font-bold underline">elrizonasiya.vercel.app</a></p>
             </div>
             <div className="grid grid-cols-2 gap-2 pt-1">
               <a
@@ -1376,7 +1388,10 @@ export const TelegramMiniApp: React.FC = () => {
                         : 'bg-gray-50 dark:bg-slate-750 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-slate-700'
                     }`}
                   >
-                    💳 Naqd / Karta
+                    <span className="inline-flex items-center gap-1.5 justify-center w-full">
+                      <CreditCard className="w-3.5 h-3.5 shrink-0" />
+                      <span>Naqd / Karta</span>
+                    </span>
                   </button>
                 </div>
               </div>
