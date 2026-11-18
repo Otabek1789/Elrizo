@@ -39,7 +39,6 @@ export const ClientLayout: React.FC<ClientLayoutProps> = ({ children }) => {
     removeToast,
     initSupabaseCheck,
     fetchProductsFromCloud,
-    theme,
   } = useStore();
 
   useEffect(() => {
@@ -126,14 +125,12 @@ export const ClientLayout: React.FC<ClientLayoutProps> = ({ children }) => {
     };
   }, [initSupabaseCheck, navigate]);
 
-  // Dark/Light theme class synchronization
+  // Dark rejim butunlay olib tashlangan - har doim yorug' (Light) rejimni kafolatlash
   useEffect(() => {
-    if (theme === 'dark') {
-      document.documentElement.classList.add('dark');
-    } else {
+    if (typeof document !== 'undefined') {
       document.documentElement.classList.remove('dark');
     }
-  }, [theme]);
+  }, []);
 
   // Har safar sahifa o'zgarganda yuqoriga aylantirish
   useEffect(() => {
@@ -148,7 +145,7 @@ export const ClientLayout: React.FC<ClientLayoutProps> = ({ children }) => {
 
   return (
     <div
-      className={`flex flex-col w-full max-w-full overflow-x-hidden bg-[#F8F9FA] dark:bg-slate-900 text-gray-900 dark:text-gray-100 relative selection:bg-purple-200 selection:text-purple-900 ${
+      className={`flex flex-col w-full max-w-full overflow-x-hidden bg-[#F8F9FA] text-gray-900 relative selection:bg-purple-200 selection:text-purple-900 ${
         isAdminPage ? 'h-screen overflow-hidden' : 'min-h-screen'
       }`}
     >

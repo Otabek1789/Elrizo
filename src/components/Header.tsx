@@ -23,8 +23,6 @@ import {
   SlidersHorizontal,
   TrendingUp,
   ArrowRight,
-  Sun,
-  Moon,
   Globe,
   Zap,
   Truck,
@@ -96,8 +94,6 @@ export const Header: React.FC = () => {
     openAuth,
     getCartItemsCount,
     getCartTotal,
-    theme,
-    toggleTheme,
     selectedCity,
     openCityModal,
     openOrderTracking,
@@ -450,15 +446,6 @@ export const Header: React.FC = () => {
                 </button>
               ))}
             </div>
-
-            {/* Theme Toggle Button */}
-            <button
-              onClick={toggleTheme}
-              className="p-1 rounded-lg text-gray-500 hover:text-uzum-primary hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors shrink-0"
-              title={theme === 'dark' ? t('themeLight') : t('themeDark')}
-            >
-              {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-slate-700 dark:text-gray-200" />}
-            </button>
           </div>
         </div>
       </div>
@@ -607,20 +594,6 @@ export const Header: React.FC = () => {
           >
             <MapPin className="w-3.5 h-3.5 text-uzum-primary dark:text-purple-400 shrink-0" />
             <span className="max-w-[48px] sm:max-w-[65px] truncate text-[10px] sm:text-[11px] font-bold">{formatCity(selectedCity, language)}</span>
-          </motion.button>
-
-          {/* Theme Switcher Button (Mobile only) */}
-          <motion.button
-            whileTap={{ scale: 0.92 }}
-            onClick={toggleTheme}
-            className="p-1 sm:p-1.5 rounded-xl text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors md:hidden shrink-0"
-            title={theme === 'dark' ? t('themeLight') : t('themeDark')}
-          >
-            {theme === 'dark' ? (
-              <Sun className="w-3.5 h-3.5 text-amber-400" />
-            ) : (
-              <Moon className="w-3.5 h-3.5 text-gray-700 dark:text-gray-300" />
-            )}
           </motion.button>
 
           {/* Language Selector in Main Header (Mobile only: Compact cycling badge) */}

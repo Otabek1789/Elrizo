@@ -35,8 +35,6 @@ import {
   AlertCircle,
   Menu,
   ChevronLeft,
-  Sun,
-  Moon,
   ExternalLink,
   Check,
   RefreshCw,
@@ -197,7 +195,6 @@ export const AdminPanel: React.FC = () => {
     logoutUser,
     addToast,
     theme,
-    toggleTheme,
     language,
     setLanguage,
     promoCodes,
@@ -1035,44 +1032,6 @@ export const AdminPanel: React.FC = () => {
                 </motion.button>
               ))}
             </div>
-
-            {/* Theme Toggle Button */}
-            <motion.button
-              whileTap={{ scale: 0.94 }}
-              whileHover={{ scale: 1.03 }}
-              transition={{ duration: 0.15 }}
-              onClick={toggleTheme}
-              className="h-9 px-3 rounded-xl bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 text-gray-700 dark:text-slate-300 border border-gray-200 dark:border-slate-700 transition-colors flex items-center gap-1.5 text-xs font-bold shadow-xs select-none"
-              title={theme === 'dark' ? (language === 'ru' ? 'Светлый режим' : "Yorug' rejim") : (language === 'ru' ? 'Тёмный режим' : 'Tungi rejim')}
-            >
-              <AnimatePresence mode="wait" initial={false}>
-                {theme === 'dark' ? (
-                  <motion.div
-                    key="dark"
-                    initial={{ scale: 0.8, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    exit={{ scale: 0.8, opacity: 0 }}
-                    transition={{ duration: 0.15 }}
-                    className="flex items-center gap-1.5"
-                  >
-                    <Sun className="w-4 h-4 text-amber-400" />
-                    <span className="hidden md:inline text-[11px]">{language === 'ru' ? 'Светлый' : "Yorug'"}</span>
-                  </motion.div>
-                ) : (
-                  <motion.div
-                    key="light"
-                    initial={{ scale: 0.8, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    exit={{ scale: 0.8, opacity: 0 }}
-                    transition={{ duration: 0.15 }}
-                    className="flex items-center gap-1.5"
-                  >
-                    <Moon className="w-4 h-4 text-uzum-primary" />
-                    <span className="hidden md:inline text-[11px]">{language === 'ru' ? 'Тёмный' : 'Tungi'}</span>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </motion.button>
 
             <div className="text-right hidden sm:block">
               <div className="text-xs font-bold text-gray-900 dark:text-white">

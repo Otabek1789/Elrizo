@@ -1017,47 +1017,19 @@ export const useStore = create<StoreState>()(
         set((state) => ({ toasts: state.toasts.filter((t) => t.id !== id) }));
       },
 
-      // Theme (Light/Dark mode)
+      // Theme (Faqat Light mode - Dark mode butunlay o'chirilgan)
       theme: 'light' as Theme,
-      setTheme: (theme: Theme) => {
+      setTheme: (_theme?: Theme) => {
         if (typeof document !== 'undefined') {
-          // Vaqtinchalik barcha transitionlarni o'chirib, rejimni bir lahzada (bittada) o'tkazish
-          const css = document.createElement('style');
-          css.appendChild(
-            document.createTextNode(
-              `*, *::before, *::after {
-                -webkit-transition: none !important;
-                -moz-transition: none !important;
-                -o-transition: none !important;
-                -ms-transition: none !important;
-                transition: none !important;
-              }`
-            )
-          );
-          document.head.appendChild(css);
-
-          if (theme === 'dark') {
-            document.documentElement.classList.add('dark');
-          } else {
-            document.documentElement.classList.remove('dark');
-          }
-
-          // Force reflow to immediately apply theme styles without delay
-          void window.getComputedStyle(document.body).opacity;
-
-          requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-              if (document.head.contains(css)) {
-                document.head.removeChild(css);
-              }
-            });
-          });
+          document.documentElement.classList.remove('dark');
         }
-        set({ theme });
+        set({ theme: 'light' });
       },
       toggleTheme: () => {
-        const next = get().theme === 'dark' ? 'light' : 'dark';
-        get().setTheme(next);
+        if (typeof document !== 'undefined') {
+          document.documentElement.classList.remove('dark');
+        }
+        set({ theme: 'light' });
       },
 
       // Language (UZ/RU faqat O'zbek va Rus tillari, EN butunlay olib tashlangan)
@@ -1150,12 +1122,11 @@ export const useStore = create<StoreState>()(
         if (state && (state.language as any) === 'en') {
           state.language = 'uz';
         }
+        if (state) {
+          state.theme = 'light';
+        }
         if (state && typeof document !== 'undefined') {
-          if (state.theme === 'dark') {
-            document.documentElement.classList.add('dark');
-          } else {
-            document.documentElement.classList.remove('dark');
-          }
+          document.documentElement.classList.remove('dark');
           if (state.language) {
             document.documentElement.lang = state.language;
           }

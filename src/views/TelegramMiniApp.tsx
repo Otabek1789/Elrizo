@@ -32,8 +32,6 @@ import {
   Trash2,
   Percent,
   CheckCircle2,
-  Moon,
-  Sun,
   Globe,
   SlidersHorizontal,
   Flame,
@@ -88,8 +86,6 @@ export const TelegramMiniApp: React.FC = () => {
     isFavorite,
     orders,
     addOrder,
-    theme,
-    toggleTheme,
     language,
     setLanguage,
     addToast
@@ -389,18 +385,6 @@ export const TelegramMiniApp: React.FC = () => {
             >
               <Globe className="w-3.5 h-3.5" />
               <span>{language.toUpperCase()}</span>
-            </button>
-
-            {/* Dark / Light Toggle */}
-            <button
-              onClick={() => {
-                tgHaptic('light');
-                toggleTheme();
-              }}
-              className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 border border-white/15 text-white transition-all"
-              title="Mavzuni o'zgartirish"
-            >
-              {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-300" /> : <Moon className="w-4 h-4" />}
             </button>
           </div>
         </div>

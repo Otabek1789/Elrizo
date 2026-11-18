@@ -44,16 +44,15 @@ export const viewport: Viewport = {
 
 const themeInitScript = `
   try {
+    document.documentElement.classList.remove('dark');
     const stored = localStorage.getItem('elrizo_store_v3') || localStorage.getItem('elrizo_nasiya_storage');
     if (stored) {
       const parsed = JSON.parse(stored);
-      if (parsed?.state?.theme === 'dark') {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-      }
-      if (parsed?.state && parsed?.state?.language === 'en') {
-        parsed.state.language = 'uz';
+      if (parsed?.state) {
+        parsed.state.theme = 'light';
+        if (parsed.state.language === 'en') {
+          parsed.state.language = 'uz';
+        }
         localStorage.setItem('elrizo_store_v3', JSON.stringify(parsed));
       }
     }
@@ -70,7 +69,7 @@ export default function RootLayout({
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>
-      <body className="bg-[#F8F9FA] dark:bg-slate-900 text-[#1F2937] dark:text-gray-100 font-sans antialiased selection:bg-purple-200 selection:text-purple-900">
+      <body className="bg-[#F8F9FA] text-[#1F2937] font-sans antialiased selection:bg-purple-200 selection:text-purple-900">
         <Script
           src="https://telegram.org/js/telegram-web-app.js"
           strategy="beforeInteractive"
