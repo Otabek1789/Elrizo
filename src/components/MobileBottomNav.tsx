@@ -115,23 +115,33 @@ export const MobileBottomNav: React.FC = () => {
         </Link>
 
         {/* 4. Savat (Cart) */}
-        <button
-          type="button"
-          onClick={openCart}
-          className="flex flex-col items-center justify-center py-1 px-1 rounded-xl text-gray-700 dark:text-gray-300 font-medium hover:text-uzum-primary dark:hover:text-purple-300 transition-all relative group"
+        <Link
+          to="/cart"
+          className={`flex flex-col items-center justify-center py-1 px-1 rounded-xl transition-all ${
+            currentPath === '/cart'
+              ? 'text-uzum-primary dark:text-purple-400 font-extrabold'
+              : 'text-gray-700 dark:text-gray-300 font-medium hover:text-uzum-primary dark:hover:text-purple-300'
+          } relative group`}
+          title={t('cart')}
         >
           <div className="relative">
-            <ShoppingCart className="w-5 h-5 stroke-2 group-active:scale-95 transition-transform" />
+            <ShoppingCart className={`w-5 h-5 ${currentPath === '/cart' ? 'stroke-[2.5]' : 'stroke-2'} group-active:scale-95 transition-transform`} />
             {cartCount > 0 && (
-              <span className="absolute -top-1.5 -right-2 min-w-[15px] h-[15px] px-0.5 bg-uzum-primary text-white text-[9px] font-black rounded-full flex items-center justify-center shadow-xs animate-bounce">
+              <span className="absolute -top-1.5 -right-2 min-w-[15px] h-[15px] px-0.5 bg-uzum-primary text-white text-[9px] font-black rounded-full flex items-center justify-center shadow-xs">
                 {cartCount}
               </span>
             )}
+            {currentPath === '/cart' && (
+              <motion.div 
+                layoutId="bottomNavIndicator"
+                className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-uzum-primary dark:bg-purple-400"
+              />
+            )}
           </div>
-          <span className="text-[10px] mt-1 tracking-tight truncate font-bold text-gray-800 dark:text-gray-200">
+          <span className="text-[10px] mt-1 tracking-tight truncate font-bold">
             {cartTotal > 0 ? formatPrice(cartTotal, false, language) : t('cart')}
           </span>
-        </button>
+        </Link>
 
         {/* 5. Kirish / Profil (User / Login Tab) */}
         <Link

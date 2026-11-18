@@ -700,37 +700,38 @@ export const Header: React.FC = () => {
             </motion.button>
           </Link>
 
-          {/* Cart Drawer Trigger */}
-          <motion.button
-            id="cart-drawer-btn"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={openCart}
-            className="hidden md:flex relative items-center gap-2 p-2 sm:px-3 sm:py-2 rounded-2xl bg-purple-50 dark:bg-purple-950/40 text-uzum-primary dark:text-white hover:bg-purple-100 dark:hover:bg-purple-900/60 transition-colors font-bold text-sm shadow-sm"
-            title={t('cart')}
-          >
-            <div className="relative">
-              <ShoppingCart className="w-5 h-5 text-uzum-primary dark:text-purple-300" />
-              {cartItemsCount > 0 && (
-                <motion.span 
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ type: 'spring', stiffness: 500 }}
-                  className="absolute -top-2 -right-2 min-w-[18px] h-[18px] px-1 bg-uzum-primary text-white text-[10px] font-black rounded-full flex items-center justify-center shadow-md"
-                >
-                  {cartItemsCount}
-                </motion.span>
-              )}
-            </div>
-            <div className="hidden md:flex flex-col text-left">
-              <span className="text-xs font-bold leading-none text-uzum-primary dark:text-white">{t('cart')}</span>
-              {cartTotal > 0 && (
-                <span className="text-[10px] font-extrabold text-gray-900 dark:text-white mt-0.5">
-                  {formatPrice(cartTotal, true, language)}
-                </span>
-              )}
-            </div>
-          </motion.button>
+          {/* Cart Page Trigger */}
+          <Link to="/cart">
+            <motion.div
+              id="cart-drawer-btn"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="hidden md:flex relative items-center gap-2 p-2 sm:px-3 sm:py-2 rounded-2xl bg-purple-50 dark:bg-purple-950/40 text-uzum-primary dark:text-white hover:bg-purple-100 dark:hover:bg-purple-900/60 transition-colors font-bold text-sm shadow-sm cursor-pointer"
+              title={t('cart')}
+            >
+              <div className="relative">
+                <ShoppingCart className="w-5 h-5 text-uzum-primary dark:text-purple-300" />
+                {cartItemsCount > 0 && (
+                  <motion.span 
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ type: 'spring', stiffness: 500 }}
+                    className="absolute -top-2 -right-2 min-w-[18px] h-[18px] px-1 bg-uzum-primary text-white text-[10px] font-black rounded-full flex items-center justify-center shadow-md"
+                  >
+                    {cartItemsCount}
+                  </motion.span>
+                )}
+              </div>
+              <div className="hidden md:flex flex-col text-left">
+                <span className="text-xs font-bold leading-none text-uzum-primary dark:text-white">{t('cart')}</span>
+                {cartTotal > 0 && (
+                  <span className="text-[10px] font-extrabold text-gray-900 dark:text-white mt-0.5">
+                    {formatPrice(cartTotal, true, language)}
+                  </span>
+                )}
+              </div>
+            </motion.div>
+          </Link>
 
           {/* User / Profile Dropdown Wrapper (Navbarni eng chetida) */}
           <div className="relative" ref={userMenuRef}>
