@@ -465,7 +465,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.85,
     reviewsCount: 76,
     images: [
-      '/products/prod-011.webp?v=4',
+      '/products/prod-011.webp?v=5',
     ],
     categoryId: 'cat-appliances',
     categoryName: 'Maishiy texnika',
@@ -528,11 +528,11 @@ export const PRODUCTS: Product[] = [
     rating: 5.0,
     reviewsCount: 164,
     images: [
-      '/products/prod-013.webp?v=4',
-      '/products/prod-013-starlight.webp?v=4',
-      '/products/prod-013-spacegray.webp?v=4',
-      '/products/prod-013-silver.webp?v=4',
-      '/products/prod-013-side.webp?v=4',
+      '/products/prod-013.webp?v=5',
+      '/products/prod-013-starlight.webp?v=5',
+      '/products/prod-013-spacegray.webp?v=5',
+      '/products/prod-013-silver.webp?v=5',
+      '/products/prod-013-side.webp?v=5',
     ],
     categoryId: 'cat-computers',
     categoryName: 'Noutbuk va kompyuterlar',
@@ -551,10 +551,10 @@ export const PRODUCTS: Product[] = [
       'Doimiy xotira': '512 GB SSD',
     },
     description: 'Yupqa, yengil va nihoyatda tezkor Apple MacBook Air M3. Talabalar, dasturchilar va dizaynerlar uchun eng ideal noutbuk.',    colors: [
-      { name: 'Midnight', hex: '#1C2530', image: '/products/prod-013.webp?v=4' },
-      { name: 'Starlight', hex: '#EDE6DB', image: '/products/prod-013-starlight.webp?v=4' },
-      { name: 'Space Gray', hex: '#7D7E80', image: '/products/prod-013-spacegray.webp?v=4' },
-      { name: 'Silver', hex: '#E3E4E5', image: '/products/prod-013-silver.webp?v=4' },
+      { name: 'Midnight', hex: '#1C2530', image: '/products/prod-013.webp?v=5' },
+      { name: 'Starlight', hex: '#EDE6DB', image: '/products/prod-013-starlight.webp?v=5' },
+      { name: 'Space Gray', hex: '#7D7E80', image: '/products/prod-013-spacegray.webp?v=5' },
+      { name: 'Silver', hex: '#E3E4E5', image: '/products/prod-013-silver.webp?v=5' },
     ],
     deliveryDays: 1,
   },
@@ -569,8 +569,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.9,
     reviewsCount: 92,
     images: [
-      '/products/prod-014-infographic.webp?v=4',
-      '/products/prod-014.webp?v=4',
+      '/products/prod-014.webp?v=5',
     ],
     categoryId: 'cat-computers',
     categoryName: 'Noutbuk va kompyuterlar',
@@ -634,7 +633,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.65,
     reviewsCount: 78,
     images: [
-      '/products/prod-016.webp?v=4',
+      '/products/prod-016.webp?v=5',
     ],
     categoryId: 'cat-computers',
     categoryName: 'Noutbuk va kompyuterlar',
@@ -706,7 +705,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.9,
     reviewsCount: 74,
     images: [
-      '/products/prod-018.webp?v=4',
+      '/products/prod-018.webp?v=5',
     ],
     categoryId: 'cat-beauty',
     categoryName: 'Goʻzallik va parvarish',
@@ -736,7 +735,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.85,
     reviewsCount: 135,
     images: [
-      '/products/prod-019.webp?v=4',
+      '/products/prod-019.webp?v=5',
     ],
     categoryId: 'cat-beauty',
     categoryName: 'Goʻzallik va parvarish',
@@ -830,8 +829,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.8,
     reviewsCount: 114,
     images: [
-      '/products/prod-022-infographic.webp?v=4',
-      '/products/prod-022.webp?v=4',
+      '/products/prod-022.webp?v=5',
     ],
     categoryId: 'cat-auto',
     categoryName: 'Avtomobil jihozlari',
@@ -862,7 +860,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.75,
     reviewsCount: 89,
     images: [
-      '/products/prod-023.webp?v=4',
+      '/products/prod-023.webp?v=5',
     ],
     categoryId: 'cat-auto',
     categoryName: 'Avtomobil jihozlari',
@@ -893,7 +891,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.8,
     reviewsCount: 167,
     images: [
-      '/products/prod-024.webp?v=4',
+      '/products/prod-024.webp?v=5',
     ],
     categoryId: 'cat-auto',
     categoryName: 'Avtomobil jihozlari',
@@ -956,7 +954,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.8,
     reviewsCount: 88,
     images: [
-      '/products/prod-026.webp?v=4',
+      '/products/prod-026.webp?v=5',
     ],
     categoryId: 'cat-home',
     categoryName: 'Uy-roʻzgʻor buyumlari',
@@ -986,7 +984,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.85,
     reviewsCount: 165,
     images: [
-      '/products/prod-027.webp?v=4',
+      '/products/prod-027.webp?v=5',
     ],
     categoryId: 'cat-home',
     categoryName: 'Uy-roʻzgʻor buyumlari',
