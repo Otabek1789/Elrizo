@@ -102,31 +102,18 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     ? (product.images[0] || fallbackImg)
     : fallbackImg;
 
-  // Foni oq bo'lmagan (rangli poster / infografika / geyming) tovarlar kartochka sirtini 100% to'liq qoplab turadi (p-0 va object-cover)
-  const FULL_BLEED_PRODUCTS = new Set([
-    'prod-010', 'prod-011', 'prod-012', 'prod-014', 
-    'prod-018', 'prod-019', 'prod-021', 'prod-022', 'prod-024', 
-    'prod-026', 'prod-027', 'prod-028', 'prod-029', 'prod-030', 
-    'prod-031', 'prod-032', 'prod-033'
-  ]);
-  const isFullBleed = FULL_BLEED_PRODUCTS.has(product.id) || currentImg.includes('infographic') || currentImg.includes('uzum');
-
   return (
     <div
       onClick={handleCardClick}
       className="group bg-white rounded-2xl sm:rounded-3xl border border-gray-200/70 hover:border-purple-300 shadow-sm hover:shadow-card-hover hover:-translate-y-1 transition-all duration-150 flex flex-col justify-between overflow-hidden cursor-pointer relative"
     >
-      {/* Top Image Section - Bir xil 3:4 proporsiya (Uzum Market standarti). Oq bo'lmagan tovarlar 100% to'liq, oq fonlilar esa qulay tekis markazlashgan */}
-      <div 
-        className={`relative w-full aspect-[3/4] overflow-hidden bg-white flex items-center justify-center ${
-          isFullBleed ? 'p-0' : 'p-2.5 sm:p-3'
-        }`}
-      >
+      {/* Top Image Section - Bir xil 3:4 proporsiya (Uzum standarti), sof oq fon va markazlashgan toza studiya rasmlari */}
+      <div className="relative w-full aspect-[3/4] overflow-hidden bg-white flex items-center justify-center p-3 sm:p-3.5">
         <motion.img
           src={currentImg}
           alt={product.title}
           onError={() => setImageError(true)}
-          className={`w-full h-full ${isFullBleed ? 'object-cover' : 'object-contain'} object-center group-hover:scale-105 transition-transform duration-500`}
+          className="w-full h-full object-contain object-center group-hover:scale-105 transition-transform duration-500"
           loading="lazy"
         />
 

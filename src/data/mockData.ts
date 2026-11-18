@@ -111,7 +111,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.95,
     reviewsCount: 342,
     images: [
-      '/products/prod-001.webp?v=7',
+      '/products/prod-001.webp?v=8',
     ],
     categoryId: 'cat-smartphones',
     categoryName: 'Smartfonlar va gadjetlar',
@@ -131,10 +131,10 @@ export const PRODUCTS: Product[] = [
       'Akkumulyator': '4685 mA/soat',
     },
     description: 'Yangi Apple iPhone 16 Pro Max titan korpus, eng kuchli A18 Pro chipi va Camera Control maxsus sensor tugmasi bilan jihozlangan. Elrizo Nasiya orqali ortiqcha to\'lovlarsiz 0-0-12 tizimida oling!',    colors: [
-      { name: 'Desert Titanium', hex: '#C5B5A5', image: '/products/prod-001.webp?v=7' },
-      { name: 'Natural Titanium', hex: '#9A9590', image: '/products/prod-001.webp?v=7' },
-      { name: 'Black Titanium', hex: '#2B2B2B', image: '/products/prod-001.webp?v=7' },
-      { name: 'White Titanium', hex: '#F2F1ED', image: '/products/prod-001.webp?v=7' },
+      { name: 'Desert Titanium', hex: '#C5B5A5', image: '/products/prod-001.webp?v=8' },
+      { name: 'Natural Titanium', hex: '#9A9590', image: '/products/prod-001.webp?v=8' },
+      { name: 'Black Titanium', hex: '#2B2B2B', image: '/products/prod-001.webp?v=8' },
+      { name: 'White Titanium', hex: '#F2F1ED', image: '/products/prod-001.webp?v=8' },
     ],
     deliveryDays: 1,
   },
@@ -149,7 +149,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.9,
     reviewsCount: 215,
     images: [
-      '/products/prod-002.webp?v=7',
+      '/products/prod-002.webp?v=8',
     ],
     categoryId: 'cat-smartphones',
     categoryName: 'Smartfonlar va gadjetlar',
@@ -168,10 +168,10 @@ export const PRODUCTS: Product[] = [
       'Asosiy kamera': '200 MP + 50 MP + 12 MP + 10 MP',
     },
     description: 'Samsung Galaxy S24 Ultra - sun\'iy intellekt Galaxy AI xususiyatlari, titan ramka va 200 MP kamera bilan jihozlangan eng ilg\'or flagman.',    colors: [
-      { name: 'Titanium Gray', hex: '#878681', image: '/products/prod-002.webp?v=7' },
-      { name: 'Titanium Black', hex: '#282828', image: '/products/prod-002.webp?v=7' },
-      { name: 'Titanium Violet', hex: '#59536B', image: '/products/prod-002.webp?v=7' },
-      { name: 'Titanium Yellow', hex: '#E8DFB8', image: '/products/prod-002.webp?v=7' },
+      { name: 'Titanium Gray', hex: '#878681', image: '/products/prod-002.webp?v=8' },
+      { name: 'Titanium Black', hex: '#282828', image: '/products/prod-002.webp?v=8' },
+      { name: 'Titanium Violet', hex: '#59536B', image: '/products/prod-002.webp?v=8' },
+      { name: 'Titanium Yellow', hex: '#E8DFB8', image: '/products/prod-002.webp?v=8' },
     ],
     deliveryDays: 1,
   },
@@ -186,7 +186,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.75,
     reviewsCount: 198,
     images: [
-      '/products/prod-003.webp?v=7',
+      '/products/prod-003.webp?v=8',
     ],
     categoryId: 'cat-smartphones',
     categoryName: 'Smartfonlar va gadjetlar',
@@ -205,9 +205,9 @@ export const PRODUCTS: Product[] = [
       'Himoya': 'IP68 suv va changdan himoya',
     },
     description: '200 megapikselli kamera, 120W ultra-tez quvvatlash va qavariq AMOLED ekran bilan hamyonbop flagman darajasidagi smartfon.',    colors: [
-      { name: 'Midnight Black', hex: '#1C1C1E', image: '/products/prod-003.webp?v=7' },
-      { name: 'Aurora Purple', hex: '#6D5BA3', image: '/products/prod-003.webp?v=7' },
-      { name: 'Moonlight White', hex: '#F5F5F7', image: '/products/prod-003.webp?v=7' },
+      { name: 'Midnight Black', hex: '#1C1C1E', image: '/products/prod-003.webp?v=8' },
+      { name: 'Aurora Purple', hex: '#6D5BA3', image: '/products/prod-003.webp?v=8' },
+      { name: 'Moonlight White', hex: '#F5F5F7', image: '/products/prod-003.webp?v=8' },
     ],
     deliveryDays: 1,
   },
@@ -222,7 +222,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.7,
     reviewsCount: 145,
     images: [
-      '/products/prod-004.webp?v=7',
+      '/products/prod-004.webp?v=8',
     ],
     categoryId: 'cat-smartphones',
     categoryName: 'Smartfonlar va gadjetlar',
@@ -240,9 +240,9 @@ export const PRODUCTS: Product[] = [
       'Batareya': '5000 mA/soat',
     },
     description: 'Metall korpus, Gorilla Glass Victus+ himoyasi va yuqori darajadagi xavfsizlik bilan jihozlangan eng ommabop Samsung smartfoni.',    colors: [
-      { name: 'Awesome Iceblue', hex: '#C8D9E6', image: '/products/prod-004.webp?v=7' },
-      { name: 'Awesome Navy', hex: '#2B3A4A', image: '/products/prod-004.webp?v=7' },
-      { name: 'Awesome Lilac', hex: '#D8CCE5', image: '/products/prod-004.webp?v=7' },
+      { name: 'Awesome Iceblue', hex: '#C8D9E6', image: '/products/prod-004.webp?v=8' },
+      { name: 'Awesome Navy', hex: '#2B3A4A', image: '/products/prod-004.webp?v=8' },
+      { name: 'Awesome Lilac', hex: '#D8CCE5', image: '/products/prod-004.webp?v=8' },
     ],
     deliveryDays: 1,
   },
@@ -257,7 +257,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.9,
     reviewsCount: 88,
     images: [
-      '/products/prod-005.webp?v=7',
+      '/products/prod-005.webp?v=8',
     ],
     categoryId: 'cat-smartphones',
     categoryName: 'Smartfonlar va gadjetlar',
@@ -275,9 +275,9 @@ export const PRODUCTS: Product[] = [
       'Sensorlar': 'EKG, kislorod, uyqu apnoesi nazorati',
     },
     description: 'Tarixdagi eng yupqa va eng katta displeyli Apple Watch. Salomatlik va sport nazorati bo\'yicha birinchi raqamli ko\'makchi.',    colors: [
-      { name: 'Jet Black', hex: '#1C1C1E', image: '/products/prod-005.webp?v=7' },
-      { name: 'Rose Gold', hex: '#E6C7C2', image: '/products/prod-005.webp?v=7' },
-      { name: 'Silver', hex: '#E3E4E6', image: '/products/prod-005.webp?v=7' },
+      { name: 'Jet Black', hex: '#1C1C1E', image: '/products/prod-005.webp?v=8' },
+      { name: 'Rose Gold', hex: '#E6C7C2', image: '/products/prod-005.webp?v=8' },
+      { name: 'Silver', hex: '#E3E4E6', image: '/products/prod-005.webp?v=8' },
     ],
     deliveryDays: 1,
   },
@@ -292,7 +292,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.9,
     reviewsCount: 310,
     images: [
-      '/products/prod-006.webp?v=7',
+      '/products/prod-006.webp?v=8',
     ],
     categoryId: 'cat-smartphones',
     categoryName: 'Smartfonlar va gadjetlar',
@@ -323,7 +323,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.95,
     reviewsCount: 420,
     images: [
-      '/products/prod-007.webp?v=7',
+      '/products/prod-007.webp?v=8',
     ],
     categoryId: 'cat-smartphones',
     categoryName: 'Smartfonlar va gadjetlar',
@@ -355,7 +355,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.7,
     reviewsCount: 98,
     images: [
-      '/products/prod-008.webp?v=7',
+      '/products/prod-008.webp?v=8',
     ],
     categoryId: 'cat-appliances',
     categoryName: 'Maishiy texnika',
@@ -386,7 +386,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.8,
     reviewsCount: 84,
     images: [
-      '/products/prod-009.webp?v=7',
+      '/products/prod-009.webp?v=8',
     ],
     categoryId: 'cat-appliances',
     categoryName: 'Maishiy texnika',
@@ -417,7 +417,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.85,
     reviewsCount: 112,
     images: [
-      '/products/prod-010.webp?v=7',
+      '/products/prod-010.webp?v=8',
     ],
     categoryId: 'cat-appliances',
     categoryName: 'Maishiy texnika',
@@ -448,7 +448,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.85,
     reviewsCount: 76,
     images: [
-      '/products/prod-011.webp?v=7',
+      '/products/prod-011.webp?v=8',
     ],
     categoryId: 'cat-appliances',
     categoryName: 'Maishiy texnika',
@@ -478,7 +478,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.8,
     reviewsCount: 65,
     images: [
-      '/products/prod-012.webp?v=7',
+      '/products/prod-012.webp?v=8',
     ],
     categoryId: 'cat-appliances',
     categoryName: 'Maishiy texnika',
@@ -511,7 +511,7 @@ export const PRODUCTS: Product[] = [
     rating: 5.0,
     reviewsCount: 164,
     images: [
-      '/products/prod-013.webp?v=7',
+      '/products/prod-013.webp?v=8',
     ],
     categoryId: 'cat-computers',
     categoryName: 'Noutbuk va kompyuterlar',
@@ -530,10 +530,10 @@ export const PRODUCTS: Product[] = [
       'Doimiy xotira': '512 GB SSD',
     },
     description: 'Yupqa, yengil va nihoyatda tezkor Apple MacBook Air M3. Talabalar, dasturchilar va dizaynerlar uchun eng ideal noutbuk.',    colors: [
-      { name: 'Midnight', hex: '#1C2530', image: '/products/prod-013.webp?v=7' },
-      { name: 'Starlight', hex: '#EDE6DB', image: '/products/prod-013.webp?v=7' },
-      { name: 'Space Gray', hex: '#7D7E80', image: '/products/prod-013.webp?v=7' },
-      { name: 'Silver', hex: '#E3E4E5', image: '/products/prod-013.webp?v=7' },
+      { name: 'Midnight', hex: '#1C2530', image: '/products/prod-013.webp?v=8' },
+      { name: 'Starlight', hex: '#EDE6DB', image: '/products/prod-013.webp?v=8' },
+      { name: 'Space Gray', hex: '#7D7E80', image: '/products/prod-013.webp?v=8' },
+      { name: 'Silver', hex: '#E3E4E5', image: '/products/prod-013.webp?v=8' },
     ],
     deliveryDays: 1,
   },
@@ -548,7 +548,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.9,
     reviewsCount: 92,
     images: [
-      '/products/prod-014.webp?v=7',
+      '/products/prod-014.webp?v=8',
     ],
     categoryId: 'cat-computers',
     categoryName: 'Noutbuk va kompyuterlar',
@@ -580,7 +580,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.8,
     reviewsCount: 110,
     images: [
-      '/products/prod-015.webp?v=7',
+      '/products/prod-015.webp?v=8',
     ],
     categoryId: 'cat-computers',
     categoryName: 'Noutbuk va kompyuterlar',
@@ -612,7 +612,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.65,
     reviewsCount: 78,
     images: [
-      '/products/prod-016.webp?v=7',
+      '/products/prod-016.webp?v=8',
     ],
     categoryId: 'cat-computers',
     categoryName: 'Noutbuk va kompyuterlar',
@@ -646,7 +646,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.95,
     reviewsCount: 189,
     images: [
-      '/products/prod-017.webp?v=7',
+      '/products/prod-017.webp?v=8',
     ],
     categoryId: 'cat-beauty',
     categoryName: 'Goʻzallik va parvarish',
@@ -664,9 +664,9 @@ export const PRODUCTS: Product[] = [
       'Komplektatsiya': '6 ta almashtiriladigan nasadka + saqlash qutisi',
     },
     description: 'Sochni haddan tashqari qizdirmasdan shakllantiruvchi afsonaviy Dyson Airwrap Coanda effekti bilan.',    colors: [
-      { name: 'Nickel / Copper', hex: '#B87333', image: '/products/prod-017.webp?v=7' },
-      { name: 'Strawberry Bronze', hex: '#E8A5A5', image: '/products/prod-017.webp?v=7' },
-      { name: 'Prussian Blue', hex: '#1D2A44', image: '/products/prod-017.webp?v=7' },
+      { name: 'Nickel / Copper', hex: '#B87333', image: '/products/prod-017.webp?v=8' },
+      { name: 'Strawberry Bronze', hex: '#E8A5A5', image: '/products/prod-017.webp?v=8' },
+      { name: 'Prussian Blue', hex: '#1D2A44', image: '/products/prod-017.webp?v=8' },
     ],
     deliveryDays: 1,
   },
@@ -681,7 +681,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.9,
     reviewsCount: 74,
     images: [
-      '/products/prod-018.webp?v=7',
+      '/products/prod-018.webp?v=8',
     ],
     categoryId: 'cat-beauty',
     categoryName: 'Goʻzallik va parvarish',
@@ -711,7 +711,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.85,
     reviewsCount: 135,
     images: [
-      '/products/prod-019.webp?v=7',
+      '/products/prod-019.webp?v=8',
     ],
     categoryId: 'cat-beauty',
     categoryName: 'Goʻzallik va parvarish',
@@ -741,7 +741,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.8,
     reviewsCount: 91,
     images: [
-      '/products/prod-020.webp?v=7',
+      '/products/prod-020.webp?v=8',
     ],
     categoryId: 'cat-beauty',
     categoryName: 'Goʻzallik va parvarish',
@@ -773,7 +773,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.85,
     reviewsCount: 142,
     images: [
-      '/products/prod-021.webp?v=7',
+      '/products/prod-021.webp?v=8',
     ],
     categoryId: 'cat-auto',
     categoryName: 'Avtomobil jihozlari',
@@ -804,7 +804,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.8,
     reviewsCount: 114,
     images: [
-      '/products/prod-022.webp?v=7',
+      '/products/prod-022.webp?v=8',
     ],
     categoryId: 'cat-auto',
     categoryName: 'Avtomobil jihozlari',
@@ -835,7 +835,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.75,
     reviewsCount: 89,
     images: [
-      '/products/prod-023.webp?v=7',
+      '/products/prod-023.webp?v=8',
     ],
     categoryId: 'cat-auto',
     categoryName: 'Avtomobil jihozlari',
@@ -866,7 +866,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.8,
     reviewsCount: 167,
     images: [
-      '/products/prod-024.webp?v=7',
+      '/products/prod-024.webp?v=8',
     ],
     categoryId: 'cat-auto',
     categoryName: 'Avtomobil jihozlari',
@@ -898,7 +898,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.9,
     reviewsCount: 124,
     images: [
-      '/products/prod-025.webp?v=7',
+      '/products/prod-025.webp?v=8',
     ],
     categoryId: 'cat-home',
     categoryName: 'Uy-roʻzgʻor buyumlari',
@@ -929,7 +929,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.8,
     reviewsCount: 88,
     images: [
-      '/products/prod-026.webp?v=7',
+      '/products/prod-026.webp?v=8',
     ],
     categoryId: 'cat-home',
     categoryName: 'Uy-roʻzgʻor buyumlari',
@@ -959,7 +959,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.85,
     reviewsCount: 165,
     images: [
-      '/products/prod-027.webp?v=7',
+      '/products/prod-027.webp?v=8',
     ],
     categoryId: 'cat-home',
     categoryName: 'Uy-roʻzgʻor buyumlari',
@@ -989,7 +989,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.8,
     reviewsCount: 230,
     images: [
-      '/products/prod-028.webp?v=7',
+      '/products/prod-028.webp?v=8',
     ],
     categoryId: 'cat-home',
     categoryName: 'Uy-roʻzgʻor buyumlari',
@@ -1019,7 +1019,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.9,
     reviewsCount: 140,
     images: [
-      '/products/prod-029.webp?v=7',
+      '/products/prod-029.webp?v=8',
     ],
     categoryId: 'cat-home',
     categoryName: 'Uy-roʻzgʻor buyumlari',
@@ -1049,7 +1049,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.85,
     reviewsCount: 215,
     images: [
-      '/products/prod-030-uzum.webp?v=7',
+      '/products/prod-030.webp?v=8',
     ],
     categoryId: 'cat-computers',
     categoryName: 'Noutbuk va kompyuterlar',
@@ -1082,7 +1082,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.8,
     reviewsCount: 138,
     images: [
-      '/products/prod-031-uzum.webp?v=7',
+      '/products/prod-031.webp?v=8',
     ],
     categoryId: 'cat-computers',
     categoryName: 'Noutbuk va kompyuterlar',
@@ -1115,7 +1115,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.9,
     reviewsCount: 312,
     images: [
-      '/products/prod-032-uzum.webp?v=7',
+      '/products/prod-032.webp?v=8',
     ],
     categoryId: 'cat-computers',
     categoryName: 'Noutbuk va kompyuterlar',
@@ -1147,7 +1147,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.92,
     reviewsCount: 175,
     images: [
-      '/products/prod-033-infographic.webp?v=7',
+      '/products/prod-033.webp?v=8',
     ],
     categoryId: 'cat-computers',
     categoryName: 'Noutbuk va kompyuterlar',

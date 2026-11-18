@@ -369,27 +369,16 @@ export const ProductDetail: React.FC = () => {
             </div>
           )}
 
-          {/* Main Big Image - 3:4 proporsiya (Uzum standarti) */}
+          {/* Main Big Image - 3:4 proporsiya (Uzum standarti), sof oq fon va markazlashgan toza rasm */}
           {(() => {
             const currentDetailImgSrc = galleryImages[selectedImageIndex] || galleryImages[0] || fallbackDetailImg;
-            const FULL_BLEED_DETAIL_PRODUCTS = new Set([
-              'prod-010', 'prod-011', 'prod-012', 'prod-014', 
-              'prod-018', 'prod-019', 'prod-021', 'prod-022', 'prod-024', 
-              'prod-026', 'prod-027', 'prod-028', 'prod-029', 'prod-030', 
-              'prod-031', 'prod-032', 'prod-033'
-            ]);
-            const isDetailFullBleed = FULL_BLEED_DETAIL_PRODUCTS.has(product.id) || currentDetailImgSrc.includes('infographic') || currentDetailImgSrc.includes('uzum');
             return (
-              <div className={`w-full relative aspect-[3/4] max-h-[580px] bg-white rounded-2xl sm:rounded-3xl border border-gray-200/80 overflow-hidden flex items-center justify-center shadow-sm ${
-                isDetailFullBleed ? 'p-0' : 'p-4 sm:p-6'
-              }`}>
+              <div className="w-full relative aspect-[3/4] max-h-[580px] bg-white rounded-2xl sm:rounded-3xl border border-gray-200/80 overflow-hidden flex items-center justify-center p-4 sm:p-6 shadow-sm">
                 <img
                   src={currentDetailImgSrc}
                   alt={product.title}
                   onError={() => setImageError(true)}
-                  className={`w-full h-full ${
-                    isDetailFullBleed ? 'object-cover' : 'object-contain'
-                  } transition-all duration-300`}
+                  className="w-full h-full object-contain object-center transition-all duration-300"
                 />
 
                 {/* Badges - Gorizontal qatorda, mahsulotni to'smaydi */}
