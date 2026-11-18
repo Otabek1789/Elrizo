@@ -102,17 +102,25 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   const currentImg = !imageError && product.images && product.images.length > 0
     ? (product.images[activeImageIndex] || product.images[0] || fallbackImg)
     : fallbackImg;
-  const isInfographic = currentImg.includes('infographic') || currentImg.includes('uzum');
+
+  // Foni oq bo'lmagan (rangli poster / infografika / geyming) tovarlar kartochka sirtini 100% to'liq qoplab turadi (p-0 va object-cover)
+  const FULL_BLEED_PRODUCTS = new Set([
+    'prod-010', 'prod-011', 'prod-012', 'prod-014', 
+    'prod-018', 'prod-019', 'prod-021', 'prod-022', 'prod-024', 
+    'prod-026', 'prod-027', 'prod-028', 'prod-029', 'prod-030', 
+    'prod-031', 'prod-032', 'prod-033'
+  ]);
+  const isFullBleed = FULL_BLEED_PRODUCTS.has(product.id) || currentImg.includes('infographic') || currentImg.includes('uzum');
 
   return (
     <div
       onClick={handleCardClick}
-      className="group bg-white dark:bg-slate-800 rounded-2xl sm:rounded-3xl border border-gray-200/70 dark:border-slate-800/80 hover:border-purple-300 dark:hover:border-purple-500/40 shadow-sm hover:shadow-card-hover hover:-translate-y-1 transition-all duration-150 flex flex-col justify-between overflow-hidden cursor-pointer relative"
+      className="group bg-white rounded-2xl sm:rounded-3xl border border-gray-200/70 hover:border-purple-300 shadow-sm hover:shadow-card-hover hover:-translate-y-1 transition-all duration-150 flex flex-col justify-between overflow-hidden cursor-pointer relative"
     >
-      {/* Top Image Section - Infografikali tovarlar butun sirt bo'ylab to'liq, oddiy tovarlar esa qulay padding bilan ko'rinadi */}
+      {/* Top Image Section - Bir xil 3:4 proporsiya (Uzum Market standarti). Oq bo'lmagan tovarlar 100% to'liq, oq fonlilar esa qulay tekis markazlashgan */}
       <div 
-        className={`relative w-full aspect-[4/4.2] overflow-hidden bg-gray-50 dark:bg-slate-900/60 flex items-center justify-center ${
-          isInfographic ? 'p-0' : 'pt-8 pb-3 px-4 sm:px-5'
+        className={`relative w-full aspect-[3/4] overflow-hidden bg-white flex items-center justify-center ${
+          isFullBleed ? 'p-0' : 'p-2.5 sm:p-3'
         }`}
         onMouseEnter={() => {
           if (product.images && product.images.length > 1) setActiveImageIndex(1);
@@ -125,7 +133,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           src={currentImg}
           alt={product.title}
           onError={() => setImageError(true)}
-          className={`w-full h-full ${isInfographic ? 'object-cover' : 'object-contain'} object-center group-hover:scale-105 transition-transform duration-500`}
+          className={`w-full h-full ${isFullBleed ? 'object-cover' : 'object-contain'} object-center group-hover:scale-105 transition-transform duration-500`}
           loading="lazy"
         />
 

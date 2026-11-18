@@ -383,17 +383,23 @@ export const ProductDetail: React.FC = () => {
           {/* Main Big Image */}
           {(() => {
             const currentDetailImgSrc = galleryImages[selectedImageIndex] || galleryImages[0] || fallbackDetailImg;
-            const isDetailInfographic = currentDetailImgSrc.includes('infographic') || currentDetailImgSrc.includes('uzum');
+            const FULL_BLEED_DETAIL_PRODUCTS = new Set([
+              'prod-010', 'prod-011', 'prod-012', 'prod-014', 
+              'prod-018', 'prod-019', 'prod-021', 'prod-022', 'prod-024', 
+              'prod-026', 'prod-027', 'prod-028', 'prod-029', 'prod-030', 
+              'prod-031', 'prod-032', 'prod-033'
+            ]);
+            const isDetailFullBleed = FULL_BLEED_DETAIL_PRODUCTS.has(product.id) || currentDetailImgSrc.includes('infographic') || currentDetailImgSrc.includes('uzum');
             return (
-              <div className={`flex-1 relative aspect-square bg-gray-50/60 dark:bg-slate-900/60 rounded-2xl border border-gray-200/80 dark:border-slate-800 overflow-hidden flex items-center justify-center shadow-sm ${
-                isDetailInfographic ? 'p-0' : ''
+              <div className={`flex-1 relative aspect-square bg-white rounded-2xl border border-gray-200/80 overflow-hidden flex items-center justify-center shadow-sm ${
+                isDetailFullBleed ? 'p-0' : 'p-4 sm:p-6'
               }`}>
                 <img
                   src={currentDetailImgSrc}
                   alt={product.title}
                   onError={() => setImageError(true)}
                   className={`w-full h-full ${
-                    isDetailInfographic ? 'object-cover' : 'object-contain pt-10 pb-4 px-6'
+                    isDetailFullBleed ? 'object-cover' : 'object-contain'
                   } transition-all duration-300`}
                 />
 
