@@ -122,24 +122,11 @@ export const ProductDetail: React.FC = () => {
     setSelectedImageIndex(0);
   }, [product.id, availableColors, availableStorage]);
 
-  // Gallerydagi to'liq rasmlar ro'yxati:
-  // Tanlangan rang rasmi har doim birinchi o'rinda chiqadi!
-  // Keyin tovarning boshqa real fotosuratlari takrorlanmasdan qo'shiladi.
+  // Tovarda faqat bitta o'zining original rasmi bo'ladi (ortiqcha takrorlanishlar yo'q)
   const galleryImages = useMemo(() => {
-    const list: string[] = [];
-    if (selectedColor?.image) {
-      list.push(selectedColor.image);
-    }
-    if (product.images && product.images.length > 0) {
-      product.images.forEach((img) => {
-        const clean = img.split('?')[0];
-        const isAlreadyInList = list.some((x) => x.split('?')[0] === clean);
-        if (!isAlreadyInList) list.push(img);
-      });
-    }
-    if (list.length === 0) list.push(fallbackDetailImg);
-    return list;
-  }, [selectedColor, product.images]);
+    const singleImg = (product.images && product.images[0]) || fallbackDetailImg;
+    return [singleImg];
+  }, [product.images]);
 
   // Thumbnail bosilganda:
   // 1. O'sha rasm ochiladi
@@ -355,32 +342,34 @@ export const ProductDetail: React.FC = () => {
 
       {/* Main Product Showcase Section */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* Left Column: Image Gallery (5 cols) */}
-        <div className="lg:col-span-5 flex flex-col-reverse sm:flex-row gap-3">
-          {/* Thumbnails */}
-          <div className="flex sm:flex-col gap-2 overflow-x-auto sm:overflow-y-auto sm:max-h-[480px] no-scrollbar">
-            {galleryImages.map((img, idx) => (
-              <button
-                key={idx}
-                type="button"
-                onClick={() => handleThumbnailClick(idx, img)}
-                className={`w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden border-2 transition-all shrink-0 bg-gray-50 dark:bg-slate-900/80 p-1 cursor-pointer ${
-                  selectedImageIndex === idx
-                    ? 'border-uzum-primary shadow-sm ring-2 ring-purple-100 dark:ring-purple-900/50'
-                    : 'border-gray-200 dark:border-slate-800 hover:border-gray-300 opacity-80'
-                }`}
-              >
-                <img 
-                  src={img} 
-                  alt="" 
-                  onError={(e) => { (e.currentTarget as HTMLImageElement).src = fallbackDetailImg; }}
-                  className="w-full h-full object-contain p-1 rounded-lg" 
-                />
-              </button>
-            ))}
-          </div>
+        {/* Left Column: Image Showcase (5 cols) */}
+        <div className="lg:col-span-5 flex flex-col gap-3">
+          {/* Thumbnails (agar 1 tadan ortiq rasm mavjud bo'lsa) */}
+          {galleryImages.length > 1 && (
+            <div className="flex gap-2 overflow-x-auto no-scrollbar">
+              {galleryImages.map((img, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={() => handleThumbnailClick(idx, img)}
+                  className={`w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden border-2 transition-all shrink-0 bg-white p-1 cursor-pointer ${
+                    selectedImageIndex === idx
+                      ? 'border-uzum-primary shadow-sm ring-2 ring-purple-100'
+                      : 'border-gray-200 hover:border-gray-300 opacity-80'
+                  }`}
+                >
+                  <img 
+                    src={img} 
+                    alt="" 
+                    onError={(e) => { (e.currentTarget as HTMLImageElement).src = fallbackDetailImg; }}
+                    className="w-full h-full object-contain p-1 rounded-lg" 
+                  />
+                </button>
+              ))}
+            </div>
+          )}
 
-          {/* Main Big Image */}
+          {/* Main Big Image - 3:4 proporsiya (Uzum standarti) */}
           {(() => {
             const currentDetailImgSrc = galleryImages[selectedImageIndex] || galleryImages[0] || fallbackDetailImg;
             const FULL_BLEED_DETAIL_PRODUCTS = new Set([
@@ -391,7 +380,7 @@ export const ProductDetail: React.FC = () => {
             ]);
             const isDetailFullBleed = FULL_BLEED_DETAIL_PRODUCTS.has(product.id) || currentDetailImgSrc.includes('infographic') || currentDetailImgSrc.includes('uzum');
             return (
-              <div className={`flex-1 relative aspect-square bg-white rounded-2xl border border-gray-200/80 overflow-hidden flex items-center justify-center shadow-sm ${
+              <div className={`w-full relative aspect-[3/4] max-h-[580px] bg-white rounded-2xl sm:rounded-3xl border border-gray-200/80 overflow-hidden flex items-center justify-center shadow-sm ${
                 isDetailFullBleed ? 'p-0' : 'p-4 sm:p-6'
               }`}>
                 <img

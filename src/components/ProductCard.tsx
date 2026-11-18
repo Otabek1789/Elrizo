@@ -36,7 +36,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   } = useStore();
   const { t, language } = useTranslation();
 
-  const [activeImageIndex, setActiveImageIndex] = useState(0);
   const favorite = isFavorite(product.id);
   const isCompared = comparisonList.includes(product.id);
 
@@ -100,7 +99,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   const [imageError, setImageError] = useState(false);
   const fallbackImg = '/products/prod-001.webp';
   const currentImg = !imageError && product.images && product.images.length > 0
-    ? (product.images[activeImageIndex] || product.images[0] || fallbackImg)
+    ? (product.images[0] || fallbackImg)
     : fallbackImg;
 
   // Foni oq bo'lmagan (rangli poster / infografika / geyming) tovarlar kartochka sirtini 100% to'liq qoplab turadi (p-0 va object-cover)
@@ -122,12 +121,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         className={`relative w-full aspect-[3/4] overflow-hidden bg-white flex items-center justify-center ${
           isFullBleed ? 'p-0' : 'p-2.5 sm:p-3'
         }`}
-        onMouseEnter={() => {
-          if (product.images && product.images.length > 1) setActiveImageIndex(1);
-        }}
-        onMouseLeave={() => {
-          setActiveImageIndex(0);
-        }}
       >
         <motion.img
           src={currentImg}
