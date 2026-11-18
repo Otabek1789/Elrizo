@@ -54,91 +54,102 @@ export const ProductDetail: React.FC = () => {
   const product = products.find((p) => p.id === id || p.id === selectedProductId) || products[0];
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [imageError, setImageError] = useState(false);
-  const fallbackDetailImg = '/products/prod-001.webp';
+  const fallbackDetailImg = '/products/prod-001.webp?v=4';
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState<'specs' | 'description' | 'reviews'>('specs');
 
-  // Ushbu tovar smartfon/telefon ekanligini aniqlash (Faqat telefonlarda rang va xotira varianti bo'ladi)
-  // Noutbuklar va boshqa tovarlar (Tefal, maishiy texnika va h.k.) uchun rang/xotira bloklari umuman chiqmaydi!
-  const isPhoneProduct = useMemo(() => {
-    if (product.colors && product.colors.length > 0) return true;
-    if (product.categoryId === 'cat-smartphones') {
-      const titleLower = (product.title || '').toLowerCase();
-      // Soat, naushnik, konsollarni chiqarib tashlaymiz
-      if (
-        titleLower.includes('watch') ||
-        titleLower.includes('soat') ||
-        titleLower.includes('airpods') ||
-        titleLower.includes('quloqchin') ||
-        titleLower.includes('naushnik') ||
-        titleLower.includes('playstation') ||
-        titleLower.includes('ps5')
-      ) {
-        return false;
-      }
-      return true;
-    }
-    return false;
+  // Foydalanuvchi qat'iy talabi bo'yicha:
+  // Kir yuvish mashinasi, konditsioner, televizor, airpods, playstation va adapterda
+  // rang o'zgartirish ham, xotira ham BO'LMASIN!
+  const isExcludedFromColorAndStorage = useMemo(() => {
+    const t = (product.title || '').toLowerCase();
+    const c = (product.categoryId || '').toLowerCase();
+    const sku = (product.sku || '').toLowerCase();
+    return (
+      t.includes('kir yuvish') ||
+      t.includes('washing') ||
+      t.includes('konditsioner') ||
+      t.includes('konditsioner') ||
+      t.includes('midea inverter') ||
+      t.includes('televizor') ||
+      t.includes('smart tv') ||
+      t.includes('4k uhd') ||
+      t.includes('airpods') ||
+      t.includes('quloqchin') ||
+      t.includes('naushnik') ||
+      t.includes('playstation') ||
+      t.includes('ps5') ||
+      t.includes('adapter') ||
+      t.includes('quvvatlagich') ||
+      t.includes('zaryadlovchi ushlagich') ||
+      sku.includes('airpod') ||
+      sku.includes('ps5') ||
+      sku.includes('artel-tv') ||
+      sku.includes('kond') ||
+      sku.includes('wash')
+    );
   }, [product]);
 
-  // Telefon brendiga mos keladigan haqiqiy ranglar
+  // Ranglar ro'yxati (faqat ruxsat etilgan tovarlar uchun)
   const availableColors = useMemo(() => {
-    if (!isPhoneProduct) return [];
+    if (isExcludedFromColorAndStorage) return [];
     if (product.colors && product.colors.length > 0) return product.colors;
-    const titleLower = (product.title || '').toLowerCase();
-    if (titleLower.includes('iphone') || titleLower.includes('apple')) {
-      return [
-        { name: 'Natural Titanium', hex: '#9A9590' },
-        { name: 'Black Titanium', hex: '#2B2B2B' },
-        { name: 'White Titanium', hex: '#F2F1ED' },
-        { name: 'Desert Titanium', hex: '#C5B5A5' },
-      ];
-    }
-    if (titleLower.includes('samsung') || titleLower.includes('galaxy')) {
-      return [
-        { name: 'Titanium Gray', hex: '#878681' },
-        { name: 'Titanium Black', hex: '#282828' },
-        { name: 'Titanium Violet', hex: '#59536B' },
-        { name: 'Titanium Yellow', hex: '#E8DFB8' },
-      ];
-    }
-    if (titleLower.includes('xiaomi') || titleLower.includes('redmi')) {
-      return [
-        { name: 'Midnight Black', hex: '#1C1C1E' },
-        { name: 'Aurora Purple', hex: '#6D5BA3' },
-        { name: 'Moonlight White', hex: '#F5F5F7' },
-        { name: 'Ocean Blue', hex: '#3A6B88' },
-      ];
-    }
-    return [
-      { name: 'Qora (Black)', hex: '#1C1C1E' },
-      { name: 'Oq (White)', hex: '#F5F5F7' },
-      { name: "Ko'k (Blue)", hex: '#3A6B88' },
-      { name: 'Kulrang (Gray)', hex: '#8E8E93' },
-    ];
-  }, [isPhoneProduct, product.colors, product.title]);
+    return [];
+  }, [isExcludedFromColorAndStorage, product.colors]);
 
+  // Xotira variantlari (faqat smartfonlar va noutbuklar uchun)
   const availableStorage = useMemo(() => {
-    if (!isPhoneProduct) return [];
+    if (isExcludedFromColorAndStorage) return [];
     if (product.storageOptions && product.storageOptions.length > 0) return product.storageOptions;
-    return DEFAULT_STORAGE_OPTIONS;
-  }, [isPhoneProduct, product.storageOptions]);
+    const titleLower = (product.title || '').toLowerCase();
+    if (
+      titleLower.includes('iphone') || 
+      titleLower.includes('galaxy') || 
+      titleLower.includes('redmi') || 
+      titleLower.includes('macbook')
+    ) {
+      return DEFAULT_STORAGE_OPTIONS;
+    }
+    return [];
+  }, [isExcludedFromColorAndStorage, product.storageOptions, product.title]);
 
-  const [selectedColor, setSelectedColor] = useState(availableColors[0] || null);
-  const [selectedStorage, setSelectedStorage] = useState(availableStorage[0] || null);
+  const [selectedColor, setSelectedColor] = useState<any>(availableColors[0] || null);
+  const [selectedStorage, setSelectedStorage] = useState<any>(availableStorage[0] || null);
 
   useEffect(() => {
     setSelectedColor(availableColors[0] || null);
     setSelectedStorage(availableStorage[0] || null);
-  }, [availableColors, availableStorage]);
+    setSelectedImageIndex(0);
+  }, [product.id, availableColors, availableStorage]);
 
-  // Dynamic price based on selected storage (faqat telefonlar uchun)
-  const effectivePrice = isPhoneProduct && selectedStorage?.priceOffset
+  // Gallerydagi to'liq rasmlar ro'yxati: tanlangan rang rasmi + tovar rasmlari
+  const galleryImages = useMemo(() => {
+    const list: string[] = [];
+    if (selectedColor?.image) {
+      list.push(selectedColor.image);
+    }
+    if (product.images && product.images.length > 0) {
+      product.images.forEach((img) => {
+        if (!list.includes(img)) list.push(img);
+      });
+    }
+    if (list.length === 0) list.push(fallbackDetailImg);
+    return list;
+  }, [selectedColor, product.images]);
+
+  // Rang tanlanganda rasm darhol o'sha rangga o'zgaradi!
+  const handleColorSelect = (color: any) => {
+    setSelectedColor(color);
+    setSelectedImageIndex(0);
+  };
+
+  // Dynamic price based on selected storage
+  const effectivePrice = !isExcludedFromColorAndStorage && selectedStorage?.priceOffset
     ? product.price + selectedStorage.priceOffset
     : product.price;
 
   const effectiveOriginalPrice = product.originalPrice
-    ? (isPhoneProduct && selectedStorage?.priceOffset ? product.originalPrice + selectedStorage.priceOffset : product.originalPrice)
+    ? (!isExcludedFromColorAndStorage && selectedStorage?.priceOffset ? product.originalPrice + selectedStorage.priceOffset : product.originalPrice)
     : undefined;
 
   const monthlyPayment = calculateMonthlyPaymentQuick(effectivePrice, 12, product.hasZeroDown !== false);
@@ -164,7 +175,8 @@ export const ProductDetail: React.FC = () => {
       openLoginRequiredModal();
       return;
     }
-    const itemTitle = isPhoneProduct && selectedStorage && selectedColor
+    const hasVariants = !isExcludedFromColorAndStorage;
+    const itemTitle = hasVariants && selectedStorage && selectedColor
       ? `${product.title} (${selectedStorage.size}, ${selectedColor.name})`
       : product.title;
     const configuredProduct = {
@@ -181,7 +193,8 @@ export const ProductDetail: React.FC = () => {
       openLoginRequiredModal();
       return;
     }
-    const itemTitle = isPhoneProduct && selectedStorage && selectedColor
+    const hasVariants = !isExcludedFromColorAndStorage;
+    const itemTitle = hasVariants && selectedStorage && selectedColor
       ? `${product.title} (${selectedStorage.size}, ${selectedColor.name})`
       : product.title;
     const configuredProduct = {
@@ -221,7 +234,8 @@ export const ProductDetail: React.FC = () => {
 
   const handleSendToTelegram = async () => {
     setIsSendingToTelegram(true);
-    const itemTitle = isPhoneProduct && selectedStorage && selectedColor
+    const hasVariants = !isExcludedFromColorAndStorage;
+    const itemTitle = hasVariants && selectedStorage && selectedColor
       ? `${product.title} (${selectedStorage.size}, ${selectedColor.name})`
       : product.title;
     const configuredProduct = {
@@ -231,8 +245,8 @@ export const ProductDetail: React.FC = () => {
       title: itemTitle,
     };
     const res = await sendProductToTelegram(configuredProduct, {
-      color: isPhoneProduct && selectedColor ? selectedColor.name : undefined,
-      storage: isPhoneProduct && selectedStorage ? selectedStorage.size : undefined,
+      color: hasVariants && selectedColor ? selectedColor.name : undefined,
+      storage: hasVariants && selectedStorage ? selectedStorage.size : undefined,
       price: effectivePrice,
       monthlyPayment: monthlyPayment,
       user: user,
@@ -306,11 +320,11 @@ export const ProductDetail: React.FC = () => {
         <div className="lg:col-span-5 flex flex-col-reverse sm:flex-row gap-3">
           {/* Thumbnails */}
           <div className="flex sm:flex-col gap-2 overflow-x-auto sm:overflow-y-auto sm:max-h-[480px] no-scrollbar">
-            {product.images.map((img, idx) => (
+            {galleryImages.map((img, idx) => (
               <button
                 key={idx}
                 onClick={() => setSelectedImageIndex(idx)}
-                className={`w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden border-2 transition-all shrink-0 bg-white dark:bg-slate-800 p-1 ${
+                className={`w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden border-2 transition-all shrink-0 bg-gray-50 dark:bg-slate-900/80 p-1 cursor-pointer ${
                   selectedImageIndex === idx
                     ? 'border-uzum-primary shadow-sm ring-2 ring-purple-100 dark:ring-purple-900/50'
                     : 'border-gray-200 dark:border-slate-800 hover:border-gray-300 opacity-80'
@@ -327,9 +341,9 @@ export const ProductDetail: React.FC = () => {
           </div>
 
           {/* Main Big Image */}
-          <div className="flex-1 relative aspect-square bg-white dark:bg-slate-800/90 rounded-2xl border border-gray-200 dark:border-slate-800 overflow-hidden flex items-center justify-center shadow-sm">
+          <div className="flex-1 relative aspect-square bg-gray-50/60 dark:bg-slate-900/60 rounded-2xl border border-gray-200/80 dark:border-slate-800 overflow-hidden flex items-center justify-center shadow-sm">
             <img
-              src={!imageError && product.images && product.images.length > 0 ? (product.images[selectedImageIndex] || product.images[0] || fallbackDetailImg) : fallbackDetailImg}
+              src={galleryImages[selectedImageIndex] || galleryImages[0] || fallbackDetailImg}
               alt={product.title}
               onError={() => setImageError(true)}
               className="w-full h-full object-contain pt-10 pb-4 px-6 transition-all duration-300"
@@ -417,15 +431,15 @@ export const ProductDetail: React.FC = () => {
             </h1>
           </div>
 
-          {/* Color Selection Swatches (Faqat telefon/smartfonlar uchun) */}
-          {isPhoneProduct && availableColors.length > 0 && selectedColor && (
+          {/* Color Selection Swatches (Kir yuvish, konditsioner, televizor, airpods, ps5, adapterda CHIQMAYDI) */}
+          {!isExcludedFromColorAndStorage && availableColors.length > 0 && selectedColor && (
             <div className="space-y-2.5 p-4 rounded-2xl bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-800">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 text-xs font-bold text-slate-700 dark:text-slate-300">
-                  <Palette className="w-4 h-4 text-primary-500" />
+                  <Palette className="w-4 h-4 text-uzum-primary dark:text-purple-400" />
                   <span>{t('productSelectColor')}</span>
                 </div>
-                <span className="text-xs font-semibold text-primary-600 dark:text-primary-400">
+                <span className="text-xs font-semibold text-uzum-primary dark:text-purple-400">
                   {selectedColor.name}
                 </span>
               </div>
@@ -437,10 +451,10 @@ export const ProductDetail: React.FC = () => {
                     <button
                       key={idx}
                       type="button"
-                      onClick={() => setSelectedColor(color)}
+                      onClick={() => handleColorSelect(color)}
                       className={`group relative flex items-center gap-2 p-1.5 rounded-xl border-2 transition-all cursor-pointer ${
                         isSelected
-                          ? 'border-primary-600 bg-primary-50/50 dark:bg-primary-950/30 ring-2 ring-primary-500/20'
+                          ? 'border-uzum-primary bg-purple-50/50 dark:bg-purple-950/30 ring-2 ring-purple-500/20 shadow-xs'
                           : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 bg-white dark:bg-slate-900'
                       }`}
                     >
@@ -452,7 +466,7 @@ export const ProductDetail: React.FC = () => {
                         {color.name}
                       </span>
                       {isSelected && (
-                        <Check className="w-3.5 h-3.5 text-primary-600 dark:text-primary-400" />
+                        <Check className="w-3.5 h-3.5 text-uzum-primary dark:text-purple-400" />
                       )}
                     </button>
                   );
@@ -461,8 +475,8 @@ export const ProductDetail: React.FC = () => {
             </div>
           )}
 
-          {/* Storage / Memory Selection Chips (Faqat telefon/smartfonlar uchun) */}
-          {isPhoneProduct && availableStorage.length > 0 && selectedStorage && (
+          {/* Storage / Memory Selection Chips (Kir yuvish, konditsioner, televizor, airpods, ps5, adapterda CHIQMAYDI) */}
+          {!isExcludedFromColorAndStorage && availableStorage.length > 0 && selectedStorage && (
             <div className="space-y-2.5 p-4 rounded-2xl bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-800">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 text-xs font-bold text-slate-700 dark:text-slate-300">

@@ -21,7 +21,7 @@ export interface Product {
   description: string;
   deliveryDays?: number;
   sku: string;
-  colors?: { name: string; hex: string }[];
+  colors?: { name: string; hex: string; image?: string; images?: string[] }[];
   storageOptions?: { size: string; priceOffset?: number }[];
 }
 
