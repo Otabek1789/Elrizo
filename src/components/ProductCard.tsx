@@ -36,6 +36,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   } = useStore();
   const { t, language } = useTranslation();
 
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
   const favorite = isFavorite(product.id);
   const isCompared = comparisonList.includes(product.id);
 
@@ -99,21 +100,32 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   const [imageError, setImageError] = useState(false);
   const fallbackImg = '/products/prod-001.webp';
   const currentImg = !imageError && product.images && product.images.length > 0
-    ? (product.images[0] || fallbackImg)
+    ? (product.images[activeImageIndex] || product.images[0] || fallbackImg)
     : fallbackImg;
+  const isInfographic = currentImg.includes('infographic') || currentImg.includes('uzum');
 
   return (
     <div
       onClick={handleCardClick}
       className="group bg-white rounded-2xl sm:rounded-3xl border border-gray-200/70 hover:border-purple-300 shadow-sm hover:shadow-card-hover hover:-translate-y-1 transition-all duration-150 flex flex-col justify-between overflow-hidden cursor-pointer relative"
     >
-      {/* Top Image Section - Bir xil 3:4 proporsiya (Uzum standarti), sof oq fon va markazlashgan toza studiya rasmlari */}
-      <div className="relative w-full aspect-[3/4] overflow-hidden bg-white flex items-center justify-center p-3 sm:p-3.5">
+      {/* Top Image Section - Infografikali tovarlar butun sirt bo'ylab to'liq, oddiy tovarlar esa qulay padding bilan ko'rinadi */}
+      <div 
+        className={`relative w-full aspect-[3/4] overflow-hidden bg-white flex items-center justify-center ${
+          isInfographic ? 'p-0' : 'pt-6 pb-2 px-3 sm:px-4'
+        }`}
+        onMouseEnter={() => {
+          if (product.images && product.images.length > 1) setActiveImageIndex(1);
+        }}
+        onMouseLeave={() => {
+          setActiveImageIndex(0);
+        }}
+      >
         <motion.img
           src={currentImg}
           alt={product.title}
           onError={() => setImageError(true)}
-          className="w-full h-full object-contain object-center group-hover:scale-105 transition-transform duration-500"
+          className={`w-full h-full ${isInfographic ? 'object-cover' : 'object-contain'} object-center group-hover:scale-105 transition-transform duration-500`}
           loading="lazy"
         />
 
