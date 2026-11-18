@@ -65,10 +65,15 @@ export async function authenticateWithSupabase(email: string, password: string):
 
     // 2. Agar foydalanuvchi hali mavjud bo'lmasa yoki ro'yxatdan o'tmagan bo'lsa, signUp qilishga urinamiz
     if (signInError && (signInError.message.includes('Invalid login credentials') || signInError.status === 400)) {
+      const redirectBase = typeof window !== 'undefined' && window.location.hostname === 'localhost'
+        ? window.location.origin
+        : 'https://elrizonasiya.vercel.app';
+
       const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
         email: cleanEmail,
         password,
         options: {
+          emailRedirectTo: `${redirectBase}/login`,
           data: {
             is_admin: isAdmin,
             full_name: isAdmin ? "Otabek Jo'rayev" : cleanEmail.split('@')[0],

@@ -26,6 +26,7 @@ import {
 import { useStore } from '../store/useStore';
 import { formatPrice } from '../utils/calculator';
 import { useTranslation } from '../utils/translations';
+import { AddressMapModal } from '../components/AddressMapModal';
 
 // Zamonaviy tayyor avatarlar to'plami
 const PRESET_AVATARS = [
@@ -113,6 +114,7 @@ export const ProfilePage: React.FC = () => {
   const [showAvatarModal, setShowAvatarModal] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [isMapModalOpen, setIsMapModalOpen] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -510,17 +512,37 @@ export const ProfilePage: React.FC = () => {
 
                 {/* Yetkazib berish manzili */}
                 <div className="sm:col-span-2 space-y-1.5">
-                  <label className="text-xs font-bold text-gray-700 dark:text-slate-300 flex items-center gap-1.5">
-                    <MapPin className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
-                    <span>{t('profileAddressLabel')}</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={address}
-                    onChange={(e) => setAddress(e.target.value)}
-                    placeholder={t('profileAddressPlaceholder')}
-                    className="w-full px-4 py-3 rounded-2xl bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-xs font-semibold text-gray-900 dark:text-white outline-none focus:border-uzum-primary focus:ring-2 focus:ring-purple-200 dark:focus:ring-purple-900 transition-all"
-                  />
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-bold text-gray-700 dark:text-slate-300 flex items-center gap-1.5">
+                      <MapPin className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
+                      <span>{t('profileAddressLabel')}</span>
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => setIsMapModalOpen(true)}
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold text-uzum-primary dark:text-purple-400 bg-purple-50 dark:bg-purple-950/60 hover:bg-purple-100 dark:hover:bg-purple-900/50 border border-purple-200 dark:border-purple-800 transition-all shadow-xs group cursor-pointer"
+                    >
+                      <MapPin className="w-3.5 h-3.5 text-uzum-primary dark:text-purple-400 group-hover:scale-110 transition-transform" />
+                      <span>{language === 'ru' ? 'Выбрать на карте' : 'Xaritadan tanlash'}</span>
+                    </button>
+                  </div>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={address}
+                      onChange={(e) => setAddress(e.target.value)}
+                      placeholder={t('profileAddressPlaceholder')}
+                      className="w-full pl-4 pr-10 py-3 rounded-2xl bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-xs font-semibold text-gray-900 dark:text-white outline-none focus:border-uzum-primary focus:ring-2 focus:ring-purple-200 dark:focus:ring-purple-900 transition-all"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setIsMapModalOpen(true)}
+                      title={language === 'ru' ? 'Выбрать на карте' : 'Xaritadan tanlash'}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-uzum-primary dark:hover:text-purple-400 transition-colors"
+                    >
+                      <MapPin className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
 
                 {/* JShShIR / Pasport (Ixtiyoriy) */}
@@ -800,6 +822,18 @@ export const ProfilePage: React.FC = () => {
           </div>
         )}
       </AnimatePresence>
+
+      {/* Xaritadan manzilni tanlash modal oynasi */}
+      <AddressMapModal
+        isOpen={isMapModalOpen}
+        onClose={() => setIsMapModalOpen(false)}
+        onSelectAddress={(selectedAddr, detectedCity) => {
+          setAddress(selectedAddr);
+          if (detectedCity) setCity(detectedCity);
+        }}
+        initialAddress={address}
+        defaultCity={city}
+      />
     </div>
   );
 };

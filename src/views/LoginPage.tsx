@@ -282,10 +282,14 @@ export const LoginPage: React.FC = () => {
       setIsOAuthLoading(true);
       setErrorMessage(null);
 
+      const redirectBase = typeof window !== 'undefined' && window.location.hostname === 'localhost'
+        ? window.location.origin
+        : 'https://elrizonasiya.vercel.app';
+
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: window.location.origin,
+          redirectTo: `${redirectBase}/login`,
           queryParams: {
             access_type: 'offline',
             prompt: 'select_account',

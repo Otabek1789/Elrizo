@@ -22,7 +22,8 @@ import {
   Download,
   ExternalLink,
   Truck,
-  Banknote
+  Banknote,
+  MapPin
 } from 'lucide-react';
 import { useStore } from '../store/useStore';
 import { formatPrice, calculateMonthlyPaymentQuick, calculateInstallment } from '../utils/calculator';
@@ -33,6 +34,7 @@ import { CustomSelect } from '../components/CustomSelect';
 import { UZBEKISTAN_REGIONS } from '../data/regions';
 import { generateAndPrintContract } from '../lib/pdfContractGenerator';
 import { generatePaymentLink, openPaymentCheckout } from '../lib/paymentService';
+import { AddressMapModal } from '../components/AddressMapModal';
 
 export const Checkout: React.FC = () => {
   const navigate = useNavigate();
@@ -109,6 +111,17 @@ export const Checkout: React.FC = () => {
     cardExpiry: '',
     otpCode: '',
   });
+
+  // Xarita orqali manzil tanlash modal oynasi
+  const [isMapModalOpen, setIsMapModalOpen] = useState<boolean>(false);
+
+  const handleAddressFromMap = (selectedAddress: string, detectedCity?: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      address: selectedAddress,
+      ...(detectedCity ? { city: detectedCity } : {}),
+    }));
+  };
 
   // Skoring simulyatsiya holati
   const [isScoringChecking, setIsScoringChecking] = useState<boolean>(false);
@@ -738,17 +751,37 @@ export const Checkout: React.FC = () => {
                       </div>
 
                       <div>
-                        <label className="block text-xs font-bold text-gray-700 dark:text-slate-300 mb-1">
-                          {t('checkoutAddressLabel')}
-                        </label>
-                        <input
-                          type="text"
-                          required
-                          value={formData.address}
-                          onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                          className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-gray-900 dark:text-white text-sm focus:border-uzum-primary focus:ring-2 focus:ring-purple-200 dark:focus:ring-purple-900 outline-none"
-                          placeholder={t('checkoutAddressPlaceholder')}
-                        />
+                        <div className="flex items-center justify-between mb-1.5">
+                          <label className="block text-xs font-bold text-gray-700 dark:text-slate-300">
+                            {t('checkoutAddressLabel')}
+                          </label>
+                          <button
+                            type="button"
+                            onClick={() => setIsMapModalOpen(true)}
+                            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] sm:text-xs font-bold text-uzum-primary dark:text-purple-400 bg-purple-50 dark:bg-purple-950/60 hover:bg-purple-100 dark:hover:bg-purple-900/50 border border-purple-200 dark:border-purple-800 transition-all shadow-xs group cursor-pointer"
+                          >
+                            <MapPin className="w-3.5 h-3.5 text-uzum-primary dark:text-purple-400 group-hover:scale-110 transition-transform" />
+                            <span>{language === 'ru' ? 'Выбрать на карте' : 'Xaritadan tanlash'}</span>
+                          </button>
+                        </div>
+                        <div className="relative">
+                          <input
+                            type="text"
+                            required
+                            value={formData.address}
+                            onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                            className="w-full pl-3.5 pr-10 py-2.5 rounded-xl border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-gray-900 dark:text-white text-sm focus:border-uzum-primary focus:ring-2 focus:ring-purple-200 dark:focus:ring-purple-900 outline-none transition-all"
+                            placeholder={t('checkoutAddressPlaceholder')}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setIsMapModalOpen(true)}
+                            title={language === 'ru' ? 'Выбрать на карте' : 'Xaritadan tanlash'}
+                            className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-uzum-primary dark:hover:text-purple-400 transition-colors"
+                          >
+                            <MapPin className="w-4 h-4" />
+                          </button>
+                        </div>
                       </div>
                     </div>
 
@@ -1060,13 +1093,36 @@ export const Checkout: React.FC = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-gray-700 dark:text-slate-300 mb-1">{t('checkoutAddressLabel')}</label>
-                    <input
-                      type="text"
-                      value={formData.address}
-                      onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-gray-900 dark:text-white text-sm outline-none focus:border-uzum-primary focus:ring-2 focus:ring-purple-200 dark:focus:ring-purple-900"
-                    />
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className="block text-xs font-bold text-gray-700 dark:text-slate-300">
+                        {t('checkoutAddressLabel')}
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => setIsMapModalOpen(true)}
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] sm:text-xs font-bold text-uzum-primary dark:text-purple-400 bg-purple-50 dark:bg-purple-950/60 hover:bg-purple-100 dark:hover:bg-purple-900/50 border border-purple-200 dark:border-purple-800 transition-all shadow-xs group cursor-pointer"
+                      >
+                        <MapPin className="w-3.5 h-3.5 text-uzum-primary dark:text-purple-400 group-hover:scale-110 transition-transform" />
+                        <span>{language === 'ru' ? 'Выбрать на карте' : 'Xaritadan tanlash'}</span>
+                      </button>
+                    </div>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        value={formData.address}
+                        onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                        placeholder={t('checkoutAddressPlaceholder')}
+                        className="w-full pl-3.5 pr-10 py-2.5 rounded-xl border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-gray-900 dark:text-white text-sm outline-none focus:border-uzum-primary focus:ring-2 focus:ring-purple-200 dark:focus:ring-purple-900 transition-all"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setIsMapModalOpen(true)}
+                        title={language === 'ru' ? 'Выбрать на карте' : 'Xaritadan tanlash'}
+                        className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-uzum-primary dark:hover:text-purple-400 transition-colors"
+                      >
+                        <MapPin className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
                 </div>
 
@@ -1291,6 +1347,15 @@ export const Checkout: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Xaritadan manzilni interaktiv tanlash modal oynasi */}
+      <AddressMapModal
+        isOpen={isMapModalOpen}
+        onClose={() => setIsMapModalOpen(false)}
+        onSelectAddress={handleAddressFromMap}
+        initialAddress={formData.address}
+        defaultCity={formData.city}
+      />
     </div>
   );
 };

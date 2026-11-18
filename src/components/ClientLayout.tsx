@@ -43,6 +43,14 @@ export const ClientLayout: React.FC<ClientLayoutProps> = ({ children }) => {
   } = useStore();
 
   useEffect(() => {
+    // Preview domenlardan (masalan, elrizonasiya-4odv1hyx6-otabek1789s-projects.vercel.app)
+    // rasmiy domen https://elrizonasiya.vercel.app ga avtomatik yo'naltirish
+    if (typeof window !== 'undefined' && window.location.hostname.includes('otabek1789s-projects.vercel.app')) {
+      const canonicalTarget = `https://elrizonasiya.vercel.app${window.location.pathname}${window.location.search}${window.location.hash}`;
+      window.location.replace(canonicalTarget);
+      return;
+    }
+
     setMounted(true);
     initSupabaseCheck();
     fetchProductsFromCloud();
