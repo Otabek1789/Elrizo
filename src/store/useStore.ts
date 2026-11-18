@@ -1070,11 +1070,14 @@ export const useStore = create<StoreState>()(
           if (!state.products || state.products.length === 0) {
             state.products = PRODUCTS;
           } else {
-            // Yangilangan original mahsulot rasmlarini xotiradagi tovarlarga zudlik bilan sinxronizatsiya qilish:
+            // Yangilangan original mahsulot rasmlarini va ranglarini xotiradagi tovarlarga zudlik bilan sinxronizatsiya qilish:
             state.products = state.products.map((p) => {
               const fresh = PRODUCTS.find((fp) => fp.id === p.id);
               if (fresh && fresh.images && fresh.images.length > 0) {
                 p.images = fresh.images;
+                if (fresh.colors) {
+                  p.colors = fresh.colors;
+                }
               }
               return p;
             });
