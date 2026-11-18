@@ -103,7 +103,7 @@ export const PRODUCTS: Product[] = [
   {
     id: 'prod-001',
     sku: 'ELR-IPH16PM-256',
-    title: 'Apple iPhone 16 Pro Max 256GB Desert Titanium (Nasiya 0-0-12)',
+    title: 'Apple iPhone 16 Pro Max (Nasiya 0-0-12)',
     slug: 'apple-iphone-16-pro-max-256gb-desert-titanium',
     price: 18450000,
     originalPrice: 20500000,
@@ -115,7 +115,6 @@ export const PRODUCTS: Product[] = [
       '/products/prod-001-natural.webp?v=4',
       '/products/prod-001-black.webp?v=4',
       '/products/prod-001-white.webp?v=4',
-      '/products/prod-001-back.webp?v=4',
       '/products/prod-001-camera.webp?v=4',
     ],
     categoryId: 'cat-smartphones',
@@ -146,7 +145,7 @@ export const PRODUCTS: Product[] = [
   {
     id: 'prod-002',
     sku: 'ELR-SAM-S24U',
-    title: 'Samsung Galaxy S24 Ultra 12GB/512GB Titanium Gray (Galaxy AI)',
+    title: 'Samsung Galaxy S24 Ultra (Galaxy AI)',
     slug: 'samsung-galaxy-s24-ultra-512gb',
     price: 16200000,
     originalPrice: 17800000,
@@ -159,7 +158,6 @@ export const PRODUCTS: Product[] = [
       '/products/prod-002-violet.webp?v=4',
       '/products/prod-002-yellow.webp?v=4',
       '/products/prod-002-side.webp?v=4',
-      '/products/prod-002-zoom.webp?v=4',
     ],
     categoryId: 'cat-smartphones',
     categoryName: 'Smartfonlar va gadjetlar',
@@ -188,7 +186,7 @@ export const PRODUCTS: Product[] = [
   {
     id: 'prod-003',
     sku: 'ELR-XIA-RN13P',
-    title: 'Xiaomi Redmi Note 13 Pro+ 5G 12GB/512GB Midnight Black',
+    title: 'Xiaomi Redmi Note 13 Pro+ 5G',
     slug: 'xiaomi-redmi-note-13-pro-plus-512gb',
     price: 4650000,
     originalPrice: 5500000,
@@ -228,7 +226,7 @@ export const PRODUCTS: Product[] = [
   {
     id: 'prod-004',
     sku: 'ELR-SAM-A55',
-    title: 'Samsung Galaxy A55 5G 8GB/256GB Awesome Iceblue',
+    title: 'Samsung Galaxy A55 5G',
     slug: 'samsung-galaxy-a55-5g-256gb',
     price: 4850000,
     originalPrice: 5400000,
@@ -239,7 +237,6 @@ export const PRODUCTS: Product[] = [
       '/products/prod-004.png?v=4',
       '/products/prod-004-navy.webp?v=4',
       '/products/prod-004-lilac.webp?v=4',
-      '/products/prod-004-back.webp?v=4',
     ],
     categoryId: 'cat-smartphones',
     categoryName: 'Smartfonlar va gadjetlar',
@@ -266,7 +263,7 @@ export const PRODUCTS: Product[] = [
   {
     id: 'prod-005',
     sku: 'ELR-AW-S10',
-    title: 'Apple Watch Series 10 46mm GPS Jet Black Aluminium Case',
+    title: 'Apple Watch Series 10 46mm GPS Aluminium Case',
     slug: 'apple-watch-series-10-46mm',
     price: 6200000,
     originalPrice: 6900000,
@@ -313,9 +310,6 @@ export const PRODUCTS: Product[] = [
     reviewsCount: 310,
     images: [
       '/products/prod-006.webp?v=4',
-      '/products/prod-006-angle1.webp?v=4',
-      '/products/prod-006-angle2.webp?v=4',
-      '/products/prod-006-angle3.webp?v=4',
     ],
     categoryId: 'cat-smartphones',
     categoryName: 'Smartfonlar va gadjetlar',
@@ -348,9 +342,6 @@ export const PRODUCTS: Product[] = [
     images: [
       '/products/prod-007-infographic.webp?v=4',
       '/products/prod-007.webp?v=4',
-      '/products/prod-007-angle1.webp?v=4',
-      '/products/prod-007-angle2.webp?v=4',
-      '/products/prod-007-angle3.webp?v=4',
     ],
     categoryId: 'cat-smartphones',
     categoryName: 'Smartfonlar va gadjetlar',
@@ -383,9 +374,6 @@ export const PRODUCTS: Product[] = [
     reviewsCount: 98,
     images: [
       '/products/prod-008.webp?v=4',
-      '/products/prod-008-angle1.webp?v=4',
-      '/products/prod-008-angle2.webp?v=4',
-      '/products/prod-008-angle3.webp?v=4',
     ],
     categoryId: 'cat-appliances',
     categoryName: 'Maishiy texnika',
@@ -417,9 +405,6 @@ export const PRODUCTS: Product[] = [
     reviewsCount: 84,
     images: [
       '/products/prod-009.webp?v=4',
-      '/products/prod-009-angle1.webp?v=4',
-      '/products/prod-009-angle2.webp?v=4',
-      '/products/prod-009-angle3.webp?v=4',
     ],
     categoryId: 'cat-appliances',
     categoryName: 'Maishiy texnika',
@@ -451,9 +436,6 @@ export const PRODUCTS: Product[] = [
     reviewsCount: 112,
     images: [
       '/products/prod-010.webp?v=4',
-      '/products/prod-010-angle1.webp?v=4',
-      '/products/prod-010-angle2.webp?v=4',
-      '/products/prod-010-angle3.webp?v=4',
     ],
     categoryId: 'cat-appliances',
     categoryName: 'Maishiy texnika',
@@ -485,9 +467,6 @@ export const PRODUCTS: Product[] = [
     reviewsCount: 76,
     images: [
       '/products/prod-011.webp?v=4',
-      '/products/prod-011-angle1.webp?v=4',
-      '/products/prod-011-angle2.webp?v=4',
-      '/products/prod-011-angle3.webp?v=4',
     ],
     categoryId: 'cat-appliances',
     categoryName: 'Maishiy texnika',
@@ -518,9 +497,6 @@ export const PRODUCTS: Product[] = [
     reviewsCount: 65,
     images: [
       '/products/prod-012.webp?v=4',
-      '/products/prod-012-angle1.webp?v=4',
-      '/products/prod-012-angle2.webp?v=4',
-      '/products/prod-012-angle3.webp?v=4',
     ],
     categoryId: 'cat-appliances',
     categoryName: 'Maishiy texnika',
@@ -545,7 +521,7 @@ export const PRODUCTS: Product[] = [
   {
     id: 'prod-013',
     sku: 'ELR-MAC-M3',
-    title: 'Apple MacBook Air 13" M3 Chip (16GB / 512GB SSD) Midnight',
+    title: 'Apple MacBook Air 13" M3 Chip (16GB / 512GB SSD)',
     slug: 'apple-macbook-air-13-m3-16-512',
     price: 15900000,
     originalPrice: 17200000,
@@ -596,9 +572,6 @@ export const PRODUCTS: Product[] = [
     images: [
       '/products/prod-014-infographic.webp?v=4',
       '/products/prod-014.webp?v=4',
-      '/products/prod-014-angle1.webp?v=4',
-      '/products/prod-014-angle2.webp?v=4',
-      '/products/prod-014-angle3.webp?v=4',
     ],
     categoryId: 'cat-computers',
     categoryName: 'Noutbuk va kompyuterlar',
@@ -631,9 +604,6 @@ export const PRODUCTS: Product[] = [
     reviewsCount: 110,
     images: [
       '/products/prod-015.png?v=4',
-      '/products/prod-015-angle1.webp?v=4',
-      '/products/prod-015-angle2.webp?v=4',
-      '/products/prod-015-angle3.webp?v=4',
     ],
     categoryId: 'cat-computers',
     categoryName: 'Noutbuk va kompyuterlar',
@@ -666,9 +636,6 @@ export const PRODUCTS: Product[] = [
     reviewsCount: 78,
     images: [
       '/products/prod-016.webp?v=4',
-      '/products/prod-016-angle1.webp?v=4',
-      '/products/prod-016-angle2.webp?v=4',
-      '/products/prod-016-angle3.webp?v=4',
     ],
     categoryId: 'cat-computers',
     categoryName: 'Noutbuk va kompyuterlar',
@@ -741,9 +708,6 @@ export const PRODUCTS: Product[] = [
     reviewsCount: 74,
     images: [
       '/products/prod-018.webp?v=4',
-      '/products/prod-018-angle1.webp?v=4',
-      '/products/prod-018-angle2.webp?v=4',
-      '/products/prod-018-angle3.webp?v=4',
     ],
     categoryId: 'cat-beauty',
     categoryName: 'Goʻzallik va parvarish',
@@ -774,9 +738,6 @@ export const PRODUCTS: Product[] = [
     reviewsCount: 135,
     images: [
       '/products/prod-019.webp?v=4',
-      '/products/prod-019-angle1.webp?v=4',
-      '/products/prod-019-angle2.webp?v=4',
-      '/products/prod-019-angle3.webp?v=4',
     ],
     categoryId: 'cat-beauty',
     categoryName: 'Goʻzallik va parvarish',
@@ -807,9 +768,6 @@ export const PRODUCTS: Product[] = [
     reviewsCount: 91,
     images: [
       '/products/prod-020.webp?v=4',
-      '/products/prod-020-angle1.webp?v=4',
-      '/products/prod-020-angle2.webp?v=4',
-      '/products/prod-020-angle3.webp?v=4',
     ],
     categoryId: 'cat-beauty',
     categoryName: 'Goʻzallik va parvarish',
@@ -843,9 +801,6 @@ export const PRODUCTS: Product[] = [
     images: [
       '/products/prod-021-infographic.webp?v=4',
       '/products/prod-021.webp?v=4',
-      '/products/prod-021-angle1.webp?v=4',
-      '/products/prod-021-angle2.webp?v=4',
-      '/products/prod-021-angle3.webp?v=4',
     ],
     categoryId: 'cat-auto',
     categoryName: 'Avtomobil jihozlari',
@@ -878,9 +833,6 @@ export const PRODUCTS: Product[] = [
     images: [
       '/products/prod-022-infographic.webp?v=4',
       '/products/prod-022.webp?v=4',
-      '/products/prod-022-angle1.webp?v=4',
-      '/products/prod-022-angle2.webp?v=4',
-      '/products/prod-022-angle3.webp?v=4',
     ],
     categoryId: 'cat-auto',
     categoryName: 'Avtomobil jihozlari',
@@ -912,9 +864,6 @@ export const PRODUCTS: Product[] = [
     reviewsCount: 89,
     images: [
       '/products/prod-023.webp?v=4',
-      '/products/prod-023-angle1.webp?v=4',
-      '/products/prod-023-angle2.webp?v=4',
-      '/products/prod-023-angle3.webp?v=4',
     ],
     categoryId: 'cat-auto',
     categoryName: 'Avtomobil jihozlari',
@@ -946,9 +895,6 @@ export const PRODUCTS: Product[] = [
     reviewsCount: 167,
     images: [
       '/products/prod-024.webp?v=4',
-      '/products/prod-024-angle1.webp?v=4',
-      '/products/prod-024-angle2.webp?v=4',
-      '/products/prod-024-angle3.webp?v=4',
     ],
     categoryId: 'cat-auto',
     categoryName: 'Avtomobil jihozlari',
@@ -981,9 +927,6 @@ export const PRODUCTS: Product[] = [
     reviewsCount: 124,
     images: [
       '/products/prod-025.webp?v=4',
-      '/products/prod-025-angle1.webp?v=4',
-      '/products/prod-025-angle2.webp?v=4',
-      '/products/prod-025-angle3.webp?v=4',
     ],
     categoryId: 'cat-home',
     categoryName: 'Uy-roʻzgʻor buyumlari',
@@ -1015,9 +958,6 @@ export const PRODUCTS: Product[] = [
     reviewsCount: 88,
     images: [
       '/products/prod-026.webp?v=4',
-      '/products/prod-026-angle1.webp?v=4',
-      '/products/prod-026-angle2.webp?v=4',
-      '/products/prod-026-angle3.webp?v=4',
     ],
     categoryId: 'cat-home',
     categoryName: 'Uy-roʻzgʻor buyumlari',
@@ -1048,9 +988,6 @@ export const PRODUCTS: Product[] = [
     reviewsCount: 165,
     images: [
       '/products/prod-027.webp?v=4',
-      '/products/prod-027-angle1.webp?v=4',
-      '/products/prod-027-angle2.webp?v=4',
-      '/products/prod-027-angle3.webp?v=4',
     ],
     categoryId: 'cat-home',
     categoryName: 'Uy-roʻzgʻor buyumlari',
@@ -1081,9 +1018,6 @@ export const PRODUCTS: Product[] = [
     reviewsCount: 230,
     images: [
       '/products/prod-028.webp?v=4',
-      '/products/prod-028-angle1.webp?v=4',
-      '/products/prod-028-angle2.webp?v=4',
-      '/products/prod-028-angle3.webp?v=4',
     ],
     categoryId: 'cat-home',
     categoryName: 'Uy-roʻzgʻor buyumlari',
@@ -1114,9 +1048,6 @@ export const PRODUCTS: Product[] = [
     reviewsCount: 140,
     images: [
       '/products/prod-029.webp?v=4',
-      '/products/prod-029-angle1.webp?v=4',
-      '/products/prod-029-angle2.webp?v=4',
-      '/products/prod-029-angle3.webp?v=4',
     ],
     categoryId: 'cat-home',
     categoryName: 'Uy-roʻzgʻor buyumlari',

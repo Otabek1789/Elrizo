@@ -122,7 +122,9 @@ export const ProductDetail: React.FC = () => {
     setSelectedImageIndex(0);
   }, [product.id, availableColors, availableStorage]);
 
-  // Gallerydagi to'liq rasmlar ro'yxati: tanlangan rang rasmi + tovar rasmlari
+  // Gallerydagi to'liq rasmlar ro'yxati:
+  // Tanlangan rang rasmi har doim birinchi o'rinda chiqadi!
+  // Keyin tovarning boshqa real fotosuratlari takrorlanmasdan qo'shiladi.
   const galleryImages = useMemo(() => {
     const list: string[] = [];
     if (selectedColor?.image) {
@@ -130,18 +132,57 @@ export const ProductDetail: React.FC = () => {
     }
     if (product.images && product.images.length > 0) {
       product.images.forEach((img) => {
-        if (!list.includes(img)) list.push(img);
+        const clean = img.split('?')[0];
+        const isAlreadyInList = list.some((x) => x.split('?')[0] === clean);
+        if (!isAlreadyInList) list.push(img);
       });
     }
     if (list.length === 0) list.push(fallbackDetailImg);
     return list;
   }, [selectedColor, product.images]);
 
-  // Rang tanlanganda rasm darhol o'sha rangga o'zgaradi!
+  // Thumbnail bosilganda:
+  // 1. O'sha rasm ochiladi
+  // 2. Agar bu rasm biron-bir rangga tegishli bo'lsa, avtomatik ravishda tanlangan rang ham o'zgaradi!
+  const handleThumbnailClick = (idx: number, img: string) => {
+    setSelectedImageIndex(idx);
+    if (!isExcludedFromColorAndStorage && availableColors.length > 0) {
+      const clean = img.split('?')[0];
+      const matchingColor = availableColors.find(
+        (c) => (c.image || '').split('?')[0] === clean
+      );
+      if (matchingColor && matchingColor.name !== selectedColor?.name) {
+        setSelectedColor(matchingColor);
+      }
+    }
+  };
+
+  // Rang tugmasi bosilganda:
+  // Tanlangan rang o'zgaradi va asosiy galereyada darhol o'sha rang surati chiqadi!
   const handleColorSelect = (color: any) => {
     setSelectedColor(color);
-    setSelectedImageIndex(0);
+    if (color?.image) {
+      const cleanTarget = color.image.split('?')[0];
+      const idx = galleryImages.findIndex((img) => img.split('?')[0] === cleanTarget);
+      if (idx !== -1) {
+        setSelectedImageIndex(idx);
+      } else {
+        setSelectedImageIndex(0);
+      }
+    }
   };
+
+  // Sarlavhani tanlangan rang va xotiraga qarab dinamik ko'rsatish
+  const displayTitle = useMemo(() => {
+    if (isExcludedFromColorAndStorage) return product.title;
+    const parts: string[] = [];
+    if (selectedColor?.name) parts.push(selectedColor.name);
+    if (selectedStorage?.size) parts.push(selectedStorage.size);
+    if (parts.length > 0) {
+      return `${product.title} (${parts.join(', ')})`;
+    }
+    return product.title;
+  }, [product.title, selectedColor, selectedStorage, isExcludedFromColorAndStorage]);
 
   // Dynamic price based on selected storage
   const effectivePrice = !isExcludedFromColorAndStorage && selectedStorage?.priceOffset
@@ -175,15 +216,14 @@ export const ProductDetail: React.FC = () => {
       openLoginRequiredModal();
       return;
     }
-    const hasVariants = !isExcludedFromColorAndStorage;
-    const itemTitle = hasVariants && selectedStorage && selectedColor
-      ? `${product.title} (${selectedStorage.size}, ${selectedColor.name})`
-      : product.title;
     const configuredProduct = {
       ...product,
       price: effectivePrice,
       originalPrice: effectiveOriginalPrice,
-      title: itemTitle,
+      title: displayTitle,
+      image: selectedColor?.image || product.images[0] || fallbackDetailImg,
+      color: !isExcludedFromColorAndStorage && selectedColor ? selectedColor.name : undefined,
+      storage: !isExcludedFromColorAndStorage && selectedStorage ? selectedStorage.size : undefined,
     };
     addToCart(configuredProduct, 12, 'full', quantity);
   };
@@ -193,15 +233,14 @@ export const ProductDetail: React.FC = () => {
       openLoginRequiredModal();
       return;
     }
-    const hasVariants = !isExcludedFromColorAndStorage;
-    const itemTitle = hasVariants && selectedStorage && selectedColor
-      ? `${product.title} (${selectedStorage.size}, ${selectedColor.name})`
-      : product.title;
     const configuredProduct = {
       ...product,
       price: effectivePrice,
       originalPrice: effectiveOriginalPrice,
-      title: itemTitle,
+      title: displayTitle,
+      image: selectedColor?.image || product.images[0] || fallbackDetailImg,
+      color: !isExcludedFromColorAndStorage && selectedColor ? selectedColor.name : undefined,
+      storage: !isExcludedFromColorAndStorage && selectedStorage ? selectedStorage.size : undefined,
     };
     addToCart(configuredProduct, 12, 'installment');
     navigate('/checkout');
@@ -323,7 +362,8 @@ export const ProductDetail: React.FC = () => {
             {galleryImages.map((img, idx) => (
               <button
                 key={idx}
-                onClick={() => setSelectedImageIndex(idx)}
+                type="button"
+                onClick={() => handleThumbnailClick(idx, img)}
                 className={`w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden border-2 transition-all shrink-0 bg-gray-50 dark:bg-slate-900/80 p-1 cursor-pointer ${
                   selectedImageIndex === idx
                     ? 'border-uzum-primary shadow-sm ring-2 ring-purple-100 dark:ring-purple-900/50'
@@ -437,24 +477,24 @@ export const ProductDetail: React.FC = () => {
 
             {/* Product Title */}
             <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-gray-900 dark:text-white leading-tight">
-              {product.title}
+              {displayTitle}
             </h1>
           </div>
 
-          {/* Color Selection Swatches (Kir yuvish, konditsioner, televizor, airpods, ps5, adapterda CHIQMAYDI) */}
+          {/* Color Selection Swatches (Uzum Market uslubidagi haqiqiy tovar rasmli tanlash tugmalari) */}
           {!isExcludedFromColorAndStorage && availableColors.length > 0 && selectedColor && (
-            <div className="space-y-2.5 p-4 rounded-2xl bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-800">
+            <div className="space-y-3 p-4 rounded-2xl bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-800 shadow-xs">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 text-xs font-bold text-slate-700 dark:text-slate-300">
+                <div className="flex items-center gap-2 text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">
                   <Palette className="w-4 h-4 text-uzum-primary dark:text-purple-400" />
-                  <span>{t('productSelectColor')}</span>
+                  <span>{t('productSelectColor')}:</span>
                 </div>
-                <span className="text-xs font-semibold text-uzum-primary dark:text-purple-400">
+                <span className="text-xs font-extrabold text-uzum-primary dark:text-purple-300 bg-purple-50 dark:bg-purple-950/60 px-3 py-1 rounded-lg border border-purple-200/80 dark:border-purple-800">
                   {selectedColor.name}
                 </span>
               </div>
 
-              <div className="flex items-center gap-3 flex-wrap">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
                 {availableColors.map((color, idx) => {
                   const isSelected = selectedColor.name === color.name;
                   return (
@@ -462,22 +502,38 @@ export const ProductDetail: React.FC = () => {
                       key={idx}
                       type="button"
                       onClick={() => handleColorSelect(color)}
-                      className={`group relative flex items-center gap-2 p-1.5 rounded-xl border-2 transition-all cursor-pointer ${
+                      className={`group relative flex items-center gap-2.5 p-2 rounded-xl border-2 transition-all cursor-pointer text-left ${
                         isSelected
-                          ? 'border-uzum-primary bg-purple-50/50 dark:bg-purple-950/30 ring-2 ring-purple-500/20 shadow-xs'
-                          : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 bg-white dark:bg-slate-900'
+                          ? 'border-uzum-primary bg-purple-50/40 dark:bg-purple-950/40 ring-2 ring-purple-500/20 shadow-sm'
+                          : 'border-slate-200 dark:border-slate-700 hover:border-purple-300 bg-white dark:bg-slate-900'
                       }`}
                     >
-                      <span
-                        className="w-6 h-6 rounded-lg shadow-inner border border-black/10 shrink-0"
-                        style={{ backgroundColor: color.hex }}
-                      />
-                      <span className="text-xs font-medium text-slate-700 dark:text-slate-300 pr-1.5">
-                        {color.name}
-                      </span>
-                      {isSelected && (
-                        <Check className="w-3.5 h-3.5 text-uzum-primary dark:text-purple-400" />
+                      {color.image ? (
+                        <img
+                          src={color.image}
+                          alt={color.name}
+                          className="w-9 h-9 object-contain rounded-lg p-0.5 bg-gray-50 dark:bg-slate-800 shrink-0 border border-black/5"
+                        />
+                      ) : (
+                        <span
+                          className="w-7 h-7 rounded-lg shadow-inner border border-black/10 shrink-0"
+                          style={{ backgroundColor: color.hex }}
+                        />
                       )}
+                      <div className="min-w-0 flex-1">
+                        <div className="text-xs font-bold text-slate-900 dark:text-white truncate">
+                          {color.name}
+                        </div>
+                        <div className="text-[10px] text-slate-500 dark:text-slate-400 flex items-center gap-0.5 mt-0.5">
+                          {isSelected ? (
+                            <span className="text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-0.5">
+                              <Check className="w-3 h-3" /> Tanlangan
+                            </span>
+                          ) : (
+                            <span>Tanlash</span>
+                          )}
+                        </div>
+                      </div>
                     </button>
                   );
                 })}
