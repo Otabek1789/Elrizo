@@ -341,63 +341,73 @@ export const ProductDetail: React.FC = () => {
           </div>
 
           {/* Main Big Image */}
-          <div className="flex-1 relative aspect-square bg-gray-50/60 dark:bg-slate-900/60 rounded-2xl border border-gray-200/80 dark:border-slate-800 overflow-hidden flex items-center justify-center shadow-sm">
-            <img
-              src={galleryImages[selectedImageIndex] || galleryImages[0] || fallbackDetailImg}
-              alt={product.title}
-              onError={() => setImageError(true)}
-              className="w-full h-full object-contain pt-10 pb-4 px-6 transition-all duration-300"
-            />
+          {(() => {
+            const currentDetailImgSrc = galleryImages[selectedImageIndex] || galleryImages[0] || fallbackDetailImg;
+            const isDetailInfographic = currentDetailImgSrc.includes('infographic') || currentDetailImgSrc.includes('uzum');
+            return (
+              <div className={`flex-1 relative aspect-square bg-gray-50/60 dark:bg-slate-900/60 rounded-2xl border border-gray-200/80 dark:border-slate-800 overflow-hidden flex items-center justify-center shadow-sm ${
+                isDetailInfographic ? 'p-0' : ''
+              }`}>
+                <img
+                  src={currentDetailImgSrc}
+                  alt={product.title}
+                  onError={() => setImageError(true)}
+                  className={`w-full h-full ${
+                    isDetailInfographic ? 'object-cover' : 'object-contain pt-10 pb-4 px-6'
+                  } transition-all duration-300`}
+                />
 
-            {/* Badges - Gorizontal qatorda, mahsulotni to'smaydi */}
-            <div className="absolute top-3 left-3 flex items-center gap-2 z-10 pointer-events-none">
-              {product.hasZeroDown && (
-                <span className="inline-flex items-center gap-1 bg-emerald-600 text-white text-xs font-bold px-2.5 py-1 rounded-lg shadow-sm w-fit">
-                  0-0-12 {t('zeroDownBadge')}
-                </span>
-              )}
-              {product.discountPercentage && (
-                <span className="inline-flex items-center justify-center bg-rose-500 text-white text-xs font-bold px-2.5 py-0.5 rounded-lg shadow-sm w-fit">
-                  -{product.discountPercentage}%
-                </span>
-              )}
-            </div>
+                {/* Badges - Gorizontal qatorda, mahsulotni to'smaydi */}
+                <div className="absolute top-3 left-3 flex items-center gap-2 z-10 pointer-events-none">
+                  {product.hasZeroDown && (
+                    <span className="inline-flex items-center gap-1 bg-emerald-600 text-white text-xs font-bold px-2.5 py-1 rounded-lg shadow-sm w-fit">
+                      0-0-12 {t('zeroDownBadge')}
+                    </span>
+                  )}
+                  {product.discountPercentage && (
+                    <span className="inline-flex items-center justify-center bg-rose-500 text-white text-xs font-bold px-2.5 py-0.5 rounded-lg shadow-sm w-fit">
+                      -{product.discountPercentage}%
+                    </span>
+                  )}
+                </div>
 
-            {/* Top Right Actions: Compare, Favorite & Share */}
-            <div className="absolute top-3 right-3 flex items-center gap-2">
-              {/* Compare Button */}
-              <button
-                onClick={handleToggleComparison}
-                className={`p-2.5 rounded-full shadow-sm border transition-all ${
-                  isCompared
-                    ? 'bg-primary-600 text-white border-primary-600 ring-2 ring-primary-300'
-                    : 'bg-white/90 dark:bg-slate-700/90 hover:bg-white text-gray-500 hover:text-primary-600 dark:text-slate-300 dark:hover:text-primary-400 border-gray-200/60 dark:border-slate-700'
-                }`}
-                title={isCompared 
-                  ? (language === 'ru' ? "Удалить из сравнения" : "Taqqoslashdan o'chirish") 
-                  : (language === 'ru' ? "Добавить к сравнению" : "Taqqoslashga qo'shish")
-                }
-              >
-                <Scale className="w-4 h-4" />
-              </button>
+                {/* Top Right Actions: Compare, Favorite & Share */}
+                <div className="absolute top-3 right-3 flex items-center gap-2">
+                  {/* Compare Button */}
+                  <button
+                    onClick={handleToggleComparison}
+                    className={`p-2.5 rounded-full shadow-sm border transition-all ${
+                      isCompared
+                        ? 'bg-primary-600 text-white border-primary-600 ring-2 ring-primary-300'
+                        : 'bg-white/90 dark:bg-slate-700/90 hover:bg-white text-gray-500 hover:text-primary-600 dark:text-slate-300 dark:hover:text-primary-400 border-gray-200/60 dark:border-slate-700'
+                    }`}
+                    title={isCompared 
+                      ? (language === 'ru' ? "Удалить из сравнения" : "Taqqoslashdan o'chirish") 
+                      : (language === 'ru' ? "Добавить к сравнению" : "Taqqoslashga qo'shish")
+                    }
+                  >
+                    <Scale className="w-4 h-4" />
+                  </button>
 
-              <button
-                onClick={handleShare}
-                className="p-2.5 rounded-full bg-white/90 dark:bg-slate-700/90 hover:bg-white text-gray-500 hover:text-gray-900 dark:text-slate-300 dark:hover:text-white shadow-sm border border-gray-200/60 dark:border-slate-700 transition-colors"
-                title={t('shareBtn')}
-              >
-                <Share2 className="w-4 h-4" />
-              </button>
+                  <button
+                    onClick={handleShare}
+                    className="p-2.5 rounded-full bg-white/90 dark:bg-slate-700/90 hover:bg-white text-gray-500 hover:text-gray-900 dark:text-slate-300 dark:hover:text-white shadow-sm border border-gray-200/60 dark:border-slate-700 transition-colors"
+                    title={t('shareBtn')}
+                  >
+                    <Share2 className="w-4 h-4" />
+                  </button>
 
-              <button
-                onClick={() => toggleFavorite(product.id)}
-                className="p-2.5 rounded-full bg-white/90 dark:bg-slate-700/90 hover:bg-white text-gray-400 hover:text-rose-500 dark:text-slate-300 dark:hover:text-rose-400 shadow-sm border border-gray-200/60 dark:border-slate-700 transition-colors"
-                title={t('addToFavoritesTitle')}
-              >
-                <Heart className={`w-4 h-4 ${favorite ? 'fill-rose-500 text-rose-500' : ''}`} />
-              </button>
-            </div>
-          </div>
+                  <button
+                    onClick={() => toggleFavorite(product.id)}
+                    className="p-2.5 rounded-full bg-white/90 dark:bg-slate-700/90 hover:bg-white text-gray-400 hover:text-rose-500 dark:text-slate-300 dark:hover:text-rose-400 shadow-sm border border-gray-200/60 dark:border-slate-700 transition-colors"
+                    title={t('addToFavoritesTitle')}
+                  >
+                    <Heart className={`w-4 h-4 ${favorite ? 'fill-rose-500 text-rose-500' : ''}`} />
+                  </button>
+                </div>
+              </div>
+            );
+          })()}
         </div>
 
         {/* Center / Right Column: Product Info & Purchase Actions (7 cols) */}
