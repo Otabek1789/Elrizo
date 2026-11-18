@@ -20,7 +20,7 @@ import {
   ExternalLink
 } from 'lucide-react';
 import { useStore } from '../store/useStore';
-import { ADMIN_EMAIL, supabase } from '../lib/supabase';
+import { ADMIN_EMAIL, isAdminUser, supabase } from '../lib/supabase';
 import { User } from '../types';
 import { useTranslation } from '../utils/translations';
 import { findTelegramChatIdByUsername, sendTelegramLoginCode, TELEGRAM_BOT_USERNAME } from '../utils/telegramBot';
@@ -117,6 +117,98 @@ export const LoginPage: React.FC = () => {
       clearInterval(pollInterval);
     };
   }, [isTelegramModalOpen, telegramStep, telegramSessionToken, language, addToast]);
+
+  // Google OAuth callback / sessiyani tekshirish
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    let isHandled = false;
+    const checkOAuthCallback = async () => {
+      try {
+        const searchParams = new URLSearchParams(window.location.search);
+        const code = searchParams.get('code');
+        const error = searchParams.get('error');
+        const errorDesc = searchParams.get('error_description');
+
+        if (error || errorDesc) {
+          console.error("OAuth redirect error:", error, errorDesc);
+          const msg = errorDesc || error || (language === 'ru' ? 'Ошибка входа через Google' : 'Google orqali kirishda xatolik yuz berdi');
+          setErrorMessage(msg);
+          addToast(msg, 'error');
+          return;
+        }
+
+        // Agar URL da code bo'lsa yoki hash da access_token bo'lsa
+        if (code || window.location.hash.includes('access_token')) {
+          setIsOAuthLoading(true);
+
+          let userSession = null;
+          // 1. Agar code mavjud bo'lsa, kodni sessiyaga almashtirish
+          if (code) {
+            try {
+              const { data, error: exchangeErr } = await supabase.auth.exchangeCodeForSession(code);
+              if (!exchangeErr && data?.session?.user) {
+                userSession = data.session;
+              }
+            } catch (e) {
+              console.warn("exchangeCodeForSession already consumed or not required:", e);
+            }
+          }
+
+          // 2. Agar exchangeCodeForSession bilan olinmagan bo'lsa, getSession tekshirish
+          if (!userSession) {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session?.user) {
+              userSession = session;
+            }
+          }
+
+          if (userSession?.user && !isHandled) {
+            isHandled = true;
+            localStorage.removeItem('elrizo_user_logged_out');
+            const authUser = userSession.user;
+            const email = authUser.email || '';
+            const isAdmin = isAdminUser(email);
+            const meta = authUser.user_metadata || {};
+            const fullName = meta.full_name || meta.name || email.split('@')[0];
+
+            const userObj: User = {
+              id: authUser.id || (isAdmin ? 'admin-otabek' : `usr-${Date.now()}`),
+              fullName: isAdmin ? "Otabek Jo'rayev (Bosh Administrator)" : fullName,
+              email: email,
+              phone: authUser.phone || meta.phone || '+998 90 123 45 67',
+              isVerified: true,
+              scoringLimit: 0,
+              usedLimit: 0,
+              isAdmin,
+              role: isAdmin ? 'admin' : 'user',
+              cashbackBalance: useStore.getState().user?.cashbackBalance ?? 0,
+            };
+
+            useStore.setState({ user: userObj, isAuthOpen: false });
+            addToast(
+              language === 'ru'
+                ? `Добро пожаловать, ${userObj.fullName}! (через Google)`
+                : `Xush kelibsiz, ${userObj.fullName}! (Google orqali kirdingiz)`,
+              'success'
+            );
+            // URL tozalash
+            try {
+              window.history.replaceState({}, document.title, window.location.pathname);
+            } catch (e) {}
+            navigate(isAdmin ? '/admin' : '/');
+            return;
+          }
+        }
+      } catch (err: any) {
+        console.error("OAuth callback check error:", err);
+      } finally {
+        setIsOAuthLoading(false);
+      }
+    };
+
+    checkOAuthCallback();
+  }, [language, addToast, navigate]);
 
   // Agar allaqachon kirgan bo'lsa darhol tegishli sahifaga yo'naltirish (tizimdan chiqish holatida bo'lmasa)
   if (user && typeof window !== 'undefined' && localStorage.getItem('elrizo_user_logged_out') !== 'true') {
@@ -282,7 +374,12 @@ export const LoginPage: React.FC = () => {
       setIsOAuthLoading(true);
       setErrorMessage(null);
 
-      const redirectBase = typeof window !== 'undefined' && window.location.hostname === 'localhost'
+      // Foydalanuvchi Google tugmasini bosganda chiqish belgisini darhol tozalash
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('elrizo_user_logged_out');
+      }
+
+      const redirectBase = typeof window !== 'undefined'
         ? window.location.origin
         : 'https://elrizonasiya.vercel.app';
 

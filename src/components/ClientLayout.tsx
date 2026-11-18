@@ -61,8 +61,14 @@ export const ClientLayout: React.FC<ClientLayoutProps> = ({ children }) => {
         return;
       }
 
-      // Agar foydalanuvchi tizimdan chiqqan bo'lsa, uni avtomatik qayta kirgizib yubormaslik
-      if (typeof window !== 'undefined' && localStorage.getItem('elrizo_user_logged_out') === 'true') {
+      // Agar SIGNED_IN bo'lsa (foydalanuvchi hozirgina Google orqali kirdi), albatta uni tizimga kiritamiz
+      // va eski "chiqish" belgisini tozalaymiz!
+      if (event === 'SIGNED_IN') {
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('elrizo_user_logged_out');
+        }
+      } else if (typeof window !== 'undefined' && localStorage.getItem('elrizo_user_logged_out') === 'true') {
+        // Faqat passiv / eski sessiyani avtomatik yuklamaslik uchun
         return;
       }
 
