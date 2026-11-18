@@ -102,18 +102,15 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   const currentImg = !imageError && product.images && product.images.length > 0
     ? (product.images[activeImageIndex] || product.images[0] || fallbackImg)
     : fallbackImg;
-  const isInfographic = currentImg.includes('infographic') || currentImg.includes('uzum');
 
   return (
     <div
       onClick={handleCardClick}
-      className="group bg-white rounded-2xl sm:rounded-3xl border border-gray-200/70 hover:border-purple-300 shadow-sm hover:shadow-card-hover hover:-translate-y-1 transition-all duration-150 flex flex-col justify-between overflow-hidden cursor-pointer relative"
+      className="group bg-white dark:bg-slate-800 rounded-2xl sm:rounded-3xl border border-gray-200/70 dark:border-slate-800/80 hover:border-purple-300 dark:hover:border-purple-500/40 shadow-sm hover:shadow-card-hover hover:-translate-y-1 transition-all duration-150 flex flex-col justify-between overflow-hidden cursor-pointer relative"
     >
-      {/* Top Image Section - Infografikali tovarlar butun sirt bo'ylab to'liq, oddiy tovarlar esa qulay padding bilan ko'rinadi */}
+      {/* Top Image Section - Tovar yozuvlar ostida qolib ketmasligi uchun yuqoridan qulay joy qoldirilgan */}
       <div 
-        className={`relative w-full aspect-[3/4] overflow-hidden bg-white flex items-center justify-center ${
-          isInfographic ? 'p-0' : 'pt-6 pb-2 px-3 sm:px-4'
-        }`}
+        className="relative w-full aspect-[4/4.2] overflow-hidden bg-gray-50 dark:bg-slate-900/60 flex items-center justify-center pt-8 pb-3 px-4 sm:px-5"
         onMouseEnter={() => {
           if (product.images && product.images.length > 1) setActiveImageIndex(1);
         }}
@@ -125,7 +122,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           src={currentImg}
           alt={product.title}
           onError={() => setImageError(true)}
-          className={`w-full h-full ${isInfographic ? 'object-cover' : 'object-contain'} object-center group-hover:scale-105 transition-transform duration-500`}
+          className="w-full h-full object-contain object-center group-hover:scale-105 transition-transform duration-500"
           loading="lazy"
         />
 
