@@ -11,9 +11,13 @@ const inter = Inter({
   variable: '--font-inter',
 });
 
+
 export const metadata: Metadata = {
   metadataBase: new URL('https://elrizonasiya.vercel.app'),
-  title: {
+  verification: {
+    google: 'A7cQcwhLON-3ImF-jSMHe-sxJwha-QZvrW5oqxoHCa4',
+  },
+    title: {
     default: 'ELRIZO - Siz rozi — biz rozi! | 0-0-12 Halol Nasiya Savdo',
     template: '%s | ELRIZO',
   },
