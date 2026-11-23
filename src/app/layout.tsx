@@ -53,6 +53,9 @@ const themeInitScript = `
         if (parsed.state.language === 'en') {
           parsed.state.language = 'uz';
         }
+        if (parsed.state.language) {
+          document.documentElement.lang = parsed.state.language;
+        }
         localStorage.setItem('elrizo_store_v3', JSON.stringify(parsed));
       }
     }

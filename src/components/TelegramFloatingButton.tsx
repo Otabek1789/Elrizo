@@ -17,7 +17,7 @@ export const TelegramFloatingButton: React.FC = () => {
             initial={{ opacity: 0, x: 10, scale: 0.9 }}
             animate={{ opacity: 1, x: 0, scale: 1 }}
             exit={{ opacity: 0, x: 10, scale: 0.9 }}
-            className="hidden sm:flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-white dark:bg-slate-800 text-gray-800 dark:text-white shadow-xl border border-sky-200 dark:border-sky-900/50 text-xs font-bold"
+            className="hidden sm:flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-white text-gray-800 shadow-xl border border-sky-200 text-xs font-bold"
           >
             <span className="w-2 h-2 rounded-full bg-sky-500 animate-ping" />
             <span>

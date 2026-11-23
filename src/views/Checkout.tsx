@@ -378,7 +378,7 @@ export const Checkout: React.FC = () => {
       monthlyPayment: finalMonthlyTotal,
       status: 'scoring_approved',
       items: orderItems,
-    });
+    }, language);
   };
 
   // Agar kiritilgan telefon raqam avval ushbu promokoddan foydalangan bo'lsa, uni avtomatik bekor qilish

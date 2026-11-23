@@ -50,6 +50,20 @@ interface MockOrderTrackingData {
   estimatedDelivery?: string;
 }
 
+const STEP_TRANSLATIONS: Record<string, { titleRu: string; descRu: string }> = {
+  'Ariza qabul qilindi': { titleRu: 'Заявка принята', descRu: 'Автоматически подтверждено скорингом' },
+  'Nasiya shartnomasi imzolandi': { titleRu: 'Договор рассрочки подписан', descRu: 'Подтверждено одноразовым кодом из SMS' },
+  'Omborda qadoqlanmoqda': { titleRu: 'Упаковывается на складе', descRu: 'Подготовлено к отправке после контроля качества' },
+  'Kuryer yo\'lda': { titleRu: 'Курьер в пути', descRu: 'Курьерская служба доставляет ваш заказ' },
+  'Topshirildi': { titleRu: 'Доставлено', descRu: 'Покупатель получил товар' },
+  'Ariza yuborildi': { titleRu: 'Заявка отправлена', descRu: 'Скоринг рассматривается' },
+  'Nasiya shartnomasi': { titleRu: 'Договор рассрочки', descRu: 'Подписано через SMS' },
+  'Omborda tayyorlanmoqda': { titleRu: 'Готовится на складе', descRu: 'Контроль качества' },
+  'Yetkazib berish': { titleRu: 'Доставка', descRu: 'Курьер в пути' },
+  'Shartnoma rasmiylashtirildi': { titleRu: 'Договор оформлен', descRu: 'Код договора принят' },
+  'Viloyatga jo\'natildi': { titleRu: 'Отправлено в регион', descRu: 'Направлено на региональный склад' },
+};
+
 const DEMO_ORDERS: Record<string, MockOrderTrackingData> = {
   'ELR-849201': {
     orderNumber: 'ELR-849201',
@@ -67,7 +81,7 @@ const DEMO_ORDERS: Record<string, MockOrderTrackingData> = {
         title: 'iPhone 15 Pro Max 256GB Natural Titanium',
         quantity: 1,
         price: 14500000,
-        image: 'https://images.unsplash.com/photo-1695048133142-1a20484d2569?auto=format&fit=crop&q=80&w=400',
+        image: '/products/prod-001.webp',
       }
     ],
     currentStepIndex: 3,
@@ -98,7 +112,7 @@ const DEMO_ORDERS: Record<string, MockOrderTrackingData> = {
         title: 'Sony PlayStation 5 Slim Digital Edition',
         quantity: 1,
         price: 8200000,
-        image: 'https://images.unsplash.com/photo-1606813907291-d86efa9b94db?auto=format&fit=crop&q=80&w=400',
+        image: '/products/prod-007.webp',
       }
     ],
     currentStepIndex: 2,
@@ -159,7 +173,7 @@ export const OrderTrackingModal: React.FC = () => {
           title: item.title,
           quantity: item.quantity,
           price: item.price,
-          image: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&q=80&w=300',
+          image: (item as any).image || '/products/prod-001.webp',
         })),
         currentStepIndex: isDelivered ? 4 : isApproved ? 3 : 1,
         steps: [
@@ -203,7 +217,7 @@ export const OrderTrackingModal: React.FC = () => {
         price: i.price,
         quantity: i.quantity,
       })),
-    });
+    }, language);
   };
 
   return (
@@ -356,16 +370,16 @@ export const OrderTrackingModal: React.FC = () => {
                         <div className="flex-1">
                           <div className="flex items-center justify-between">
                             <span className={`text-sm font-semibold ${
-                              isCurrent ? 'text-primary-600 dark:text-primary-400' : isDone ? 'text-slate-800 dark:text-slate-200' : 'text-slate-400'
+                              isCurrent ? 'text-primary-600' : isDone ? 'text-slate-800' : 'text-slate-400'
                             }`}>
-                              {step.title}
+                              {language === 'ru' && STEP_TRANSLATIONS[step.title]?.titleRu ? STEP_TRANSLATIONS[step.title].titleRu : step.title}
                             </span>
                             <span className="text-[11px] text-slate-400 font-mono">
                               {step.date}
                             </span>
                           </div>
-                          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                            {step.desc}
+                          <p className="text-xs text-slate-500 mt-0.5">
+                            {language === 'ru' && STEP_TRANSLATIONS[step.title]?.descRu ? STEP_TRANSLATIONS[step.title].descRu : step.desc}
                           </p>
                         </div>
                       </div>
@@ -376,12 +390,12 @@ export const OrderTrackingModal: React.FC = () => {
 
               {/* Courier and address details */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-                <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/60">
-                  <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 dark:text-slate-400 mb-2">
+                <div className="p-4 rounded-xl bg-slate-50 border border-slate-200/70">
+                  <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 mb-2">
                     <User className="w-4 h-4 text-primary-500" />
                     <span>{t('trackModalRecipient')}</span>
                   </div>
-                  <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">
+                  <p className="text-sm font-semibold text-slate-800">
                     {activeOrder.buyerName}
                   </p>
                   <p className="text-xs text-slate-500 flex items-center gap-1 mt-1">
@@ -395,20 +409,20 @@ export const OrderTrackingModal: React.FC = () => {
                 </div>
 
                 {activeOrder.courierName && (
-                  <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/60">
-                    <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 dark:text-slate-400 mb-2">
+                  <div className="p-4 rounded-xl bg-slate-50 border border-slate-200/70">
+                    <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 mb-2">
                       <Truck className="w-4 h-4 text-emerald-500" />
                       <span>{t('trackModalResponsibleCourier')}</span>
                     </div>
-                    <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">
+                    <p className="text-sm font-semibold text-slate-800">
                       {activeOrder.courierName}
                     </p>
                     <p className="text-xs text-slate-500 flex items-center gap-1 mt-1">
                       <Phone className="w-3 h-3" />
                       {activeOrder.courierPhone}
                     </p>
-                    <p className="text-xs text-emerald-600 dark:text-emerald-400 font-medium mt-1">
-                      Kutilayotgan vaqt: {activeOrder.estimatedDelivery}
+                    <p className="text-xs text-emerald-600 font-medium mt-1">
+                      {language === 'ru' ? 'Ожидаемое время:' : 'Kutilayotgan vaqt:'} {activeOrder.estimatedDelivery}
                     </p>
                   </div>
                 )}

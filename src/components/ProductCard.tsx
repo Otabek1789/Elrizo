@@ -106,11 +106,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   return (
     <div
       onClick={handleCardClick}
-      className="group bg-white dark:bg-slate-800 rounded-2xl sm:rounded-3xl border border-gray-200/70 dark:border-slate-800/80 hover:border-purple-300 dark:hover:border-purple-500/40 shadow-sm hover:shadow-card-hover hover:-translate-y-1 transition-all duration-150 flex flex-col justify-between overflow-hidden cursor-pointer relative"
+      className="group bg-white rounded-2xl sm:rounded-3xl border border-gray-200/70 hover:border-purple-300:border-purple-500/40 shadow-sm hover:shadow-card-hover hover:-translate-y-1 transition-all duration-150 flex flex-col justify-between overflow-hidden cursor-pointer relative"
     >
       {/* Top Image Section - Tovar yozuvlar ostida qolib ketmasligi uchun yuqoridan qulay joy qoldirilgan */}
       <div 
-        className="relative w-full aspect-[4/4.2] overflow-hidden bg-gray-50 dark:bg-slate-900/60 flex items-center justify-center pt-8 pb-3 px-4 sm:px-5"
+        className="relative w-full aspect-[4/4.2] overflow-hidden bg-gray-50 flex items-center justify-center pt-8 pb-3 px-4 sm:px-5"
         onMouseEnter={() => {
           if (product.images && product.images.length > 1) setActiveImageIndex(1);
         }}
@@ -132,7 +132,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             whileHover={{ scale: 1.2 }}
             whileTap={{ scale: 0.85 }}
             onClick={handleToggleFavorite}
-            className="p-1.5 sm:p-2 rounded-full bg-white/85 hover:bg-white dark:bg-slate-800/80 dark:hover:bg-slate-700 backdrop-blur-md text-gray-400 dark:text-gray-300 hover:text-rose-500 transition-colors shadow-sm"
+            className="p-1.5 sm:p-2 rounded-full bg-white/85 hover:bg-white:bg-slate-700 backdrop-blur-md text-gray-400 hover:text-rose-500 transition-colors shadow-sm"
             title={t('addToFavoritesTitle')}
           >
             <Heart
@@ -149,7 +149,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             className={`p-1.5 sm:p-2 rounded-full backdrop-blur-md transition-colors shadow-sm ${
               isCompared
                 ? 'bg-primary-600 text-white shadow-md shadow-primary-500/30'
-                : 'bg-white/85 hover:bg-white dark:bg-slate-800/80 dark:hover:bg-slate-700 text-gray-400 dark:text-gray-300 hover:text-primary-600'
+                : 'bg-white/85 hover:bg-white:bg-slate-700 text-gray-400 hover:text-primary-600'
             }`}
             title={isCompared ? t('productCompareRemoveTooltip') : t('productCompareAddTooltip')}
           >
@@ -161,7 +161,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             whileTap={{ scale: 0.85 }}
             onClick={handleSendProductToTelegram}
             disabled={isSendingTg}
-            className="p-1.5 sm:p-2 rounded-full bg-white/85 hover:bg-sky-50 dark:bg-slate-800/80 dark:hover:bg-sky-950/40 backdrop-blur-md text-sky-500 hover:text-sky-600 transition-colors shadow-sm cursor-pointer"
+            className="p-1.5 sm:p-2 rounded-full bg-white/85 hover:bg-sky-50:bg-sky-950/40 backdrop-blur-md text-sky-500 hover:text-sky-600 transition-colors shadow-sm cursor-pointer"
             title={`${t('telegramSendProduct')} (@elrizo_bot)`}
           >
             <Send className={`w-4 h-4 -rotate-12 ${isSendingTg ? 'animate-spin' : ''}`} />
@@ -217,10 +217,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           {onClick ? (
             <div
               onClick={handleCardClick}
-              className="block group-hover:text-uzum-primary dark:group-hover:text-purple-400 transition-colors cursor-pointer"
+              className="block group-hover:text-uzum-primary:text-purple-400 transition-colors cursor-pointer"
             >
               <h3 
-                className="text-xs sm:text-sm font-semibold text-gray-800 dark:text-gray-100 line-clamp-2 leading-snug"
+                className="text-xs sm:text-sm font-semibold text-gray-800 line-clamp-2 leading-snug"
                 title={product.title}
               >
                 {product.title}
@@ -230,10 +230,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             <Link
               to={`/product/${product.id}`}
               onClick={(e) => e.stopPropagation()}
-              className="block group-hover:text-uzum-primary dark:group-hover:text-purple-400 transition-colors no-underline"
+              className="block group-hover:text-uzum-primary:text-purple-400 transition-colors no-underline"
             >
               <h3 
-                className="text-xs sm:text-sm font-semibold text-gray-800 dark:text-gray-100 line-clamp-2 leading-snug"
+                className="text-xs sm:text-sm font-semibold text-gray-800 line-clamp-2 leading-snug"
                 title={product.title}
               >
                 {product.title}
@@ -245,9 +245,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           <div className="flex items-center gap-1.5 mt-1.5">
             <div className="flex items-center text-amber-500">
               <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-              <span className="text-xs font-bold text-gray-700 dark:text-gray-200 ml-1">{product.rating}</span>
+              <span className="text-xs font-bold text-gray-700 ml-1">{product.rating}</span>
             </div>
-            <span className="text-[11px] text-gray-400 dark:text-gray-400 font-medium">({product.reviewsCount} {t('reviewsCount')})</span>
+            <span className="text-[11px] text-gray-400 font-medium">({product.reviewsCount} {t('reviewsCount')})</span>
           </div>
         </div>
 
@@ -256,10 +256,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           {/* Oylik to'lov - Uzum uslubidagi ajralib turuvchi binafsharang fonli yorliq */}
           <motion.div 
             whileHover={{ scale: 1.02 }}
-            className="bg-purple-100/90 dark:bg-purple-950/50 text-uzum-dark dark:text-purple-300 px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-xl flex items-center justify-between border border-purple-200/60 dark:border-purple-900/40 shadow-xs"
+            className="bg-purple-100/90 text-uzum-dark px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-xl flex items-center justify-between border border-purple-200/60 shadow-xs"
           >
-            <span className="text-[10px] sm:text-[11px] font-bold text-purple-700 dark:text-purple-300">{t('monthlyLabel')}</span>
-            <span className="text-xs sm:text-sm font-black text-uzum-primary dark:text-purple-200 tracking-tight">
+            <span className="text-[10px] sm:text-[11px] font-bold text-purple-700">{t('monthlyLabel')}</span>
+            <span className="text-xs sm:text-sm font-black text-uzum-primary tracking-tight">
               {formatPrice(monthlyPayment, true, language)}{t('perMonth')}
             </span>
           </motion.div>
@@ -267,11 +267,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           {/* Original and Current Total Price */}
           <div className="pt-0.5">
             {product.originalPrice && (
-              <span className="text-[10px] sm:text-[11px] text-gray-400 dark:text-gray-500 line-through mr-1.5 sm:mr-2 font-medium">
+              <span className="text-[10px] sm:text-[11px] text-gray-400 line-through mr-1.5 sm:mr-2 font-medium">
                 {formatPrice(product.originalPrice, true, language)}
               </span>
             )}
-            <div className="text-xs sm:text-base font-black text-gray-900 dark:text-white leading-tight">
+            <div className="text-xs sm:text-base font-black text-gray-900 leading-tight">
               {formatPrice(product.price, true, language)}
             </div>
           </div>
@@ -284,7 +284,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             whileHover={{ scale: 1.04 }}
             whileTap={{ scale: 0.94 }}
             onClick={handleAddToCart}
-            className="flex items-center justify-center gap-1 py-2 px-1 sm:px-2 rounded-xl bg-purple-50 dark:bg-slate-800/80 hover:bg-purple-100 dark:hover:bg-slate-700 text-uzum-primary dark:text-purple-300 text-[11px] sm:text-xs font-bold transition-colors border border-purple-200/60 dark:border-slate-800"
+            className="flex items-center justify-center gap-1 py-2 px-1 sm:px-2 rounded-xl bg-purple-50 hover:bg-purple-100:bg-slate-700 text-uzum-primary text-[11px] sm:text-xs font-bold transition-colors border border-purple-200/60"
             title={t('toCartBtn')}
           >
             <ShoppingBag className="w-3.5 h-3.5 shrink-0" />

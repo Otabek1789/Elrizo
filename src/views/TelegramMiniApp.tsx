@@ -65,12 +65,12 @@ const REGIONS = [
 ];
 
 const CATEGORY_CHIPS = [
-  { id: 'all', label: 'Barchasi', icon: Grid },
-  { id: 'zero_nasiya', label: '0-0-12 Nasiya', icon: Percent },
-  { id: 'smartphones', label: 'Smartfonlar', icon: Sparkles },
-  { id: 'appliances', label: 'Maishiy texnika', icon: Package },
-  { id: 'computers', label: 'Noutbuklar', icon: SlidersHorizontal },
-  { id: 'discounts', label: 'Chegirmalar', icon: Percent },
+  { id: 'all', label: 'Barchasi', labelRu: 'Все', icon: Grid },
+  { id: 'zero_nasiya', label: '0-0-12 Nasiya', labelRu: '0-0-12 Рассрочка', icon: Percent },
+  { id: 'smartphones', label: 'Smartfonlar', labelRu: 'Смартфоны', icon: Sparkles },
+  { id: 'appliances', label: 'Maishiy texnika', labelRu: 'Бытовая техника', icon: Package },
+  { id: 'computers', label: 'Noutbuklar', labelRu: 'Ноутбуки', icon: SlidersHorizontal },
+  { id: 'discounts', label: 'Chegirmalar', labelRu: 'Скидки', icon: Percent },
 ];
 
 export const TelegramMiniApp: React.FC = () => {
@@ -363,13 +363,13 @@ export const TelegramMiniApp: React.FC = () => {
             <div className="min-w-0">
               <div className="flex items-center gap-1.5">
                 <span className="font-bold text-sm tracking-tight truncate">
-                  {tgUser?.first_name ? `Salom, ${tgUser.first_name}` : "ELRIZO Market"}
+                  {tgUser?.first_name ? (language === "ru" ? `Привет, ${tgUser.first_name}` : `Salom, ${tgUser.first_name}`) : "ELRIZO Market"}
                 </span>
                 <span className="bg-emerald-500/30 text-emerald-300 border border-emerald-400/30 text-[10px] font-semibold px-1.5 py-0.5 rounded-full shrink-0 flex items-center gap-0.5">
-                  <Check className="w-2.5 h-2.5" /> Rasmiy
+                  <Check className="w-2.5 h-2.5" /> {language === "ru" ? "Официальный" : "Rasmiy"}
                 </span>
               </div>
-              <p className="text-[11px] text-purple-200/90 truncate">0-0-12 Halol Nasiya Savdo</p>
+              <p className="text-[11px] text-purple-200/90 truncate">{language === "ru" ? "Халяльная рассрочка 0-0-12" : "0-0-12 Halol Nasiya Savdo"}</p>
             </div>
           </div>
 
@@ -396,7 +396,7 @@ export const TelegramMiniApp: React.FC = () => {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Smartfon, noutbuk, maishiy texnika qidirish..."
+            placeholder={language === "ru" ? "Поиск смартфонов, ноутбуков, техники..." : "Smartfon, noutbuk, maishiy texnika qidirish..."}
             className="w-full pl-9 pr-8 py-2 rounded-xl bg-white/15 backdrop-blur-md text-white placeholder-purple-200/80 text-xs border border-white/20 focus:outline-none focus:bg-white/25 focus:border-white/40 transition-all"
           />
           {searchQuery && (
@@ -433,15 +433,15 @@ export const TelegramMiniApp: React.FC = () => {
                   }}
                   className="text-xs font-semibold text-rose-500 hover:underline"
                 >
-                  Tozalash
+                  {language === "ru" ? "Очистить" : "Tozalash"}
                 </button>
               </div>
 
               {filteredProducts.length === 0 ? (
                 <div className="py-14 text-center space-y-2">
                   <Package className="w-12 h-12 text-gray-400 mx-auto" />
-                  <p className="font-semibold text-sm text-gray-700 dark:text-gray-300">Mahsulot topilmadi</p>
-                  <p className="text-xs text-gray-500">Qidiruv so'zini o'zgartirib ko'ring yoki boshqa toifani tanlang</p>
+                  <p className="font-semibold text-sm text-gray-700 dark:text-gray-300">{language === "ru" ? "Товары не найдены" : "Mahsulot topilmadi"}</p>
+                  <p className="text-xs text-gray-500">{language === "ru" ? "Попробуйте изменить поисковый запрос или выбрать другую категорию" : "Qidiruv so'zini o'zgartirib ko'ring yoki boshqa toifani tanlang"}</p>
                 </div>
               ) : (
                 <div className="grid grid-cols-2 gap-2.5">
@@ -479,7 +479,7 @@ export const TelegramMiniApp: React.FC = () => {
                       }`}
                     >
                       <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-amber-300' : 'text-purple-600 dark:text-purple-400'}`} />
-                      <span>{chip.label}</span>
+                      <span>{language === 'ru' ? chip.labelRu : chip.label}</span>
                     </button>
                   );
                 })}
@@ -499,14 +499,14 @@ export const TelegramMiniApp: React.FC = () => {
                   }}
                   className="text-xs font-semibold text-purple-600 dark:text-purple-400 hover:underline"
                 >
-                  Barcha tovarlar
+                  {language === 'ru' ? 'Все товары' : 'Barcha tovarlar'}
                 </button>
               </div>
 
               {filteredProducts.length === 0 ? (
                 <div className="py-14 text-center space-y-2">
                   <Package className="w-12 h-12 text-gray-400 mx-auto" />
-                  <p className="font-semibold text-sm text-gray-700 dark:text-gray-300">Bu toifada tovar mavjud emas</p>
+                  <p className="font-semibold text-sm text-gray-700 dark:text-gray-300">{language === "ru" ? "В этой категории пока нет товаров" : "Bu toifada tovar mavjud emas"}</p>
                   <button
                     onClick={() => {
                       tgHaptic('light');
@@ -514,7 +514,7 @@ export const TelegramMiniApp: React.FC = () => {
                     }}
                     className="px-4 py-2 rounded-xl bg-[#640199] text-white font-semibold text-xs shadow-md mt-2"
                   >
-                    Barcha tovarlarga qaytish
+                    {language === 'ru' ? 'Вернуться ко всем товарам' : 'Barcha tovarlarga qaytish'}
                   </button>
                 </div>
               ) : (
@@ -753,7 +753,7 @@ export const TelegramMiniApp: React.FC = () => {
                         }`}
                       >
                         <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-amber-300' : 'text-purple-600 dark:text-purple-400'}`} />
-                        <span>{chip.label}</span>
+                        <span>{language === 'ru' ? chip.labelRu : chip.label}</span>
                       </button>
                     );
                   })}
@@ -878,7 +878,7 @@ export const TelegramMiniApp: React.FC = () => {
         <main className="flex-1 px-3 pt-3 space-y-3">
           <h3 className="font-bold text-base text-gray-900 dark:text-white flex items-center gap-1.5">
             <Heart className="w-4 h-4 text-rose-500 fill-rose-500" />
-            <span>Sevimlilar ({favorites.length})</span>
+            <span>{language === "ru" ? "Избранное" : "Sevimlilar"} ({favorites.length})</span>
           </h3>
 
           {favorites.length === 0 ? (
@@ -886,9 +886,9 @@ export const TelegramMiniApp: React.FC = () => {
               <div className="w-16 h-16 rounded-full bg-rose-50 dark:bg-rose-950/40 text-rose-500 flex items-center justify-center mx-auto">
                 <Heart className="w-8 h-8" />
               </div>
-              <p className="font-bold text-sm text-gray-800 dark:text-gray-200">Hozircha sevimlilar yo'q</p>
+              <p className="font-bold text-sm text-gray-800 dark:text-gray-200">{language === "ru" ? "В избранном пока ничего нет" : "Hozircha sevimlilar yo'q"}</p>
               <p className="text-xs text-gray-500 max-w-xs mx-auto">
-                Sizga yoqqan tovarlarning yurakchasini bosib, ularni bu yerda saqlab qo'yishingiz mumkin.
+                {language === "ru" ? "Нажмите на сердечко у понравившегося товара, чтобы сохранить его здесь." : "Sizga yoqqan tovarlarning yurakchasini bosib, ularni bu yerda saqlab qo'yishingiz mumkin."}
               </p>
               <button
                 onClick={() => {
@@ -897,7 +897,7 @@ export const TelegramMiniApp: React.FC = () => {
                 }}
                 className="px-4 py-2 rounded-xl bg-[#640199] text-white font-semibold text-xs shadow-md"
               >
-                Katalogga o'tish
+                {language === "ru" ? "Перейти в каталог" : "Katalogga o'tish"}
               </button>
             </div>
           ) : (
@@ -924,19 +924,19 @@ export const TelegramMiniApp: React.FC = () => {
           <div className="flex items-center justify-between">
             <h3 className="font-bold text-base text-gray-900 dark:text-white flex items-center gap-1.5">
               <ShoppingCart className="w-4 h-4 text-[#640199] dark:text-purple-400" />
-              <span>Savat ({cartCount} dona)</span>
+              <span>{language === "ru" ? `Корзина (${cartCount} шт)` : `Savat (${cartCount} dona)`}</span>
             </h3>
             {cart.length > 0 && (
               <button
                 onClick={() => {
                   tgHaptic('light');
-                  if (confirm("Savatni tozalashni xohlaysizmi?")) {
+                  if (confirm(language === "ru" ? "Очистить корзину?" : "Savatni tozalashni xohlaysizmi?")) {
                     clearCart();
                   }
                 }}
                 className="text-xs text-rose-500 flex items-center gap-1 font-semibold"
               >
-                <Trash2 className="w-3 h-3" /> Tozalash
+                <Trash2 className="w-3 h-3" /> {language === "ru" ? "Очистить" : "Tozalash"}
               </button>
             )}
           </div>
@@ -946,9 +946,9 @@ export const TelegramMiniApp: React.FC = () => {
               <div className="w-16 h-16 rounded-full bg-purple-50 dark:bg-purple-950/40 text-[#640199] dark:text-purple-300 flex items-center justify-center mx-auto">
                 <ShoppingCart className="w-8 h-8" />
               </div>
-              <p className="font-bold text-sm text-gray-800 dark:text-gray-200">Savatingiz hozircha bo'sh</p>
+              <p className="font-bold text-sm text-gray-800 dark:text-gray-200">{language === "ru" ? "Ваша корзина пуста" : "Savatingiz hozircha bo'sh"}</p>
               <p className="text-xs text-gray-500 max-w-xs mx-auto">
-                Do'konimizdan o'zingizga yoqqan tovarlarni tanlang va 0-0-12 nasiyaga oling!
+                {language === "ru" ? "Выберите товары в каталоге и оформите их в рассрочку 0-0-12!" : "Do'konimizdan o'zingizga yoqqan tovarlarni tanlang va 0-0-12 nasiyaga oling!"}
               </p>
               <button
                 onClick={() => {
@@ -957,7 +957,7 @@ export const TelegramMiniApp: React.FC = () => {
                 }}
                 className="px-4 py-2 rounded-xl bg-[#640199] text-white font-semibold text-xs shadow-md"
               >
-                Xaridni boshlash
+                {language === "ru" ? "Начать покупки" : "Xaridni boshlash"}
               </button>
             </div>
           ) : (
@@ -1008,23 +1008,23 @@ export const TelegramMiniApp: React.FC = () => {
               {/* Cart Summary Card */}
               <div className="bg-white dark:bg-slate-800 rounded-2xl p-3.5 border border-gray-100 dark:border-slate-700 space-y-2 text-xs">
                 <div className="flex items-center justify-between text-gray-500 dark:text-gray-400">
-                  <span>Mahsulotlar jami:</span>
+                  <span>{language === "ru" ? "Итого товаров:" : "Mahsulotlar jami:"}</span>
                   <span className="font-semibold text-gray-900 dark:text-white">
                     {cartTotal.toLocaleString('uz-UZ')} so'm
                   </span>
                 </div>
                 <div className="flex items-center justify-between text-gray-500 dark:text-gray-400">
-                  <span>Yetkazib berish (24 soat):</span>
-                  <span className="font-semibold text-emerald-600 dark:text-emerald-400">0 so'm (Bepul)</span>
+                  <span>{language === "ru" ? "Доставка (24 часа):" : "Yetkazib berish (24 soat):"}</span>
+                  <span className="font-semibold text-emerald-600 dark:text-emerald-400">{language === "ru" ? "0 сум (Бесплатно)" : "0 so'm (Bepul)"}</span>
                 </div>
                 <div className="flex items-center justify-between text-gray-500 dark:text-gray-400">
-                  <span>Nasiyaga (12 oy bo'yicha):</span>
+                  <span>{language === "ru" ? "В рассрочку (на 12 мес):" : "Nasiyaga (12 oy bo'yicha):"}</span>
                   <span className="font-bold text-[#640199] dark:text-purple-300">
                     ⚡ {cartMonthly.toLocaleString('uz-UZ')} so'm/oy
                   </span>
                 </div>
                 <div className="border-t border-gray-100 dark:border-slate-700 pt-2 flex items-center justify-between font-extrabold text-sm">
-                  <span>Jami to'lov:</span>
+                  <span>{language === "ru" ? "К оплате:" : "Jami to'lov:"}</span>
                   <span className="text-gray-950 dark:text-white">
                     {cartTotal.toLocaleString('uz-UZ')} so'm
                   </span>
@@ -1037,7 +1037,7 @@ export const TelegramMiniApp: React.FC = () => {
                 className="w-full py-3 rounded-2xl bg-gradient-to-r from-[#640199] to-[#7B0FB5] hover:opacity-95 active:scale-95 text-white font-extrabold text-xs flex items-center justify-center gap-2 shadow-lg shadow-purple-500/25 transition-all"
               >
                 <Percent className="w-4 h-4 text-amber-300" />
-                <span>⚡ 0-0-12 Nasiyaga Ariza Berish</span>
+                <span>{language === "ru" ? "⚡ Оформить рассрочку 0-0-12" : "⚡ 0-0-12 Nasiyaga Ariza Berish"}</span>
               </button>
             </div>
           )}
@@ -1055,10 +1055,10 @@ export const TelegramMiniApp: React.FC = () => {
               </div>
               <div>
                 <h4 className="font-extrabold text-sm">
-                  {tgUser?.first_name ? `${tgUser.first_name}${tgUser.last_name ? ' ' + tgUser.last_name : ''}` : 'ELRIZO Mijozi'}
+                  {tgUser?.first_name ? `${tgUser.first_name}${tgUser.last_name ? ' ' + tgUser.last_name : ''}` : (language === "ru" ? "Клиент ELRIZO" : "ELRIZO Mijozi")}
                 </h4>
                 <p className="text-[11px] text-purple-200">
-                  {tgUser?.username ? `@${tgUser.username}` : 'Telegram WebApp orqali'}
+                  {tgUser?.username ? `@${tgUser.username}` : (language === "ru" ? "Через Telegram WebApp" : "Telegram WebApp orqali")}
                 </p>
                 {tgUser?.id && (
                   <p className="text-[10px] text-purple-300/80">ID: {tgUser.id}</p>
@@ -1066,8 +1066,8 @@ export const TelegramMiniApp: React.FC = () => {
               </div>
             </div>
             <div className="pt-2 border-t border-white/10 flex items-center justify-between text-[11px]">
-              <span className="text-purple-200">Nasiya limiti:</span>
-              <span className="font-bold text-amber-300">⚡ 25 000 000 so'mgacha</span>
+              <span className="text-purple-200">{language === "ru" ? "Лимит рассрочки:" : "Nasiya limiti:"}</span>
+              <span className="font-bold text-amber-300">{language === "ru" ? "⚡ до 25 000 000 сум" : "⚡ 25 000 000 so'mgacha"}</span>
             </div>
           </div>
 
@@ -1075,12 +1075,12 @@ export const TelegramMiniApp: React.FC = () => {
           <div className="space-y-2">
             <h4 className="font-bold text-xs text-gray-900 dark:text-white flex items-center gap-1.5">
               <Package className="w-3.5 h-3.5 text-[#640199] dark:text-purple-400" />
-              <span>Buyurtmalarim ({orders.length})</span>
+              <span>{language === "ru" ? "Мои заказы" : "Buyurtmalarim"} ({orders.length})</span>
             </h4>
 
             {orders.length === 0 ? (
               <div className="bg-white dark:bg-slate-800 rounded-2xl p-4 text-center text-xs text-gray-500 border border-gray-100 dark:border-gray-800">
-                Sizda hali faol buyurtmalar mavjud emas.
+                {language === "ru" ? "У вас пока нет активных заказов." : "Sizda hali faol buyurtmalar mavjud emas."}
               </div>
             ) : (
               <div className="space-y-2">
@@ -1100,15 +1100,19 @@ export const TelegramMiniApp: React.FC = () => {
                           ? 'bg-blue-100 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300'
                           : 'bg-amber-100 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300'
                       }`}>
-                        {ord.status === 'delivered' ? 'Yetkazildi' : ord.status === 'scoring_approved' || ord.status === 'processing' ? 'Tasdiqlangan' : 'Kutilmoqda'}
+                        {ord.status === 'delivered'
+                          ? (language === 'ru' ? 'Доставлен' : 'Yetkazildi')
+                          : ord.status === 'scoring_approved' || ord.status === 'processing'
+                          ? (language === 'ru' ? 'Подтвержден' : 'Tasdiqlangan')
+                          : (language === 'ru' ? 'Ожидается' : 'Kutilmoqda')}
                       </span>
                     </div>
                     <div className="text-gray-500 text-[11px]">
-                      {ord.items?.length || 1} ta tovar • {ord.totalPrice.toLocaleString('uz-UZ')} so'm
+                      {ord.items?.length || 1} {language === 'ru' ? 'товаров' : 'ta tovar'} • {ord.totalPrice.toLocaleString('uz-UZ')} {language === 'ru' ? 'сум' : "so'm"}
                     </div>
                     {ord.monthlyPayment && (
                       <div className="text-[10px] font-medium text-purple-600 dark:text-purple-400">
-                        Oylik to'lov: {ord.monthlyPayment.toLocaleString('uz-UZ')} so'm / oy ({ord.installmentMonths || 12} oy)
+                        {language === 'ru' ? 'Ежемесячный платеж:' : "Oylik to'lov:"} {ord.monthlyPayment.toLocaleString('uz-UZ')} {language === 'ru' ? 'сум/мес' : "so'm / oy"} ({ord.installmentMonths || 12} {language === 'ru' ? 'мес' : 'oy'})
                       </div>
                     )}
                   </div>
@@ -1121,14 +1125,14 @@ export const TelegramMiniApp: React.FC = () => {
           <div className="bg-white dark:bg-slate-800 rounded-2xl p-3.5 border border-gray-100 dark:border-gray-800 space-y-2.5">
             <h4 className="font-bold text-xs text-gray-900 dark:text-white flex items-center gap-1.5">
               <Phone className="w-3.5 h-3.5 text-[#640199] dark:text-purple-400" />
-              <span>ELRIZO NASIYA SAVDO — Rasmiy ma'lumotlar</span>
+              <span>{language === "ru" ? "ELRIZO NASIYA SAVDO — Официальные данные" : "ELRIZO NASIYA SAVDO — Rasmiy ma'lumotlar"}</span>
             </h4>
             <div className="text-[11px] text-gray-600 dark:text-gray-300 space-y-1.5 leading-relaxed">
-              <p className="flex items-center gap-1.5"><Phone className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400 shrink-0" /> <b>Telefon:</b> <a href="tel:+998943335522" className="text-purple-600 dark:text-purple-400 font-bold">+998 94 333 55 22</a></p>
-              <p className="flex items-center gap-1.5"><MessageCircle className="w-3.5 h-3.5 text-sky-500 shrink-0" /> <b>Telegram admin:</b> <a href="https://t.me/yahyo0526" target="_blank" rel="noreferrer" className="text-purple-600 dark:text-purple-400 font-bold">@yahyo0526</a></p>
-              <p className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5 text-amber-500 shrink-0" /> <b>Ish vaqti:</b> Har kuni 09:00 dan 21:00 gacha</p>
-              <p className="flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5 text-rose-500 shrink-0" /> <b>Manzil:</b> Namangan shahri, Yangiqo'rg'on tumani</p>
-              <p className="flex items-center gap-1.5"><Globe className="w-3.5 h-3.5 text-emerald-500 shrink-0" /> <b>Rasmiy sayt:</b> <a href="https://elrizonasiya.vercel.app" target="_blank" rel="noreferrer" className="text-purple-600 dark:text-purple-400 font-bold underline">elrizonasiya.vercel.app</a></p>
+              <p className="flex items-center gap-1.5"><Phone className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400 shrink-0" /> <b>{language === 'ru' ? 'Телефон:' : 'Telefon:'}</b> <a href="tel:+998943335522" className="text-purple-600 dark:text-purple-400 font-bold">+998 94 333 55 22</a></p>
+              <p className="flex items-center gap-1.5"><MessageCircle className="w-3.5 h-3.5 text-sky-500 shrink-0" /> <b>{language === 'ru' ? 'Telegram администратор:' : 'Telegram admin:'}</b> <a href="https://t.me/yahyo0526" target="_blank" rel="noreferrer" className="text-purple-600 dark:text-purple-400 font-bold">@yahyo0526</a></p>
+              <p className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5 text-amber-500 shrink-0" /> <b>{language === 'ru' ? 'Время работы:' : 'Ish vaqti:'}</b> {language === 'ru' ? 'Ежедневно с 09:00 до 21:00' : 'Har kuni 09:00 dan 21:00 gacha'}</p>
+              <p className="flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5 text-rose-500 shrink-0" /> <b>{language === 'ru' ? 'Адрес:' : 'Manzil:'}</b> {language === 'ru' ? 'г. Наманган, Янгикурганский р-н' : "Namangan shahri, Yangiqo'rg'on tumani"}</p>
+              <p className="flex items-center gap-1.5"><Globe className="w-3.5 h-3.5 text-emerald-500 shrink-0" /> <b>{language === 'ru' ? 'Официальный сайт:' : 'Rasmiy sayt:'}</b> <a href="https://elrizonasiya.vercel.app" target="_blank" rel="noreferrer" className="text-purple-600 dark:text-purple-400 font-bold underline">elrizonasiya.vercel.app</a></p>
             </div>
             <div className="grid grid-cols-2 gap-2 pt-1">
               <a
@@ -1147,7 +1151,7 @@ export const TelegramMiniApp: React.FC = () => {
                 className="py-2 px-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 font-semibold text-xs flex items-center justify-center gap-1 border border-emerald-200/60 dark:border-emerald-800/60"
               >
                 <Phone className="w-3 h-3" />
-                <span>Qo'ng'iroq qilish</span>
+                <span>{language === 'ru' ? 'Позвонить' : "Qo'ng'iroq qilish"}</span>
               </a>
             </div>
           </div>
@@ -1207,9 +1211,9 @@ export const TelegramMiniApp: React.FC = () => {
               <div className="bg-purple-50 dark:bg-purple-950/40 rounded-2xl p-3 border border-purple-200/60 dark:border-purple-800/60 space-y-2">
                 <div className="flex items-center justify-between text-xs font-bold text-[#640199] dark:text-purple-300">
                   <span className="flex items-center gap-1">
-                    <Percent className="w-3.5 h-3.5" /> 0-0-12 Halol Nasiya Hisobi:
+                    <Percent className="w-3.5 h-3.5" /> {language === "ru" ? "Расчет рассрочки 0-0-12 Халяль:" : "0-0-12 Halol Nasiya Hisobi:"}
                   </span>
-                  <span>0% Boshlang'ich</span>
+                  <span>{language === "ru" ? "0% Первый взнос" : "0% Boshlang'ich"}</span>
                 </div>
 
                 {/* Month Selector Buttons */}
@@ -1227,7 +1231,7 @@ export const TelegramMiniApp: React.FC = () => {
                           : 'bg-white dark:bg-slate-800 text-gray-700 dark:text-gray-300 border border-purple-200/60 dark:border-slate-700'
                       }`}
                     >
-                      {m} oy
+                      {m} {language === "ru" ? "мес" : "oy"}
                     </button>
                   ))}
                 </div>
@@ -1235,18 +1239,18 @@ export const TelegramMiniApp: React.FC = () => {
                 {/* Installment breakdown */}
                 <div className="pt-1 text-[11px] space-y-1">
                   <div className="flex justify-between text-gray-600 dark:text-gray-300">
-                    <span>Oylik to'lov:</span>
+                    <span>{language === "ru" ? "Ежемесячный платеж:" : "Oylik to'lov:"}</span>
                     <span className="font-extrabold text-[#640199] dark:text-purple-300">
                       {Math.round(selectedProduct.price / selectedMonths).toLocaleString('uz-UZ')} so'm / oy
                     </span>
                   </div>
                   <div className="flex justify-between text-gray-500 dark:text-gray-400">
-                    <span>Boshlang'ich to'lov:</span>
-                    <span className="font-semibold text-emerald-600 dark:text-emerald-400">0 so'm (0%)</span>
+                    <span>{language === "ru" ? "Первоначальный взнос:" : "Boshlang'ich to'lov:"}</span>
+                    <span className="font-semibold text-emerald-600 dark:text-emerald-400">{language === "ru" ? "0 сум (0%)" : "0 so'm (0%)"}</span>
                   </div>
                   <div className="flex justify-between text-gray-500 dark:text-gray-400">
-                    <span>Ustama (ortiqcha to'lov):</span>
-                    <span className="font-semibold text-emerald-600 dark:text-emerald-400">0 so'm (0%)</span>
+                    <span>{language === "ru" ? "Наценка (переплата):" : "Ustama (ortiqcha to'lov):"}</span>
+                    <span className="font-semibold text-emerald-600 dark:text-emerald-400">{language === "ru" ? "0 сум (0%)" : "0 so'm (0%)"}</span>
                   </div>
                 </div>
               </div>
@@ -1254,7 +1258,7 @@ export const TelegramMiniApp: React.FC = () => {
               {/* Specs Table */}
               {selectedProduct.specs && Object.keys(selectedProduct.specs).length > 0 && (
                 <div className="space-y-1.5 pt-1">
-                  <h4 className="font-bold text-xs text-gray-900 dark:text-white">Texnik xususiyatlari:</h4>
+                  <h4 className="font-bold text-xs text-gray-900 dark:text-white">{language === "ru" ? "Технические характеристики:" : "Texnik xususiyatlari:"}</h4>
                   <div className="bg-gray-50 dark:bg-slate-750/50 rounded-xl p-2.5 space-y-1 text-xs">
                     {Object.entries(selectedProduct.specs).slice(0, 6).map(([k, v]) => (
                       <div key={k} className="flex justify-between text-gray-600 dark:text-gray-300 text-[11px]">
@@ -1269,7 +1273,7 @@ export const TelegramMiniApp: React.FC = () => {
               {/* Description */}
               {selectedProduct.description && (
                 <div className="space-y-1 text-xs">
-                  <h4 className="font-bold text-gray-900 dark:text-white">Tavsif:</h4>
+                  <h4 className="font-bold text-gray-900 dark:text-white">{language === "ru" ? "Описание:" : "Tavsif:"}</h4>
                   <p className="text-gray-600 dark:text-gray-300 text-[11px] leading-relaxed">
                     {selectedProduct.description}
                   </p>
@@ -1287,14 +1291,14 @@ export const TelegramMiniApp: React.FC = () => {
                 className="py-2.5 rounded-xl bg-gray-100 dark:bg-slate-750 text-gray-900 dark:text-white font-bold text-xs flex items-center justify-center gap-1.5 active:scale-95"
               >
                 <ShoppingCart className="w-3.5 h-3.5" />
-                <span>Savatga</span>
+                <span>{language === "ru" ? "В корзину" : "Savatga"}</span>
               </button>
               <button
                 onClick={() => handleBuyNow(selectedProduct)}
                 className="py-2.5 rounded-xl bg-gradient-to-r from-[#640199] to-[#7B0FB5] text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-md active:scale-95"
               >
                 <Percent className="w-3.5 h-3.5 text-amber-300" />
-                <span>⚡ Nasiyaga Olish</span>
+                <span>{language === "ru" ? "⚡ В рассрочку" : "⚡ Nasiyaga Olish"}</span>
               </button>
             </div>
           </div>
@@ -1309,7 +1313,7 @@ export const TelegramMiniApp: React.FC = () => {
             <div className="px-4 pt-3 pb-2.5 flex items-center justify-between border-b border-gray-100 dark:border-gray-800">
               <div className="flex items-center gap-1.5 font-bold text-sm text-gray-900 dark:text-white">
                 <Percent className="w-4 h-4 text-[#640199] dark:text-purple-400" />
-                <span>0-0-12 Nasiya Rasmiylashtirish</span>
+                <span>{language === "ru" ? "Оформление рассрочки 0-0-12" : "0-0-12 Nasiya Rasmiylashtirish"}</span>
               </div>
               <button
                 onClick={() => {
@@ -1327,14 +1331,14 @@ export const TelegramMiniApp: React.FC = () => {
               {/* Order Items Preview */}
               <div className="bg-purple-50 dark:bg-purple-950/40 rounded-xl p-3 border border-purple-200/50 dark:border-purple-800/50 space-y-1.5">
                 <div className="flex justify-between font-bold text-xs">
-                  <span>Buyurtma summasi:</span>
+                  <span>{language === "ru" ? "Сумма заказа:" : "Buyurtma summasi:"}</span>
                   <span className="text-[#640199] dark:text-purple-300">
                     {(directCheckoutProduct ? directCheckoutProduct.price : cartTotal).toLocaleString('uz-UZ')} so'm
                   </span>
                 </div>
                 {checkoutPaymentMode === 'installment' && (
                   <div className="flex justify-between text-[11px] text-gray-600 dark:text-gray-300">
-                    <span>Oylik to'lov ({checkoutMonths} oy):</span>
+                    <span>{language === "ru" ? `Ежемесячный платеж (${checkoutMonths} мес):` : `Oylik to'lov (${checkoutMonths} oy):`}</span>
                     <span className="font-extrabold text-emerald-600 dark:text-emerald-400">
                       {Math.round((directCheckoutProduct ? directCheckoutProduct.price : cartTotal) / checkoutMonths).toLocaleString('uz-UZ')} so'm/oy
                     </span>
@@ -1344,7 +1348,7 @@ export const TelegramMiniApp: React.FC = () => {
 
               {/* Payment Mode Selector */}
               <div className="space-y-1">
-                <label className="font-semibold text-gray-700 dark:text-gray-300">To'lov usuli:</label>
+                <label className="font-semibold text-gray-700 dark:text-gray-300">{language === "ru" ? "Способ оплаты:" : "To'lov usuli:"}</label>
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     type="button"
@@ -1358,7 +1362,7 @@ export const TelegramMiniApp: React.FC = () => {
                         : 'bg-gray-50 dark:bg-slate-750 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-slate-700'
                     }`}
                   >
-                    ⚡ 0-0-12 Halol Nasiya
+                    {language === "ru" ? "⚡ 0-0-12 Рассрочка" : "⚡ 0-0-12 Halol Nasiya"}
                   </button>
                   <button
                     type="button"
@@ -1374,7 +1378,7 @@ export const TelegramMiniApp: React.FC = () => {
                   >
                     <span className="inline-flex items-center gap-1.5 justify-center w-full">
                       <CreditCard className="w-3.5 h-3.5 shrink-0" />
-                      <span>Naqd / Karta</span>
+                      <span>{language === "ru" ? "Карта / Наличные" : "Naqd / Karta"}</span>
                     </span>
                   </button>
                 </div>
@@ -1383,7 +1387,7 @@ export const TelegramMiniApp: React.FC = () => {
               {/* Installment Tenure (if Nasiya) */}
               {checkoutPaymentMode === 'installment' && (
                 <div className="space-y-1">
-                  <label className="font-semibold text-gray-700 dark:text-gray-300">Nasiya muddati:</label>
+                  <label className="font-semibold text-gray-700 dark:text-gray-300">{language === "ru" ? "Срок рассрочки:" : "Nasiya muddati:"}</label>
                   <div className="grid grid-cols-4 gap-1.5">
                     {([3, 6, 12, 24] as const).map(m => (
                       <button
@@ -1399,7 +1403,7 @@ export const TelegramMiniApp: React.FC = () => {
                             : 'bg-gray-50 dark:bg-slate-750 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-slate-700'
                         }`}
                       >
-                        {m} oy
+                        {m} {language === "ru" ? "мес" : "oy"}
                       </button>
                     ))}
                   </div>
@@ -1408,20 +1412,20 @@ export const TelegramMiniApp: React.FC = () => {
 
               {/* Customer Name */}
               <div className="space-y-1">
-                <label className="font-semibold text-gray-700 dark:text-gray-300">Ism va familiyangiz:</label>
+                <label className="font-semibold text-gray-700 dark:text-gray-300">{language === "ru" ? "Ваше имя и фамилия:" : "Ism va familiyangiz:"}</label>
                 <input
                   type="text"
                   required
                   value={checkoutName}
                   onChange={(e) => setCheckoutName(e.target.value)}
-                  placeholder="Masalan: Sardor Aliyev"
+                  placeholder={language === "ru" ? "Например: Сардор Алиев" : "Masalan: Sardor Aliyev"}
                   className="w-full px-3 py-2 rounded-xl bg-gray-50 dark:bg-slate-750 border border-gray-200 dark:border-slate-700 focus:outline-none focus:border-purple-600 text-xs text-gray-900 dark:text-white"
                 />
               </div>
 
               {/* Customer Phone */}
               <div className="space-y-1">
-                <label className="font-semibold text-gray-700 dark:text-gray-300">Telefon raqamingiz:</label>
+                <label className="font-semibold text-gray-700 dark:text-gray-300">{language === "ru" ? "Номер телефона:" : "Telefon raqamingiz:"}</label>
                 <input
                   type="tel"
                   required
@@ -1434,7 +1438,7 @@ export const TelegramMiniApp: React.FC = () => {
 
               {/* Region */}
               <div className="space-y-1">
-                <label className="font-semibold text-gray-700 dark:text-gray-300">Viloyat / Hudud:</label>
+                <label className="font-semibold text-gray-700 dark:text-gray-300">{language === "ru" ? "Область / Регион:" : "Viloyat / Hudud:"}</label>
                 <select
                   value={checkoutRegion}
                   onChange={(e) => setCheckoutRegion(e.target.value)}
@@ -1448,13 +1452,13 @@ export const TelegramMiniApp: React.FC = () => {
 
               {/* Address */}
               <div className="space-y-1">
-                <label className="font-semibold text-gray-700 dark:text-gray-300">Manzil (tuman, ko'cha, uy raqami):</label>
+                <label className="font-semibold text-gray-700 dark:text-gray-300">{language === "ru" ? "Адрес (район, улица, дом):" : "Manzil (tuman, ko'cha, uy raqami):"}</label>
                 <input
                   type="text"
                   required
                   value={checkoutAddress}
                   onChange={(e) => setCheckoutAddress(e.target.value)}
-                  placeholder="Masalan: Chilonzor tumani, 9-mavze, 12-uy"
+                  placeholder={language === "ru" ? "Например: Чиланзарский р-н, кв-л 9, дом 12" : "Masalan: Chilonzor tumani, 9-mavze, 12-uy"}
                   className="w-full px-3 py-2 rounded-xl bg-gray-50 dark:bg-slate-750 border border-gray-200 dark:border-slate-700 focus:outline-none focus:border-purple-600 text-xs text-gray-900 dark:text-white"
                 />
               </div>
@@ -1467,11 +1471,11 @@ export const TelegramMiniApp: React.FC = () => {
                   className="w-full py-3 rounded-2xl bg-gradient-to-r from-[#640199] to-[#7B0FB5] hover:opacity-95 active:scale-95 text-white font-extrabold text-xs flex items-center justify-center gap-2 shadow-lg shadow-purple-500/25 transition-all disabled:opacity-50"
                 >
                   {isSubmitting ? (
-                    <span>Rasmiylashtirilmoqda...</span>
+                    <span>{language === "ru" ? "Оформление заявки..." : "Rasmiylashtirilmoqda..."}</span>
                   ) : (
                     <>
                       <CheckCircle2 className="w-4 h-4 text-emerald-300" />
-                      <span>⚡ Buyurtmani Tasdiqlash</span>
+                      <span>{language === "ru" ? "⚡ Подтвердить заказ" : "⚡ Buyurtmani Tasdiqlash"}</span>
                     </>
                   )}
                 </button>
@@ -1491,43 +1495,43 @@ export const TelegramMiniApp: React.FC = () => {
 
             <div className="space-y-1">
               <h3 className="font-extrabold text-base text-gray-900 dark:text-white">
-                Buyurtmangiz qabul qilindi! 🎉
+                {language === "ru" ? "Ваш заказ успешно принят! 🎉" : "Buyurtmangiz qabul qilindi! 🎉"}
               </h3>
               <p className="text-xs text-gray-500">
-                Shartnoma raqami: <span className="font-mono font-bold text-[#640199] dark:text-purple-300">{orderSuccessData.contractNumber}</span>
+                {language === "ru" ? "Номер договора:" : "Shartnoma raqami:"} <span className="font-mono font-bold text-[#640199] dark:text-purple-300">{orderSuccessData.contractNumber}</span>
               </p>
             </div>
 
             <div className="bg-gray-50 dark:bg-slate-750/60 rounded-2xl p-3 text-left space-y-1.5 text-xs">
               <div className="flex justify-between text-gray-600 dark:text-gray-300">
-                <span>Xaridor:</span>
+                <span>{language === "ru" ? "Покупатель:" : "Xaridor:"}</span>
                 <span className="font-bold">{orderSuccessData.customerName}</span>
               </div>
               <div className="flex justify-between text-gray-600 dark:text-gray-300">
-                <span>Telefon:</span>
+                <span>{language === "ru" ? "Телефон:" : "Telefon:"}</span>
                 <span className="font-mono">{orderSuccessData.customerPhone}</span>
               </div>
               <div className="flex justify-between text-gray-600 dark:text-gray-300">
-                <span>Jami summa:</span>
+                <span>{language === "ru" ? "Итоговая сумма:" : "Jami summa:"}</span>
                 <span className="font-bold">{orderSuccessData.totalPrice.toLocaleString('uz-UZ')} so'm</span>
               </div>
               {orderSuccessData.monthlyPayment && (
                 <div className="flex justify-between text-purple-600 dark:text-purple-400 font-semibold">
-                  <span>Oylik to'lov:</span>
+                  <span>{language === "ru" ? "Ежемесячный платеж:" : "Oylik to'lov:"}</span>
                   <span>{orderSuccessData.monthlyPayment.toLocaleString('uz-UZ')} so'm/oy</span>
                 </div>
               )}
             </div>
 
             <p className="text-[11px] text-gray-500 leading-relaxed">
-              Operatorimiz 10 daqiqa ichida siz bilan bog'lanib, bepul yetkazib berish vaqtini tasdiqlaydi.
+              {language === "ru" ? "Наш оператор свяжется с вами в течение 10 минут для подтверждения времени бесплатной доставки." : "Operatorimiz 10 daqiqa ichida siz bilan bog'lanib, bepul yetkazib berish vaqtini tasdiqlaydi."}
             </p>
 
             {/* Agar Naqd/Karta to'lovi tanlangan bo'lsa: Payme va Click to'lov tugmalari */}
             {orderSuccessData.paymentMode === 'full' && (
               <div className="space-y-2 pt-1">
                 <div className="text-[11px] font-bold text-gray-700 dark:text-gray-300 text-left">
-                  To'lovni hoziroq amalga oshirish:
+                  {language === "ru" ? "Оплатить сейчас:" : "To'lovni hoziroq amalga oshirish:"}
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   <button
@@ -1572,7 +1576,7 @@ export const TelegramMiniApp: React.FC = () => {
               }}
               className="w-full py-2.5 rounded-xl bg-[#640199] text-white font-bold text-xs shadow-md"
             >
-              Buyurtmalarimga o'tish
+              {language === "ru" ? "Перейти к заказам" : "Buyurtmalarimga o'tish"}
             </button>
           </div>
         </div>
@@ -1582,11 +1586,11 @@ export const TelegramMiniApp: React.FC = () => {
       <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-slate-800/95 backdrop-blur-md border-t border-gray-200/80 dark:border-slate-700/80 py-2 px-3 shadow-2xl">
         <div className="max-w-md mx-auto grid grid-cols-5 gap-1">
           {[
-            { id: 'home', label: 'Asosiy', icon: Home },
-            { id: 'catalog', label: 'Katalog', icon: Grid },
-            { id: 'favorites', label: 'Sevimlilar', icon: Heart, badge: favorites.length },
-            { id: 'cart', label: 'Savat', icon: ShoppingCart, badge: cartCount },
-            { id: 'profile', label: 'Profil', icon: UserIcon }
+            { id: 'home', label: language === 'ru' ? 'Главная' : 'Asosiy', icon: Home },
+            { id: 'catalog', label: language === 'ru' ? 'Каталог' : 'Katalog', icon: Grid },
+            { id: 'favorites', label: language === 'ru' ? 'Избранное' : 'Sevimlilar', icon: Heart, badge: favorites.length },
+            { id: 'cart', label: language === 'ru' ? 'Корзина' : 'Savat', icon: ShoppingCart, badge: cartCount },
+            { id: 'profile', label: language === 'ru' ? 'Профиль' : 'Profil', icon: UserIcon }
           ].map(tab => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;

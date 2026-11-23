@@ -28,6 +28,50 @@ import { useTranslation, getCategoryTitle } from '../utils/translations';
 import { sendProductToTelegram } from '../utils/telegramBot';
 import { DEFAULT_PRODUCT_COLORS, DEFAULT_STORAGE_OPTIONS } from '../data/mockReviews';
 
+const SPEC_KEY_MAP: Record<string, string> = {
+  'Brend': 'Бренд',
+  'Ekran': 'Экран',
+  'Protsessor': 'Процессор',
+  'Xotira': 'Память',
+  'Kamera': 'Камера',
+  'Asosiy kamera': 'Основная камера',
+  'Batareya': 'Аккумулятор',
+  'Kafolat': 'Гарантия',
+  'Zaryadlash': 'Зарядка',
+  'Himoya': 'Защита',
+  'Korpus': 'Корпус',
+  'Sensorlar': 'Датчики',
+  'Chip': 'Чип',
+  'Shovqin so\'ndirish': 'Шумоподавление',
+  'Komplekt': 'Комплектация',
+  'Ekran o\'lchami': 'Размер экрана',
+  'Ruxsat': 'Разрешение',
+  'Hajmi': 'Объем',
+  'Tizim': 'Система',
+  'Kompressor': 'Компрессор',
+  'Yuklash sig\'imi': 'Загрузка',
+  'Siqish tezligi': 'Скорость отжима',
+  'Dvigatel': 'Двигатель',
+  'Material': 'Материал',
+  'Quvvat': 'Мощность',
+  'Datchik': 'Датчик',
+  'Dasturlar': 'Программы',
+  'Filtr': 'Фильтр',
+  'Xona maydoni': 'Площадь помещения',
+  'Bosim': 'Давление',
+  'Kapuchinator': 'Капучинатор',
+  'Harorat': 'Температура',
+  'Pichoqlar': 'Лезвия',
+  'Funktsiyalar': 'Функции',
+  'Pik toki': 'Пиковый ток',
+  'Maksimal quvvat': 'Максимальная мощность',
+  'Nominal quvvat': 'Номинальная мощность',
+  'Turi': 'Тип',
+  'O\'rnatish': 'Установка',
+  'Dasta': 'Ручка',
+  'Qo\'shimcha': 'Дополнительно',
+};
+
 export const ProductDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -111,12 +155,12 @@ export const ProductDetail: React.FC = () => {
       ];
     }
     return [
-      { name: 'Qora (Black)', hex: '#1C1C1E' },
-      { name: 'Oq (White)', hex: '#F5F5F7' },
-      { name: "Ko'k (Blue)", hex: '#3A6B88' },
-      { name: 'Kulrang (Gray)', hex: '#8E8E93' },
+      { name: language === 'ru' ? 'Черный (Black)' : 'Qora (Black)', hex: '#1C1C1E' },
+      { name: language === 'ru' ? 'Белый (White)' : 'Oq (White)', hex: '#F5F5F7' },
+      { name: language === 'ru' ? 'Синий (Blue)' : "Ko'k (Blue)", hex: '#3A6B88' },
+      { name: language === 'ru' ? 'Серый (Gray)' : 'Kulrang (Gray)', hex: '#8E8E93' },
     ];
-  }, [isPhoneProduct, product.colors, product.title]);
+  }, [isPhoneProduct, product.colors, product.title, language]);
 
   const availableStorage = useMemo(() => {
     if (!isPhoneProduct) return [];
@@ -680,11 +724,13 @@ export const ProductDetail: React.FC = () => {
 
         {activeTab === 'specs' && (
           <div className="max-w-2xl">
-            <div className="divide-y divide-gray-100 dark:divide-slate-800">
+            <div className="divide-y divide-gray-100">
               {Object.entries(product.specs).map(([key, value]) => (
                 <div key={key} className="py-3 flex justify-between text-xs sm:text-sm">
-                  <span className="text-gray-500 dark:text-slate-400 font-medium">{key}</span>
-                  <span className="text-gray-900 dark:text-white font-semibold text-right">{value}</span>
+                  <span className="text-gray-500 font-medium">
+                    {language === 'ru' && SPEC_KEY_MAP[key] ? SPEC_KEY_MAP[key] : key}
+                  </span>
+                  <span className="text-gray-900 font-semibold text-right">{value}</span>
                 </div>
               ))}
             </div>

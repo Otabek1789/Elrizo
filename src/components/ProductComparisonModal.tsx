@@ -4,8 +4,52 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Scale, X, ShoppingBag, Trash2, Check, ArrowRight } from 'lucide-react';
 import { useStore } from '../store/useStore';
 import { formatPrice, calculateMonthlyPaymentQuick } from '../utils/calculator';
-import { useTranslation } from '../utils/translations';
+import { useTranslation, getCategoryTitle } from '../utils/translations';
 import { Link } from '@/lib/navigation';
+
+const SPEC_KEY_MAP: Record<string, string> = {
+  'Brend': 'Бренд',
+  'Ekran': 'Экран',
+  'Protsessor': 'Процессор',
+  'Xotira': 'Память',
+  'Kamera': 'Камера',
+  'Asosiy kamera': 'Основная камера',
+  'Batareya': 'Аккумулятор',
+  'Kafolat': 'Гарантия',
+  'Zaryadlash': 'Зарядка',
+  'Himoya': 'Защита',
+  'Korpus': 'Корпус',
+  'Sensorlar': 'Датчики',
+  'Chip': 'Чип',
+  'Shovqin so\'ndirish': 'Шумоподавление',
+  'Komplekt': 'Комплектация',
+  'Ekran o\'lchami': 'Размер экрана',
+  'Ruxsat': 'Разрешение',
+  'Hajmi': 'Объем',
+  'Tizim': 'Система',
+  'Kompressor': 'Компрессор',
+  'Yuklash sig\'imi': 'Загрузка',
+  'Siqish tezligi': 'Скорость отжима',
+  'Dvigatel': 'Двигатель',
+  'Material': 'Материал',
+  'Quvvat': 'Мощность',
+  'Datchik': 'Датчик',
+  'Dasturlar': 'Программы',
+  'Filtr': 'Фильтр',
+  'Xona maydoni': 'Площадь помещения',
+  'Bosim': 'Давление',
+  'Kapuchinator': 'Капучинатор',
+  'Harorat': 'Температура',
+  'Pichoqlar': 'Лезвия',
+  'Funktsiyalar': 'Функции',
+  'Pik toki': 'Пиковый ток',
+  'Maksimal quvvat': 'Максимальная мощность',
+  'Nominal quvvat': 'Номинальная мощность',
+  'Turi': 'Тип',
+  'O\'rnatish': 'Установка',
+  'Dasta': 'Ручка',
+  'Qo\'shimcha': 'Дополнительно',
+};
 
 export const ProductComparisonModal: React.FC = () => {
   const {
@@ -170,8 +214,8 @@ export const ProductComparisonModal: React.FC = () => {
                   <div className="grid grid-cols-5 gap-4 py-3 items-center">
                     <span className="font-bold text-gray-400">{t('compareModalCategoryLabel')}</span>
                     {comparedProducts.map((p) => (
-                      <span key={p.id} className="text-gray-800 dark:text-slate-200 font-semibold text-center truncate">
-                        {p.categoryName}
+                      <span key={p.id} className="text-gray-800 font-semibold text-center truncate">
+                        {getCategoryTitle(p.categoryId, language)}
                       </span>
                     ))}
                   </div>
@@ -181,7 +225,7 @@ export const ProductComparisonModal: React.FC = () => {
                     <span className="font-bold text-gray-400">{t('compareModalZeroDownLabel')}</span>
                     {comparedProducts.map((p) => (
                       <div key={p.id} className="flex justify-center">
-                        <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400">
+                        <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-600">
                           <Check className="w-3 h-3" />
                           {t('compareModalZeroDownAvailable')}
                         </span>
@@ -193,7 +237,7 @@ export const ProductComparisonModal: React.FC = () => {
                   <div className="grid grid-cols-5 gap-4 py-3 items-center">
                     <span className="font-bold text-gray-400">{t('compareModalInStockLabel')}</span>
                     {comparedProducts.map((p) => (
-                      <span key={p.id} className="text-center font-bold text-emerald-600 dark:text-emerald-400">
+                      <span key={p.id} className="text-center font-bold text-emerald-600">
                         {p.inStock ? t('compareModalInStock') : t('compareModalOutOfStock')}
                       </span>
                     ))}
@@ -201,9 +245,9 @@ export const ProductComparisonModal: React.FC = () => {
 
                   {/* Dynamic specs */}
                   {allSpecKeys.map((key) => (
-                    <div key={key} className="grid grid-cols-5 gap-4 py-3 items-center hover:bg-gray-50/50 dark:hover:bg-slate-800/30 transition-colors rounded-xl px-1">
-                      <span className="font-bold text-gray-500 dark:text-slate-400">
-                        {key}
+                    <div key={key} className="grid grid-cols-5 gap-4 py-3 items-center hover:bg-gray-50/50 transition-colors rounded-xl px-1">
+                      <span className="font-bold text-gray-500">
+                        {language === 'ru' && SPEC_KEY_MAP[key] ? SPEC_KEY_MAP[key] : key}
                       </span>
                       {comparedProducts.map((p) => (
                         <span key={p.id} className="text-center font-semibold text-gray-800 dark:text-slate-200">
