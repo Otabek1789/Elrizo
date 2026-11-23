@@ -1968,7 +1968,7 @@ export const AdminPanel: React.FC = () => {
 
                   <div className="p-4 rounded-2xl bg-white border border-gray-200 shadow-xs space-y-1">
                     <span className="text-[11px] font-bold text-emerald-600 block uppercase">
-                      {t('adminDebtorsPaid')}
+                      {'To‘langan summa'}
                     </span>
                     <strong className="text-xl font-black text-emerald-600 font-mono">118 500 000 so'm</strong>
                     <span className="text-[10px] text-emerald-700 font-bold block">83% tushum qabul qilindi</span>
