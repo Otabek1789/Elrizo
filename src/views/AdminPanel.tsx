@@ -2018,7 +2018,7 @@ export const AdminPanel: React.FC = () => {
                       className="px-4 py-2 bg-rose-600 hover:bg-rose-700 disabled:opacity-50 text-white font-bold text-xs rounded-xl shadow transition-all flex items-center gap-1.5 cursor-pointer"
                     >
                       <Send className="w-3.5 h-3.5" />
-                      <span>{isSendingBulkSms ? "SMS yuborilmoqda..." : t('adminDebtorsSendBulkSms')}</span>
+                      <span>{isSendingBulkSms ? "SMS yuborilmoqda..." : "Ommaviy SMS yuborish"}</span>
                     </button>
 
                     <button
@@ -2040,7 +2040,7 @@ export const AdminPanel: React.FC = () => {
                       className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-bold text-xs rounded-xl shadow transition-all flex items-center gap-1.5 cursor-pointer"
                     >
                       <Zap className="w-3.5 h-3.5" />
-                      <span>{isProcessingAutoDebit ? "Yechilmoqda..." : t('adminDebtorsAutoDebitTrigger')}</span>
+                      <span>{isProcessingAutoDebit ? "Yechilmoqda..." : "Avtomatik yechish"}</span>
                     </button>
                   </div>
                 </div>
@@ -2167,7 +2167,7 @@ export const AdminPanel: React.FC = () => {
                 <div className="bg-white rounded-2xl border border-gray-200 p-5 flex items-center justify-between shadow-xs">
                   <div>
                     <h3 className="text-sm font-black text-gray-900">
-                      {t('adminTabReviews')}
+                      {'Sharhlar va baholashlar'}
                     </h3>
                     <p className="text-xs text-gray-500 mt-0.5">
                       Foydalanuvchilar qoldirgan sharhlar, foto-baholashlar va moderatsiya
