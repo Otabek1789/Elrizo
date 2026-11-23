@@ -388,6 +388,86 @@ export const OrderTrackingModal: React.FC = () => {
                 </div>
               </div>
 
+              {/* Interactive Live GPS Courier Route Map */}
+              {activeOrder.courierName && (
+                <div className="rounded-2xl border border-blue-200 bg-gradient-to-b from-blue-50/70 to-indigo-50/50 p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-blue-900 flex items-center gap-1.5">
+                      <Truck className="w-4 h-4 text-blue-600 animate-bounce" />
+                      <span>{t('trackCourierLiveTitle')}</span>
+                    </span>
+                    <span className="text-[11px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full border border-emerald-300">
+                      Jonli harakatda
+                    </span>
+                  </div>
+
+                  {/* Stylized Interactive Map Canvas */}
+                  <div className="relative h-32 rounded-xl bg-slate-900 overflow-hidden flex items-center justify-center border border-slate-700 shadow-inner">
+                    {/* Simulated Map Streets & Grid */}
+                    <div className="absolute inset-0 opacity-20 bg-[radial-gradient(#3b82f6_1px,transparent_1px)] [background-size:16px_16px]" />
+                    <svg className="absolute inset-0 w-full h-full" xmlns="http://www.w3.org/2000/svg">
+                      <path
+                        d="M 40 80 Q 150 20 260 70 T 380 40"
+                        fill="none"
+                        stroke="#38bdf8"
+                        strokeWidth="3"
+                        strokeDasharray="6 6"
+                        className="animate-pulse"
+                      />
+                    </svg>
+
+                    {/* Start Warehouse Pin */}
+                    <div className="absolute left-8 top-16 flex flex-col items-center">
+                      <div className="w-6 h-6 rounded-full bg-purple-600 text-white flex items-center justify-center text-[10px] font-bold shadow-lg">
+                        <Package className="w-3.5 h-3.5" />
+                      </div>
+                      <span className="text-[9px] text-white/80 font-mono mt-0.5">Ombor</span>
+                    </div>
+
+                    {/* Courier Moving Indicator */}
+                    <div className="absolute left-1/2 top-10 -translate-x-1/2 flex flex-col items-center animate-pulse">
+                      <div className="w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center shadow-lg ring-4 ring-emerald-500/30">
+                        <Truck className="w-4 h-4" />
+                      </div>
+                      <span className="text-[10px] text-emerald-300 font-bold font-mono mt-0.5">Kuryer (Spark)</span>
+                    </div>
+
+                    {/* Destination Customer Pin */}
+                    <div className="absolute right-8 top-6 flex flex-col items-center">
+                      <div className="w-6 h-6 rounded-full bg-rose-500 text-white flex items-center justify-center text-[10px] font-bold shadow-lg">
+                        <MapPin className="w-3.5 h-3.5" />
+                      </div>
+                      <span className="text-[9px] text-white/80 font-mono mt-0.5">Mijoz</span>
+                    </div>
+
+                    <div className="absolute bottom-2 left-3 right-3 flex justify-between text-[11px] font-mono text-white/90 bg-black/60 px-3 py-1 rounded-lg backdrop-blur-sm">
+                      <span>{t('trackCourierDistance')} <strong className="text-emerald-400">2.4 km</strong></span>
+                      <span>{t('trackCourierEta')} <strong className="text-sky-300">~18 daqiqa</strong></span>
+                    </div>
+                  </div>
+
+                  {/* Courier contact buttons */}
+                  <div className="flex gap-2">
+                    <a
+                      href={`tel:${activeOrder.courierPhone}`}
+                      className="flex-1 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 transition-colors shadow-sm"
+                    >
+                      <Phone className="w-3.5 h-3.5" />
+                      <span>{t('trackCourierCallBtn')}</span>
+                    </a>
+                    <a
+                      href="https://t.me/elrizo_support"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex-1 py-2 bg-blue-500 hover:bg-blue-600 text-white text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 transition-colors shadow-sm"
+                    >
+                      <ShieldCheck className="w-3.5 h-3.5" />
+                      <span>{t('trackCourierTgBtn')}</span>
+                    </a>
+                  </div>
+                </div>
+              )}
+
               {/* Courier and address details */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
                 <div className="p-4 rounded-xl bg-slate-50 border border-slate-200/70">
@@ -426,6 +506,22 @@ export const OrderTrackingModal: React.FC = () => {
                     </p>
                   </div>
                 )}
+              </div>
+
+              {/* Kuryerga topshirish OTP xavfsizlik kodi */}
+              <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-950 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <h5 className="font-bold text-xs uppercase tracking-wider text-amber-900 flex items-center gap-1.5">
+                    <ShieldCheck className="w-4 h-4 text-amber-600" />
+                    <span>{t('trackCourierOtpTitle')}</span>
+                  </h5>
+                  <p className="text-[11px] text-amber-700 mt-0.5">
+                    {t('trackCourierOtpDesc')}
+                  </p>
+                </div>
+                <span className="text-2xl font-black font-mono tracking-widest text-amber-900 bg-amber-200/80 px-4 py-1.5 rounded-xl border border-amber-300 self-start sm:self-center">
+                  4829
+                </span>
               </div>
 
               {/* Items in order */}

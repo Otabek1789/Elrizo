@@ -18,7 +18,9 @@ import {
   CheckCircle2,
   HardDrive,
   Palette,
-  RefreshCw
+  RefreshCw,
+  Camera,
+  Image as ImageIcon
 } from 'lucide-react';
 import { useStore } from '../store/useStore';
 import { formatPrice, calculateMonthlyPaymentQuick } from '../utils/calculator';
@@ -195,6 +197,7 @@ export const ProductDetail: React.FC = () => {
   const [newReviewRating, setNewReviewRating] = useState(5);
   const [newReviewAuthor, setNewReviewAuthor] = useState(user?.fullName || '');
   const [newReviewComment, setNewReviewComment] = useState('');
+  const [newReviewImages, setNewReviewImages] = useState<string[]>([]);
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
   const [likedReviews, setLikedReviews] = useState<Record<string, boolean>>({});
 
@@ -307,8 +310,10 @@ export const ProductDetail: React.FC = () => {
         userName: newReviewAuthor.trim() || (language === 'ru' ? 'Покупатель' : 'Mijoz'),
         rating: newReviewRating,
         comment: newReviewComment.trim(),
+        images: newReviewImages,
       });
       setNewReviewComment('');
+      setNewReviewImages([]);
       setIsSubmittingReview(false);
       addToast(
         language === 'ru'
@@ -863,6 +868,27 @@ export const ProductDetail: React.FC = () => {
                   />
                 </div>
 
+                {/* Photo attachment */}
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (newReviewImages.length < 3) {
+                        setNewReviewImages(prev => [...prev, product.images[0]]);
+                      }
+                    }}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-dashed border-gray-300 text-xs text-gray-600 hover:border-uzum-primary hover:text-uzum-primary transition-colors cursor-pointer"
+                  >
+                    <Camera className="w-3.5 h-3.5" />
+                    <span>{language === 'ru' ? 'Добавить фото товара' : "Tovar rasmini ilova qilish"}</span>
+                  </button>
+                  {newReviewImages.map((img, i) => (
+                    <div key={i} className="relative w-9 h-9 rounded-lg overflow-hidden border border-gray-200">
+                      <img src={img} alt="review" className="w-full h-full object-contain" />
+                    </div>
+                  ))}
+                </div>
+
                 <div className="flex justify-end">
                   <button
                     type="submit"
@@ -945,9 +971,23 @@ export const ProductDetail: React.FC = () => {
                         </button>
                       </div>
 
-                      <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed pl-12">
+                      <p className="text-xs sm:text-sm text-slate-700 leading-relaxed pl-12">
                         {rev.comment}
                       </p>
+
+                      {/* Photo Reviews Gallery */}
+                      {rev.images && rev.images.length > 0 && (
+                        <div className="flex gap-2 pl-12 pt-1">
+                          {rev.images.map((imgUrl, idx) => (
+                            <img
+                              key={idx}
+                              src={imgUrl}
+                              alt="Customer review photo"
+                              className="w-16 h-16 rounded-xl object-contain bg-slate-50 border border-slate-200 p-1 cursor-pointer hover:scale-105 transition-transform"
+                            />
+                          ))}
+                        </div>
+                      )}
                     </div>
                   );
                 })

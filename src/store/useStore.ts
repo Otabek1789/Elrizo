@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { ActivePage, CartItem, Order, Product, PromoCode, User, Review, CashbackTransaction, InfoModalTopic } from '../types';
+import { ActivePage, CartItem, Order, Product, PromoCode, User, Review, CashbackTransaction, InfoModalTopic, UserCard } from '../types';
 import { PRODUCTS } from '../data/mockData';
 import { INITIAL_REVIEWS } from '../data/mockReviews';
 import { searchProducts } from '../utils/searchHelper';
@@ -148,7 +148,22 @@ interface StoreState {
 
   // Real Customer Reviews (Sharhlar)
   reviews: Record<string, Review[]>;
-  addReview: (productId: string, review: { userName: string; rating: number; comment: string }) => void;
+  addReview: (productId: string, review: { userName: string; rating: number; comment: string; images?: string[] }) => void;
+  deleteReviewAdmin: (productId: string, reviewId: string) => void;
+
+  // Stock Management (Omborxona)
+  updateProductStock: (productId: string, newStock: number) => void;
+
+  // User Cards & Auto-Debit
+  userCards: UserCard[];
+  addUserCard: (card: Omit<UserCard, 'id'>) => void;
+  removeUserCard: (cardId: string) => void;
+  toggleCardAutoDebit: (cardId: string) => void;
+
+  // Abandoned Cart Modal
+  isAbandonedCartOpen: boolean;
+  openAbandonedCart: () => void;
+  closeAbandonedCart: () => void;
 
   // Info & Trust Modals (Oferta, Rekvizitlar, Nasiya qoidalari, FAQ va h.k.)
   infoModalTopic: InfoModalTopic | null;
@@ -963,6 +978,8 @@ export const useStore = create<StoreState>()(
           createdAt: new Date().toISOString(),
           verifiedPurchase: true,
           likesCount: 0,
+          images: reviewData.images || [],
+          status: 'approved',
         };
         set((state) => {
           const currentList = state.reviews[productId] || [];
@@ -982,22 +999,158 @@ export const useStore = create<StoreState>()(
         get().addToast("Sharhingiz qabul qilindi va chop etildi! Rahmat!", 'success');
       },
 
+      deleteReviewAdmin: (productId: string, reviewId: string) => {
+        set((state) => {
+          const currentList = state.reviews[productId] || [];
+          return {
+            reviews: {
+              ...state.reviews,
+              [productId]: currentList.filter(r => r.id !== reviewId),
+            },
+          };
+        });
+        get().addToast("Sharh muvaffaqiyatli o'chirildi", 'info');
+      },
+
+      // Stock Management
+      updateProductStock: (productId: string, newStock: number) => {
+        set((state) => ({
+          products: state.products.map(p => {
+            if (p.id === productId) {
+              const stock = Math.max(0, newStock);
+              return {
+                ...p,
+                stockCount: stock,
+                inStock: stock > 0,
+              };
+            }
+            return p;
+          }),
+        }));
+        get().addToast("Tovar qoldig'i yangilandi", 'success');
+      },
+
+      // User Cards & Auto-Debit
+      userCards: [
+        {
+          id: 'card-uzcard-1',
+          cardNumber: '8600 •••• •••• 4912',
+          cardHolder: "OTABEK JURAYEV",
+          expiryDate: '08/28',
+          cardType: 'uzcard',
+          isAutoDebitEnabled: true,
+          isDefault: true,
+          balance: 4250000,
+        },
+        {
+          id: 'card-humo-2',
+          cardNumber: '9860 •••• •••• 7741',
+          cardHolder: "OTABEK JURAYEV",
+          expiryDate: '12/29',
+          cardType: 'humo',
+          isAutoDebitEnabled: false,
+          isDefault: false,
+          balance: 1890000,
+        }
+      ],
+      addUserCard: (card) => {
+        const newCard: UserCard = {
+          ...card,
+          id: `card-${Date.now()}`,
+        };
+        set((state) => ({
+          userCards: [...state.userCards, newCard],
+        }));
+        get().addToast("Yangi bank kartasi muvaffaqiyatli ulandi!", 'success');
+      },
+      removeUserCard: (cardId) => {
+        set((state) => ({
+          userCards: state.userCards.filter(c => c.id !== cardId),
+        }));
+        get().addToast("Karta ro'yxatdan o'chirildi", 'info');
+      },
+      toggleCardAutoDebit: (cardId) => {
+        set((state) => ({
+          userCards: state.userCards.map(c => 
+            c.id === cardId ? { ...c, isAutoDebitEnabled: !c.isAutoDebitEnabled } : c
+          ),
+        }));
+        get().addToast("Auto-debit holati o'zgartirildi", 'success');
+      },
+
+      // Abandoned Cart Modal
+      isAbandonedCartOpen: false,
+      openAbandonedCart: () => set({ isAbandonedCartOpen: true }),
+      closeAbandonedCart: () => set({ isAbandonedCartOpen: false }),
+
       // Order Tracking (Buyurtmani kuzatish)
       isOrderTrackingOpen: false,
       openOrderTracking: () => set({ isOrderTrackingOpen: true }),
       closeOrderTracking: () => set({ isOrderTrackingOpen: false }),
 
-      // Jamg'arma Karta (Loyalty program removed)
-      cashbackTransactions: [],
+      // Jamg'arma Karta & Keshbek
+      cashbackTransactions: [
+        {
+          id: 'tx-init-1',
+          type: 'earned',
+          amount: 150000,
+          date: '2026-10-15T12:00:00Z',
+          description: "ELRIZO Nasiya xarididan 1% keshbek",
+        },
+        {
+          id: 'tx-init-2',
+          type: 'earned',
+          amount: 50000,
+          date: '2026-10-18T09:30:00Z',
+          description: "Do'stni taklif qilganlik uchun referal bonus",
+        }
+      ],
       useCashbackInCheckout: false,
-      setUseCashbackInCheckout: () => {},
-      toggleUseCashbackInCheckout: () => {},
-      getCashbackDiscount: () => 0,
-      addCashback: () => {},
-      spendCashback: () => false,
+      setUseCashbackInCheckout: (val: boolean) => set({ useCashbackInCheckout: val }),
+      toggleUseCashbackInCheckout: () => set((state) => ({ useCashbackInCheckout: !state.useCashbackInCheckout })),
+      getCashbackDiscount: () => {
+        const { user, useCashbackInCheckout, getCartTotal } = get();
+        if (!useCashbackInCheckout || !user || !user.cashbackBalance) return 0;
+        const maxUsable = Math.floor(getCartTotal() * 0.3);
+        return Math.min(user.cashbackBalance, maxUsable);
+      },
+      addCashback: (amount: number, description: string, orderId?: string) => {
+        const tx: CashbackTransaction = {
+          id: `tx-${Date.now()}`,
+          orderId,
+          type: 'earned',
+          amount,
+          date: new Date().toISOString(),
+          description,
+        };
+        set((state) => {
+          const currentBal = state.user?.cashbackBalance || 0;
+          return {
+            cashbackTransactions: [tx, ...state.cashbackTransactions],
+            user: state.user ? { ...state.user, cashbackBalance: currentBal + amount } : null,
+          };
+        });
+      },
+      spendCashback: (amount: number, description: string, orderId?: string) => {
+        const { user } = get();
+        if (!user || (user.cashbackBalance || 0) < amount) return false;
+        const tx: CashbackTransaction = {
+          id: `tx-${Date.now()}`,
+          orderId,
+          type: 'spent',
+          amount,
+          date: new Date().toISOString(),
+          description,
+        };
+        set((state) => ({
+          cashbackTransactions: [tx, ...state.cashbackTransactions],
+          user: state.user ? { ...state.user, cashbackBalance: (state.user.cashbackBalance || 0) - amount } : null,
+        }));
+        return true;
+      },
       isCashbackCardModalOpen: false,
-      openCashbackCardModal: () => {},
-      closeCashbackCardModal: () => {},
+      openCashbackCardModal: () => set({ isCashbackCardModalOpen: true }),
+      closeCashbackCardModal: () => set({ isCashbackCardModalOpen: false }),
 
       // Info & Trust Modals
       infoModalTopic: null,

@@ -23,13 +23,15 @@ import {
   ExternalLink,
   Truck,
   Banknote,
-  MapPin
+  MapPin,
+  Camera,
+  Scan
 } from 'lucide-react';
 import { useStore } from '../store/useStore';
 import { formatPrice, calculateMonthlyPaymentQuick, calculateInstallment } from '../utils/calculator';
 import { PaymentMode, ScoringResult, Order, OrderItem } from '../types';
 import { useTranslation } from '../utils/translations';
-import { sendVerificationSms } from '../lib/smsService';
+import { sendVerificationSms, sendOrderConfirmedSms } from '../lib/smsService';
 import { CustomSelect } from '../components/CustomSelect';
 import { UZBEKISTAN_REGIONS } from '../data/regions';
 import { generateAndPrintContract } from '../lib/pdfContractGenerator';
@@ -121,6 +123,35 @@ export const Checkout: React.FC = () => {
       address: selectedAddress,
       ...(detectedCity ? { city: detectedCity } : {}),
     }));
+  };
+
+  // Auto-debit va MyID biometrik holat
+  const [isAutoDebitEnabled, setIsAutoDebitEnabled] = useState<boolean>(true);
+  const [isMyIdModalOpen, setIsMyIdModalOpen] = useState<boolean>(false);
+  const [myIdScanProgress, setMyIdScanProgress] = useState<number>(0);
+  const [isMyIdScanning, setIsMyIdScanning] = useState<boolean>(false);
+  const [isMyIdVerified, setIsMyIdVerified] = useState<boolean>(false);
+
+  const handleStartMyIdScan = () => {
+    setIsMyIdScanning(true);
+    setMyIdScanProgress(15);
+    const interval = setInterval(() => {
+      setMyIdScanProgress((prev) => {
+        if (prev >= 100) {
+          clearInterval(interval);
+          setIsMyIdScanning(false);
+          setIsMyIdVerified(true);
+          setIsMyIdModalOpen(false);
+          addToast(t('checkoutMyIdVerified'), 'success');
+          setFormData((p) => ({
+            ...p,
+            pinfl: p.pinfl || '31204984500012',
+          }));
+          return 100;
+        }
+        return prev + 25;
+      });
+    }, 400);
   };
 
   // Skoring simulyatsiya holati
@@ -256,6 +287,9 @@ export const Checkout: React.FC = () => {
         createdAt: new Date().toISOString(),
         appliedPromoCode: appliedPromoCode?.code,
         discountAmount: discountAmount > 0 ? discountAmount : undefined,
+        autoDebitEnabled: isAutoDebitEnabled,
+        courierOtp: Math.floor(1000 + Math.random() * 9000).toString(),
+        myIdVerified: isMyIdVerified,
         items: cart.map((c) => ({
           productId: c.product.id,
           title: c.product.title,
@@ -267,6 +301,7 @@ export const Checkout: React.FC = () => {
 
       addOrder(newInstallmentOrder);
       setCompletedOrder(newInstallmentOrder);
+      sendOrderConfirmedSms(formData.phone, contractNumber, finalTotal).catch(() => {});
 
       setCurrentStep(4);
       clearCart();
@@ -463,10 +498,36 @@ export const Checkout: React.FC = () => {
                 <span>{t('checkoutFirstPaymentDateLabel')}</span>
                 <strong className="text-gray-900 dark:text-white">15.11.2026</strong>
               </div>
-              <div className="flex justify-between text-gray-700 dark:text-slate-300">
+              <div className="flex justify-between text-gray-700">
                 <span>{t('checkoutDeliveryAddressLabel')}</span>
-                <strong className="text-gray-900 dark:text-white">{formData.city}, {formData.address}</strong>
+                <strong className="text-gray-900">{formData.city}, {formData.address}</strong>
               </div>
+            </div>
+          )}
+
+          {/* Kuryerga topshirish OTP xavfsizlik kodi */}
+          <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-950 text-left space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="font-bold text-xs uppercase tracking-wider flex items-center gap-1.5 text-amber-800">
+                <Truck className="w-4 h-4 text-amber-600" />
+                {t('trackCourierOtpTitle')}
+              </span>
+              <span className="text-xl font-black font-mono tracking-widest text-amber-900 bg-amber-200/80 px-3 py-1 rounded-xl border border-amber-300">
+                {completedOrder?.courierOtp || '4829'}
+              </span>
+            </div>
+            <p className="text-[11px] text-amber-700">
+              {t('trackCourierOtpDesc')}
+            </p>
+          </div>
+
+          {/* Auto-Debit holati */}
+          {completedOrder?.autoDebitEnabled && (
+            <div className="flex items-center gap-2 p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-800 text-xs text-left">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+              <span>
+                <strong>Auto-debit faollashtirildi:</strong> Oylik to'lovlar har oy to'lov sanasida kartangizdan avtomatik yechiladi.
+              </span>
             </div>
           )}
 
@@ -908,6 +969,34 @@ export const Checkout: React.FC = () => {
                       </p>
                     </div>
 
+                    {/* MyID Biometrik identifikatsiya bloki */}
+                    <div className="p-4 rounded-2xl bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-sm">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow">
+                          <Scan className="w-5 h-5" />
+                        </div>
+                        <div>
+                          <h4 className="text-xs font-bold text-gray-900">{t('checkoutMyIdTitle')}</h4>
+                          <p className="text-[11px] text-gray-500">{t('checkoutMyIdSubtitle')}</p>
+                        </div>
+                      </div>
+                      {isMyIdVerified ? (
+                        <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-xl border border-emerald-300">
+                          <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                          <span>{t('checkoutMyIdVerified')}</span>
+                        </div>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => setIsMyIdModalOpen(true)}
+                          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow transition-all flex items-center justify-center gap-2 cursor-pointer"
+                        >
+                          <Camera className="w-4 h-4" />
+                          <span>{t('checkoutMyIdScanFace')}</span>
+                        </button>
+                      )}
+                    </div>
+
                     <div className="p-4 rounded-2xl bg-gradient-to-r from-gray-900 via-purple-950 to-indigo-950 text-white shadow-lg space-y-4 max-w-md mx-auto">
                       <div className="flex justify-between items-center text-xs text-purple-200">
                         <span className="font-mono">Uzcard / Humo</span>
@@ -939,6 +1028,21 @@ export const Checkout: React.FC = () => {
                           <span className="text-xs font-mono font-bold truncate text-white">{formData.fullName.toUpperCase()}</span>
                         </div>
                       </div>
+                    </div>
+
+                    {/* Auto-Debit Avtomatik To'lov Sozlamasi */}
+                    <div className="p-3.5 bg-gray-50 rounded-xl border border-gray-200 flex items-start gap-3">
+                      <input
+                        type="checkbox"
+                        id="autoDebitCheck"
+                        checked={isAutoDebitEnabled}
+                        onChange={(e) => setIsAutoDebitEnabled(e.target.checked)}
+                        className="mt-1 w-4 h-4 rounded text-uzum-primary focus:ring-uzum-primary cursor-pointer"
+                      />
+                      <label htmlFor="autoDebitCheck" className="text-xs text-gray-700 cursor-pointer">
+                        <span className="font-bold text-gray-900 block">{t('checkoutAutoDebitLabel')}</span>
+                        <span className="text-[11px] text-gray-500">{t('checkoutAutoDebitHint')}</span>
+                      </label>
                     </div>
 
                     {/* Skoring tekshirish jarayoni */}
@@ -1356,6 +1460,69 @@ export const Checkout: React.FC = () => {
         initialAddress={formData.address}
         defaultCity={formData.city}
       />
+
+      {/* MyID Biometrik Face-ID Scanner Modali */}
+      {isMyIdModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-sm w-full p-6 text-center space-y-5 shadow-2xl relative animate-in zoom-in-95">
+            <button
+              type="button"
+              onClick={() => { setIsMyIdModalOpen(false); setIsMyIdScanning(false); }}
+              className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-700 rounded-full cursor-pointer"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div>
+              <span className="text-[10px] font-black tracking-widest uppercase bg-blue-100 text-blue-800 px-3 py-1 rounded-full border border-blue-200">
+                MyID Liveness Check
+              </span>
+              <h3 className="text-lg font-bold text-gray-900 mt-2">{t('checkoutMyIdTitle')}</h3>
+              <p className="text-xs text-gray-500 mt-1">Yuzingizni belgilangan oval doira ichida tuting</p>
+            </div>
+
+            {/* Simulyatsiya qilingan kamera oynasi */}
+            <div className="relative w-48 h-60 mx-auto rounded-full border-4 border-dashed border-blue-500 bg-gradient-to-b from-gray-100 to-blue-50 flex items-center justify-center overflow-hidden shadow-inner">
+              {isMyIdScanning ? (
+                <>
+                  <div className="absolute inset-0 bg-blue-500/10 animate-pulse" />
+                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-blue-500 to-transparent animate-bounce" />
+                  <div className="text-center space-y-2 z-10">
+                    <Loader2 className="w-10 h-10 text-blue-600 animate-spin mx-auto" />
+                    <span className="text-xs font-bold text-blue-900">{myIdScanProgress}%</span>
+                  </div>
+                </>
+              ) : (
+                <div className="text-center space-y-2 text-gray-400">
+                  <UserCheck className="w-16 h-16 mx-auto text-blue-400 animate-pulse" />
+                  <span className="text-[11px] text-gray-500 block">Kameraga qarang</span>
+                </div>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <button
+                type="button"
+                disabled={isMyIdScanning}
+                onClick={handleStartMyIdScan}
+                className="w-full py-3 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-bold text-sm rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
+              >
+                {isMyIdScanning ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>{t('checkoutMyIdScanning')}</span>
+                  </>
+                ) : (
+                  <>
+                    <Scan className="w-4 h-4" />
+                    <span>Skanerlashni boshlash</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

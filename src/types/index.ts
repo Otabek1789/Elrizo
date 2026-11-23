@@ -34,6 +34,8 @@ export interface Review {
   createdAt: string;
   verifiedPurchase?: boolean;
   likesCount?: number;
+  images?: string[];
+  status?: 'approved' | 'pending' | 'rejected';
 }
 
 export type OnlinePaymentProvider = 'click' | 'payme' | 'uzumpay';
@@ -107,6 +109,17 @@ export interface CashbackTransaction {
   description: string;
 }
 
+export interface UserCard {
+  id: string;
+  cardNumber: string; // e.g. 8600 **** **** 1234
+  cardHolder: string;
+  expiryDate: string; // MM/YY
+  cardType: 'uzcard' | 'humo' | 'visa' | 'mastercard';
+  isAutoDebitEnabled: boolean;
+  isDefault: boolean;
+  balance?: number;
+}
+
 export interface User {
   id: string;
   fullName: string;
@@ -124,6 +137,11 @@ export interface User {
   address?: string;
   city?: string;
   usedPromoCodes?: string[]; // Ushbu foydalanuvchi buyurtmalarida ishlatgan promokodlar
+  referralCode?: string;
+  referredBy?: string;
+  referralCount?: number;
+  referralEarnings?: number;
+  cards?: UserCard[];
 }
 
 export type PaymentMode = 'full' | 'installment';
@@ -173,6 +191,24 @@ export interface Order {
   discountAmount?: number;
   cashbackEarned?: number; // Xariddan yig'ilgan 1% keshbek
   cashbackSpent?: number; // Xaridda ishlatilgan keshbek
+  autoDebitEnabled?: boolean;
+  courierOtp?: string;
+  myIdVerified?: boolean;
+}
+
+export interface DebtorRecord {
+  id: string;
+  orderId: string;
+  contractNumber: string;
+  customerName: string;
+  customerPhone: string;
+  productTitle: string;
+  monthlyAmount: number;
+  dueDate: string;
+  daysOverdue: number; // musbat = kechikkan kun, 0 = bugun, manfiy = kelgusi
+  status: 'paid' | 'due_today' | 'overdue' | 'upcoming';
+  autoDebitStatus: 'active' | 'failed' | 'disabled';
+  lastSmsDate?: string;
 }
 
 export interface PromoCode {

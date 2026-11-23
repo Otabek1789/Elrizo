@@ -147,3 +147,79 @@ export const sendVerificationSms = async (
     message: `SMS kod: ${code} (${phone} raqamiga yuborildi)`,
   };
 };
+
+/**
+ * Nasiya oylik to'lovi eslatma SMS xabari yuborish
+ */
+export const sendPaymentReminderSms = async (
+  phone: string,
+  customerName: string,
+  dueDate: string,
+  amount: number
+): Promise<{ success: boolean; message: string; isRealSmsSent: boolean }> => {
+  const formattedAmount = new Intl.NumberFormat('uz-UZ').format(amount);
+  const smsText = `Hurmatli ${customerName}, ELRIZO Nasiya to'lovingiz (${formattedAmount} so'm) sanasi: ${dueDate}. To'lovni Click/Payme orqali amalga oshirishingiz mumkin. Tel: +998 71 200-00-00`;
+  const rawPhone = cleanPhoneNumber(phone);
+
+  const token = await getEskizToken();
+  if (token) {
+    try {
+      const formData = new FormData();
+      formData.append('mobile_phone', rawPhone);
+      formData.append('message', smsText);
+      formData.append('from', '4546');
+
+      const res = await fetch('https://notify.eskiz.uz/api/message/sms/send', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData,
+      });
+
+      if (res.ok) {
+        return {
+          success: true,
+          message: `${phone} raqamiga haqiqiy to'lov eslatmasi yuborildi`,
+          isRealSmsSent: true,
+        };
+      }
+    } catch (err) {
+      console.error('Payment reminder SMS error:', err);
+    }
+  }
+
+  return {
+    success: true,
+    message: `${phone} raqamiga eslatma SMS yuborildi (${formattedAmount} so'm)`,
+    isRealSmsSent: false,
+  };
+};
+
+/**
+ * Buyurtma tasdiqlanganda xaridorga SMS yuborish
+ */
+export const sendOrderConfirmedSms = async (
+  phone: string,
+  orderNumber: string,
+  totalAmount: number
+): Promise<void> => {
+  const formatted = new Intl.NumberFormat('uz-UZ').format(totalAmount);
+  const smsText = `ELRIZO: ${orderNumber} raqamli buyurtmangiz tasdiqlandi. Umumiy summa: ${formatted} so'm. Tez orada kuryer siz bilan bog'lanadi.`;
+  const rawPhone = cleanPhoneNumber(phone);
+  const token = await getEskizToken();
+
+  if (token) {
+    try {
+      const formData = new FormData();
+      formData.append('mobile_phone', rawPhone);
+      formData.append('message', smsText);
+      formData.append('from', '4546');
+      await fetch('https://notify.eskiz.uz/api/message/sms/send', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData,
+      });
+    } catch (err) {
+      console.error('Order SMS error:', err);
+    }
+  }
+};

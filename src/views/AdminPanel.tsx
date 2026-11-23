@@ -53,11 +53,17 @@ import {
   Save,
   CreditCard,
   Key,
-  Link2
+  Link2,
+  Star,
+  Phone,
+  MessageSquare
 } from 'lucide-react';
 import { useStore } from '../store/useStore';
 import { formatPrice } from '../utils/calculator';
 import { ADMIN_EMAIL, fetchOrdersFromSupabase } from '../lib/supabase';
+import { sendPaymentReminderSms } from '../lib/smsService';
+import { DebtorRecord } from '../types';
+import { useTranslation } from '../utils/translations';
 import { CATEGORIES } from '../data/mockData';
 import { Order, Product, PromoCode } from '../types';
 import { CustomSelect } from '../components/CustomSelect';
@@ -179,6 +185,87 @@ const getDynamicChartDataset = (orders: Order[], timeframe: '1m' | '6m' | '1y', 
   };
 };
 
+const DEMO_DEBTORS: DebtorRecord[] = [
+  {
+    id: 'debt-1',
+    orderId: 'ord-101',
+    contractNumber: 'ELR-849201',
+    customerName: 'Otabek Mirzayev',
+    customerPhone: '+998 90 123-45-67',
+    productTitle: 'iPhone 16 Pro Max 256GB',
+    monthlyAmount: 1450000,
+    dueDate: '20.11.2026',
+    daysOverdue: 3,
+    status: 'overdue',
+    autoDebitStatus: 'active',
+  },
+  {
+    id: 'debt-2',
+    orderId: 'ord-102',
+    contractNumber: 'ELR-731904',
+    customerName: 'Dilshod Karimov',
+    customerPhone: '+998 93 456-78-90',
+    productTitle: 'Samsung Galaxy S24 Ultra',
+    monthlyAmount: 1320000,
+    dueDate: '23.11.2026',
+    daysOverdue: 0,
+    status: 'due_today',
+    autoDebitStatus: 'active',
+  },
+  {
+    id: 'debt-3',
+    orderId: 'ord-103',
+    contractNumber: 'ELR-582190',
+    customerName: 'Ziyoda Rahimova',
+    customerPhone: '+998 97 888-12-34',
+    productTitle: 'Dyson Airwrap Complete Long',
+    monthlyAmount: 650000,
+    dueDate: '18.11.2026',
+    daysOverdue: 5,
+    status: 'overdue',
+    autoDebitStatus: 'failed',
+  },
+  {
+    id: 'debt-4',
+    orderId: 'ord-104',
+    contractNumber: 'ELR-912443',
+    customerName: 'Bobur Aliyev',
+    customerPhone: '+998 99 711-22-33',
+    productTitle: 'Sony PlayStation 5 Slim 1TB',
+    monthlyAmount: 780000,
+    dueDate: '28.11.2026',
+    daysOverdue: -5,
+    status: 'upcoming',
+    autoDebitStatus: 'active',
+  },
+  {
+    id: 'debt-5',
+    orderId: 'ord-105',
+    contractNumber: 'ELR-441209',
+    customerName: 'Shaxnoza Umarova',
+    customerPhone: '+998 90 999-00-11',
+    productTitle: 'Artel Grand Inverter Sovutgich',
+    monthlyAmount: 520000,
+    dueDate: '15.11.2026',
+    daysOverdue: 8,
+    status: 'overdue',
+    autoDebitStatus: 'disabled',
+  },
+  {
+    id: 'debt-6',
+    orderId: 'ord-106',
+    contractNumber: 'ELR-632117',
+    customerName: 'Jamshid Ergashev',
+    customerPhone: '+998 91 333-44-55',
+    productTitle: 'MacBook Air 13" M3 16/512GB',
+    monthlyAmount: 1680000,
+    dueDate: '23.11.2026',
+    daysOverdue: 0,
+    status: 'due_today',
+    autoDebitStatus: 'active',
+  }
+];
+
 export const AdminPanel: React.FC = () => {
   const navigate = useNavigate();
   const { 
@@ -191,6 +278,9 @@ export const AdminPanel: React.FC = () => {
     addProduct, 
     updateProduct,
     deleteProduct,
+    updateProductStock,
+    reviews,
+    deleteReviewAdmin,
     fetchProductsFromCloud,
     logoutUser,
     addToast,
@@ -203,7 +293,10 @@ export const AdminPanel: React.FC = () => {
     deletePromoCode
   } = useStore();
 
-  const [activeSection, setActiveSection] = useState<'dashboard' | 'applications' | 'analytics' | 'products' | 'telegram' | 'promos' | 'coordinates' | 'customers' | 'payments' | 'settings'>('dashboard');
+  const [activeSection, setActiveSection] = useState<'dashboard' | 'applications' | 'debtors' | 'reviews' | 'analytics' | 'products' | 'telegram' | 'promos' | 'coordinates' | 'customers' | 'payments' | 'settings'>('dashboard');
+  const [debtorsList, setDebtorsList] = useState<DebtorRecord[]>(DEMO_DEBTORS);
+  const [isSendingBulkSms, setIsSendingBulkSms] = useState(false);
+  const [isProcessingAutoDebit, setIsProcessingAutoDebit] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [searchFilter, setSearchFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'scoring_approved' | 'processing' | 'delivered'>('all');
@@ -690,7 +783,7 @@ export const AdminPanel: React.FC = () => {
   };
 
   interface NavItem {
-    id: 'dashboard' | 'applications' | 'analytics' | 'products' | 'telegram' | 'promos' | 'coordinates' | 'customers' | 'payments' | 'settings';
+    id: 'dashboard' | 'applications' | 'debtors' | 'reviews' | 'analytics' | 'products' | 'telegram' | 'promos' | 'coordinates' | 'customers' | 'payments' | 'settings';
     labelUz: string;
     labelRu: string;
     labelEn: string;
@@ -714,6 +807,7 @@ export const AdminPanel: React.FC = () => {
       items: [
         { id: 'dashboard', labelUz: 'Dashboard Overview', labelRu: 'Дашборд', labelEn: 'Dashboard', icon: LayoutDashboard },
         { id: 'applications', labelUz: 'Nasiya Arizalari', labelRu: 'Заявки', labelEn: 'Applications', icon: FileText, count: orders.length },
+        { id: 'debtors', labelUz: "Debitorlik & To'lovlar", labelRu: 'Дебиторка и Платежи', labelEn: 'Debtors & Billing', icon: Calendar, iconColor: 'text-rose-500', count: debtorsList.filter(d => d.status === 'overdue').length },
         { id: 'analytics', labelUz: 'Grafikalar & Tahlil', labelRu: 'Аналитика', labelEn: 'Analytics', icon: BarChart3 },
       ],
     },
@@ -723,6 +817,7 @@ export const AdminPanel: React.FC = () => {
       titleEn: 'Catalog & Sales',
       items: [
         { id: 'products', labelUz: 'Mahsulotlar Bazasi', labelRu: 'Товары', labelEn: 'Products', icon: Package, count: products.length },
+        { id: 'reviews', labelUz: 'Sharhlar Moderatsiyasi', labelRu: 'Отзывы клиентов', labelEn: 'Reviews Moderation', icon: Star, iconColor: 'text-amber-500' },
         { id: 'telegram', labelUz: 'Telegram Post', labelRu: 'Пост в Телеграм', labelEn: 'Telegram Post', icon: Send, iconColor: 'text-sky-500' },
         { id: 'promos', labelUz: 'Promokodlar', labelRu: 'Промокоды', labelEn: 'Promo Codes', icon: Tag, count: promoCodes.length },
         { id: 'coordinates', labelUz: 'Viloyatlar & GPS', labelRu: 'Регионы (GPS)', labelEn: 'Regions (GPS)', icon: Compass, iconColor: 'text-emerald-500' },
@@ -976,6 +1071,8 @@ export const AdminPanel: React.FC = () => {
               >
                 {activeSection === 'dashboard' && (language === 'ru' ? 'Панель управления' : 'Boshqaruv Paneli & Umumiy Holat')}
                 {activeSection === 'applications' && (language === 'ru' ? 'Заявки на рассрочку' : 'Nasiya Savdo Arizalari va Shartnomalar')}
+                {activeSection === 'debtors' && (language === 'ru' ? 'Дебиторская задолженность и Автоплатежи' : 'Debitorlik Qarzdorlik & Auto-Debit Nazorati')}
+                {activeSection === 'reviews' && (language === 'ru' ? 'Модерация отзывов покупателей' : 'Xaridorlar Sharhlari & Foto-baholash')}
                 {activeSection === 'analytics' && (language === 'ru' ? 'Финансовая аналитика' : 'Moliyaviy Statistikalar va Dinamik Grafikalar')}
                 {activeSection === 'promos' && (language === 'ru' ? 'Управление промокодами' : 'Promokodlar va Chegirmalar Boshqaruvi')}
                 {activeSection === 'coordinates' && (language === 'ru' ? 'Регионы и GPS координаты' : 'Viloyatlar Geografiyasi va GPS Koordinatalari')}
@@ -1850,6 +1947,305 @@ export const AdminPanel: React.FC = () => {
               </motion.div>
             )}
 
+            {/* SECTION: DEBTORS & AUTO-DEBIT BILLING */}
+            {activeSection === 'debtors' && (
+              <motion.div
+                key="debtors"
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -15 }}
+                className="space-y-6"
+              >
+                {/* 4 KPI Metrics Cards */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <div className="p-4 rounded-2xl bg-white border border-gray-200 shadow-xs space-y-1">
+                    <span className="text-[11px] font-bold text-gray-500 block uppercase">
+                      {t('adminDebtorsTotalExpected')}
+                    </span>
+                    <strong className="text-xl font-black text-gray-900 font-mono">142 800 000 so'm</strong>
+                    <span className="text-[10px] text-gray-400 block">Jami 124 ta faol nasiya shartnomasi</span>
+                  </div>
+
+                  <div className="p-4 rounded-2xl bg-white border border-gray-200 shadow-xs space-y-1">
+                    <span className="text-[11px] font-bold text-emerald-600 block uppercase">
+                      {t('adminDebtorsPaid')}
+                    </span>
+                    <strong className="text-xl font-black text-emerald-600 font-mono">118 500 000 so'm</strong>
+                    <span className="text-[10px] text-emerald-700 font-bold block">83% tushum qabul qilindi</span>
+                  </div>
+
+                  <div className="p-4 rounded-2xl bg-white border border-gray-200 shadow-xs space-y-1">
+                    <span className="text-[11px] font-bold text-rose-600 block uppercase">
+                      {t('adminDebtorsOverdue')}
+                    </span>
+                    <strong className="text-xl font-black text-rose-600 font-mono">24 300 000 so'm</strong>
+                    <span className="text-[10px] text-rose-700 font-bold block">
+                      {debtorsList.filter(d => d.status === 'overdue').length} ta to'lov kechikmoqda
+                    </span>
+                  </div>
+
+                  <div className="p-4 rounded-2xl bg-white border border-gray-200 shadow-xs space-y-1">
+                    <span className="text-[11px] font-bold text-purple-600 block uppercase">
+                      Auto-Debit Ulangan
+                    </span>
+                    <strong className="text-xl font-black text-purple-600 font-mono">38 ta karta</strong>
+                    <span className="text-[10px] text-purple-700 font-bold block">Avtomatik yechish faol</span>
+                  </div>
+                </div>
+
+                {/* Bulk Actions Header */}
+                <div className="p-4 rounded-2xl bg-gradient-to-r from-gray-900 to-purple-950 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-md">
+                  <div>
+                    <h3 className="text-sm font-black">Debitorlik Qarzdorlar Boshqaruvi & Avtomatlashtirish</h3>
+                    <p className="text-xs text-purple-200 mt-0.5">
+                      Kechikayotgan mijozlarga bitta tugma orqali rasmiy Eskiz SMS eslatma jo'natish yoki kartadan avtomatik yechish
+                    </p>
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-2">
+                    <button
+                      type="button"
+                      disabled={isSendingBulkSms}
+                      onClick={async () => {
+                        setIsSendingBulkSms(true);
+                        const overdueList = debtorsList.filter(d => d.status === 'overdue' || d.status === 'due_today');
+                        for (const d of overdueList) {
+                          await sendPaymentReminderSms(d.customerPhone, d.customerName, d.dueDate, d.monthlyAmount);
+                        }
+                        setIsSendingBulkSms(false);
+                        addToast(`${overdueList.length} ta qarzdorga rasmiy SMS eslatma yuborildi!`, 'success');
+                      }}
+                      className="px-4 py-2 bg-rose-600 hover:bg-rose-700 disabled:opacity-50 text-white font-bold text-xs rounded-xl shadow transition-all flex items-center gap-1.5 cursor-pointer"
+                    >
+                      <Send className="w-3.5 h-3.5" />
+                      <span>{isSendingBulkSms ? "SMS yuborilmoqda..." : t('adminDebtorsSendBulkSms')}</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      disabled={isProcessingAutoDebit}
+                      onClick={() => {
+                        setIsProcessingAutoDebit(true);
+                        setTimeout(() => {
+                          setIsProcessingAutoDebit(false);
+                          setDebtorsList(prev => prev.map(d => {
+                            if (d.status === 'due_today' && d.autoDebitStatus === 'active') {
+                              return { ...d, status: 'paid' };
+                            }
+                            return d;
+                          }));
+                          addToast("Bugungi to'lovlar ulangan kartalardan avtomatik yechildi!", 'success');
+                        }, 1200);
+                      }}
+                      className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-bold text-xs rounded-xl shadow transition-all flex items-center gap-1.5 cursor-pointer"
+                    >
+                      <Zap className="w-3.5 h-3.5" />
+                      <span>{isProcessingAutoDebit ? "Yechilmoqda..." : t('adminDebtorsAutoDebitTrigger')}</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Debtors List Table */}
+                <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-xs">
+                  <div className="p-4 border-b border-gray-100 flex items-center justify-between">
+                    <h4 className="text-xs font-black text-gray-900 uppercase tracking-wider">
+                      Mijozlar to'lov grafigi va qarzdorliklar ({debtorsList.length})
+                    </h4>
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-xs text-left">
+                      <thead className="bg-gray-50 border-b border-gray-100 text-gray-500 font-bold uppercase text-[10px]">
+                        <tr>
+                          <th className="px-4 py-3">Shartnoma & Tovar</th>
+                          <th className="px-4 py-3">Mijoz & Telefon</th>
+                          <th className="px-4 py-3">Oylik summa</th>
+                          <th className="px-4 py-3">To'lov sanasi</th>
+                          <th className="px-4 py-3">Holati</th>
+                          <th className="px-4 py-3">Auto-Debit</th>
+                          <th className="px-4 py-3 text-right">Amallar</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-100 font-medium">
+                        {debtorsList.map((d) => (
+                          <tr key={d.id} className="hover:bg-gray-50 transition-colors">
+                            <td className="px-4 py-3">
+                              <span className="font-mono font-bold text-purple-700 block">{d.contractNumber}</span>
+                              <span className="text-[11px] text-gray-500">{d.productTitle}</span>
+                            </td>
+                            <td className="px-4 py-3">
+                              <span className="font-bold text-gray-900 block">{d.customerName}</span>
+                              <span className="text-[11px] text-gray-500 font-mono flex items-center gap-1">
+                                <Phone className="w-3 h-3 text-gray-400" />
+                                {d.customerPhone}
+                              </span>
+                            </td>
+                            <td className="px-4 py-3 font-mono font-black text-gray-900">
+                              {formatPrice(d.monthlyAmount, true, language)}
+                            </td>
+                            <td className="px-4 py-3 font-mono text-gray-700">
+                              {d.dueDate}
+                            </td>
+                            <td className="px-4 py-3">
+                              {d.status === 'paid' && (
+                                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
+                                  To'langan
+                                </span>
+                              )}
+                              {d.status === 'due_today' && (
+                                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 animate-pulse">
+                                  Bugun to'lov
+                                </span>
+                              )}
+                              {d.status === 'overdue' && (
+                                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 text-rose-800">
+                                  +{d.daysOverdue} kun kechikdi
+                                </span>
+                              )}
+                              {d.status === 'upcoming' && (
+                                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800">
+                                  Kelgusi hafta
+                                </span>
+                              )}
+                            </td>
+                            <td className="px-4 py-3">
+                              <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                                d.autoDebitStatus === 'active' 
+                                  ? 'bg-purple-100 text-purple-800' 
+                                  : d.autoDebitStatus === 'failed' 
+                                  ? 'bg-rose-100 text-rose-800'
+                                  : 'bg-gray-100 text-gray-600'
+                              }`}>
+                                {d.autoDebitStatus === 'active' ? 'Faol' : d.autoDebitStatus === 'failed' ? 'Muvaffaqiyatsiz' : "Bog'lanmagan"}
+                              </span>
+                            </td>
+                            <td className="px-4 py-3 text-right">
+                              <div className="flex items-center justify-end gap-1.5">
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    sendPaymentReminderSms(d.customerPhone, d.customerName, d.dueDate, d.monthlyAmount);
+                                    addToast(`${d.customerName} ga SMS eslatma jo'natildi`, 'success');
+                                  }}
+                                  className="p-1.5 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors cursor-pointer"
+                                  title="SMS yuborish"
+                                >
+                                  <Send className="w-3.5 h-3.5" />
+                                </button>
+                                {d.status !== 'paid' && (
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setDebtorsList(prev => prev.map(item => item.id === d.id ? { ...item, status: 'paid' } : item));
+                                      addToast(`${d.customerName} to'lovi qabul qilindi`, 'success');
+                                    }}
+                                    className="p-1.5 rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-100 transition-colors cursor-pointer"
+                                    title="To'lovni tasdiqlash"
+                                  >
+                                    <Check className="w-3.5 h-3.5" />
+                                  </button>
+                                )}
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
+            {/* SECTION: REVIEWS MODERATION */}
+            {activeSection === 'reviews' && (
+              <motion.div
+                key="reviews"
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -15 }}
+                className="space-y-6"
+              >
+                <div className="bg-white rounded-2xl border border-gray-200 p-5 flex items-center justify-between shadow-xs">
+                  <div>
+                    <h3 className="text-sm font-black text-gray-900">
+                      {t('adminTabReviews')}
+                    </h3>
+                    <p className="text-xs text-gray-500 mt-0.5">
+                      Foydalanuvchilar qoldirgan sharhlar, foto-baholashlar va moderatsiya
+                    </p>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  {Object.entries(reviews).flatMap(([pId, revList]) => 
+                    revList.map(rev => {
+                      const prod = products.find(p => p.id === pId);
+                      return (
+                        <div key={rev.id} className="bg-white rounded-2xl border border-gray-200 p-5 shadow-xs flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                          <div className="space-y-2 flex-1">
+                            <div className="flex items-center gap-2">
+                              <span className="font-bold text-sm text-gray-900">{rev.userName}</span>
+                              <span className="text-[10px] bg-purple-100 text-purple-800 font-bold px-2 py-0.5 rounded-full">
+                                {prod?.title || pId}
+                              </span>
+                              {rev.verifiedPurchase && (
+                                <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                                  <CheckCircle2 className="w-3 h-3" />
+                                  Xarid tasdiqlangan
+                                </span>
+                              )}
+                            </div>
+
+                            <div className="flex items-center gap-2">
+                              <div className="flex text-amber-400">
+                                {[1, 2, 3, 4, 5].map((s) => (
+                                  <Star
+                                    key={s}
+                                    className={`w-3.5 h-3.5 ${s <= rev.rating ? 'fill-current' : 'text-gray-300'}`}
+                                  />
+                                ))}
+                              </div>
+                              <span className="text-xs text-gray-400 font-mono">
+                                {new Date(rev.createdAt).toLocaleDateString()}
+                              </span>
+                            </div>
+
+                            <p className="text-xs text-gray-700 leading-relaxed max-w-2xl">
+                              {rev.comment}
+                            </p>
+
+                            {/* Customer Photos */}
+                            {rev.images && rev.images.length > 0 && (
+                              <div className="flex gap-2 pt-1">
+                                {rev.images.map((imgUrl, idx) => (
+                                  <img
+                                    key={idx}
+                                    src={imgUrl}
+                                    alt="Review attach"
+                                    className="w-14 h-14 rounded-xl object-contain bg-gray-50 border border-gray-200 p-1"
+                                  />
+                                ))}
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="flex items-center gap-2 self-end sm:self-start">
+                            <button
+                              type="button"
+                              onClick={() => deleteReviewAdmin(pId, rev.id)}
+                              className="px-3 py-1.5 rounded-xl border border-rose-200 text-rose-600 hover:bg-rose-50 text-xs font-bold transition-colors cursor-pointer flex items-center gap-1"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                              <span>O'chirish</span>
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+              </motion.div>
+            )}
+
             {/* SECTION: PRODUCTS */}
             {activeSection === 'products' && (
               <motion.div 
@@ -2024,11 +2420,40 @@ export const AdminPanel: React.FC = () => {
                             />
                             <div className="truncate">
                               <h4 className="font-bold text-gray-900 dark:text-white truncate">{p.title}</h4>
-                              <div className="text-amber-600 dark:text-amber-400 font-extrabold mt-0.5">{formatPrice(p.price, true, language)}</div>
+                              <div className="flex items-center gap-2 mt-0.5">
+                                <span className="text-amber-600 dark:text-amber-400 font-extrabold">{formatPrice(p.price, true, language)}</span>
+                                <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                                  (p.stockCount ?? 10) > 0 ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
+                                }`}>
+                                  {(p.stockCount ?? 10) > 0 ? `Qoldiq: ${p.stockCount ?? 10} dona` : 'Tugagan'}
+                                </span>
+                              </div>
                             </div>
                           </div>
 
                           <div className="flex items-center gap-1.5 shrink-0">
+                            {/* Tezkor omborxona boshqaruvi */}
+                            <div className="flex items-center gap-1 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg p-0.5 shadow-xs">
+                              <button
+                                type="button"
+                                onClick={() => updateProductStock(p.id, Math.max(0, (p.stockCount ?? 10) - 1))}
+                                className="w-5 h-5 rounded flex items-center justify-center text-gray-500 hover:bg-gray-100 dark:hover:bg-slate-700 font-bold cursor-pointer"
+                                title="Qoldiqni kamaytirish"
+                              >
+                                -
+                              </button>
+                              <span className="font-mono font-bold text-xs px-1 text-gray-800 dark:text-slate-200 min-w-5 text-center">
+                                {p.stockCount ?? 10}
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => updateProductStock(p.id, (p.stockCount ?? 10) + 1)}
+                                className="w-5 h-5 rounded flex items-center justify-center text-gray-500 hover:bg-gray-100 dark:hover:bg-slate-700 font-bold cursor-pointer"
+                                title="Qoldiqni oshirish"
+                              >
+                                +
+                              </button>
+                            </div>
                             <motion.button
                               whileHover={{ scale: 1.05 }}
                               whileTap={{ scale: 0.95 }}

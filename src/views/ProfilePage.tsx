@@ -21,7 +21,14 @@ import {
   FileText,
   Upload,
   Image as ImageIcon,
-  Trash2
+  Trash2,
+  CreditCard,
+  Share2,
+  Copy,
+  Plus,
+  CheckCircle2,
+  Building2,
+  Gift
 } from 'lucide-react';
 import { useStore } from '../store/useStore';
 import { formatPrice } from '../utils/calculator';
@@ -98,10 +105,24 @@ const compressImage = (file: File): Promise<string> => {
 
 export const ProfilePage: React.FC = () => {
   const navigate = useNavigate();
-  const { user, updateUserProfile, logoutUser, orders, deleteOrder, clearAllOrders, favorites, language, addToast } = useStore();
+  const { 
+    user, 
+    updateUserProfile, 
+    logoutUser, 
+    orders, 
+    deleteOrder, 
+    clearAllOrders, 
+    favorites, 
+    language, 
+    addToast,
+    userCards,
+    addUserCard,
+    removeUserCard,
+    toggleCardAutoDebit
+  } = useStore();
   const { t } = useTranslation();
 
-  const [activeTab, setActiveTab] = useState<'info' | 'orders' | 'security'>('info');
+  const [activeTab, setActiveTab] = useState<'info' | 'orders' | 'cards' | 'referral'>('info');
 
   // Form states
   const [fullName, setFullName] = useState(user?.fullName || '');
@@ -115,6 +136,13 @@ export const ProfilePage: React.FC = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [isMapModalOpen, setIsMapModalOpen] = useState(false);
+
+  // Karta qo'shish va referal holati
+  const [showAddCardModal, setShowAddCardModal] = useState(false);
+  const [newCardNumber, setNewCardNumber] = useState('');
+  const [newCardExpiry, setNewCardExpiry] = useState('');
+  const [newCardHolder, setNewCardHolder] = useState(user?.fullName || '');
+  const [isCopiedRef, setIsCopiedRef] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -425,6 +453,32 @@ export const ProfilePage: React.FC = () => {
             <Package className="w-4 h-4" />
             <span>{t('profileOrderHistory')} ({orders.length})</span>
           </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab('cards')}
+            className={`pb-3 px-4 text-xs font-black transition-all border-b-2 flex items-center gap-2 ${
+              activeTab === 'cards'
+                ? 'border-uzum-primary text-uzum-primary dark:border-purple-400 dark:text-purple-300'
+                : 'border-transparent text-gray-500 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white'
+            }`}
+          >
+            <CreditCard className="w-4 h-4" />
+            <span>{t('profileTabCards')} ({userCards.length})</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab('referral')}
+            className={`pb-3 px-4 text-xs font-black transition-all border-b-2 flex items-center gap-2 ${
+              activeTab === 'referral'
+                ? 'border-uzum-primary text-uzum-primary dark:border-purple-400 dark:text-purple-300'
+                : 'border-transparent text-gray-500 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white'
+            }`}
+          >
+            <Gift className="w-4 h-4" />
+            <span>{t('profileTabReferral')}</span>
+          </button>
         </div>
 
         {/* 4. TAB KONTENTI */}
@@ -710,6 +764,210 @@ export const ProfilePage: React.FC = () => {
               )}
             </motion.div>
           )}
+
+          {/* TAB 3: BANK KARTALARI VA AUTO-DEBIT */}
+          {activeTab === 'cards' && (
+            <motion.div
+              key="cards"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="space-y-6"
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-base font-bold text-gray-900">
+                    {t('profileTabCards')}
+                  </h3>
+                  <p className="text-xs text-gray-500 mt-0.5">
+                    Nasiya to'lovlarini avtomatik yechish (Auto-debit) uchun kartalarni boshqaring
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowAddCardModal(true)}
+                  className="px-4 py-2 bg-uzum-primary hover:bg-uzum-hover text-white text-xs font-bold rounded-xl shadow transition-all flex items-center gap-1.5 cursor-pointer"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>{t('profileAddCard')}</span>
+                </button>
+              </div>
+
+              {userCards.length === 0 ? (
+                <div className="bg-white rounded-3xl border border-gray-200 p-8 text-center space-y-3">
+                  <CreditCard className="w-12 h-12 text-gray-300 mx-auto" />
+                  <p className="text-sm font-bold text-gray-700">{t('profileCardsEmpty')}</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {userCards.map((c) => (
+                    <div
+                      key={c.id}
+                      className="bg-gradient-to-br from-gray-900 via-purple-950 to-indigo-950 text-white rounded-3xl p-5 shadow-lg relative overflow-hidden flex flex-col justify-between min-h-[190px]"
+                    >
+                      <div className="flex justify-between items-start">
+                        <span className="text-xs font-mono font-bold tracking-widest uppercase text-purple-300">
+                          {c.cardType.toUpperCase()}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => removeUserCard(c.id)}
+                          className="text-white/60 hover:text-rose-400 p-1 cursor-pointer transition-colors"
+                          title="Kartani o'chirish"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+
+                      <div className="my-3">
+                        <div className="text-lg font-mono tracking-widest font-black text-white">
+                          {c.cardNumber}
+                        </div>
+                        <div className="flex justify-between items-center text-[10px] text-purple-200 uppercase mt-1 font-mono">
+                          <span>{c.cardHolder}</span>
+                          <span>{c.expiryDate}</span>
+                        </div>
+                      </div>
+
+                      <div className="pt-3 border-t border-white/10 flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => toggleCardAutoDebit(c.id)}
+                            className={`w-9 h-5 rounded-full transition-colors relative cursor-pointer ${
+                              c.isAutoDebitEnabled ? 'bg-emerald-500' : 'bg-white/20'
+                            }`}
+                          >
+                            <span
+                              className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-transform ${
+                                c.isAutoDebitEnabled ? 'left-4.5' : 'left-0.5'
+                              }`}
+                            />
+                          </button>
+                          <span className="text-[11px] font-bold text-purple-200">
+                            {c.isAutoDebitEnabled ? t('profileCardAutoDebitActive') : t('profileCardAutoDebitInactive')}
+                          </span>
+                        </div>
+                        {c.balance !== undefined && (
+                          <span className="text-[11px] font-bold text-emerald-400 font-mono">
+                            {formatPrice(c.balance, true, language)}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <div className="p-4 rounded-2xl bg-purple-50 border border-purple-200 text-purple-900 text-xs flex items-start gap-3">
+                <Building2 className="w-5 h-5 text-purple-600 shrink-0 mt-0.5" />
+                <div>
+                  <strong className="block mb-0.5">Auto-debit tizimi haqida:</strong>
+                  Auto-debit yoqilgan kartalardan har oyning to'lov sanasida kerakli oylik to'lov summasi avtomatik yechiladi. Siz hech qanday jarima va kechikishlarsiz to'lovni amalga oshirasiz.
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {/* TAB 4: REFERAL VA KESHEBK DASTURI */}
+          {activeTab === 'referral' && (
+            <motion.div
+              key="referral"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="space-y-6"
+            >
+              {/* Hero Referral Banner */}
+              <div className="p-6 rounded-3xl bg-gradient-to-r from-purple-700 via-indigo-700 to-uzum-primary text-white shadow-xl space-y-4">
+                <span className="text-[10px] font-black uppercase tracking-widest bg-white/20 px-3 py-1 rounded-full">
+                  ELRIZO Referral Program
+                </span>
+                <h3 className="text-xl sm:text-2xl font-black">
+                  {t('profileReferralTitle')}
+                </h3>
+                <p className="text-xs sm:text-sm text-purple-100 max-w-xl">
+                  Shaxsiy taklif havolangizni do'stlaringizga yuboring. Ular birinchi marta nasiyaga xarid qilishganda, sizning balansingizga 50 000 so'm keshbek qo'shiladi!
+                </p>
+              </div>
+
+              {/* Referal statistikasi */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="bg-white rounded-2xl border border-gray-200 p-4 space-y-1 shadow-sm">
+                  <span className="text-xs text-gray-500 font-medium block">{t('profileReferralStatsInvited')}</span>
+                  <strong className="text-2xl font-black text-uzum-primary">4 ta do'st</strong>
+                </div>
+                <div className="bg-white rounded-2xl border border-gray-200 p-4 space-y-1 shadow-sm">
+                  <span className="text-xs text-gray-500 font-medium block">{t('profileReferralStatsEarned')}</span>
+                  <strong className="text-2xl font-black text-emerald-600">200 000 so'm</strong>
+                </div>
+                <div className="bg-white rounded-2xl border border-gray-200 p-4 space-y-1 shadow-sm">
+                  <span className="text-xs text-gray-500 font-medium block">Keshbek Balans</span>
+                  <strong className="text-2xl font-black text-amber-600">
+                    {formatPrice(user?.cashbackBalance || 200000, true, language)}
+                  </strong>
+                </div>
+              </div>
+
+              {/* Shaxsiy havola va ulashish */}
+              <div className="bg-white rounded-3xl border border-gray-200 p-6 space-y-4 shadow-sm">
+                <label className="text-xs font-bold text-gray-700 block">Sizning shaxsiy referal havolangiz:</label>
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <input
+                    type="text"
+                    readOnly
+                    value={`https://elrizonasiya.vercel.app/?ref=${user?.id?.slice(0, 8) || 'ELR-7829'}`}
+                    className="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-xs font-mono font-bold text-gray-800 outline-none select-all"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const link = `https://elrizonasiya.vercel.app/?ref=${user?.id?.slice(0, 8) || 'ELR-7829'}`;
+                      navigator.clipboard.writeText(link);
+                      setIsCopiedRef(true);
+                      addToast(t('profileReferralLinkCopied'), 'success');
+                      setTimeout(() => setIsCopiedRef(false), 3000);
+                    }}
+                    className="px-5 py-3 bg-gray-900 hover:bg-black text-white text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer shadow"
+                  >
+                    {isCopiedRef ? <CheckCircle2 className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
+                    <span>{isCopiedRef ? "Nusxalandi" : "Nusxa olish"}</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const link = `https://elrizonasiya.vercel.app/?ref=${user?.id?.slice(0, 8) || 'ELR-7829'}`;
+                      const text = encodeURIComponent("ELRIZO Nasiya Savdoda 0-0-12 halol muddatli to'lov bilan xarid qiling va bonusga ega bo'ling!");
+                      window.open(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=${text}`, '_blank');
+                    }}
+                    className="px-5 py-3 bg-blue-500 hover:bg-blue-600 text-white text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer shadow"
+                  >
+                    <Share2 className="w-4 h-4" />
+                    <span>{t('profileReferralShareTelegram')}</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Dastur qoidalari */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+                <div className="p-4 rounded-2xl bg-gray-50 border border-gray-200 space-y-1">
+                  <span className="w-6 h-6 rounded-full bg-purple-100 text-purple-700 font-black flex items-center justify-center text-xs">1</span>
+                  <strong className="block text-gray-900">Havolani ulashing</strong>
+                  <p className="text-gray-500 text-[11px]">Telegram yoki ijtimoiy tarmoqlar orqali do'stlaringizga yuboring.</p>
+                </div>
+                <div className="p-4 rounded-2xl bg-gray-50 border border-gray-200 space-y-1">
+                  <span className="w-6 h-6 rounded-full bg-purple-100 text-purple-700 font-black flex items-center justify-center text-xs">2</span>
+                  <strong className="block text-gray-900">Do'stingiz xarid qilsin</strong>
+                  <p className="text-gray-500 text-[11px]">Do'stingiz saytdan istalgan tovarni 0-0-12 nasiyaga oladi.</p>
+                </div>
+                <div className="p-4 rounded-2xl bg-gray-50 border border-gray-200 space-y-1">
+                  <span className="w-6 h-6 rounded-full bg-purple-100 text-purple-700 font-black flex items-center justify-center text-xs">3</span>
+                  <strong className="block text-gray-900">50 000 so'm oling</strong>
+                  <p className="text-gray-500 text-[11px]">Keshbek hisobingizga tushadi va keyingi xaridlaringizda chegirma bo'ladi.</p>
+                </div>
+              </div>
+            </motion.div>
+          )}
         </AnimatePresence>
 
       </div>
@@ -817,6 +1075,100 @@ export const ProfilePage: React.FC = () => {
                     </button>
                   </div>
                 )}
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Yangi bank kartasini ulash modali */}
+      <AnimatePresence>
+        {showAddCardModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="w-full max-w-md bg-white rounded-3xl p-6 border border-gray-200 shadow-2xl space-y-5"
+            >
+              <div className="flex items-center justify-between">
+                <h3 className="text-base font-black text-gray-900 flex items-center gap-2">
+                  <CreditCard className="w-5 h-5 text-uzum-primary" />
+                  <span>{t('profileAddCard')}</span>
+                </h3>
+                <button
+                  type="button"
+                  onClick={() => setShowAddCardModal(false)}
+                  className="p-1 rounded-full text-gray-400 hover:text-gray-700 cursor-pointer"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <label className="text-xs font-bold text-gray-700 block mb-1">Karta raqami (16 xonali):</label>
+                  <input
+                    type="text"
+                    maxLength={19}
+                    placeholder="8600 0000 0000 0000"
+                    value={newCardNumber}
+                    onChange={(e) => setNewCardNumber(e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm font-mono tracking-wider outline-none focus:border-uzum-primary"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-xs font-bold text-gray-700 block mb-1">Amal qilish muddati:</label>
+                    <input
+                      type="text"
+                      maxLength={5}
+                      placeholder="MM/YY"
+                      value={newCardExpiry}
+                      onChange={(e) => setNewCardExpiry(e.target.value)}
+                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm font-mono tracking-wider outline-none focus:border-uzum-primary"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-bold text-gray-700 block mb-1">Karta egasi:</label>
+                    <input
+                      type="text"
+                      placeholder="ISM FAMILYA"
+                      value={newCardHolder}
+                      onChange={(e) => setNewCardHolder(e.target.value)}
+                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm font-bold uppercase outline-none focus:border-uzum-primary"
+                    />
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (newCardNumber.length < 16) {
+                      addToast("Iltimos, to'liq 16 xonali karta raqamini kiriting", 'warning');
+                      return;
+                    }
+                    const isUzcard = newCardNumber.startsWith('8600');
+                    const cleanNum = newCardNumber.replace(/\s/g, '');
+                    const masked = `${cleanNum.slice(0, 4)} •••• •••• ${cleanNum.slice(-4)}`;
+                    addUserCard({
+                      cardNumber: masked,
+                      cardHolder: newCardHolder || (user?.fullName?.toUpperCase() || 'MIJOZ'),
+                      expiryDate: newCardExpiry || '12/28',
+                      cardType: isUzcard ? 'uzcard' : 'humo',
+                      isAutoDebitEnabled: true,
+                      isDefault: false,
+                      balance: 1500000,
+                    });
+                    setShowAddCardModal(false);
+                    setNewCardNumber('');
+                    setNewCardExpiry('');
+                  }}
+                  className="w-full py-3 bg-uzum-primary hover:bg-uzum-hover text-white font-bold text-xs rounded-xl shadow-md transition-all cursor-pointer mt-2"
+                >
+                  Kartani saqlash va ulash
+                </button>
               </div>
             </motion.div>
           </div>

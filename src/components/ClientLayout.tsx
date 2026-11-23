@@ -15,6 +15,7 @@ import { InstallmentCalculator } from './InstallmentCalculator';
 import { ProductComparisonModal } from './ProductComparisonModal';
 import { ComparisonBar } from './ComparisonBar';
 import { OrderTrackingModal } from './OrderTrackingModal';
+import { AbandonedCartModal } from './AbandonedCartModal';
 import { ScrollToTopButton } from './ScrollFeatures';
 import { TelegramFloatingButton } from './TelegramFloatingButton';
 import { useStore } from '../store/useStore';
@@ -185,6 +186,7 @@ export const ClientLayout: React.FC<ClientLayoutProps> = ({ children }) => {
           <ProductComparisonModal />
           <ComparisonBar />
           <OrderTrackingModal />
+          <AbandonedCartModal />
           <InfoModal />
 
           {/* Global Tezkor Nasiya Kalkulyatori Modali */}
