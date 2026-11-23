@@ -1960,7 +1960,7 @@ export const AdminPanel: React.FC = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                   <div className="p-4 rounded-2xl bg-white border border-gray-200 shadow-xs space-y-1">
                     <span className="text-[11px] font-bold text-gray-500 block uppercase">
-                      {t('adminDebtorsTotalExpected')}
+                      {'Kutilayotgan qarzdorlik'}
                     </span>
                     <strong className="text-xl font-black text-gray-900 font-mono">142 800 000 so'm</strong>
                     <span className="text-[10px] text-gray-400 block">Jami 124 ta faol nasiya shartnomasi</span>
