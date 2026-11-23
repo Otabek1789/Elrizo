@@ -1976,7 +1976,7 @@ export const AdminPanel: React.FC = () => {
 
                   <div className="p-4 rounded-2xl bg-white border border-gray-200 shadow-xs space-y-1">
                     <span className="text-[11px] font-bold text-rose-600 block uppercase">
-                      {t('adminDebtorsOverdue')}
+                      {'Muddati o‘tgan qarzdorlik'}
                     </span>
                     <strong className="text-xl font-black text-rose-600 font-mono">24 300 000 so'm</strong>
                     <span className="text-[10px] text-rose-700 font-bold block">
