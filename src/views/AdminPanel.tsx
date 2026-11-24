@@ -268,6 +268,7 @@ const DEMO_DEBTORS: DebtorRecord[] = [
 
 export const AdminPanel: React.FC = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { 
     user, 
     orders, 
